@@ -71,21 +71,22 @@ CONFIG=config
 EPIX_FCNS=epix_functions
 
 SRCS=triples.cc domain.cc segment.cc circle.cc lengths.cc camera.cc \
-	cropping.cc path.cc sphere.cc plane.cc output.cc Label.cc \
-	objects.cc curves.cc plots.cc dataplot.cc geometry.cc functions.cc
+	cropping.cc path.cc sphere.cc plane.cc polyhedron.cc output.cc \
+	Label.cc objects.cc curves.cc plots.cc dataplot.cc geometry.cc \
+	functions.cc
 
 OBJS=triples.o domain.o segment.o circle.o lengths.o camera.o cropping.o \
-	path.o sphere.o plane.o output.o Label.o objects.o curves.o plots.o \
-	dataplot.o geometry.o functions.o
+	path.o sphere.o plane.o polyhedron.o output.o Label.o objects.o \
+	curves.o plots.o dataplot.o geometry.o functions.o
 
 HDRS=globals.h triples.h domain.h map.h pairs.h segment.h circle.h lengths.h \
-	camera.h cropping.h path.h sphere.h plane.h output.h \
+	camera.h cropping.h path.h sphere.h plane.h polyhedron.h output.h \
 	Label.h objects.h curves.h plots.h dataplot.h geometry.h functions.h
 
 # header groups for build deps
 GLOBALS=globals.h triples.h functions.h map.h pairs.h
 OUTPUTS=camera.h cropping.h lengths.h output.h 
-OBJECTS=Label.h sphere.h segment.h circle.h plane.h objects.h
+OBJECTS=Label.h sphere.h segment.h circle.h plane.h polyhedron.h objects.h
 PATHS=domain.h path.h curves.h plots.h dataplot.h
 
 
@@ -159,6 +160,9 @@ sphere.o:	sphere.cc $(GLOBALS) $(OBJECTS) sphere.h
 plane.o:	plane.cc $(GLOBALS) $(OBJECTS) plane.h
 	$(CXX) $(CFLAGS) plane.cc
 
+polyhedron.o:	polyhedron.cc $(GLOBALS) $(OBJECTS) polyhedron.h
+	$(CXX) $(CFLAGS) polyhedron.cc
+
 output.o:	output.cc $(GLOBALS) $(OUTPUTS) output.h
 	$(CXX) -O2 $(CFLAGS) output.cc
 
@@ -214,21 +218,27 @@ install:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(FLIX) $(ELAPS) $(LAPS)
 	$(INSTALL_DATA) ${EPIX_CONFFILES} ${EPIX_CONF_PATH}
 	$(INSTALL_DATA) $(EPIX_MAN) ${mandir}/$(EPIX_MAN)
 
+	@if [ -f ${EPIX_MANUAL}.ps.gz ]; then \
 	$(INSTALL_DATA) \
 		${EPIX_MANUAL}.ps.gz \
 		${EPIX_MANUAL}.pdf.gz \
-		${EPIX_MANUAL_TAR}.gz ${EPIX_DOC_PATH}
+		${EPIX_MANUAL_TAR}.gz ${EPIX_DOC_PATH}; \
+	fi
 
+	@if [ -f ${EPIX_SAMPLES}.ps.gz ]; then \
 	$(INSTALL_DATA) \
 		${EPIX_SAMPLES}.ps.gz \
 		${EPIX_SAMPLES}.pdf.gz \
-		${EPIX_SAMPLES_TAR}.gz ${EPIX_DOC_PATH}
+		${EPIX_SAMPLES_TAR}.gz ${EPIX_DOC_PATH}; \
+	fi
 
 	$(RANLIB) ${libdir}/$(EPIX_LIB)
 	$(LINK) ${hdrdir}/$(EPIX_HDR) ${hdrdir}/epix.h
 	$(LINK) ${libdir}/$(EPIX_LIB) ${libdir}/libepix.a
 
-	$(INSTALL_DATA) ${EPIX_CONTRIB_TAR}.gz ${EPIX_DOC_PATH}
+	@if [ -f ${EPIX_CONTRIB_TAR}.gz ]; then \
+	$(INSTALL_DATA) ${EPIX_CONTRIB_TAR}.gz ${EPIX_DOC_PATH}; \
+	fi
 
 doc-clean:
 	@-$(RM) $(LAPS) doc/*.{c,dvi,log} doc/{koch,plot_?,torus}.eepic \

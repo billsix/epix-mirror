@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.2
- * Last Change: December 31, 2004
+ * Version 1.0.4
+ * Last Change: March 5, 2005
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -78,12 +78,12 @@ namespace ePiX {
   // equal-length data subdivisions. By default the total area is unity;
   // v_scale adjusts height.
   void histogram(const FILEDATA& data_columns, unsigned int column, 
-		 double low=x_min, double high=x_max, int subdivs=(int)x_size,
-		 double v_scale=1);
+		 int subdivs=(int)x_size, 
+		 double low=x_min, double high=x_max, double v_scale=1);
 
   void histogram(const char* filename, int columns, unsigned int column, 
-		 double low=x_min, double high=x_max, int subdivs=(int)x_size,
-		 double v_scale=1);
+		 int subdivs=(int)x_size, 
+		 double low=x_min, double high=x_max, double v_scale=1);
 
 } /* end of namespace */ 
 

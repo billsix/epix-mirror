@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.2
- * Last Change: December 31, 2004
+ * Version 1.0.4
+ * Last Change: March 5, 2005
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -222,7 +222,7 @@ namespace ePiX {
 
   // Histogram plot
   void histogram(const FILEDATA& data_columns, unsigned int column, 
-		 double low, double high, int subdivs, double v_scale)
+		 int subdivs, double low, double high, double v_scale)
   {
     std::vector<unsigned int> data_count(subdivs+2);
     double step=(high-low)/subdivs; // length of subintervals
@@ -270,12 +270,12 @@ namespace ePiX {
   } // end of histogram()
 
   void histogram(const char* filename, int columns, unsigned int column, 
-		 double low, double high, int subdivs, double v_scale)
+		 int subdivs, double low, double high, double v_scale)
   {
     FILEDATA data_columns(columns);
     read(filename, data_columns);
 
-    histogram(data_columns, column, low, high, subdivs, v_scale);
+    histogram(data_columns, column, subdivs, low, high, v_scale);
     end_stanza();
   }
 

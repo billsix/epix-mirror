@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 26, 2004
+ * Version 1.0.4
+ * Last Change: March 13, 2005
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -37,16 +37,22 @@
  *
  *  The plane class (point, normal),
  *  and operators:
+ *   - height function and friends
  *   - equality, parallelity test
+ *   - plane*segment (point of intersection)
  *   - plane*plane (draw line of intersection)
  *   - plane*sphere (circle of intersection)
+ *
  */
 
 #ifndef EPIX_PLANE
 #define EPIX_PLANE
 
+#include <vector>
+
 #include "globals.h"
 #include "triples.h"
+#include "functions.h"
 #include "sphere.h"
 #include "circle.h"
 
@@ -71,29 +77,62 @@ namespace ePiX {
 
       plane(P p1, P p2, P p3);
 
-      bool parallel_to (const plane& arg)
-	{ return (norm((this->N)*arg.N)<EPIX_EPSILON); }
+      P normal() const { return N; }
 
-      bool operator== (const plane& arg)
+      plane& reverse(void) 
+	{ 
+	  N *= -1;
+	  return *this;
+	}
+
+      plane& operator += (const P& arg)
+        {
+          pt += arg;
+          return *this;
+        }
+
+      // normal component of arg
+      double height(const P arg) const { return (arg-pt)|N; }
+
+      bool contains(const P arg) const
+	{ 
+	  return (fabs(height(arg)) < EPIX_EPSILON); 
+	}
+
+      bool separates(const P arg1, const P arg2) const
+	{
+	  return (height(arg1)*height(arg2) <= 0 );
+	}
+
+      bool parallel_to (const plane& arg) const
+	{ return (norm(N*arg.N)<EPIX_EPSILON); }
+
+      bool operator== (const plane& arg) const
 	{
 	  // normals parallel and arg.pt lies in *this
-	  return ( (*this).parallel_to(arg) &&
-		   (((this->pt) - arg.pt)|(this->N)) < EPIX_EPSILON);
+	  return ( parallel_to(arg) &&
+		   ((pt - arg.pt)|N) < EPIX_EPSILON);
 	}
 
       // return circle of intersection
       circle operator* (const sphere& S) const;
       // draw Line
-      void  operator* (const plane P1);
+      void  operator* (const plane P1) const;
 
       // draw lines of intersection of *this with clip box faces
-      void draw();
+      void draw() const;
 
   }; /* end of plane class */
 
   inline circle operator* (const sphere& S, const plane& P) { return P*S; }
 
   inline void draw(plane arg) { arg.draw(); }
+
+  P operator* (const plane knife, const segment seg);
+  inline P operator* (const segment seg, const plane knife)
+    {
+      return knife*seg;
+    }
 
 } /* end of namespace */
 

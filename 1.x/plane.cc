@@ -1,15 +1,15 @@
 /* 
- * sphere.cc -- ePiX::sphere class and mathematical operators
+ * plane.cc -- ePiX::plane class and mathematical operators
  *
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 26, 2004
+ * Version 1.0.4
+ * Last Change: March 13, 2005
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -35,6 +35,9 @@
 #include <iostream>
 
 #include "plane.h"
+#include "polyhedron.h"
+#include "segment.h"
+#include "path.h"
 #include "circle.h"
 #include "curves.h"
 #include "cropping.h"
@@ -57,8 +60,18 @@ namespace ePiX {
       }
   }
 
+  P operator* (const plane knife, const segment seg)
+  {
+    P tail=seg.end1(), head=seg.end2();
+    double ptail=knife.height(tail);
+    double phead=knife.height(head);
+    double t=ptail/(ptail-phead);
+
+    return tail+t*(head-tail);
+  }
+
   // draw Line of intersection between non-parallel planes
-  void plane::operator* (const plane P1)
+  void plane::operator* (const plane P1) const
   {
     const plane P2=*this;
 
@@ -81,52 +94,56 @@ namespace ePiX {
 
   // intersection
   circle plane::operator* (const sphere& S) const
-    {
-      double rad=S.radius();
-      P perp=(*this).N;
-      // signed dist from S.ctr to *this
-      double height = ((*this).pt-S.center())|perp;
+  {
+    double rad=S.radius();
+    P perp=(*this).N;
+    // signed dist from S.ctr to *this
+    double height = ((*this).pt-S.center())|perp;
 
-      if (rad<fabs(height))
+    if (rad<fabs(height))
       throw join_error(SEPARATED);
 
-      else if (rad == fabs(height))
+    else if (rad == fabs(height))
       throw join_error(TANGENT);
 
-      else
-	return circle(S.center()+height*perp,
-		      sqrt(rad*rad-height*height), perp);
-    }
-
-  void plane::draw()
-  {
-    // outward-oriented clip_box faces
-    plane face1_min = plane(P(clip1_min(),0,0), -E_1);
-    plane face1_max = plane(P(clip1_max(),0,0),  E_1);
-
-    plane face2_min = plane(P(0,clip2_min(),0), -E_2);
-    plane face2_max = plane(P(0,clip2_max(),0),  E_2);
-
-    plane face3_min = plane(P(0,0,clip3_min()), -E_3);
-    plane face3_max = plane(P(0,0,clip3_max()),  E_3);
-
-    try {
-      (*this)*face1_min;
-      (*this)*face1_max;
-    }
-    catch (join_error PARALLEL) { };
-
-    try {
-      (*this)*face2_min;
-      (*this)*face2_max;
-    }
-    catch (join_error PARALLEL) { };
-
-    try {
-      (*this)*face3_min;
-      (*this)*face3_max;
-    }
-    catch (join_error PARALLEL) { };
+    else
+      return circle(S.center()+height*perp,
+		    sqrt(rad*rad-height*height), perp);
   }
+
+  void plane::draw() const
+  {
+    // clip_box vertices
+    P vert000(clip1_min(), clip2_min(), clip3_min());
+    P vert100(clip1_max(), clip2_min(), clip3_min());
+    P vert010(clip1_min(), clip2_max(), clip3_min());
+    P vert110(clip1_max(), clip2_max(), clip3_min());
+
+    P vert001(clip1_min(), clip2_min(), clip3_max());
+    P vert101(clip1_max(), clip2_min(), clip3_max());
+    P vert011(clip1_min(), clip2_max(), clip3_max());
+    P vert111(clip1_max(), clip2_max(), clip3_max());
+
+    segment edge00=join(vert000, vert001);
+    segment edge01=join(vert001, vert011);
+    segment edge02=join(vert011, vert010);
+    segment edge03=join(vert010, vert000);
+
+    segment edge04=join(vert000, vert100);
+    segment edge05=join(vert001, vert101);
+    segment edge06=join(vert011, vert111);
+    segment edge07=join(vert010, vert110);
+
+    segment edge08=join(vert100, vert101);
+    segment edge09=join(vert101, vert111);
+    segment edge10=join(vert111, vert110);
+    segment edge11=join(vert110, vert100);
+
+    // and edges
+    one_skel walls(12, &edge00, &edge01, &edge02, &edge03, &edge04, &edge05,
+		   &edge06, &edge07, &edge08, &edge09, &edge10, &edge11);
+
+    walls.section(*this);
+  } // end of plane::draw()
 
 } /* end of namespace */

@@ -2,6 +2,26 @@ ePiX -- CHANGELOG
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
+March 11-13, 2005 (v1.0.4)
+ * (New files: polyhedron.{cc,h}) Manipulate, draw convex 1-skeleta
+ * (plane.h) Functions to extract normal, determine separation of points
+ * (plane.cc) draw() reimplemented to draw a (shadable) closed path
+ * (make_header) Remove multiple inclusion #defines
+ * (helpfiles.sh) Check for existing documentation before building
+
+March 5, 2005
+ * (dataplot.*) Change argument order in histogram()
+
+February 27, 2005
+ * (make_elaps, make_laps) -n|--no-config option (ignore ~/.dvipsrc)
+
+February 11, 2005
+ * (make_elaps) /tmp cleanup bug (directory wasn't removed)
+
+January 14, 2005
+ * (make_laps) Option compatibility
+  - "--pdf" works with "--tex", interacts politely with "--pdf(la)tex"
+
 January 02-12, 2005 (v1.0.3)
  * (New file: config) Configurable parts of the old Makefile
   - Install paths conform to the Filesystem Hierarchy Standard

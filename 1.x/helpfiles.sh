@@ -102,35 +102,51 @@ case "$1" in
 
     --doc)
 
-        makedocs $MANUAL_SRC_DIR manual xp $MANUAL_SRC $EPIX_MANUAL
+        if [ -f $EPIX_MANUAL.pdf.gz ]; then
+	    exit 0;
 
-        tar -cf ${EPIX_MANUAL}_src.tar \
-            $MANUAL_SRC_DIR/$MANUAL_SRC.{aux,idx,ind,tex,toc} \
-            $MANUAL_SRC_DIR/*.{xp,eepic}
-        gzip -9 ${EPIX_MANUAL}*
+	else 
+	    makedocs $MANUAL_SRC_DIR manual xp $MANUAL_SRC $EPIX_MANUAL
+
+	    tar -cf ${EPIX_MANUAL}_src.tar \
+		$MANUAL_SRC_DIR/$MANUAL_SRC.{aux,idx,ind,tex,toc} \
+		$MANUAL_SRC_DIR/*.{xp,eepic}
+	    gzip -9 ${EPIX_MANUAL}*
+
+	fi
         ;;
 
 
     --contrib-doc)
 
-        echo -n "Compiling contrib figures..."
-        cd $CONTRIB_SRC_DIR && makefigs cc && cd $EPIX_SRC_DIR
-        echo "done"
+        if [ -f ${EPIX_CONTRIB}_src.tar.gz ]; then
+	    exit 0;
 
-        tar -cf ${EPIX_CONTRIB}_src.tar \
-            $CONTRIB_SRC_DIR/$CONTRIB_SRC.{aux,tex,toc} \
-            $CONTRIB_SRC_DIR/*.{cc,eepic}
-        gzip -9 ${EPIX_CONTRIB}_src.tar
+	else 
+	    echo -n "Compiling contrib figures..."
+	    cd $CONTRIB_SRC_DIR && makefigs cc && cd $EPIX_SRC_DIR
+	    echo "done"
+
+	    tar -cf ${EPIX_CONTRIB}_src.tar \
+		$CONTRIB_SRC_DIR/$CONTRIB_SRC.{aux,tex,toc} \
+		$CONTRIB_SRC_DIR/*.{cc,eepic}
+	    gzip -9 ${EPIX_CONTRIB}_src.tar
+	fi
         ;;
 
 
     --samples)
 
-        makedocs $SAMPLE_SRC_DIR samples xp $SAMPLE_SRC $EPIX_SAMPLE
+        if [ -f $EPIX_SAMPLE_src.tar.gz ]; then
+	    exit 0;
 
-        tar -cf ${EPIX_SAMPLE}_src.tar \
-            $SAMPLE_SRC_DIR/{$SAMPLE_SRC.*,*.xp,template,extras}
-        gzip -9 ${EPIX_SAMPLE}*
+	else 
+	    makedocs $SAMPLE_SRC_DIR samples xp $SAMPLE_SRC $EPIX_SAMPLE
+
+	    tar -cf ${EPIX_SAMPLE}_src.tar \
+		$SAMPLE_SRC_DIR/{$SAMPLE_SRC.*,*.xp,extras}
+	    gzip -9 ${EPIX_SAMPLE}*
+	fi
         ;;
 
 

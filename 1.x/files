@@ -57,6 +57,8 @@ path.h
 path.cc
 plane.cc
 plane.h
+polyhedron.cc
+polyhedron.h
 plots.cc
 plots.h
 post-uninst.sh
