@@ -4,7 +4,7 @@
 #
 # Andrew D. Hwang <"elaps -v" for email>
 #
-# January 04, 2005
+# February 27, 2005
 #
 
 ## Don't modify anything below unless you know what you're doing :) ##
@@ -99,6 +99,9 @@ cat <<"HELP" >&1
     -o|--output
       Specify output file (ONLY for use with a single input file)
 
+    -n, --no-config
+      Ignore $(HOME)/.dvipsrc
+
     --size
       Set default font size: 10, 11, or 12 (default)
 
@@ -156,6 +159,11 @@ function elaps_process_files ()
             fi && 
             exit 0
 	    ;;
+
+        -n|--no-config) # do not use ~/.dvipsrc
+            export DVIPSRC=/dev/null
+            shift;
+            ;;
 
         -P*)
             DVIPS_OPTS="$1 $DVIPS_OPTS";
@@ -333,8 +341,6 @@ function elaps_process_files ()
 
     done # for ELAPS_INFILE in $INFILE_LIST
 
-# clean up
-# rm -Rf $ELAPS_TEMPDIR
 } # elaps_process_files()
 
 ## Script proper starts here ##
@@ -348,6 +354,8 @@ else
 
 fi
 
+# clean up
+rm -Rf $ELAPS_TEMPDIR
 EOF
 
 chmod 700 $ELAPS_WRAPPER

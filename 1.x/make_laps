@@ -4,7 +4,7 @@
 #
 # Andrew D. Hwang <"laps -v" for email>
 #
-# January 04, 2005
+# February 27, 2005
 #
 
 ## Don't modify anything below unless you know what you're doing :) ##
@@ -82,6 +82,11 @@ while [ "$1" != "${1#"-"}" ]; do
             exit 0
 	    ;;
 
+        -n|--no-config) # do not use ~/.dvipsrc
+            export DVIPSRC=/dev/null
+            shift;
+            ;;
+
         -ps|--ps)
             LAPS_PREFIX="psla";
             shift;
@@ -89,17 +94,19 @@ while [ "$1" != "${1#"-"}" ]; do
 
         --pdftex)
             LAPS_PREFIX="pdf";
+            LAPS_PDF="";
             shift;
             ;;
 
         --pdflatex)
             LAPS_PREFIX="pdfla";
+            LAPS_PDF="";
             shift;
             ;;
 
         -pdf|--pdf)
-            LAPS_PREFIX="la";
-            LAPS_PDF="yes"
+            LAPS_PREFIX=${LAPS_PREFIX##"pdf"};
+            LAPS_PDF="yes";
             shift;
             ;;
 
@@ -151,6 +158,9 @@ cat <<"HELP" >&1
     -P<printer>
       dvips printer options, e.g. "-Pamz", may be given on the command 
       line. They are also read from ~/.dvipsrc if this file exists.
+
+    -n, --no-config
+      Ignore $(HOME)/.dvipsrc
 
     -t, --tex
       Use tex instead of latex
