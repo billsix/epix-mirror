@@ -2,7 +2,13 @@ ePiX -- CHANGELOG
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
-September 04, 2004 (v1.0.0)
+September 11, 2004 (v1.0.0)
+ * (helpfiles.sh) Install tutorial/manual as pdf (and ps)
+ * (README-authors) File removed
+ * (README, README-changes, epix.spec) Miscellaneous changes
+ * (bash_completions) Typo fixed
+
+September 04, 2004 (v1.0.0pre)
  * (lengths.*) Handle bp (big points) and sp (scaled points)
  * (sphere.cc) 
   - "Omitted endpoint" bug for closed paths

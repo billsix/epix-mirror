@@ -1,13 +1,14 @@
 ePiX -- README-changes
 
-August 26, 2004
+September 11, 2004
 
 Further development will focus on epix-2.x (The Next Generation), so
 epix-1.x (formerly Version 0.8.11) syntax is essentially finalized.
 Fairly substantial extensions were introduced after Version 0.8.10, so
 it may be difficult to make older files compile. Thus, the information
-below may not be up-to-date. Please see the archive section of the web
-site or contact the author if you need an old version of ePiX.
+below may not be up-to-date. Please see the archive section of the CVS
+site (at savannah) or contact the author if you need an old version of
+ePiX.
 
 
 Last Change: April 15, 2003

@@ -4,5 +4,5 @@
 #
 complete -f -X '!*.@(xp|flx|cc|c|C|cpp)' epix
 complete -f -X '!*.@(tex|dtx|ltx)' laps
-complete -f -X '!*.@(xp|flxcc|c|C|cpp|eepic)' elaps
-complete -f -X '!*.@(flx|xp|cc|c|C|cpp|eepic)' flix
+complete -f -X '!*.@(xp|flx|cc|c|C|cpp|eepic)' elaps
+complete -f -X '!*.@(flx|cc|c|C|cpp)' flix

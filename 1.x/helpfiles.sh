@@ -9,7 +9,7 @@
 #
 # Andrew D. Hwang, <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 #
-# August 12, 2004  
+# September 11, 2004
 #
 
 PROG=$(basename $0)
@@ -30,7 +30,7 @@ EPIX_SAMPDIR=${EPIX_EPIXDIR}/samples
 EPIX_TTRLDIR=${EPIX_EPIXDIR}/tutorial
 
 EPIX_CONFFILES="bash_completions epix.el epix.spec update_figs.sh"
-EPIX_NOTEFILES="BUGS CHANGELOG COPYING INSTALL POST-INSTALL README README-authors README-changes THANKS TODO"
+EPIX_NOTEFILES="BUGS CHANGELOG COPYING INSTALL POST-INSTALL README README-changes THANKS TODO"
 
 EPIX_DOCDIR=doc
 EPIX_VERSION=epix-$(cat VERSION)
@@ -93,11 +93,13 @@ case "$1" in
 
 	### Tutorial ###
 	if [ "$EPIX_DOCDIR" != "" ]; then # we're "complete"
-	    cd $EPIX_DOCDIR && makefigs && ../laps -Pamz -Pcmz tutorial.tex
+	    cd $EPIX_DOCDIR && makefigs && 
+	    ../laps -Pamz -Pcmz tutorial.tex && ps2pdf tutorial.ps
 	    # Put tutorial in $INSTALL_DIR/share/epix/tutorial
-	    $INSTALL tutorial.ps $EPIX_TTRLDIR/${EPIX_VERSION}_howto.ps
+	    $INSTALL tutorial.ps  $EPIX_TTRLDIR/${EPIX_VERSION}_howto.ps
+	    $INSTALL tutorial.pdf $EPIX_TTRLDIR/${EPIX_VERSION}_howto.pdf
 
-	    rm tutorial.{dvi,log,ps}
+	    rm tutorial.{dvi,log,ps,pdf}
 
 	    # Tutorial source files
 	    $INSTALL tutorial.{aux,idx,ind,tex,toc} *.{xp,eepic} $EPIX_TTRLDIR

@@ -1,20 +1,21 @@
 Name:      epix
 Version:   1.0.0
 Release:   1
-Summary:   Utility for generating figures for LaTeX.
+Summary:   Utility for generating LaTeX figures.
 License:   GPL
 URL:       http://math.holycross.edu/~ahwang/current/ePiX.html
 Group:     Applications/Engineering
 Prefix:    %{_prefix}
 BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
-Source:    http://math.holycross.edu/~ahwang/software/epix_complete.tar.gz
+Source:    http://math.holycross.edu/~ahwang/epix/epix_complete.tar.gz
 
 %description
-ePiX (pronounced like "epic" with a soft "k", as in "TeX") is a lightweight
-command-based utility for generating camera quality, mathematically accurate
-line figures for LaTeX from user-friendly source files.  The utility
-consists of a library written in C++ and some shell scripts; GNU bash and a
-C++ compiler are *required* for ordinary use.
+ePiX, a collection of batch-oriented utilities for *nix, creates
+mathematically accurate line figures, plots, and movies using
+easy-to-learn syntax. LaTeX and dvips comprise the typographical
+rendering engine, while ImageMagick is used to create bitmapped
+images and animations. GNU bash and a C++ compiler are required
+for ordinary use.
  
 %prep
 %setup -n %{name}-%{version}_complete
@@ -34,7 +35,7 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
-%doc BUGS CHANGELOG COPYING POST-INSTALL README README-authors README-changes
+%doc BUGS CHANGELOG COPYING POST-INSTALL README README-changes
 %doc THANKS VERSION contrib/doc/ doc/ samples/
 %{_bindir}/*
 %{_prefix}/man/man1/*
