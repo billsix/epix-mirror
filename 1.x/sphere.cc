@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 27, 2004
+ * Version 1.0.0
+ * Last Change: September 04, 2004
  */
 
 /* 
@@ -33,6 +33,9 @@
  */
 
 #include <iostream>
+#include <list>
+#include <string>
+#include <sstream>
 
 #include "globals.h"
 #include "triples.h"
@@ -51,6 +54,8 @@ namespace ePiX {
 
   // defined in output.cc
   void dash_seg(const P& arg0, const P& arg1, const P& arg2);
+  void dash_start(const P& arg1, const P& arg2);
+  void print(std::ostringstream& s, const P location);
 
   // intersection
   circle operator * (const sphere& sph1, const sphere& sph2)
@@ -114,11 +119,10 @@ namespace ePiX {
 	    temp.draw();
 	  }
       }
-  }
+  } // end of sphere::draw()
 
 
   // Visibility test for plotting on unit sphere; assumes arg is on S
-
   bool visible_on_sphere(const P& arg, bool front, const sphere& S)
   {
     bool visible = false;
@@ -131,8 +135,12 @@ namespace ePiX {
     return visible;
   }
 
+  // Closely adapted from path::draw() in output.cc
   void path::draw(sphere S, bool front)
   {
+    if (closed)
+      vertices.push_back(vertices.at(0));
+
     if (epix::cropping)
       this->crop_to(crop_mask::Crop_Box);
 
@@ -142,87 +150,182 @@ namespace ePiX {
     vertex prev, curr, next;
     bool prev_visible, curr_visible, next_visible;
 
+    bool started = false; // in "draw" mode when we examined curr?
+    epix_path_style STYLE = epix::path_style();
+
+    std::list<path_pt> segments;
+
+    // cull vertices, mark as start/end of path segments
     for (unsigned int i=0; i < vertices.size(); ++i)
       {
+	// get prev, curr, next
 	curr = vertices.at(i);
 	curr_visible = (curr.is_onscreen() && curr.is_in_world() &&
 			visible_on_sphere(curr.here(), front, S));
 
-	switch (epix::path_style()) {
-	case SOLID:
+	if (0 < i)
+	  {
+	    prev = vertices.at(i-1);
+	    prev_visible = (prev.is_onscreen() && prev.is_in_world());
+	  }
+	else 
+	  {
+	    prev = curr;
+	    prev_visible = false;
+	  }
 
-	  if (i < vertices.size()-1)
-	    {
-	      next = vertices.at(i+1);
-	      next_visible = (next.is_onscreen() && next.is_in_world() &&
-			      visible_on_sphere(next.here(), front, S));
-	    }
-	  else
+	if (i < vertices.size()-1)
+	  {
+	    next = vertices.at(i+1);
+	    next_visible = (next.is_onscreen() && next.is_in_world() &&
+			    visible_on_sphere(next.here(), front, S));
+	  }
+	else
+	  {
+	    next = curr;
 	    next_visible = false;
+	  }
 
-	  if (curr_visible)
-	    {
-	      if (next_visible)
-		{
-		  if (i == 0)
-		    start_path();
-		  print(curr.here());
-		}
-	      else // finish path
-		{
-		  print(curr.here());
-		  print(midpoint(curr.here(), next.here()));
-		}
-	    }
+	// four cases: "started" is (un)set and curr is (in)visible
+	if (curr_visible)
+	  {
+	    if (started)
+	      {
+		if (i < vertices.size() - 1)
+		  segments.push_back(path_pt(curr, false, false));
+		else
+		  segments.push_back(path_pt(curr, false, true));
+	      }
+	    else // start path segment
+	      {
+		// loss of accuracy; don't seek edge of sphere
+		segments.push_back(path_pt(prev.here(), true, false));
+		if (curr.here() != prev.here())
+		  segments.push_back(path_pt(curr, false, false));
+		started = true;
+	      }
+	  } // end of curr_visible; started = true in all cases
 
-	  else // !curr_visible
-	    {
-	      if (next_visible)
-		{
-		  start_path();
-		  print(midpoint(curr.here(), next.here()));
-		}
-	      // else !next_visible, do nothing
-	    }
-	  break; // end of case(SOLID)
+	else
+	  {
+	    if (started) // end path
+	      {
+		// loss of accuracy; don't seek edge of sphere
+		segments.push_back(path_pt(curr.here(), false, true));
+		started = false;
+	      }
+	  } // if !started, do nothing
 
-	case DOTTED:
-	  curr = vertices.at(i);
-	  if (curr_visible)
+      } // end of for loop to cull vertices
+
+    std::list<path_pt>::iterator p = ++segments.begin();
+    std::list<path_pt>::iterator q, q2;
+
+    if (p == segments.end())
+      return; // empty path
+
+    if (this->filled) // remove start/end flags except global first/last
+      while (p++ != segments.end())
+	p->unset();
+
+    // Write fill \special if necessary; pstricks handles its own filling
+    if (this->filled && SOLID == STYLE && !epix::using_pstricks)
+      cout << "\n\\special{sh " << epix::get_gray() << "}%";
+
+    // print path
+    switch (STYLE) 
+      {
+      case DOTTED:
+
+	for (p = segments.begin(); p != segments.end(); ++p)
+	  {
 	    newl();
-	    box(curr.here());
+	    box((p->here()));
+	  }
+	break;
 
-	  break;
 
-	case DASHED:
-	  if (curr_visible)
+      case DASHED:
+
+	for (p = segments.begin(); p != segments.end(); ++p)
+	  {
+	    q = q2 = p;
 	    {
-	      if (0 < i)
+	      if (p->is_start())
 		{
-		  prev = vertices.at(i-1);
-		  prev_visible = (prev.is_onscreen() && prev.is_in_world() &&
-				  visible_on_sphere(prev.here(), front, S));
+		  dash_start(q2->here(), (++q)->here());
 		}
-	      else // first point
-		prev = curr;
-
-	      if (i < vertices.size() - 1)
+	      else if (p->is_end())
 		{
-		  next = vertices.at(i+1);
-		  next_visible = (next.is_onscreen() && next.is_in_world() &&
-				  visible_on_sphere(next.here(), front, S));
+		  dash_start(q2->here(), (--q)->here());
 		}
-	      else // last point
-		next = curr;
-
-	      dash_seg(prev.here(), curr.here(), next.here());
+	      else
+		{
+		  dash_seg((--q2)->here(), p->here(), (++q)->here());
+		}
 	    }
-	  break;
-	} // end of switch(PATH_STYLE)
-      } // end of for loop
+	  }
+	break;
 
-    end_stanza();
-  } // end of path::draw(sphere, bool)
+      case SOLID: // fall through
+      default:
+
+	std::ostringstream outbuf;
+
+	int temp_size;            // number of characters in current point
+	int pt_count=0;           // points printed so far in path segment
+	int curr_line_count=0;    // characters so far in this line
+
+	for (p = segments.begin(); p != segments.end(); ++p)
+	  {
+	    std::ostringstream temp;         // empty buffer for point
+	    print (temp, p->here());         // examine point
+	    temp_size = temp.str().length(); // get length as a string
+	    
+	    if (p->is_start())
+	      {
+		outbuf << start_path_string();
+		print (outbuf, p->here());
+		curr_line_count=5+temp_size; // off by 2 if using_pstricks
+	      }
+
+	    else
+	      {
+		// reached maximum line length?
+		if ((curr_line_count >= EPIX_FILE_WIDTH) || 
+		    (curr_line_count + temp_size > EPIX_FILE_WIDTH + 5))
+		  {
+		    outbuf << "\n  ";
+		    curr_line_count = 2; // reset number of characters
+		  }
+
+		outbuf << temp.str(); // "routine" outcome
+		++pt_count;
+		curr_line_count += temp_size;
+
+		// break path segment to avoid TeX memory overflow?
+		if (0 == (pt_count%EPIX_PATH_LENGTH) && (pt_count > 0)
+		    && !(this->filled)) // don't break filled paths
+		  {
+		    outbuf << start_path_string() << temp.str();
+		    pt_count = 1;      // reset count and number of characters
+		    curr_line_count = 5 + temp_size; 
+		  }
+	      } // not start of path
+
+	    if (p->is_end())
+	      {
+		outbuf << end_path_string();
+	      }
+
+	  } // end of for loop; outbuf contains formatted output
+	std::cout << outbuf.str();
+
+	break;
+
+      } // end of switch(STYLE)
+
+  } // end of path::draw(sphere S, bool front)
 
 
   // point constructor in geographic coords on specified sphere/frame
@@ -246,8 +349,8 @@ namespace ePiX {
   void draw_latitude(double lat, double lngtd_min, double lngtd_max,
 		     bool hidden, sphere S, frame coords)
   {
-    P center = S.center() + (ePiX::sin(lat)*coords.eye());
-    double radius = S.radius()*ePiX::cos(lat);
+    P center = S.center() + (Sin(lat)*coords.eye());
+    double radius = S.radius()*Cos(lat);
 
     path temp(center, radius*coords.sea(), radius*coords.sky(),
 		   lngtd_min, lngtd_max);
@@ -265,8 +368,7 @@ namespace ePiX {
     double radius = S.radius();
 
     path temp(center, 
-		   radius*(ePiX::cos(lngtd)*coords.sea() +
-			   ePiX::sin(lngtd)*coords.sky() ),
+		   radius*(Cos(lngtd)*coords.sea()+Sin(lngtd)*coords.sky() ),
 		   radius*coords.eye(), lat_min, lat_max);
 
     temp.draw(S, hidden);

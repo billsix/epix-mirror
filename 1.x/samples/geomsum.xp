@@ -5,15 +5,16 @@ using namespace ePiX;
 
 const int N=8;
 
-main() 
+int main() 
 {
   unitlength("1.5pt");
   bounding_box(P(0,0), P(1,1));
-  picture(P(128,128));
-  offset(P(96,0));
-  use_pstricks();
+  picture(128,128);
+  offset(96,0);
 
-  begin();   
+  use_pstricks();
+  begin();
+
   psset("fillcolor=lightgray, linecolor=white");
   rect(P(0,0), P(1,1));
   label(P(1.0/4,   1.0/2), "$\\frac{1}{2}$");

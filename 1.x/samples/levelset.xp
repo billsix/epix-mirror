@@ -16,12 +16,12 @@ double f(double x, double y)
   return 0.5*k*(x*x-y*y); 
 }
 
-main()
+int main()
 {
   bounding_box(P(-MAX,-MAX), P(MAX, MAX));
   unitlength("0.5in");
-  picture(P(4,4));
-  //  offset(P(4,0));
+  picture(4,4);
+  //  offset(4,0);
 
   begin();
 

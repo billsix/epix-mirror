@@ -5,11 +5,12 @@ using namespace ePiX;
 // the function to be plotted
 double f(double x) { return x*x; }
 
-main() {
+int main() 
+{
   bounding_box(P(-2,0),P(2,4));
   unitlength("1in");
-  picture(P(3,3));
-  offset(P(1.5,-1));
+  picture(3,3);
+  offset(1.5,-1);
 
   begin();
 

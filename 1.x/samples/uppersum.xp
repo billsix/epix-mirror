@@ -4,27 +4,27 @@
 using namespace ePiX;
 
 const int N=12; // Number of rectangles
-inline double f(double t) { return ePiX::sin(t); } // gather references to integrand
+double f(double t) { return Sin(t); } // gather references to integrand
 
-main() 
+int main() 
 {
   bounding_box(P(0,0), P(3,1));
   unitlength("1in");
-  picture(P(3, 1));
-  offset(P(1,-1.5));
+  picture(3, 1);
+  offset(1,-1.5);
 
   begin();
 
   double dx = x_size/N;
-  gray(0.1);
+  gray(0.1); // (un)set filling in loop
 
   for(int i=0; i < N; ++i)
     {
       double ai=x_min + i*dx;
       double bi=x_min + (i+1)*dx;
 
-      swatch(P(ai, 0), P(bi, inf(f, ai, bi))); // shaded rectangle
-      rect(P(ai, 0), P(bi, sup(f, ai, bi)));
+      fill();       rect(P(ai, 0), P(bi, inf(f, ai, bi)));
+      fill(false);  rect(P(ai, 0), P(bi, sup(f, ai, bi)));
     }
 
   h_axis(x_size);

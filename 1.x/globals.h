@@ -195,7 +195,7 @@ namespace ePiX {
 
 
   // <pic_unit> is one of the following valid LaTeX length units: 
-  //   cm, in, mm, pc, or pt.
+  // bp, cm, in, mm, pc, pt (default), or sp.
   // <pic_size> is a double that (with pic_unit) specifies unitlength
   extern double pic_size; // e.g., 1
   extern char *pic_unit;  // e.g., "pt" 

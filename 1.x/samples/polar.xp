@@ -5,15 +5,15 @@ using namespace ePiX;
 
 double f(double t) 
 { 
-  return 2*ePiX::cos(3*t); 
+  return 2*Cos(3*t); 
 }
 
-main() {
-
+int main() 
+{
   unitlength("1pt");
   bounding_box(P(-2,-2), P(2,2));
-  picture(P(180, 180));
-  offset(P(100,-40));
+  picture(180, 180);
+  offset(100,-40);
 
   begin();
   degrees();
@@ -27,7 +27,7 @@ main() {
   v_axis_labels(P(x_min,y_min), P(x_min,y_max), y_size, P(-4,0), l);
 
   bold();
-  polarplot(f, 0, 180, 120);
+  polarplot(f, 0, 180, 120); // plot over [0, 180] using 120 intervals
 
   end();
 }

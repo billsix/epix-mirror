@@ -5,10 +5,10 @@ using namespace ePiX;
 
 const int koch_seed[] = {6, 4, 0, 1, -1, 0};
 
-main() 
+int main() 
 {
   bounding_box(P(-1,-1), P(1, 1));
-  picture(P(2,2));
+  picture(2,2);
   unitlength("1in");
 
   degrees();

@@ -40,10 +40,11 @@ P potential(double x, double y)
 
 const double MAX=3;
 
-main() {
+int main() 
+{
   bounding_box(P(-MAX,-MAX),P(MAX,MAX));
   unitlength("1in");
-  picture(P(4,4));
+  picture(4,4);
   use_pstricks();
 
   begin();

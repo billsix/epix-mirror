@@ -3,14 +3,14 @@
 #include "epix.h"
 using namespace ePiX;
 
-P f(double t) { return P(ePiX::sin(3*M_PI*t+0.5), ePiX::sin(4*M_PI*t+0.5)); }
+P f(double t) { return P(Sin(3*M_PI*t+0.5), Sin(4*M_PI*t+0.5)); }
 
-main() {
-
+int main()
+{
   bounding_box(P(-1,-1), P(1,1));
-  picture(P(2, 2));
+  picture(2, 2);
   unitlength("1in");
-  //  offset(P(150,-180));
+  //  offset(150,-180);
 
   begin();
   grid(2,2);

@@ -6,15 +6,15 @@ using namespace ePiX;
 double MAX=2*M_PI;
 double f(double t)
 {
-  return t*ePiX::sin(t);
+  return t*Sin(t);
 }
 
-main() {
-
+int main() 
+{
   unitlength("1pt");
-  picture(P(240, 120));
+  picture(240, 120);
   bounding_box(P(-MAX,-MAX), P(MAX,MAX));
-  offset(P(80, 0));
+  offset(80, 0);
 
   begin();
 
@@ -31,11 +31,10 @@ main() {
   bold();
   plot(f, x_min, x_max, 90);
   green();
-  plot(D(f), x_min, x_max, 90);
+  plot(D(f), x_min, x_max, 90);    // derivative class "D"
 
-  /* Definite integral from x=0 */
   blue();
-  plot(I(f, 0), x_min, x_max, 90);
+  plot(I(f, 0), x_min, x_max, 90); // definite integral from x=0
 
   end();
 }

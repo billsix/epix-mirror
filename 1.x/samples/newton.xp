@@ -5,14 +5,14 @@ using namespace ePiX;
 double f(double t) { return t*t*t-3*t+1; }
 double df(double t) { return 3*t*t - 3; }
 
-main() {
+int main() 
+{
   bounding_box(P(1.5,0),P(2,3));
   unitlength("1in");
-  picture(P(2.5,2.5));
-  offset(P(1.5,-0.25));
+  picture(2.5,2.5);
+  offset(1.5,-0.25);
 
   begin();
-
   h_axis(2);
 
   double x0 = 2;

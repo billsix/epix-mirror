@@ -3,21 +3,21 @@
 #include "epix.h"
 using namespace ePiX;
 
-main() 
+int main() 
 {
   bounding_box(P(-5, -5), P(5,5));
-  picture(P(160, 160));
+  picture(160, 160);
   unitlength("0.35mm");
-  offset(P(100,-25));
-  use_pstricks();
+  offset(100,-25);
 
+  use_pstricks();
   begin();  degrees();
   double theta=60;
   double rad=0.25, Rad=4.5; // arc radii
   double ht=1.0/16;         // half-width of slit
 
-  const double theta1 = ePiX::asin(ht/rad);
-  const double theta2 = ePiX::asin(ht/Rad);
+  // "start" angles of arcs
+  double theta1 = Asin(ht/rad), theta2 = Asin(ht/Rad);
 
   // build keyhole in pieces; += concatenates, -= reverses orientation
   path contour(P(0,0), Rad*E_1, Rad*E_2, theta2, 360-theta2);    // outer arc

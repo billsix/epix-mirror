@@ -1,34 +1,100 @@
 \begin{theindex}
 
-  \item Angular mode, \hyperpage{15}
-  \item Animation, \hyperpage{55}
+  \item Angular mode, \hyperpage{15}, \hyperpage{34}, \hyperpage{42}
+  \item Animation, \hyperpage{5}, \hyperpage{56}
+  \item Arrow, \hyperpage{16}, \emph{26--27}, \hyperpage{46}
+  \item Aspect Ratio, \hyperpage{13--14}, \hyperpage{20}
+  \item Axes, \hyperpage{27--28}
 
   \indexspace
 
-  \item Camera, \hyperpage{17--18}, \hyperpage{38--39}
-  \item Color, \hyperpage{41--42}
+  \item Bounding Box, \hyperpage{13--14}, \hyperpage{17}, 
+		\hyperpage{27}, \hyperpage{40}
 
   \indexspace
 
-  \item Free software, \hyperpage{4}, \hyperpage{65--66}
-  \item Functions, \hyperpage{32--35}
+  \item Camera, \hyperpage{17--18}, \emph{39--40}, \hyperpage{61}
+    \subitem lens, \hyperpage{39}
+    \subitem manipulation, \hyperpage{17}, \hyperpage{40}
+  \item Clipping, \hyperpage{40--41}
+  \item Color, \hyperpage{19--20}, \hyperpage{42--43}
+    \subitem shading, \hyperpage{43}
+  \item Cropping, \hyperpage{40--41}
 
   \indexspace
 
-  \item Installation, \hyperpage{6--7}, \hyperpage{56--58}
+  \item Domain, \emph{50--52}
+    \subitem coarse mesh, \hyperpage{50--51}
+    \subitem fine mesh, \hyperpage{50--51}
+    \subitem resizing, \hyperpage{51}
+    \subitem slicing, \hyperpage{51}
 
   \indexspace
 
-  \item Line styles, \hyperpage{19}
+  \item Filling, \hyperpage{18}, \hyperpage{20}, \hyperpage{27}, 
+		\hyperpage{42}, \hyperpage{45}
+    \subitem color, \hyperpage{43}, \hyperpage{45}
+  \item Free software, \hyperpage{4}, \hyperpage{67--68}
+  \item Functions, \hyperpage{32--36}
 
   \indexspace
 
-  \item MacOS X, \hyperpage{57}
-  \item Marker types, \hyperpage{20--21}
+  \item Graph paper, \hyperpage{28}
+  \item Graphical interface, \hyperpage{9}
 
   \indexspace
 
-  \item Plotting, \hyperpage{49--55}
-  \item PSTricks, \hyperpage{42}
+  \item Hidden object removal, \hyperpage{61--63}
+
+  \indexspace
+
+  \item Installation, \hyperpage{5--7}, \hyperpage{57--59}
+
+  \indexspace
+
+  \item Labels, \emph{20--22}, \hyperpage{38}
+    \subitem alignment, \hyperpage{21--22}
+    \subitem axis, \hyperpage{27}
+    \subitem offset, \hyperpage{21}
+    \subitem rotated, \hyperpage{42}
+  \item Linear regression, \hyperpage{29}
+
+  \indexspace
+
+  \item Mac OS X, \hyperpage{5}, \hyperpage{58}
+  \item Marker types, \emph{20--21}, \hyperpage{29}
+
+  \indexspace
+
+  \item Offset
+    \subitem figure, \hyperpage{13}
+    \subitem label, \hyperpage{21--22}, \hyperpage{27}
+
+  \indexspace
+
+  \item Path, \hyperpage{20}, \emph{43--46}
+    \subitem fractal, \hyperpage{54}
+    \subitem in PSTricks, \hyperpage{43}
+    \subitem on sphere, \hyperpage{55}
+    \subitem style, \hyperpage{18--19}, \hyperpage{41}
+    \subitem width, \hyperpage{18}, \hyperpage{41}
+  \item Plotting, \hyperpage{28--30}, \emph{50--52}
+    \subitem calculus, \hyperpage{53--54}
+    \subitem data, \hyperpage{28--30}
+    \subitem polar, \hyperpage{28}
+    \subitem spherical, \hyperpage{55--56}
+    \subitem surface, \hyperpage{61--63}
+    \subitem vector fields, \hyperpage{53--54}
+    \subitem wiremesh, \hyperpage{51}
+  \item PSTricks, \hyperpage{19}, \hyperpage{27}, \emph{43}, 
+		\hyperpage{45}
+
+  \indexspace
+
+  \item Screen, \hyperpage{14}, \hyperpage{17}, \hyperpage{39--40}
+
+  \indexspace
+
+  \item Windows, \hyperpage{5--6}
 
 \end{theindex}

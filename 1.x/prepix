@@ -207,8 +207,9 @@ HELP
 } # End of epix_help
 
 function epix_version {
-SPAMMY="<$(echo nujnat|rot)@$(echo zngupf|rot)."
-SPAMMY="${SPAMMY}$(echo ubylpebff|rot).$(echo rqh|rot)>"
+my_decode="tr '[a-m][n-z]' '[n-z][a-m]'" # Mac OS X has no 'rot'
+SPAMMY="<$(echo nujnat|$my_decode)@$(echo zngupf|$my_decode)."
+SPAMMY="${SPAMMY}$(echo ubylpebff|$my_decode).$(echo rqh|$my_decode)>"
 
 cat <<VERSION >&1
 $PROG is part of ePiX, Version EPIX_VERSION_NUMBER

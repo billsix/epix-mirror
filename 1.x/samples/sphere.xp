@@ -4,17 +4,17 @@
 using namespace ePiX;
 
 const double k = 2*M_PI/(360*sqrt(3)); // assume "degrees" mode
-inline double exp_cos(double t) { return exp(k*t)*ePiX::cos(t); }
-inline double exp_sin(double t) { return exp(k*t)*ePiX::sin(t); }
-inline double minus_exp_cos(double t) { return -exp_cos(t); }
-inline double minus_exp_sin(double t) { return -exp_sin(t); }
+double exp_cos(double t) { return exp(k*t)*Cos(t); }
+double exp_sin(double t) { return exp(k*t)*Sin(t); }
+double minus_exp_cos(double t) { return -exp_cos(t); }
+double minus_exp_sin(double t) { return -exp_sin(t); }
 
-main()
+int main()
 {
   bounding_box(P(-1,-1), P(1,1));
-  picture(P(160,160));
+  picture(160,160);
   unitlength("1pt");
-  offset(P(160, -35));
+  offset(160, -35);
 
   begin();
   degrees(); // set angle units

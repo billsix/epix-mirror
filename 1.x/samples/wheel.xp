@@ -5,15 +5,15 @@ using namespace ePiX;
 
 P F(double t, double r)
 {
-  return P(t,1) - r*P(ePiX::sin(t), ePiX::cos(t));
+  return P(t-r*Sin(t), 1-r*Cos(t));
 }
 
-main() 
+int main() 
 {
   const double dt = 5*M_PI/11;
   double t = 0;
 
-  picture(P(8, 1));
+  picture(8, 1);
   bounding_box(P(-1,0), P(15,2));
   unitlength("0.625in");
 
@@ -23,8 +23,8 @@ main()
       begin(); // Entire picture inside loop body
 
       line(P(x_min, y_min), P(x_max, y_min)); // the ground
-      
-      ellipse(P(t,1), P(1,1)); // the wheel
+
+      circle wheel(P(t,1), 1);  wheel.draw();
 
       domain R = domain(P(0,0), P(t, 1), // [0,t] x [0,1]
                         mesh(10*i,5), mesh((int) ceil(1+4*t), 5));

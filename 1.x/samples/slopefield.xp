@@ -3,18 +3,18 @@
 #include "epix.h"
 using namespace ePiX;
 
-triple F(double s, double t)
+P F(double s, double t)
 {
   return (P(0.1,0.025)&P(s,t)) + 
     (1/(0.01+s*s+t*t))*P(-t,s);
 }
 
-main() 
+int main() 
 {
   unitlength("1pt");
   bounding_box(P(-4, -3), P(2,2));
-  picture(P(234, 195));
-  offset(P(120, -20));
+  picture(234, 195);
+  offset(120, -20);
 
   begin();
   crop();

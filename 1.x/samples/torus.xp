@@ -5,19 +5,19 @@ using namespace ePiX;
 
 const int N = 8;
 
-triple F(double t1, double t2)
+P F(double t1, double t2)
 {
-  return polar(2+ePiX::sin(t2), t1) + ePiX::cos(t2)*E_3;
+  return polar(2+Sin(t2), t1) + Cos(t2)*E_3;
 }
 
 domain R2=domain(P(0,0), P(1,1), mesh(4*N, 2*N), mesh(12*N, 6*N));
 domain R3=domain(P(0,0), P(1,1), mesh(1, 1), mesh(6*N, 2*N));
 
-main() 
+int main() 
 {
   unitlength("1in");
   bounding_box(P(-3,-3), P(3,3));
-  picture(P(2,2));
+  picture(2,2);
 
   begin();
   revolutions();

@@ -1,22 +1,28 @@
 #!/bin/bash
 #
-# April 22, 2003
-# Create "sample.tex" from existing .xp files
+# Apr 22, 2003 --  Create "sample.tex" from existing .xp files
+# Sep 04, 2004 --  Updates for Version 1.0.0
 #
 OUTFILE="sample.tex"
+
+my_decode="tr '[a-m][n-z]' '[n-z][a-m]'" # Mac OS X has no 'rot'
+SPAMMY="<$(echo nujnat|$my_decode)@$(echo zngupf|$my_decode)."
+SPAMMY="${SPAMMY}$(echo ubylpebff|$my_decode).$(echo rqh|$my_decode)>"
 
 function get_file {
     cat $1 | grep -v offset | grep -v "\-\*\-" | grep -v "\-\-" >> $OUTFILE
 }
 
-cat <<"SEGMENT" > $OUTFILE
-%% Sample LaTeX file for ePiX                July, 2004
+cat <<HEADER > $OUTFILE
+%% Sample LaTeX file for ePiX                September, 2004
 %%
-%% Andrew D. Hwang  ahwang __aT mathcs _dOt_ holycross _doT edu
+%% Andrew D. Hwang  $SPAMMY
 %% Department of Mathematics and Computer Science
 %% College of the Holy Cross
 %% Worcester, MA 01610-2395, USA
 %%
+HEADER
+cat <<"SEGMENT" >> $OUTFILE
 \documentclass[11pt]{article}
 \usepackage[leqno]{amsmath}
 \usepackage{latexsym,pstcol,epic,eepic,rotating}
@@ -34,8 +40,8 @@ cat <<"SEGMENT" > $OUTFILE
 \setlength{\topmargin}{0in}
 
 \title{\ePiX\ Sample Document}
-\author{Version 0.8.11}
-\date{July, 2004}
+\author{Version 1.0}
+\date{September, 2004}
 
 \begin{document}
 

@@ -161,7 +161,7 @@ namespace ePiX {
     raw_print(out);
   }
 
-  static void print(std::ostringstream& s, const P location)
+  void print(std::ostringstream& s, const P location)
   {
     pair out = truncate(c2p(camera(location)));
     s << '(' << out.x1() << ',' << out.x2() << ')';
@@ -331,7 +331,7 @@ namespace ePiX {
     cout << "\n\\allinethickness{" << w << "pt}%";
   }
 
-  static void dash_start(const P& arg1, const P& arg2)
+  void dash_start(const P& arg1, const P& arg2)
   {
     P temp =  (0.5*epix::get_dashfill())*(arg2-arg1);
     start_path();

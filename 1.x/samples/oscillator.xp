@@ -2,23 +2,23 @@
 #include "epix.h"
 using namespace ePiX;
 
-double f(double t, double a) { return 2*ePiX::sin(a*t)*exp(-0.5*t); }
+double f(double t, double a) { return 2*exp(-0.5*t)*Sin(a*t); }
 
 // Completely fabricated data
 // "Predicted"
 inline double f1(double t) { return f(t,2); }
 // "Observed"
-inline double f2(double t) { return f1(t)+0.1*ePiX::cos(3*t); }
+inline double f2(double t) { return f1(t)+0.1*Cos(3*t); }
 //"error"
 inline double err(double t) { return 0.125*(1+fabs(f1(t))); }
 
 // Number of error bars
 const int samples=8;
 
-void error_bar(triple center, double error)
+void error_bar(P center, double error)
 {
-  triple top    = center + P(0,error);
-  triple bottom = center - P(0,error);
+  P top    = center + P(0,error);
+  P bottom = center - P(0,error);
 
   line(bottom,top);
   v_axis_tick(top);
@@ -28,10 +28,11 @@ void error_bar(triple center, double error)
 // Half-size of bounding box
 const int N=2;
 
-main() {
+int main() 
+{
   bounding_box(P(0,-N),P(2*N,N));
   unitlength("1in");
-  picture(P(2.5,2.5));
+  picture(2.5,2.5);
 
   begin();
 

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc16
- * Last Change: August 21, 2004
+ * Version 1.0.0
+ * Last Change: September 03, 2004
  */
 
 /* 
@@ -155,17 +155,36 @@ namespace ePiX {
 
   void triangle(const P arg1, const P arg2, const P arg3)
   {
-    path data = polygon(3, &arg1, &arg2, &arg3);
-    data.set_fill(epix::fill_paths);
-    data.draw();
+    if (epix::path_style() == SOLID)
+      {
+	path data = polygon(3, &arg1, &arg2, &arg3);
+	data.set_fill(epix::fill_paths);
+	data.draw();
+      }
+    else // dashed/dotted -- not filled
+      {
+	line(arg1, arg2);
+	line(arg2, arg3);
+	line(arg3, arg1);
+      }
   }
 
   void quad(const P arg1, const P arg2, 
 	    const P arg3, const P arg4)
   {
-    path data = polygon(4, &arg1, &arg2, &arg3, &arg4);
-    data.set_fill(epix::fill_paths);
-    data.draw();
+    if (epix::path_style() == SOLID)
+      {
+        path data = polygon(4, &arg1, &arg2, &arg3, &arg4);
+        data.set_fill(epix::fill_paths);
+        data.draw();
+      }
+    else // dashed/dotted
+      {
+	line(arg1, arg2);
+	line(arg2, arg3);
+	line(arg3, arg4);
+	line(arg4, arg1);
+      }
   }
 
 
@@ -202,10 +221,7 @@ namespace ePiX {
     P temp1 = arg1+jump;
     P temp2 = arg2-jump;
 
-    path data = polygon(4, &arg1, &temp1, &arg2, &temp2);
-    data.set_fill(epix::fill_paths || solid);
-
-    data.draw();
+    quad(arg1, temp1, arg2, temp2);
   } // end rect
 
 

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 16, 2004
+ * Version 1.0.0
+ * Last Change: September 04, 2004
  */
 
 /* 
@@ -118,9 +118,6 @@ namespace ePiX {
 	     const double t_min, const double t_max,
 	     int default_num_pts)
   {
-    using ePiX::cos;
-    using ePiX::sin;
-
     // default_num_pts = one full turn
     double frac = fabs(t_max-t_min)/(epix::full_turn());
     int num_pts = (int) max(1, ceil(frac*default_num_pts));
@@ -132,7 +129,7 @@ namespace ePiX {
     double t = t_min;
 
     for (int i=0; i <= num_pts; ++i, t += dt) 
-      vertices.at(i) = vertex(center + ((cos(t)*axis1)+(sin(t)*axis2)));
+      vertices.at(i) = vertex(center + ((Cos(t)*axis1)+(Sin(t)*axis2)));
 
     closed = false;
     filled = epix::fill_paths;

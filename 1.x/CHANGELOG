@@ -2,6 +2,22 @@ ePiX -- CHANGELOG
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
+September 04, 2004 (v1.0.0)
+ * (lengths.*) Handle bp (big points) and sp (scaled points)
+ * (sphere.cc) 
+  - "Omitted endpoint" bug for closed paths
+  - draw() reimplemented for output formatting, cf. output.cc
+ * (output.cc) dash_start, print(ostream...) made non-static
+ * (path.cc) Use Cos, Sin in ellipse constructor
+ * (functions.h) Asinine Asin bug
+
+September 03, 2004
+ * (curves.cc) triangle, quad, rect work when dashed/dotted
+
+August 26, 2004
+ * Tutorial moved to doc/
+ * (Several config/doc files) Changes for new major version
+
 August 24, 2004 (v0.8.11rc16)
  * (triples.h, segment.h) 
   - midpoint(P, P, double) moved to triples.h

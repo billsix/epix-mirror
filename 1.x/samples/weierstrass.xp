@@ -5,7 +5,7 @@ using namespace ePiX;
 
 const int N=8; // Number of summands
 
-inline double weierstrass(double t)
+double weierstrass(double t)
 {
   double y=0;
   for(int i=0; i < N; ++i)
@@ -14,12 +14,12 @@ inline double weierstrass(double t)
   return y;
 }
 
-main() {
-
+int main() 
+{
   bounding_box(P(-2, 0), P(2, 1.5));
-  picture(P(320, 120));
+  picture(320, 120);
   unitlength("0.01in");
-  offset(P(160,-120));
+  offset(160,-120);
 
   begin();
 

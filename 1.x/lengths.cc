@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc8
- * Last Change: June 21, 2004
+ * Version 1.0.0
+ * Last Change: September 04, 2004
  */
 
 /* 
@@ -57,7 +57,7 @@
  * to (user-specified) LaTeX picture units and its inverse, unscale. In
  * summary, "scale" functions convert *to* picture coordinates, "unscale"
  * functions convert *from* picture coordinates. These functions know about 
- * the following LaTeX dimensions: "cm", "in", "mm", "pc", and "pt"
+ * the following LaTeX dimensions: bp, cm, in, mm, pc, pt, and sp
  */
 
 #include <iostream>
@@ -123,7 +123,10 @@ namespace ePiX {
   // picture units to true pt
   double p2t(double dimen)
   {
-    if (! strcmp((char *)pic_unit,"cm"))
+    if (! strcmp((char *)pic_unit,"bp"))
+      return (pic_size)*(72.27/72)*dimen;
+
+    else if (! strcmp((char *)pic_unit,"cm"))
       return (pic_size)*(72.27/2.54)*dimen;
 
     else if (! strcmp((char *)pic_unit,"in"))
@@ -137,6 +140,9 @@ namespace ePiX {
 
     else if (! strcmp((char *)pic_unit,"pt"))
       return (pic_size)*dimen;
+
+    else if (! strcmp((char *)pic_unit,"sp"))
+      return (pic_size)*(1.0/65536)*dimen;
 
     // Invalid unit length and no warning printed yet
     else if (!scale_warning) 

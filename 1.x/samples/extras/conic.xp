@@ -12,13 +12,14 @@ int main()
 {
   bounding_box(P(-3,-3),P(3,3));
   unitlength("1in");
-  picture(P(4,4));
+  picture(4,4);
 
   begin();
 
   grid(1,1);
 
-  label(P(x_min, y_max), P(2,-2), "Projective equivalence of a parabola and a circle", br);
+  label(P(x_min, y_max), P(2,-2), 
+	"Projective equivalence of a parabola and a circle", br);
 
   crop();
 

@@ -6,12 +6,12 @@ using namespace ePiX;
 double f(double t) { return 2*t*(1-t)*(1-t); }
 double g(double t) { return 1/(1-t*t); }
 
-main() 
+int main() 
 {
   bounding_box(P(-2,-4), P(2,4));
-  picture(P(200,200));
+  picture(200,200);
   unitlength("1pt");
-  offset(P(120, -40));
+  offset(120, -40);
 
   begin();
 
@@ -27,7 +27,7 @@ main()
   v_axis(8);
 
   h_axis_labels(4, P(-1, 2), tl); // align top-left
-  v_axis_labels(4, P(-1, 2), lt); // same
+  v_axis_labels(4, P(-1, 2), tl);
 
   // Graphs
   plot(f, x_min, x_max, 40);

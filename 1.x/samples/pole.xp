@@ -6,11 +6,12 @@ P F(double x, double y) { return P(x, y, x/(x*x+y*y)); }
 P pt0=P(), pt1 = P(1.5,1.5), pt2 = P(-1.5,1.5);
 domain R(-pt1, pt1, mesh(24,24), mesh(72,72));
 
-main() {
+int main() 
+{
   bounding_box(-pt1, pt1);
   unitlength("1in");
-  picture(P(2.5,2.5));
-  offset(P(2.25,-0.75));
+  picture(2.5,2.5);
+  offset(2.25,-0.75);
 
   begin();
   viewpoint(-2,-4,3);  camera.range(10);
@@ -22,8 +23,8 @@ main() {
   label(P(0, 0, -1.5), P(2,0), 
         "$\\displaystyle z=\\mathrm{Re}\\,\\frac{1}{x+iy}$", r);
 
-  plain(); gray(0); swatch(pt0, pt2); // left half
-  magenta(); grid(pt0, pt2, 6, 6);
+  plain(); gray(0); fill(); rect(pt0, pt2); // left half
+  fill(false); magenta(); grid(pt0, pt2, 6, 6);
   label(P(0,0), P(2,-2), "0", br);
   label(P(x_max,0), P(2,0), "$x$", r); 
   label(P(0,y_max), P(-1,2), "$y$", t);

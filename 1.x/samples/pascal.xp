@@ -2,16 +2,16 @@
 #include "epix.h"
 using namespace ePiX;
 
-main() {
+int main() 
+{
   bounding_box(P(-2,-2),P(2,2));
   unitlength("1in");
-  picture(P(3,3));
-  offset(P(1, 0.125));
+  picture(3,3);
+  offset(1.25, 0.125);
 
-  begin(); clip_box(P(2,2,1)); clip();
+  begin(); crop();
 
   P V = P(2,-0.25),   W = P(3,1);
-
   P P1=P(-1.5,-1),    P2 = P1 + V,       P3 = P1 + 1.5*V;    // points
   P Q1 = P(-1,1),     Q2 = Q1 + 0.5*W,   Q3 = Q1 + W;
 

@@ -1,4 +1,5 @@
-%% Version 0.8.11
+%% September 03, 2004
+%% Version 1.0
 \documentclass[12pt]{report}
 \usepackage{amsmath,latexsym,epic,eepic,pstcol,comment}%,framed}
 \usepackage[dvips,hyperref]{hyperref}
@@ -25,9 +26,11 @@
 \newcommand{\bi}{\begin{itemize}}
 \newcommand{\ei}{\end{itemize}}
 
-\title{ \ePiX\ Tutorial and Manual}
-\author{Andrew D. Hwang \\ Dept.\ of Math and CS \\ Holy Cross College}
-\date{August, 2004}
+\title{ \ePiX\ Tutorial and  \\ Reference Manual}
+\author{Andrew D. Hwang \\ 
+  Department\ of Math and CS \\ 
+  College of the Holy Cross}
+\date{Version 1.0,  September, 2004}
 
 \begin{document}
 
@@ -43,9 +46,10 @@ easy-to-learn syntax. \LaTeX~and \code{dvips} comprise the
 typographical rendering engine, while \code{ImageMagick} is used to
 create bitmapped images and animations.  The user interface resembles
 that of \LaTeX\ itself: You prepare a short scene description in a
-text editor, then ``compile'' the input file into a picture. Output
-formats are \eepic (a plain text enhancement to the \LaTeX\ picture
-environment), \code{eps}, \code{pdf}, \code{png}, and~\code{mng}.
+text editor, then ``compile'' the input file into a picture. Default
+output formats are \eepic\ (a plain text enhancement to the \LaTeX\
+picture environment), \code{eps}, \code{pdf}, \code{png},
+and~\code{mng}. 
 
 \ePiX's strengths include:
  
@@ -101,12 +105,13 @@ cover''. If you are a:
 \item Potential user, you may wish to skip immediately to ``Software
 Dependencies'' before investing additional time.
 
-\item New user, please start at the beginning and proceed until you
-  have enough understanding to play with the software, then experiment
-  with the samples files and return to the manual as needed.
+\item New user, please proceed from here until you have enough
+  understanding to play with the software, then experiment with the
+  samples files while reading Chapter~\ref{chapter:started}, or return
+  to the manual as needed.
 
-\item More advanced user, browse at will.
-  %% , probably starting with the Reference Manual.
+\item More advanced user, browse at will, probably starting with
+  Chapter~\ref{chapter:ref-man}.
 
 \ei
 
@@ -126,14 +131,15 @@ material, such as \CXX\ syntax, is introduced as needed.
 
 \section{Software Dependencies}
 
-If you run GNU/Linux, a BSD, or Solaris, you almost surely have (or
-can install) all the external software needed to use \ePiX.  For
-Mac~OS~X, you will need the Apple developer tools, and will want to
-install an X~server and the~\code{fink} package manager to build a
-featureful *nix environment.  Users of other operating systems, most
-notably Windows, face a challenge in running \ePiX, though not an
-insurmountable one. The author's (second-hand) Windows-specific
-knowledge is summarized below.
+\index{Installation|(} If you run GNU/Linux, a BSD, or Solaris, you
+almost surely have (or can install) all the external software needed
+to use \ePiX.  For Mac~OS~X,\index{Mac OS X} you will need the Apple
+developer tools, and will want to install an X~server and
+the~\code{fink} package manager to build a featureful *nix
+environment.  Users of other operating systems, most notably Windows,
+face a challenge in running \ePiX, though not an insurmountable one.
+The author's (second-hand) Windows-specific knowledge is summarized
+below.
 
 ``Under the hood'', an input file is successively converted
 to~\code{eepic}, \code{dvi}, PostScript, \code{pdf}~or \code{eps}, and
@@ -163,7 +169,7 @@ utilities are needed to run \ePiX's ``conversion to
 Finally, \code{flix} uses ImageMagick's \code{convert} utility to
 create \code{png}~images, and to assemble \code{png}s into animated
 \code{mng} files. The programs \code{animate}~and \code{display} are
-useful for viewing \code{flix}~output.
+useful for viewing \code{flix}~output.\index{Animation}
 
 Aside from their reliance on specific programs, \ePiX's shell scripts
 are written using Unix-style pathnames. Thus, the most straightforward
@@ -172,6 +178,7 @@ way to use \ePiX\ is to install a Unix-like environment.
 
 \subsection*{Alternatives for Windows}
 
+\index{Windows|(}
 Version~0.8.9 of \ePiX\ has been implemented in Python~2.2 by Andrew
 Sterian, making \ePiX\ available on any platform that supports Python,
 and without requiring a \CXX~compiler or~\code{bash}.  Python is a
@@ -183,18 +190,32 @@ is probably to install Python~2.2 or later (if necessary) and
   http://claymore.engineer.gvsu.edu/~steriana/Python/index.html
 \end{verbatim}
 
-Cygwin or the de~Lorie tools can theoretically be used to run \ePiX\ 
-under Windows. The author has received scattered anecdotal reports of
-success with Cygwin, but is ignorant of installation details and
-unfortunately cannot provide substantial support for operating systems
-other than *nix.
+Cygwin, and theoretically the de~Lorie tools, can be used to run
+\ePiX\ under Windows. The following Cygwin packages are probably
+necessary and sufficient: 
+\begin{verbatim}
+  [] bash       [] GhostScript [] sh-utils
+  [] binutils   [] ImageMagick [] teTeX
+  [] fileutils  [] make        [] textutils
+  [] gcc        [] sed
+\end{verbatim}
+\begin{comment}
+  \filename{bash}, \filename{binutils}, \filename{fileutils},
+  \filename{gcc}, \filename{GhostScript}, \filename{ImageMagick},
+  \filename{make}, \filename{sed}, \filename{sh-utils},
+  \filename{teTeX}, \filename{textutils}.
+\end{comment}
+The \filename{emacs}~and \filename{gv} packages are highly desirable,
+but not absolutely necessary. The author has received scattered
+reports of success with Cygwin, but is not sufficiently knowledgeable
+to provide substantial support.
+\index{Windows|)}
 
 
 \section{Installation}
 
-\index{Installation|(} \ePiX\ is distributed over the World-Wide Web
-as source code. The latest versions (stable and development) of \ePiX\ 
-can be found at
+\ePiX\ is distributed over the World-Wide Web as source code. Packages
+(stable and development) can be found at
 \begin{verbatim}
   http://math.holycross.edu/~ahwang/current/ePiX.html
 \end{verbatim}
@@ -205,30 +226,25 @@ entire directory; it is not recommended that you download the files
 individually.  (Some users of Red Hat have reported file permission
 problems when unpacking the CTAN tarballs. If you encounter this
 difficulty, please try downloading the sources from the project main
-page.) Packages are separately maintained for FreeBSD and Gentoo:
+page.)  Unpack the compressed tar file with the appropriate command:
 \begin{verbatim}
-  http://www.freshports.org/graphics/epix/
-  http://packages.gentoo.org/search/?sstring=epix
+  tar -zxvf epix-x.y.z_complete.tar.gz
+  tar -jxvf epix-x.y.z_complete.tar.bz2
 \end{verbatim}
-Unpack the compressed tar file with the appropriate command:
-\begin{verbatim}
-  tar -zxvf epix-0.8.x_complete.tar.gz
-  tar -jxvf epix-0.8.x_complete.tar.bz2
-\end{verbatim}
-(\code{x}~stands for a small integer) or, if your \code{tar}
+(\code{x.y.z}~is the version number) or, if your \code{tar}
 doesn't do decompression,
 \begin{verbatim}
-  gunzip -c epix-0.8.x_complete.tar.gz | tar -xvf -
-  bzcat epix-0.8.x_complete.tar.bz2 | tar -xvf -
+  gunzip -c epix-x.y.z_complete.tar.gz | tar -xvf -
+  bzcat epix-x.y.z_complete.tar.bz2 | tar -xvf -
 \end{verbatim}
-\code{cd} to the source directory, which is named \filename{epix-0.8.x}.
+\code{cd} to the source directory, which is named \filename{epix-x.y.z}.
 The \filename{INSTALL} file contains detailed installation instructions.
 If you're impatient, the short of it is \code{make [test]; make install}.
 Respectively, these steps build the program, optionally run a test
 compile on the included sample files, and install the library, header
 file, and shell scripts.
 
-There is an optional package, kindly contributed by Svend Daug{\aa}rd
+There is an optional package, contributed by Svend Daug{\aa}rd
 Pedersen, that supplies extensions for enhanced Cartesian and
 logarithmic coordinate systems, and for hatching polygons and planar
 regions. To build this package, do \code{make contrib} before
@@ -244,14 +260,6 @@ if you want to install elsewhere, see the \filename{INSTALL} file for
 detailed instructions. You may also want to consult
 \filename{POST-INSTALL} for information on setting your \code{PATH}
 variable so your shell can find \ePiX.  \index{Installation|)}
-
-An RPM \filename{spec} file is kindly maintained by Guido Gonzato. If
-you run a GNU/Linux distribution that uses RPM~4.x to manage installed
-packages (e.g., a recent version of Red Hat or Mandrake), you can
-build and install \ePiX\ with the command (as \code{root})
-\begin{verbatim}
-rpm -ta epix_complete.tar.gz
-\end{verbatim}
 
 To re-iterate, \ePiX\ is not a stand-alone program, but consists of a
 \C/\CXX\ library, header, and a shell script, and therefore requires a
@@ -270,6 +278,34 @@ Should it come to this, the command \code{make uninstall} will remove
 installed components of \ePiX\ from your system. You must be in the
 source directory, and may need to log in as \code{root}.
 
+
+\subsection*{Other Sources}
+
+An RPM \filename{spec} file is maintained by Guido Gonzato. If you run
+a GNU/Linux distribution that uses RPM~4.x to manage installed
+packages (e.g., a recent version of Red Hat or Mandrake), you can
+build and install \ePiX\ with the command (as \code{root})
+\begin{verbatim}
+rpm -ta epix_complete.tar.gz
+\end{verbatim}
+An \filename{rpm} source file is available from the project page at
+Holy Cross. Separately maintained packages exist for FreeBSD and
+Gentoo:
+\begin{verbatim}
+  http://www.freshports.org/graphics/epix/
+  http://packages.gentoo.org/search/?sstring=epix
+\end{verbatim}
+The very latest source code for Versions 1.x~and 2.x (a.k.a.\ The
+Next Generation) is available by CVS from
+\begin{verbatim}
+  http://savannah.nongnu.org/cgi-bin/viewcvs/epix/epix/
+\end{verbatim}
+The main project page may migrate to
+\begin{verbatim}
+  http://savannah.nongnu.org/projects/epix
+\end{verbatim}
+
+
 \subsection*{Development}
 
 There is a (currently very low-traffic) mailing list for all things
@@ -282,12 +318,6 @@ non-empty \code{Subject:} line.  To subscribe, send an empty message
 to
 \begin{verbatim}
   ahwang-epix-subscribe@mathcs.holycross.edu
-\end{verbatim}
-
-The (unpackaged) source code for Versions 1.x~and 2.x (a.k.a.\ The
-Next Generation) is available from the CVS server
-\begin{verbatim}
-  http://subversions.gnu.org/projects/epix
 \end{verbatim}
 Please contact the author if you are interested in development.
 
@@ -315,10 +345,12 @@ The sample and tutorial figures carry the preferred file extension,
 ``\filename{elaps --pdf file.xp}'' for PDF.  Like \LaTeX, \ePiX\ is
 non-interactive, and run from the command line.  Each shell script
 accepts a \code{--help} (or~\code{-h}) option that prints a short
-summary of available options.  A graphical environment may be
-simulated by using \code{emacs} (with Jay Belanger's \ePiX\ mode) to
-edit and compile files, and a previewer such as~\code{gv} to view
-figures as they are processed.
+summary of available options.  Under~\code{X}, a graphical environment
+may be simulated by using \code{emacs} (with Jay Belanger's \ePiX\ 
+mode) to edit and compile files, and a previewer such as~\code{gv} to
+view figures as they are processed. In~\code{gv}, select ``Watch
+file'' from the ``State'' menu to have images update
+automatically.\index{Graphical interface}
 
 While \code{elaps} produces output files suitable for immediate
 previewing, \code{epix} is far preferable for documents processed with
@@ -446,11 +478,13 @@ are adequate, but the importance of structuring increases rapidly with
 the size of the input file, and good habits are best formed from the
 start. The function definition is mostly for illustration, though does
 provide slightly better organization than
+\begin{footnotesize}
 \begin{verbatim}
 double width = 0.6, height = sqrt(1-width*width);
 double lab_x = 0.5;
 P label_here(lab_x, sqrt(1-lab_x*lab_x));
 \end{verbatim}
+\end{footnotesize}
 
 
 \subsection*{Command Syntax}
@@ -508,14 +542,16 @@ set \LaTeX's unitlength to 1~in, create a picture environment 2.5~in
 wide and 1.25~in high, then shift the picture right by 0.25~in and
 down by 0.5~in. The \code{picture}~and \code{unitlength} lines are
 mandatory in an \ePiX\ preamble. The \code{offset} is optional and
-defaults to~$(0,0)$.
+defaults to~$(0,0)$.\index{Offset!figure}
 
 The argument of a \code{unitlength} command is a numerical constant
-followed by one of the following valid \LaTeX\ length units:
-\code{cm}, \code{in}, \code{mm}, \code{pc}, and~\code{pt}.  (One pica
-equals 12~pt.) \ePiX\ does not directly support the use of different
-horizontal and vertical length units; you are expected to perform any
-conversions manually.
+followed by one of the following valid \LaTeX\ length units: \code{bp}
+(big point), \code{cm} (centimeter), \code{in} (inch), \code{mm}
+(millimeter), \code{pc} (pica), \code{pt} (point, the default unit),
+and~\code{sp} (scaled point).  (There are 72~big points per inch,
+12~points per~pica, and 65536~scaled points per point.)  \ePiX\ does
+not directly support the use of different horizontal and vertical
+length units; you are expected to perform any conversions manually.
 
 A non-zero \code{offset} causes the contents of a picture to appear in
 a location where \LaTeX\ does not expect them. This may be useful when
@@ -527,6 +563,8 @@ the figure according to rules of its own.
 
 \section{Logical Size, and Aspect Ratio}
 
+\index{Aspect Ratio|(}
+\index{Bounding Box|(}
 An \ePiX\ figure occupies a rectangular Cartesian ``bounding box''.
 The lower left and upper right corners of the bounding box are known
 to \ePiX\ as \code{(x\_min,y\_min)} and \code{(x\_max,y\_max)}, while
@@ -552,15 +590,18 @@ The figure's aspect ratio is controlled by sizing the bounding box.
 The aspect ratio is ``true'' if the bounding box and picture box are
 geometrically similar, e.g., if both boxes are 1.5~times as wide as
 they are tall.
+\index{Aspect Ratio|)}
 
 
 \section{Creating and Drawing Objects}
 
+\index{Screen}
 Conceptually, \ePiX\ builds a 3-dimensional virtual ``world'', then
 photographs the world on a 2-dimensional ``screen''. The screen
 contains the bounding box, which is affinely scaled to a \LaTeX\ 
 picture environment. By default, the screen is the $(x_1,x_2)$-plane
 and the world is renderd by looking straight down the $x_3$-axis.
+\index{Bounding Box|)}
 
 \subsection*{Geometric Data Structures}
 
@@ -625,10 +666,9 @@ vectors, not points. \ePiX\ does not enforce the distinction between
 points and vectors, but will in The Next Generation.
 
 
-Reflecting a transition to object-oriented programming, \ePiX\ 
-supplies data structures that represent line segments, circles,
-planes, and spheres. These structures can be translated, scaled, and
-intersected. A code snippet illustrates basic techniques:
+\ePiX\ implements data structures that represent line segments,
+circles, planes, and spheres. These structures can be translated,
+scaled, and intersected. A code snippet illustrates basic techniques:
 \begin{verbatim}
   circle C1(P(0,1), P(0,-1), P(0.5,0)); // circle through 3 pts
   C1 += P(0.1,0);           // translate center
@@ -651,8 +691,8 @@ then the command \code{C1.draw()} draws the circle. The effect of
 drawing a \code{plane}~or \code{sphere} is described in
 Chapter~\ref{chapter:ref-man}. \ePiX\ also provides high-level
 commands that draw polygons, curves, and compound objects, such as
-arrows and coordinate axes.  Drawing commands must come in the body of
-the file, after \code{begin()}.
+arrows\index{Arrow} and coordinate axes.  Drawing commands must come
+in the body of the file, after \code{begin()}.
 
 \begin{verbatim}
   line(P p1, P p2);
@@ -692,7 +732,7 @@ when drawing the arc. This can be omitted safely in most situations.
 \section{The Camera}
 
 \index{Camera|(}
-
+\index{Screen|(}
 Art students sometimes practice perspective by tracing on a window
 with grease pencil, a mathematical transformation called \emph{point
 projection}. \ePiX's default mapping from the world to the screen is
@@ -703,9 +743,9 @@ the screen obtained by dropping a perpendicular from the viewpoint.
 
 Three mutually perpendicular unit vectors sit at the target: sea, sky,
 and eye. The sea vector points to the right, sky points upward, and
-eye points straight from the target to the viewpoint. The bounding box
-of the figure is defined with respect to the screen's (Cartesian)
-sea-sky coordinate system.
+eye points straight from the target to the viewpoint. The bounding
+box\index{Bounding Box} of the figure is defined with respect to the
+screen's (Cartesian) sea-sky coordinate system.
 
 Given a point~$p$ in front of the viewpoint, we want to determine the
 screen location to which~$p$ projects. Join~$p$ to the viewpoint by a
@@ -718,7 +758,9 @@ point of intersection is where we draw~$p$ in the screen.
   \caption{Point projection.}
   \label{fig:camera}
 \end{figure}
+\index{Screen|)}
 
+\index{Camera!manipulation}
 At the start of a figure, the camera is initialized to lie on the
 $x_3$-axis at very large distance from the origin. The resulting view,
 essentially projection along the axis, is suitable for 2-dimensional
@@ -739,15 +781,17 @@ These commands must come in the figure body.
 \ePiX\ creates line drawings, not pixmaps.  In an \code{eepic} file,
 objects are either pointlike (\LaTeX\ glyphs, text boxes) or pathlike
 (everything else). The appearance of a pathlike object depends on the
-line style, width, filling, and color. Each attribute is a
-declaration, remaining in effect until superceded or the file ends.
-When a file starts, paths are drawn solid, black, unfilled, and with
-\code{thinlines} (a width of $0.4$~pt) in effect. Attribute-setting
-commands should come in the figure body.
+line style, width, filling,\index{Filling} and color. Each attribute
+is a declaration, remaining in effect until superceded or the file
+ends.  When a file starts, paths are drawn solid, black, unfilled, and
+with \code{thinlines} (a width of $0.4$~pt) in effect.
+Attribute-setting commands should come in the figure body.
 
 
 \subsection*{Path Width and Style}
 
+\index{Path!width}
+\index{Path!style|(}
 The standard path widths are \code{plain}~(\code{thinlines}) and
 \code{bold}~(\code{thicklines}). Other widths are available via a
 \code{pen()} command. The argument is a number, interpreted as a
@@ -762,14 +806,14 @@ author-specified line widths tends to look cluttered and \emph{ad
   pen("0.02in");  // set path width to 0.02 in
 \end{verbatim}
 
-\index{Line styles|(} The path \emph{style} is one of
-\code{solid}, \code{dashed}, or \code{dotted}. The style is set with
-an identically-named command, e.g., \code{dashed()}.  Every pathlike
-object in \ePiX\ is drawn using a list of points. When the path style
-is \code{solid}, the points are joined connect-the-dots fashion. A
-\code{dotted} path is drawn by placing a small dot at each point of
-the path. When the style is \code{dashed}, line segments are drawn
-partway from each vertex to its neighbors.
+The path \emph{style} is one of \code{solid}, \code{dashed}, or
+\code{dotted}. The style is set with an identically-named command,
+e.g., \code{dashed()}.  Every pathlike object in \ePiX\ is drawn using
+a list of points. When the path style is \code{solid}, the points are
+joined connect-the-dots fashion. A \code{dotted} path is drawn by
+placing a small dot at each point of the path. When the style is
+\code{dashed}, line segments are drawn partway from each vertex to its
+neighbors.
 \begin{center}
   \input{pathstyle.eepic}
 \end{center}
@@ -783,11 +827,12 @@ dashes), and the dot size:
   dot_sep(8);     // path points separated by 8pt
   dot_size(2);    // dots 2pt in diameter
 \end{verbatim}
-\index{Line styles|)}
+\index{Path!style|)}
 
 
 \subsection*{Color and Filling}
 
+\index{Color|(}\index{PSTricks}
 An \ePiX\ output file achieves color through the \code{pstcol} style,
 an amalgamation of \code{color}~and \code{PSTricks} styles. There are
 three available color models: \code{rgb}, \code{cmyk} (cyan, magenta,
@@ -809,7 +854,9 @@ density.
 Like all parameters, color densities can depend on variables. Values
 that lie outside the interval~$[0,1]$ are ``clipped''; for example,
 \code{rgb(1.4,-0.05,2)} is also magenta.
+\index{Color|)}
 
+\index{Filling}\index{Path}
 The \code{fill()} command causes closed paths to be gray-shaded, using
 Post\-Script \code{special}s. The depth of gray ranges from~0 (white)
 to~1 (black), and defaults to~$0.3$. The command \code{gray(0.4)} sets
@@ -823,21 +870,22 @@ color shading are discussed in Chapters \ref{chapter:ref-man}~and
 
 \section{Typography}
 
+\index{Labels|(emph}
 In an \ePiX\ file, points are denoted with \LaTeX\ glyphs
 (``markers'') or text boxes (``labels''). A marker occupies a box of
 zero size, and is placed at a specified Cartesian location. A label
 has typographical size, so its placement is more involved.  When the
-size or aspect ratio of a figure is adjusted, the font size stays the
-same. In order to keep a label aligned properly over a range of sizes,
-a scale-invariant alignment point is attached to each label, and
-Cartesian coordinates are used to position the alignment point. The
-alignment point is controlled both by a true-pt offset and an optional
-\LaTeX-style alignment option.
+size or aspect ratio\index{Aspect Ratio} of a figure is adjusted, the
+font size stays the same. In order to keep a label aligned properly
+over a range of sizes, a scale-invariant alignment point is attached
+to each label, and Cartesian coordinates are used to position the
+alignment point. The alignment point is controlled both by a true-pt
+offset and an optional \LaTeX-style alignment option.
 
 
 \subsection*{Markers}
 
-\index{Marker types|(} \ePiX\ markers are called
+\index{Marker types|(emph} \ePiX\ markers are called
 by name: \input{dots.eepic}
 \begin{verbatim}
   spot(P pt);  dot(P pt);   ddot(P pt);
@@ -866,6 +914,7 @@ available via the command
 %% These marker types are also available when plotting data from a file.
 \index{Marker types|)}
 
+
 \subsection*{Labels}
 
 A \emph{label} is a typographical box. Since a \LaTeX\ box occupies a
@@ -890,16 +939,18 @@ source to get a single backslash in the output.  The general
   label(P posn, <label text>);
   label(P posn, P offset, <label text>, align);
 \end{verbatim}
+\index{Offset!label|(}
 The first command prints a label with its \LaTeX\ reference point at
 the Cartesian location~\code{posn}, offset in true points (on the
 page) by the specified amount. Offsets of 2, 4, 6, 12, or~18 points
-work well with a 12-point font.
+work well with a 12-point font.\index{Labels!offset}
 
 The second command prints the label text in a \LaTeX\ box centered
 at~\code{posn}. While this is perhaps the most obvious way of placing
 a label, it may not be the correct method, since labels often mark a
 geometric object that should not be covered by the label.
-   
+
+\index{Labels!alignment|(}
 In the third command, the \code{align} option may be one---or an
 appropriate pair---of \code{t}, \code{b}, \code{r}, or~\code{l} (top,
 bottom, right, left), or~\code{c} (center). As with \code{offset}s,
@@ -912,6 +963,7 @@ of~$p$.
   \input{alignment_lr.eepic}
   \input{alignment.eepic}
 \end{center}
+\index{Labels!alignment|)}
 
 Each label command has a corresponding ``mask'' version
 (\code{masklabel}) that draws an opaque white rectangle under the
@@ -936,6 +988,8 @@ mind that
   character~\code{"}), and contains the \LaTeX\ code to generate the
   label. Backslashes are doubled.
 \end{itemize}
+\index{Offset!label|)}
+\index{Labels|)}
 
 
 \section{\CXX\ Basics}
@@ -1015,12 +1069,14 @@ A function accepts ``arguments'' and ``returns a value''. To define a
 function in~\CXX, you must specify the return type, the name of the
 function, the types of the arguments, and the algorithm by which the
 value is computed from the inputs. The code block
+\begin{footnotesize}
 \begin{verbatim}
 double f(double x) 
 { 
   return sqrt(1-x*x); 
 }
 \end{verbatim}
+\end{footnotesize}
 specifies the \code{double}-valued function~$f$ of one \code{double}
 variable defined by the formula $f(x)=\sqrt{1-x^2}$. Several sample
 and source files (especially \filename{functions.cc}) give more
@@ -1134,6 +1190,7 @@ differential equations, and non-Euclidean geometry.
 
 \subsection*{Arrows} 
 
+\index{Arrow|(emph}
 An arrow is specified by its tail and tip. An optional third argument
 scales the arrowhead.
 \begin{verbatim}
@@ -1149,12 +1206,14 @@ actual printed height depends on the \code{arrow}'s orientation with
 respect to the camera.  
 
 By default, an arrowhead is a hollow triangle, which can be colored.
-The \code{fill()} command produces solid, uncolorable arrowheads.
-\code{PSTricks} commands can be used for solid colored \code{arrow}s.
+The \code{fill()}\index{Filling} command produces solid, uncolorable
+arrowheads.  \code{PSTricks}\index{PSTricks} commands can be used for
+solid colored \code{arrow}s.  \index{Arrow|)}
 
 
 \subsection*{Coordinate Axes and Labels} 
 
+\index{Axes|(}
 A coordinate axis consists of a line between two points together with
 a specified number of regularly-spaced tick marks:
 \begin{verbatim}
@@ -1165,9 +1224,11 @@ The style of tick mark is appropriate for an axis of the given type.
 If the endpoints are omitted, they default to $p_1=(x_\mathrm{min},0)$
 and $p_2=(x_\mathrm{max},0)$ for a horizontal axis, or to
 $p_1=(0,y_\mathrm{min})$ and $p_2=(0,y_\mathrm{max})$ for a vertical
-axis. If the bounding box has integer width and/or height, then
-omitting the number of points draws tick marks one unit apart.
+axis. If the bounding box\index{Bounding Box} has integer width and/or
+height, then omitting the number of points draws tick marks one unit
+apart.
 
+\index{Labels!axis|(}
 Labels for a horizontal axis are generated with:
 %%  h_axis_labels(p1, p2, n, P(u,v));
 \begin{verbatim}
@@ -1179,11 +1240,12 @@ match their horizontal location. As for ordinary labels, the
 \code{offset} is in~\code{pt}, and the optional \LaTeX-style alignment
 option places the labels using their corners rather than their
 reference points. Labels for a vertical axis are generated in
-the obvious way.
+the obvious way.\index{Offset!label}
 
 As for coordinate axes, the initial and final points may be omitted in
 an \code{axis\_label} command, with the same defaults.  However, the
 \code{offset} and number of labels must always be specified.
+\index{Labels!axis|)}
 
 
 \subsection*{Coordinate Grids} 
@@ -1200,7 +1262,8 @@ rings, and sectors.
 Each command draws an \code{n1}~by \code{n2} grid. The third uses
 an $m_1\times m_2$ mesh, which is useful only if the camera lens does
 not map lines in object space to lines on the screen.
-   
+
+\index{Graph paper|(}
 Graph paper may be created by superimposing grids:
 \begin{center}
   \begin{minipage}[b]{2.5in}
@@ -1221,10 +1284,13 @@ Graph paper may be created by superimposing grids:
   
 S. D. Pedersen's \code{contrib/} package provides enhanced Cartesian
 graphs. See \code{contrib/doc} in the source for documentation.
+\index{Graph paper|)}
+\index{Axes|)}
 
 
 \section{Basic Plotting}
 
+\index{Plotting|(}
 Because \filename{eepic.sty} can draw lines of arbitrary length and
 slope, curves can be approximated by connect-the-dots paths. \ePiX\ 
 renders curves, polygons, and function graphs in this way.
@@ -1240,14 +1306,16 @@ points to use. Each of the commands
 \end{verbatim}
 graphs the function~\code{f} on the interval \code{[t\_min, t\_max]}
 by dividing the interval into \code{n}~subintervals of equal length.
-The first gives a Cartesian plot, the second a polar plot with bounds
-in current angular units, the third shades the region between the
-graph and the horizontal axis. If two functions are given to
-\code{shadeplot}, the region between their graphs is shaded.
+The first gives a Cartesian plot, the second a polar
+plot\index{Plotting!polar} with bounds in current angular units, the
+third shades the region between the graph and the horizontal axis. If
+two functions are given to \code{shadeplot}, the region between their
+graphs is shaded.
 
 
 \subsection*{Data plotting} 
 
+\index{Plotting!data|(}
 Files of numerical data can be manipulated, analyzed, and plotted.
 The format for a data file is one or more floating-point numbers per
 line, with the same number of entries per line. A line in a data file
@@ -1261,17 +1329,18 @@ resulting points.
 \end{verbatim}
 The first argument is the name of the data file. The \code{STYLE} may
 be \code{PATH}, which joins the points in the order they appear, or
-any of the marker types in Table~\ref{table:marker}.  Next comes the
-number of columns (entries per line); if there are fewer columns than
-expected in the file, nothing is plotted, while if there are more
-columns than expected, a warning is issued but the data is plotted.
-The remaining arguments are optional. The integers~$i_k$ specify
-columns from which to extract data. The column entries are fed to the
-\code{P}-valued function~\code{F} to obtain points. If~\code{F} is
-omitted, it defaults to the Cartesian point constructor. If~$i_3$ is
-omitted, the $i_1$~and $i_2$~columns are used to create points; by
-default, $i_1=1$~and $i_2=2$. For example, if \filename{mydata.dat}
-contains 6~columns of numbers, then the respective commands
+any of the marker types\index{Marker types} in
+Table~\ref{table:marker}.  Next comes the number of columns (entries
+per line); if there are fewer columns than expected in the file,
+nothing is plotted, while if there are more columns than expected, a
+warning is issued but the data is plotted.  The remaining arguments
+are optional. The integers~$i_k$ specify columns from which to extract
+data. The column entries are fed to the \code{P}-valued
+function~\code{F} to obtain points. If~\code{F} is omitted, it
+defaults to the Cartesian point constructor. If~$i_3$ is omitted, the
+$i_1$~and $i_2$~columns are used to create points; by default,
+$i_1=1$~and $i_2=2$. For example, if \filename{mydata.dat} contains
+6~columns of numbers, then the respective commands
 \begin{verbatim}
   plot("mydata.dat", DOWN, 6);
   plot("mydata.dat", BOX, 6, 2, 4, 5, sph);
@@ -1297,6 +1366,7 @@ since it was provided when the data was read.  The post-\code{TYPE}
 options are identical to the earlier plot command.  The $j$th~entry of
 the $i$th~column is called \code{my\_cols.at(i).at(j)}.
 
+\index{Linear regression}
 \ePiX\ implements simple numerical functions of a \code{FILEDATA}
 structure:
 \begin{verbatim}
@@ -1309,6 +1379,8 @@ The covariance of two columns is obtained by subtracting the
 respective averages entry by entry, then taking the dot product. The
 regression line is the least-squares best fit for predicting
 column~$i_2$ from column~$i_1$.
+\index{Plotting!data|)}
+\index{Plotting|)}
 
 
 \chapter{Reference Manual}
@@ -1429,6 +1501,13 @@ contains simple functions defined by algorithms, and
 source files, such as \filename{plots.cc}, may be consulted for
 Simpson's rule, Euler's method, and the like.
 
+An error, such as division by zero or an attempt to intersect parallel
+lines, may occur when a function is executed. In this situation, a
+\CXX\ function can ``throw an exception'', or return an error type
+that the caller ``catches'' and handles. If an uncaught exception is
+thrown, the program terminates. \ePiX's intersection operators throw
+exceptions when certain conditions are not met.
+
 
 \subsection*{Mathematical Functions}
 
@@ -1438,7 +1517,7 @@ Simpson's rule, Euler's method, and the like.
 \end{verbatim}
 (\code{fabs} is the absolute value for a floating-point argument.)
 \ePiX\ provides trig functions and their inverses that are sensitive
-to angular mode:
+to angular mode:\index{Angular mode}
 \begin{center}
 \begin{tabular}{p{1.25in}p{1.25in}p{1.25in}}
   \code{Cos}  & \code{Sin}  & \code{Tan} \\
@@ -1487,6 +1566,38 @@ variable:
 double f(double t) { return t*t*log(t*t); } // t^2 \ln(t^2)
 double g(double s, double t) { return exp(2*s)*Sin(t); }
 \end{verbatim}
+
+
+\subsection*{Basics of Classes}
+
+Unlike~\code{C}, \CXX\ supports ``object-oriented programming''. In a
+nutshell, a \emph{class} is an abstraction in computer code of some
+concept, such as a point, a sphere, a mapping that can be plotted, or
+a camera. Implementationally, a class consists of \emph{members}
+(named data elements) and \emph{member functions} (functions that
+belong to the class and have free access to members).  The idea is to
+encapsulate objects and the operations that make sense for them in a
+single logical entity.  In simple programming, classes may be treated
+like built-in types.
+
+\CXX\ classes enforce access permissions on their members, protecting
+data from being manipulated except in controlled ways. A class's
+member functions (and ``public'' members) constitute its \emph{user
+  interface}. The concept of class separates logical aspects of a data
+type from a particular implementation.
+
+Each ``instantiation'' of a class has its own member functions.
+A member function therefore knows ``which object'' it was called on,
+and the call syntax differs from standard function calls:
+\begin{verbatim}
+  circle C1(P(1,0), 1.5); // circle of given center and radius
+  C1.draw();              // member function circle::draw();
+\end{verbatim}
+Naturally, this call draws the circle~\code{C1}.
+
+A few short paragraphs cannot do more than scratch the surface of
+classes and object-oriented programming. Please consult a book, such
+as Stroustrup~\cite{S}, for details.
 
 
 \subsection*{References and Function Arguments}
@@ -1604,7 +1715,7 @@ include:
   message from the compiler. Pre-processor directives, which start
   with a~\code{\#}, do not end with a semicolon.
 
-\item Backslash is an escape character in \CXX:
+\item Backslash is an escape character in \CXX:\index{Labels}
 \begin{verbatim}
   // Put label $y=\sin x$ at (2,1)
   // Note single  ^ backslash in output
@@ -1646,7 +1757,7 @@ to help you avoid name clashes. To find keywords containing the string
 
 \section{The Camera}
 
-\index{Camera|(}
+\index{Camera|(emph}\index{Screen|(}\index{Camera!lens|(}
 \ePiX\ depicts a Cartesian world by projecting mathematically to a
 screen plane, then affinely scaling to a printed page. The camera,
 which maps the world to the screen, consists of a \emph{body} (data
@@ -1685,15 +1796,18 @@ does orthogonal projection (so the entire image lies inside a disk,
 and positions behind the camera are inverted) while the bubble lens
 does stereographic projection from the point directly behind the
 viewpoint.
+\index{Screen|)}
 
 Other lenses may be defined; the file \filename{camera.cc} may be
 consulted as a template. Syntactically, a lens is a \code{pair}-valued
 function of a single \code{P}~argument. To ensure expected behavior a
 lens should respect the meaning of the camera body.
+\index{Camera!lens|)}
 
 
 \subsection*{Manipulating the Camera}
 
+\index{Camera!manipulation|(}
 The camera is a \CXX\ class, manipulated by member functions.  The
 \code{begin()} command initializes the camera, so all changes of
 camera must occur in the body of the figure. By default, the viewpoint
@@ -1714,23 +1828,27 @@ The camera may be rotated about any of its axes. Axes of rotation pass
 through the target, so rotations about the sea or sky vectors change
 the viewpoint. For best control of the camera, set the target first,
 then the viewpoint. If desired, perform eye rotations last.
+\index{Camera!manipulation|)}
 \index{Camera|)}
 
 
 \section{Clipping and Cropping}
 
+\index{Clipping|(}
+\index{Cropping|(}
 \ePiX\ provides two masking operations to handle figure elements that
 lie far from the target: clipping (in the world) and cropping (in the
 screen).  The ``clip box'' may be regarded as a set of ``walls''.
 When clipping is active, objects outside the walls are not visible. By
 default, the clip box is a large cube centered at the origin.
 
-The ``crop box'' of a figure is a rectangle in the screen plane. When
-cropping is active, objects that project outside this rectangle are
-not visible. By default, the crop box is the bounding box.  Since the
-figure is drawn (on the page) by affinely scaling the bounding box to
-a specified \LaTeX\ box, default cropping ensures that a figure lies
-inside the printed region allocated by \LaTeX.
+The ``crop box'' is a rectangle in the screen plane.\index{Screen}
+When cropping is active, objects that project outside this rectangle
+are not visible.  By default, the crop box is the bounding
+box.\index{Bounding Box} Since the figure is drawn (on the page) by
+affinely scaling the bounding box to a specified \LaTeX\ box, default
+cropping ensures that a figure lies inside the printed region
+allocated by \LaTeX.
 \begin{figure}[hbt]
   \begin{center}
     \input{torus.eepic}\hspace*{0.75in}
@@ -1753,6 +1871,8 @@ Analogously, cropping is (de)activted with \code{crop(bool)}. The crop
 box is given by a pair of opposite corners, \code{crop\_box(pt1,pt2)};
 third coordinates are discarded. With no arguments, the command
 \code{crop\_box()} re-sets the crop box to the bounding box.
+\index{Clipping|)}
+\index{Cropping|)}
 
 
 \section{Attributes}
@@ -1771,9 +1891,9 @@ immediately; the remaining attributes are managed internally.
   \code{revolutions()}.
 
 \item Path thickness: \code{plain()}, \code{bold()},
-  \code{pen(double)}. 
+  \code{pen(double)}.\index{Path!width}
 
-\item Path style: 
+\item Path style:\index{Path!style}
   \begin{itemize}
   \item \code{solid()}
   \item \code{dashed(double)}. Optional argument is the dash density,
@@ -1791,12 +1911,13 @@ immediately; the remaining attributes are managed internally.
 %% saturation).
 
 \item Filling: \code{fill(bool)}, argument defaults to \code{true}.
+  \index{Filling}
   \begin{itemize}
     \item Gray depth: \code{gray(double)}, 0=white, 1=black.
     \item PSTricks (q.v.) filling style, fill color.
   \end{itemize}
 
-\item Text rotation: \code{label\_angle(double)}
+\item Text rotation: \code{label\_angle(double)}\index{Labels!rotated}
 
 \item Clipping and cropping (q.v.)
 
@@ -1806,6 +1927,7 @@ immediately; the remaining attributes are managed internally.
 
 \subsection*{Angular Mode} 
 
+\index{Angular mode}
 \ePiX\ has three angular modes: \code{radians()} (the default),
 \code{degrees()}, and \code{revolutions()}.  These modes affect all
 trigonometric operations, including camera rotations, the drawing of
@@ -1839,21 +1961,23 @@ to remove pieces of a figure accurately.)
 
 \subsection*{PSTricks}
 
-\index{PSTricks|(} PSTricks is a powerful collection of macros, by
-Timothy van~Zandt~\cite{Z} and others, for incorporating PostScript in
-\LaTeX. \ePiX\ uses PSTricks primarily for color filling, but does not
-yet work seamlessly. PSTricks should be used in a file only when
+\index{PSTricks|(emph}\index{Filling!color|(}\index{Color!shading|(}
+PSTricks is a powerful collection of macros, by Timothy
+van~Zandt~\cite{Z} and others, for incorporating PostScript in \LaTeX.
+\ePiX\ uses PSTricks primarily for color filling, but does not yet
+work seamlessly. PSTricks should be used in a file only when
 absolutely necessary. \textbf{The discussion below assumes PSTricks is
   needed in the file}.  The command
 \begin{verbatim}
   use_pstricks(bool);
 \end{verbatim}
 sets an internal flag that determines whether a path is drawn as an
-\filename{eepic} \code{path} or as a PSTricks \code{psline}.  When
-issued before \code{begin()}, this command also synchronizes the
-PSTricks \code{unitlength} and line width with \ePiX, and sets the
-fill style to solid.  PSTricks may be activated and deactivated
-freely, but \emph{the first activation must occur in the preamble}.
+\filename{eepic} \code{path} or as a PSTricks
+\code{psline}.\index{Path!in PSTricks} When issued before
+\code{begin()}, this command also synchronizes the PSTricks
+\code{unitlength} and line width with \ePiX, and sets the fill style
+to solid.  PSTricks may be activated and deactivated freely, but
+\emph{the first activation must occur in the preamble}.
 
 While \code{pstricks} is active, commands of the form
 \begin{verbatim}
@@ -1879,12 +2003,13 @@ fill style is set explicitly to \code{none}, PSTricks fills all paths,
 even if they are not closed. Second, PSTricks manipulates colors by
 named strings, so raw output is required to exploit the full power of
 PSTricks from \ePiX.
-\index{PSTricks|)}
+\index{Color!shading|)}\index{Filling!color|)}\index{PSTricks|)}
 \index{Color|)}
 
 
 \section{The Path Class}
 
+\index{Path|(emph}
 A \code{path} data structure is \ePiX's low-level ordered list of
 points that can be cropped, clipped, mapped, concatenated, and drawn.
 Raw path data is useful for complicated paths built in pieces.
@@ -1941,8 +2066,7 @@ Path-like objects comprise polygons with a fixed number of vertices
 number of points (ellipses, arcs, splines); and plots of functions of
 one variable.
 
-Fixed-data polygons are drawn with mnemonically-named high-level
-commands.
+Fixed-data polygons are drawn with high-level commands.
 \begin{verbatim}
   line(p1, p2);
   triangle(p1, p2, p3);
@@ -1958,17 +2082,21 @@ length scaled by~$2^{t/100}$. (That is, $t=100$ doubles the length,
 while $t=-100$ halves the length.) The arguments of \code{rect()}
 must lie in a plane parallel to a coordinate plane.
 
+\index{Filling|(}
 Internally, \ePiX\ marks paths as closed or not; triangles,
-quadrilaterals, polygons, ellipses, and arrows are closed. If a closed
-path is drawn while filling is active, the path is filled with the
-current shade of gray. If filling is deactivated, the path is drawn
-but not filled.
+quadrilaterals, polygons, ellipses, and arrows are closed. If a solid,
+closed path is drawn while filling is active, the path is filled with
+the current shade of gray. If filling is deactivated, the path is
+drawn but not filled. Dashed and dotted paths cannot be filled in one
+step; instead, fill the solid path, then draw the dashed/dotted
+boundary.
 
 The shade of gray is a number between~0 (white) and~1 (black), and
 defaults to~0.3. Shading is opaque in PostScript, so the order of
 figure elements is significant in the input file when filling is
 active. 
 
+\index{Filling!color}\index{PSTricks}
 Color filling is available only through PSTricks. The features of
 PSTricks that are relatively well-supported in \ePiX\ are illustrated
 in the sample file \filename{contour.xp}. In principle, any PSTricks
@@ -1976,6 +2104,7 @@ features can be obtained through raw output. However, this approach is
 generally discouraged since, for example, PSTricks color declarations
 are not recognized by \eepic, and \emph{vice-versa}. The Next
 Generation of \ePiX\ will work more seamlessly with PSTricks.
+\index{Filling|)}
 
 Elliptical arcs are specified by their center, a pair of vectors, an
 angular range, and an optional number of points:
@@ -1999,8 +2128,10 @@ angle units) from $\theta_1$~to $\theta_2$ is drawn with
   arc(p1, r, theta1, theta2);
   arc_arrow(p1, r, theta1, theta2); // same, with arrowhead
 \end{verbatim}
+\index{Arrow}
 If $\theta_2$ is smaller, the arc goes clockwise. The arrowhead goes
 at~$\theta_2$. If an \code{arc\_arrow} is too short, nothing is drawn.
+\index{Path|)}
 
 
 \section{Geometric Data Structures}
@@ -2023,7 +2154,7 @@ longitudes, and parametrized curves on a sphere.
 \subsection*{Triples and Frames}
 
 Points and displacements in space are represented as ordered triples.
-The name of the type is~''\code{P}'', though ``\code{triple}'' may
+The name of the type is~``\code{P}'', though ``\code{triple}'' may
 be used for backward compatibility. Spherical and cylindrical/polar
 constructors are provided. Standard (and non-standard) algebraic
 operations---addition/subtraction, scalar multiplication; dot, cross,
@@ -2053,12 +2184,12 @@ The standard \code{frame} is the set \code{E\_1}, \code{E\_2},
 \code{frame}:
 \begin{verbatim}
   frame(); // the standard frame
-  frame(P v1, P v2, P v3);
+  frame(P v1, P v2, P v3); // orthonormalize (v1, v2, v3)
 \end{verbatim}
-The third vector is positively proportional to~\code{v3}, and the
-second vector is positively proportional to \code{v2\%v3}. A
-\code{frame} is right-handed, and does not depend on~\code{v1}; the
-syntax is for the user's benefit.
+The third vector of the new frame is positively proportional
+to~\code{v3}, the second vector is positively proportional to
+\code{v2\%v3}, and the first vector is the cross product. Thus, a
+\code{frame} is right-handed, and does not depend on~\code{v1}.
 
 
 \subsection*{Intersection}
@@ -2066,8 +2197,11 @@ syntax is for the user's benefit.
 The concept of \emph{genericity} is central to understanding
 intersections of geometric data structures in \ePiX. For a working
 definition, two objects that are disjoint, tangent, or coincident
-intersect ``non-generically''. (Specialists will note that this
-differs substantially from the usual algebro-geometric definition.) 
+intersect ``non-generically''. (Geometers will note that this differs
+substantially from the usual definition.)  \ePiX's intersection
+operators throw exceptions when the operands are non-generic. If a run
+of \code{epix} terminates with an error message, check that you are
+not trying to intersect badly-formed or situated objects.
 
 In \ePiX, a \code{segment} is extended into a line for purposes of
 intersecting.  Table~\ref{table:intersect} lists types of (generic!)
@@ -2184,7 +2318,7 @@ be invisible.
 
 \section{Domains and Plotting}
 
-\index{Plotting|(} To fix terminology, the noun ``map'' will be
+\index{Plotting|(emph} To fix terminology, the noun ``map'' will be
 used for a \CXX\ function that accepts one or more \code{double}
 arguments or a \code{P} argument, and returns a \code{double}~or
 a~\code{P}. Maps can be depicted in two mathematically useful ways:
@@ -2195,6 +2329,7 @@ information).  Usually, a \code{double}-valued map is graphed, while a
 used generically to mean either sort of depiction, and the noun
 ``plot'' refers to the result of plotting.
 
+\index{Domain|(emph}
 The ``domain'' of a map is the set of allowed input values. In \ePiX,
 a \code{domain} is a coordinate box of dimension one, two, or three.
 For uniformity, a 2-dimensional domain is actually a 3-dimensional
@@ -2208,19 +2343,19 @@ A plot depends on a map and a domain. For example, suppose~\code{f} is
 a \code{P}-valued map of two (\code{double}) variables, and~\code{R}
 is a two-dimensional domain. To construct a plot, subdivide~\code{R}
 with a ``coarse'' rectangular mesh, say having $m_1\times m_2$
-sub-rectangles. For each ``grid line'', plot the parametric curve
-obtained by evaluating~\code{f} along the line. The result is the
-(wiremesh) plot of~\code{f} over~\code{R}.
+sub-rectangles.\index{Domain!coarse mesh|(} For each ``grid line'', plot
+the parametric curve obtained by evaluating~\code{f} along the line.
+The result is the (wiremesh) plot of~\code{f} over~\code{R}.
 
 A detail was omitted in the preceding paragraph: the number of points
 plotted in each parametric curve. Many graphing programs use as many
 points as dictated by the coarse mesh, so that the surface is made of
 quadrilaterals (Figure~\ref{fig:plot}, left). In \ePiX, a domain
 possesses a ``fine'' mesh, say that divides~\code{R} into $n_1\times
-n_2$ subrectangles (Figure~\ref{fig:plot}, right).  The individual
-parametric curves comprising the surface are drawn using the fine
-subdivisions. A plot can conform to the ``true'' surface without
-requiring many quadrilaterals.  
+n_2$ subrectangles (Figure~\ref{fig:plot}, right).
+\index{Domain!fine mesh|(} The individual parametric curves comprising
+the surface are drawn using the fine subdivisions. A plot can conform
+to the ``true'' surface without requiring many quadrilaterals.
 
 \begin{figure}[hbt]
   \begin{center}
@@ -2229,7 +2364,7 @@ requiring many quadrilaterals.
     \caption{A surface with coarse ($6\times18$) and fine
       ($12\times60$) meshes.}
     \label{fig:plot}
-  \end{center}
+  \end{center}\index{Plotting!wiremesh}
 \end{figure}
 
 
@@ -2239,7 +2374,10 @@ fine mesh need not be a ``multiple'' of the coarse mesh.  Indeed, the
 ``fine'' mesh may be \emph{more coarse} than the ``coarse'' mesh.
 Usually, however, the fine mesh is a ``small multiple'' of the coarse
 mesh.
+\index{Domain!fine mesh|)}
+\index{Domain!coarse mesh|)}
 
+\index{Domain!resizing}
 A domain can be resized in any coordinate direction for which the
 thickness is positive, using object-oriented syntax. For the
 domain~\code{R} above,
@@ -2252,6 +2390,7 @@ sizes. In this example, the new domain has $6\times4$~coarse mesh
 ($18/4=4.5\to4$) and $12\times15$~fine mesh.  It's best to choose
 meshes so that resizing does not cause integer truncation.
 
+\index{Domain!slicing}
 A domain can be sliced by setting one variable to a constant; the
 result is a domain whose dimension is one smaller than the original:
 \begin{verbatim}
@@ -2299,6 +2438,8 @@ graph is drawn; otherwise the image is drawn.
 A function of 3~variables can be plotted over a 1-~or 2-dimensional
 domain, while a function of 2~variables cannot be plotted over a
 3-dimensional domain.
+\index{Domain|)}
+\index{Plotting|)}
 
 
 \subsection*{Utility Functions}
@@ -2345,6 +2486,8 @@ illustrate these features.
 
 \subsection*{Calculus Plotting} 
 
+\index{Plotting!calculus|(}
+\index{Plotting!vector fields|(}
 \ePiX\ can plot the derivative or definite integral of real-valued
 functions, solve ODEs in two or three variables, and graph slope- or
 vector fields. Let \code{f}~be a real-valued function of one variable,
@@ -2376,10 +2519,13 @@ line. A vector field itself may be drawn in three ways:
 \end{verbatim}
 The field is sampled at the grid points of the coordinate rectangle
 whose corners are specified.
+\index{Plotting!vector fields|)}
+\index{Plotting!calculus|)}
 
 
 \subsection*{Recursive Fractal Curves}  
 
+\index{Path!fractal|(}
 Consider a path made up of equal-length segments that can point at any
 angle of the form~$2\pi k/n$ radians, for $0\leq k<n$, like spokes on
 a wheel. A path is specified by a finite sequence of integers, taken
@@ -2405,6 +2551,7 @@ likely to exceed the capabilities of \LaTeX\ and/or PostScript.
   \end{center}
   \caption{Successive iterations of \{\code{4,8,0,1,0,3,3,0,1,0}\}}
 \end{figure}
+\index{Path!fractal|)}
 
 
 \section{Non-Euclidean Geometry}
@@ -2420,6 +2567,7 @@ output if either endpoint lies outside the model.
 For compatibility with 2-dimensional hyperbolic space, the half-space
 model is the set $\{(x_1,x_2,x_3)\mid x_2>0\}$.
 
+\index{Plotting!spherical|(}
 A \code{frame} determines geographical coordinates on a \code{sphere}:
 the first element points toward longitude~0 on the equator, the third
 element points to the north pole.  A latitude line depends on a
@@ -2436,7 +2584,7 @@ curve that is visible from the current \code{viewpoint}. The function
 
 Parametrized paths on the unit sphere can be specified either by
 radial projection of a space curve, or by stereographic projection of
-a plane curve:
+a plane curve:\index{Path!on sphere}
 \begin{verbatim}
     plot_R(phi, t_min, t_max, n);    // radial
     plot_N(f1, f2, t_min, t_max, n); // from north pole
@@ -2454,7 +2602,7 @@ invisible (respectively) from the current \code{viewpoint}.
 Because of the way \ePiX\ layers output, it is generally best to put
 hidden portions of the input before visible portions, with line width
 and/or style that suggests hidden lines.
-\index{Plotting|)}
+\index{Plotting!spherical|)}
 
 
 \section{Animation}
@@ -2518,7 +2666,7 @@ are placed into standard locations where they can find each other.
 
 Public installation (in \code{/usr/local}) is the default. Unpack
 the tar file, then \code{cd} to the source directory
-(\filename{epix-0.8.x\_complete}). If you are installing in
+(\filename{epix-x.y.z\_complete}). If you are installing in
 \filename{/usr/local}, your \CXX~compiler is~\code{g++}, and
 \code{bash} is in \filename{/bin/bash}, then do
 \begin{verbatim}
@@ -2553,7 +2701,7 @@ installed in subdirectories of \filename{\$INSTALL/share/epix}.
 
 \subsection*{Known Issues}
 
-\index{MacOS X}
+\index{Mac OS X}
 If you install \ePiX\ on MacOS~X with the December, 2002 Apple
 Developer Tools, you must manually run \code{ranlib} on the compiled
 library:
@@ -2572,6 +2720,22 @@ the problem was an unescaped special character.)
 
 
 \subsection*{Runtime Errors}
+
+Typos frequently cause errors when \code{epix} is run; the compiler
+generally issues a helpful message, naming the troublesome line of the
+input file and the type of error.
+
+Two common sources of error in a syntactically correct input file are
+camera mis-placement and non-generic intersections. If the camera is
+too close to objects in the scene, the lens may try to divide by zero
+(or by a small epsilon), resulting in \code{nan} errors (or very large
+coordinates) in the output file. In this situation, \code{epix} will
+succeed, but \code{elaps} will hang. By contrast, an error message of
+the form
+\begin{verbatim}
+  /usr/local/bin/epix: line 275: 27333 Aborted ...
+\end{verbatim}
+signifies an uncaught exception, hence a non-generic intersection.
 
 Though the shell scripts are extensively tested, they are a possible
 source of runtime problems. (For example, \code{elaps} tries to pass
@@ -2662,6 +2826,8 @@ language.
 
 \section{Hidden Object Removal}
 
+\index{Hidden object removal|(}
+\index{Plotting!surface|(}
 \ePiX\ writes the output file in the same order that objects appear in
 the input. The order is significant because PostScript builds a figure
 in layers: Objects are drawn over objects that come earlier in the
@@ -2672,18 +2838,19 @@ the author, though is not sufficiently refined for inclusion in the
 source code.
 
 The basic idea is to create a shaded quadrilateral class that knows
-its distance to the camera. To draw parametrized surfaces,
-quadrilaterals are written in any convenient order to a linked list,
-then sorted by distance to the camera and printed to the output file
-in decreasing order of distance. The gray density of a mesh element
-depends on the cosine of the angle between the normal vector and the
-vector from the camera to the element. The method works acceptably
-well in practice: Several surfaces can be drawn, and the effect is
-fairly realistic. If the surface meshes are fine enough, intersections
-are accurate and not jagged. However, the output file tends to be
-enormous, and is not effectively human-readable.
+its distance to the camera.\index{Camera} To draw parametrized
+surfaces, quadrilaterals are written in any convenient order to a
+\CXX\ vector, then sorted by distance to the camera and printed to the
+output file in decreasing order of distance. The gray density of a
+mesh element depends on the cosine of the angle between the normal
+vector and the vector from the camera to the element. The method works
+acceptably well in practice: Several surfaces can be drawn, and the
+effect is fairly realistic. If the surface meshes are fine enough,
+intersections are accurate and not jagged. However, the output file
+tends to be enormous, and is not effectively human-readable.
 
 The quadrilateral class might look like this:
+
 \begin{footnotesize}
 \begin{verbatim}
 class mesh_quad
@@ -2707,9 +2874,7 @@ public:
     pt4=f(u0+EPS,v0+dv-EPS);
     
     P center = 0.25*(pt1 + pt2 + pt3 + pt4);
-    P temp = camera.get_viewpt();
-
-    distance = norm(center-temp);
+    distance = norm(center-camera.get_viewpt());
   }
 
   double how_far() const { return distance; }
@@ -2720,11 +2885,9 @@ public:
     normal *= 1/norm(normal);
 
     double dens  = 0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
-
     gray(dens); 
     quad(pt1, pt2, pt3, pt4); 
   }
-
 };
 \end{verbatim}
 \end{footnotesize}
@@ -2759,6 +2922,7 @@ class above can be used as follows in the body of the figure:
 \end{verbatim}
 \end{footnotesize}
 For a complete file, please see \filename{samples/extras/tori.xp}.
+\index{Plotting!surface|)}\index{Hidden object removal|)}
 
 
 \section{Extensions}
@@ -2975,8 +3139,8 @@ Gonzato, Svend Daug{\aa}rd Pedersen, Andrew Sterian
 
 \paragraph{Debugging, advice, and other assistance} Jay Belanger,
 Felipe Paulo Guazzi Bergo, Robin Blume-Kohout, Patrick Cousot, Stephen
-Gibson, Dov Grobgeld, Bob Grover, Jim Hefferon, Yvon Henel, Hartmut
-Henkel, Herng-Jeng Jou, Walter Kehowski, Jacques L'helgoual, Ross
+Gibson, Dov Grobgeld, Bob Grover, Jim Hefferon, Jacques L'helgoual,
+Yvon Henel, Hartmut Henkel, Herng-Jeng Jou, Walter Kehowski, Ross
 Moore, Thorsten Riess, Neel Smith, Michael Somos, Andrew Sterian,
 Ryszard Tanas, Kai Trukenmueller, Torbjorn Vik, Wenguang Wang, Gabe
 Weaver, Mariusz Wodzicki

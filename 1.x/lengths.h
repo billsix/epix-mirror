@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2004
+ * Version 1.0.0
+ * Last Change: September 04, 2004
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003
+ * Copyright (C) 2001, 2002, 2003, 2004
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -41,7 +41,7 @@
  *                                                               *
  * The coordinate triumvirates' initials form a bad physics pun. *
  *                                                               *
- * Recognized LaTeX units are: cm, in, mm, pc, and pt            *
+ * Recognized LaTeX units are: bp, cm, in, mm, pc, pt, and sp    *
  *                                                               *
  * All objects and locations are specified in C by the user; the *
  * conversion to true coordinates is transparent. The rationale  *

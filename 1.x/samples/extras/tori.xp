@@ -74,7 +74,7 @@ P f2(double u, double v)
 	     (2+r_0*Cos(M_PI*u))*Sin(M_PI*v));
 }
 
-main() {
+int main() {
   bounding_box(P(-3,-3),P(3,3));
   unitlength("1in");
   picture(4,4);

@@ -12,10 +12,10 @@ const double du=8.0/N1, dv=4.0/N2;
 const double TMIN=2/sqrt(3);
 const double dt=2*TMIN/N3;
 
-const triple LIGHT=E_1-2*E_2-2*E_3; // location of light, for shading
+const P LIGHT(1,-2,-2); // location of light, for shading
 
-// const triple VIEWPT=P(4,-1,2);
-const triple VIEWPT=P(0,6,18);
+// const P VIEWPT(4,-1,2);
+const P VIEWPT(0,6,18);
 
 const double MAX=4;
 
@@ -29,13 +29,13 @@ private:
   static bool last_was_seg;
   bool is_segment;
 
-  triple pt1, pt2, pt3, pt4, pt5, pt6, pt7, pt8;
+  P pt1, pt2, pt3, pt4, pt5, pt6, pt7, pt8;
 
 public:
   double how_far() const { return distance; }
   double height() const { return ht; }
 
-  mesh_elt(triple f(double u, double v), double u0, double v0)
+  mesh_elt(P f(double u, double v), double u0, double v0)
   {
     // shrink mesh quad by EPS
     pt1=f(u0+EPS,v0+EPS);
@@ -48,15 +48,15 @@ public:
     pt7=f(u0+EPS,v0+dv-EPS);
     pt8=f(u0+EPS,v0+0.5*dv);
 
-    triple center = 0.25*(pt1 + (pt3 + (pt5 + pt7)));
-    triple temp = camera.get_viewpt();
+    P center = 0.25*(pt1 + (pt3 + (pt5 + pt7)));
+    P temp = camera.get_viewpt();
 
     ht=center.x3();
     distance = norm(center-temp);
     is_segment=false;
   }
 
-  mesh_elt(triple f(double), double t0)
+  mesh_elt(P f(double), double t0)
   {
     pt1=f(t0);
     pt2=f(t0+0.25*dt);
@@ -64,8 +64,8 @@ public:
     pt4=f(t0+0.75*dt);
     pt5=f(t0+dt);
 
-    triple center = 0.333*(pt1 + (pt3 + pt5));
-    triple temp = camera.get_viewpt();
+    P center = 0.333*(pt1 + (pt3 + pt5));
+    P temp = camera.get_viewpt();
 
     ht=center.x3();
     distance = min(min(norm(temp-pt1), norm(temp-pt3)), norm(temp-pt5))-0.5;
@@ -76,7 +76,7 @@ public:
   void draw() 
   { 
     if (!is_segment) {
-      triple normal = (pt2 - pt1)*(pt4 - pt1);
+      P normal = (pt2 - pt1)*(pt4 - pt1);
       normal *= 1/norm(normal);
 
       double dens  = 0.625*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
@@ -120,12 +120,12 @@ public:
   { return (arg1.how_far()) > (arg2.how_far()); }
 };
 
-triple Phi(double u, double v)
+P Phi(double u, double v)
 {
   return P(0.75*(u*u-2*v)*u, 2*u, 4*v);
 }
 
-inline triple Phi1(double t) { return Phi(t, 1.5*t*t); }
+inline P Phi1(double t) { return Phi(t, 1.5*t*t); }
 
 inline P cusp(double t) 
 { 
@@ -133,10 +133,10 @@ inline P cusp(double t)
   return P(temp.x1(), -8, temp.x3()); 
 }
 
-main() {
+int main() {
   bounding_box(P(-8,-20),P(8,4));
   unitlength("1in");
-  picture(P(4,6));
+  picture(4,6);
 
   begin();
   degrees();

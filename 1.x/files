@@ -10,6 +10,7 @@ README-authors
 README-changes
 THANKS
 TODO
+VERSION
 bash_completions
 camera.cc
 camera.h

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc16
- * Last Change: August 24, 2004
+ * Version 1.0.0
+ * Last Change: September 04, 2004
  *
  */
 
@@ -68,8 +68,8 @@ namespace ePiX {
   inline double Cot(double t) { return ePiX::cot(t); }
 
   inline double Acos(double t)  { return ePiX::acos(t); }
-  inline double Asin(double t)  { return ePiX::acos(t); }
-  inline double Atan(double t)  { return ePiX::acos(t); }
+  inline double Asin(double t)  { return ePiX::asin(t); }
+  inline double Atan(double t)  { return ePiX::atan(t); }
 
   // identity and zero functions, coordinate projections
   template<class T>T id(T arg) { return arg; }
@@ -92,9 +92,7 @@ namespace ePiX {
 
   inline P sph(double r, double t, double phi) 
     {
-      return P(r*(ePiX::cos(t))*(ePiX::cos(phi)), 
-	       r*(ePiX::sin(t))*(ePiX::cos(phi)), 
-	       r*(ePiX::sin(phi)));
+      return P(r*(Cos(t))*(Cos(phi)), r*(Sin(t))*(Cos(phi)), r*(Sin(phi)));
     }
 
   inline P cylindrical(P arg)

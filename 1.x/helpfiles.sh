@@ -32,9 +32,8 @@ EPIX_TTRLDIR=${EPIX_EPIXDIR}/tutorial
 EPIX_CONFFILES="bash_completions epix.el epix.spec update_figs.sh"
 EPIX_NOTEFILES="BUGS CHANGELOG COPYING INSTALL POST-INSTALL README README-authors README-changes THANKS TODO"
 
-EPIX_DOCDIR=$(ls -d epix-*_tex 2>/dev/null)
-EPIX_MAJOR_VERSION=${EPIX_DOCDIR%%"_tex/"} # "epix-0.8.x"
-EPIX_VERSION=epix-EPIX_VERSION_NUMBER
+EPIX_DOCDIR=doc
+EPIX_VERSION=epix-$(cat VERSION)
 EPIX_TARBALL=${EPIX_VERSION}_samples.tar
 
 # Mimic run of epix on sample file, using newly-compiled library
@@ -96,7 +95,7 @@ case "$1" in
 	if [ "$EPIX_DOCDIR" != "" ]; then # we're "complete"
 	    cd $EPIX_DOCDIR && makefigs && ../laps -Pamz -Pcmz tutorial.tex
 	    # Put tutorial in $INSTALL_DIR/share/epix/tutorial
-	    $INSTALL tutorial.ps $EPIX_TTRLDIR/${EPIX_MAJOR_VERSION}_howto.ps
+	    $INSTALL tutorial.ps $EPIX_TTRLDIR/${EPIX_VERSION}_howto.ps
 
 	    rm tutorial.{dvi,log,ps}
 

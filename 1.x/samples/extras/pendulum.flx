@@ -7,7 +7,8 @@ P F(double u, double v)
   return P(v, -Sin(u));
 }
 
-double theta0=5*M_PI/6; // 30 degrees
+double theta0=-5*M_PI/6;
+double EPS=0.01; // to avoid singularity of f at theta0
 
 P posn0(theta0, 0);
 
@@ -15,6 +16,7 @@ P pivot(0,5.5);
 double ell=3;
 
 double K=-Cos(theta0);
+
 double f(double t)
 {
   return recip(sqrt(2*(K+Cos(t))));
@@ -37,15 +39,16 @@ int main(int argc, char* argv[])
 
   begin();
 
-  double period=4*I(f).eval(theta0);
+  // calculate period, avoiding singularity at theta0
+  double period=4*(sqrt(2*EPS/(-Sin(theta0)))+I(f).eval(-theta0-EPS));
 
   rgb(0.95,0.95,0.95);
   grid();
   black();
 
   P posn=flow(F, posn0, period*tix, 120*tix); // phase position
-  double x_t = Sin(posn.x1());
-  double y_t = Cos(posn.x1());
+  double x_t = -Sin(posn.x1());
+  double y_t =  Cos(posn.x1());
 
   slope_field(F, P(-2*M_PI,-2), P(2*M_PI,2), 48, 12);
 

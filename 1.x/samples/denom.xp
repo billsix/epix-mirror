@@ -3,13 +3,13 @@
 #include "epix.h"
 using namespace ePiX;
 
-const int N = 30; // maximum denominator plotted
+int N = 30; // maximum denominator plotted
 
-main() 
+int main() 
 {
   unitlength("0.01in");
   bounding_box(P(-2,0), P(2,1));
-  picture(P(400,100));
+  picture(400,100);
 
   begin();   
 
@@ -18,7 +18,7 @@ main()
 
   h_axis_labels(x_size, P(-12, -12));
 
-  dot_size(1);
+  dot_size(1); // draw dots 1pt in diameter
   for (int i=1; i< N; ++i) 
     for (int j=i*x_min; j <= i*x_max; ++j) 
       if (gcd(i, j) == 1) 
