@@ -1,0 +1,67 @@
+August 27, 2003
+
+ePiX provides the following abstract Shape objects:
+* Line
+* Segment
+* Plane
+* Circle
+* Sphere
+
+Shape objects can be intersected (as appropriate), translated, scaled,
+and drawn. The Line, Segment, Plane, and Sphere classes are implemented
+as non-zero Vectors, while a Circle consists of a Vector and a radius.
+
+Recall that an ePiX Vector consists of a Position p=(p1,p2,p3) and a
+triple v=(v1,v2,v3). 
+
+* The associated Line is the set p + tv, t real, which passes through
+  p in the direction v.
+
+* The head and tail of a Vector define a Segment, namely the set of
+  Positions on the Line above for which 0 <= t <= 1.
+
+* The associated plane is the set of Positions x such that (x-p)|v=0, 
+  namely the plane through p that is perpendicular to v.
+
+* A Vector and a double define the circle of given radius whose center
+  is the tail, and that lies in the plane perpendicular to the Vector.
+
+* A Vector defines the sphere centered at the tail and containing the
+  head.
+
+
+Affine Operations:
+
+Translation of a Shape is translation of the defining Vector. Scaling
+is only meaningful for Segments, Circles, and Spheres, and constitutes
+expansion ("homothety") about the center (for Circles and Spheres) or
+expansion about the midpoint for Segments.
+
+
+Intersections:
+
+Shapes have "generic" intersections that satisfy the following table:
+
+       | Line    Segment   Plane  Circle   Sphere
+--------------------------------------------------
+Line   | Empty   Empty     Posn   Segment  Segment
+--------------------------------------------------
+Segment|         Empty     Posn    N/A     N/A
+--------------------------------------------------
+Plane  |                   Line   Segment  Circle
+--------------------------------------------------
+Circle |                          Segment  Segment
+--------------------------------------------------
+Sphere |                                   Circle
+
+Non-generic (or null) intersections cause exceptions to be thrown. The
+following exceptions are provided:
+
+NON_COPLANAR (Lines, Segments, and Circles)
+PARALLEL     (Lines, Segments, and Planes)
+DISJOINT     (Segment intersected with other types)
+COINCIDENT   (All types)
+TANGENT      (Circles and Spheres intersected with other types)
+CONCENTRIC   (Circles and Spheres -- means one object is inside the
+              other, but not necessarily truly concentric)
+SEPARATED    (Circles and Spheres -- DISJOINT but not CONCENTRIC)

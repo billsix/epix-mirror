@@ -1,0 +1,64 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+main() {
+  bounding_box(P(0,0),P(12,24));
+  unitlength("0.25in");
+  picture(P(16,24));
+
+  begin();
+
+  bold();
+
+  line(P(0,24), P(0,20));
+  line(P(6,24), P(6,4));
+  line(P(12,24), P(12,17));
+  line(P(0,20), P(6,20));
+
+  line(P(0,18), P(6,18));
+  line(P(6,17), P(12,17));
+  line(P(3,4), P(9,4));
+
+  line(P(0,18), P(0,8));
+
+  line(P(3,2), P(3,4));
+  line(P(9,2), P(9,4));
+
+  line(P(3,2), P(9,2));
+  line(P(6,2), P(6,0));
+
+  masklabel(P(0,24), "Position");
+  masklabel(P(0,22), "Vector");
+  masklabel(P(0,20), "Frame");
+
+  masklabel(P(6,24), "Pair");
+  masklabel(P(6,19), "Camera");
+
+  masklabel(P(12,24), "Color\\_spec");
+
+  masklabel(P(0,18), "Shape");
+  masklabel(P(6,16), "Object");
+
+  masklabel(P(6,14), "Picture");
+  masklabel(P(6,12), "Compound");
+  masklabel(P(6,10), "Point");
+  masklabel(P(6,8), "Label");
+  masklabel(P(6,6), "Vertex");
+
+  masklabel(P(3,4), "Path\\_data");
+  masklabel(P(3,2), "Path");
+
+  masklabel(P(9,4), "Face\\_data");
+  masklabel(P(9,2), "Face");
+
+  masklabel(P(6,0), "Mesh");
+
+  masklabel(P(0,16), "Line");
+  masklabel(P(0,14), "Segment");
+  masklabel(P(0,12), "Plane");
+  masklabel(P(0,10), "Circle");
+  masklabel(P(0,8), "Sphere");
+
+  end();
+}

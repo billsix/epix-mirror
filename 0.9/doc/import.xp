@@ -1,0 +1,63 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+triple p1=P(0.75,1),   q1 = P(3.5,0.5);
+triple p2=P(2.5,1),   q2 = P(6,0.5);
+triple p3=P(2.5,2.5), q3 = P(6,3);
+triple p4=P(0.75,2.5), q4 = P(3.5,3);
+
+main() {
+  bounding_box(P(0,0),P(6,3));
+  unitlength("0.5in");
+  picture(P(6,2));
+
+  begin();
+
+  bold();
+  rect(P(0,0), P(3,3));
+
+  pen(3);
+  white();
+  line(p1,q1);
+  line(p2,q2);
+  line(p3,q3);
+  line(p4,q4);
+
+  plain();
+  black();
+  dashed();
+  rect(p1,p3);
+
+  solid();
+  pen(0.15);
+  line(p1,q1);
+  line(p2,q2);
+  line(p3,q3);
+  line(p4,q4);
+
+  bold();
+  gray(0);
+  rect(q1,q3);
+
+  dot(p1);
+  dot(p3);
+  
+  dot(q1);
+  dot(q3);
+  
+  fprintf (stdout, "\n\\scriptsize");
+
+  label(P(0,y_min), P(2,2), "Parent's screen", tr);
+  //  label(q4, P(2,-2), "Child's screen", br);
+  label(0.5*(q1+q3), P(0,0), "Child's screen", c);
+
+  //  label(p1, P(-2,-2), "$(h_\\mathrm{min}, v_\\mathrm{min})$", bl);
+  label(p1, P( 2, 2), "$(h_\\mathrm{min}, v_\\mathrm{min})$", tr);
+  label(p3, P(-2,-2), "$(h_\\mathrm{max}, v_\\mathrm{max})$", bl);
+
+  label(q1, P(2,2), "$(x_\\mathrm{min}, y_\\mathrm{min})$", tr);
+  label(q3, P(-2,-2), "$(x_\\mathrm{max}, y_\\mathrm{max})$", bl);
+
+  end();
+}

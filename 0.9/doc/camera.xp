@@ -1,0 +1,63 @@
+/* -*-ePiX-*- */
+// camera.xp -- April 15, 2003
+#include "epix.h"
+using namespace ePiX;
+
+const double SIZE=3;
+const triple cam = P(0,0,3);
+triple my_proj(triple arg) { return (cam.x3/(cam.x3-arg.x3))*P(arg.x1, arg.x2); }
+
+const triple p1 = P(1,-1, 1);
+const triple p2 = P(0, 2,-3);
+
+main() {
+  bounding_box(P(-SIZE,-SIZE), P(SIZE,SIZE));
+  unitlength("1in");
+  picture(P(2,2));
+
+  begin();
+
+  viewpoint(3,1,2);
+  camera.range(8);
+
+  grid(P(-SIZE,-SIZE), P(SIZE,SIZE), 1, 1);
+
+  white();
+  pen(3);
+  line(cam, my_proj(p1));
+  line(cam, my_proj(p2));
+
+  black();
+  plain();
+
+  marker(cam, DOT);
+  label(cam, P(0,0,0), "Camera", tr);
+
+  marker(P(0,0,0), DOT);
+  label(P(0,0,0), P(0,0), "Target", b);
+
+  line(cam, my_proj(p1));
+
+  marker(p1, BBOX);
+  label(p1, P(-1,0), "$p_1$", lt);
+
+  marker(my_proj(p1), BBOX);
+  masklabel(my_proj(p1), P(-2,0), "$\\mathrm{view}(p_1)$", l);
+
+
+  line(cam, my_proj(p2));
+
+  marker(p2, BBOX);
+  label(p2, P(1,0), "$p_2$", br);
+
+  marker(my_proj(p2), BBOX);
+  masklabel(my_proj(p2), P(2,0), "$\\mathrm{view}(p_2)$", r);  
+
+  dashed();
+  line(p2, my_proj(p2));
+
+  dotted(0.25);
+  line(cam, P(0,0,0));
+
+  end();
+}

@@ -1,0 +1,296 @@
+#!/bin/bash
+#
+# prepix -- Automatically generate shell script "epix" from Makefile.
+#
+# February 07, 2003   Andrew D. Hwang        <ahwang@mathcs.holycross.edu>
+#
+
+## Don't modify anything below unless you know what you're doing :) ##
+
+EPIX_WRAPPER=${EPIX_SCRIPT:-epix}
+
+## Unquoted HERE document ##
+cat <<HEADER > $EPIX_WRAPPER
+#!/bin/bash
+#
+# epix: wrapper script for ePiX
+#
+# Options: --help for usage, --version for version and license
+#
+# Compiler flags may be specified on the command line or in the config
+# file ~/.epixrc. The script attempts to deal intelligently with missing
+# or multiple extensions. If the input file has a recognized extension,
+# there's no issue. If only the root name <infile> is given, the script
+# searches for completions in the order of preference dictated by the
+# variable EPIX_EXTENSIONS. A warning is issued for multiple matches.
+# If no output file is specified, its name is obtained from the input file
+# name. 
+#
+# Copyright (C) 2001, 2002, 2003
+# Andrew D. Hwang   <ahwang@mathcs.holycross.edu>
+# 
+
+## Auto-generated file; modify as necessary ##
+
+INSTALL_DIR=${EPIX_ROOTDIR:-/usr/local}
+COMPILER=${EPIX_CXX:-g++}
+PROG=$EPIX_WRAPPER
+HEADER
+# End of header
+
+# Now for phase two...
+cat <<"EOF" >> $EPIX_WRAPPER
+
+## Nothing below here should need modification ##
+
+EPIX_CONFIG_FILE="$HOME/.epixrc"
+# Search these extensions in order of preference
+EPIX_EXTENSIONS="xp cc c C cpp" # or NULL
+EPIX_DOT_EXT=".xp|.cc|.c|.C|.cpp" # output string for "usage"
+
+export EPIX_MYINCLUDES
+export EPIX_MYLIBDIRS
+export EPIX_MYLIBS
+export EPIX_MYWARNS
+export EPIX_MYFLAGS
+
+
+function epix_die {
+    echo "$PROG: ERROR: $1" >&2
+    exit 1
+}
+
+function epix_warn {
+    echo "$PROG: WARNING: $1" >&2
+}
+
+
+# Parse command line/config file for compiler flags/options
+function epix_parse_options {
+while [ "$1" != "${1#"-"}" ]; do
+    case "$1" in
+
+    -I*)
+	EPIX_MYINCLUDES="$EPIX_MYINCLUDES $1"; shift; continue
+	;;
+
+    -L*)
+	EPIX_MYLIBDIRS="$EPIX_MYLIBDIRS $1"; shift; continue
+	;;
+
+    -l*)
+	EPIX_MYLIBS="$EPIX_MYLIBS $1"; shift; continue
+	;;
+
+    -W*)
+	EPIX_MYWARNS="$EPIX_MYWARNS $1"; shift; continue
+	;;
+
+    -V|-i*|-u|-x)
+	EPIX_MYFLAGS="$EPIX_MYFLAGS $1 $2"; shift 2; continue
+	;;
+
+    -b|-o) 
+	epix_warn "Skipping option \"$1 $2\""
+	shift 2; continue
+	;;
+
+    -h|--help)
+	epix_help; # exit normally
+	;;
+
+    -v|--version)
+	epix_version; # exit normally
+	;;
+
+    *)
+	EPIX_MYFLAGS="$EPIX_MYFLAGS $1"; shift; continue
+	;;
+    esac
+done
+} # End of epix_parse_options
+
+# Path to standard header and library
+HDR_PATH=$INSTALL_DIR/include
+LIB_PATH=$INSTALL_DIR/lib
+
+# Standard libraries
+LIBS="-lm -lepix"
+
+declare INFILE
+declare INROOT
+declare FOUND_EXT="false"
+
+# get file's root name, assuming extension is in $EPIX_EXTENSIONS
+function epix_get_fileroot {
+# Skip compiler flags
+while [ "$1" != "${1#"-"}" ]; do 
+    case "$1" in
+
+    -V|-b|-i*|-o|-u|-x)
+	shift 2;
+	;;
+
+    *)
+	shift;
+	;;
+    esac
+done
+# Assume next parameter is input file
+    INFILE=$1
+
+    if [ "$INFILE" = "" ]; then epix_die "You must specify an input file!"; fi
+
+    for EXT in $EPIX_EXTENSIONS; do
+	if [ $1 = ${1%%".$EXT"}.$EXT ]; then
+	INROOT=${1%%".$EXT"} && FOUND_EXT="true" && break;
+	fi
+    done
+
+# No recognized extension provided
+    if [ "$FOUND_EXT" = "false" ]; then
+	INROOT=$1
+	local infile_count
+	infile_count=0
+
+	# Search for completions; first match wins
+	for EXT in $EPIX_EXTENSIONS; do
+	    if [ -f $INROOT.$EXT ]; then 
+		if [ $infile_count -eq 0 ]; then
+		    INFILE=$INROOT.$EXT;
+		fi
+
+		let infile_count=infile_count+1
+	    fi
+	done
+
+	if [ $infile_count -eq 0 ]
+	then
+	    epix_die "No completions of \"$INROOT\" found"
+
+	elif [ $infile_count -ge 2 ]
+	then
+    epix_warn "Found $infile_count completions of \"$INROOT\", using $INFILE"
+
+	# else one file found, INFILE already set
+	fi
+
+    fi
+
+    # remaining parameter (if any) assumed to be output file
+    if [ "$2" != "" ]; then
+	EPIX_OUTFILE=$2
+	EPIX_OUTROOT=${EPIX_OUTFILE%%".eepic"}
+    else
+	EPIX_OUTROOT=$INROOT
+    fi
+} # end of epix_get_fileroot
+
+function epix_help {
+cat <<HELP >&1
+Usage: $PROG [options] <infile>[$EPIX_DOT_EXT] [<outfile>[.eepic]]
+
+  Options specific to $PROG are:
+
+    -h, --help
+      Print this help message
+
+    -v, --version
+      Print version and license information
+
+    All other options are treated as compiler flags
+
+HELP
+    exit 0
+} # End of epix_help
+
+function epix_version {
+cat <<VERSION >&1
+$PROG is part of ePiX, Version EPIX_VERSION_NUMBER
+
+Copyright (C) 2001, 2002, 2003
+Andrew D. Hwang <ahwang@mathcs.holycross.edu>
+Department of Mathematics and Computer Science
+College of the Holy Cross
+Worcester, MA, 01610-2395, USA
+
+  ePiX is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+ 
+  ePiX is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with ePiX; if not, write to the Free Software Foundation, Inc.,
+  59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+VERSION
+    exit 0
+} # End of epix_version
+
+## Script proper starts here ##
+
+if [ $# -eq 0 ]; then epix_help; 
+
+else
+    # Command line options
+    epix_parse_options $@
+
+    # Remaining option(s) assumed to be input (and output) file(s)
+    epix_get_fileroot $@
+
+    # Append options from the config file, if any
+    if [ -f $EPIX_CONFIG_FILE ]; then
+	for line in $(cat $EPIX_CONFIG_FILE | grep -v "#"); do
+	    epix_parse_options $line
+	done
+    fi
+
+    # Suppress all warnings if none are requested
+    if [ "$EPIX_MYWARNS" = "" ]; then EPIX_MYWARNS="-w"; fi
+fi
+
+# Create temporary directory
+PID=$$
+EPIX_TEMPDIR=/tmp/$PROG-$PID
+mkdir $EPIX_TEMPDIR || epix_die "Can't create $EPIX_TEMPDIR"
+
+# Give temporary binary a unique name (securely if possible...)
+TEMP_BIN=$(mktemp -q $EPIX_TEMPDIR/epix-$PID.XXXXXX 2>/dev/null)
+if [ $? -ne 0 ]; then # No mktemp on this system...?
+    TEMP_BIN=$EPIX_TEMPDIR/$INROOT-$PID.exe &&
+    touch $TEMP_BIN
+fi
+
+# Create symlink to input file with appropriate extension for compiler
+EPIX_TEMP_INPUT=$EPIX_TEMPDIR/epix-$PID.cc # temporary input file
+ln -s $(pwd)/$INFILE $EPIX_TEMP_INPUT
+
+# Compile executable (temporary binary written in cwd)
+$COMPILER $EPIX_TEMP_INPUT $EPIX_MYWARNS -o $TEMP_BIN \
+    -I$HDR_PATH -I. $EPIX_MYINCLUDES -L$LIB_PATH $EPIX_MYLIBDIRS \
+    $LIBS $EPIX_MYLIBS $EPIX_MYFLAGS
+
+if [ ! -f "$TEMP_BIN" ]; then # clean up and exit
+    rm -Rf $EPIX_TEMPDIR && epix_die "Compilation failed"; fi
+
+# Write eepic file
+if [ -x "$TEMP_BIN" ]; then 
+    echo "%% Generated from $INFILE on $(date) by" > $EPIX_OUTROOT.eepic
+    $TEMP_BIN >> $EPIX_OUTROOT.eepic
+
+    # Clean up
+    rm -Rf $EPIX_TEMPDIR
+
+    exit 0;
+fi
+
+if [ ! -f "$EPIX_OUTROOT.eepic" ]; then
+    rm -Rf $EPIX_TEMPDIR && epix_die "Could not create $EPIX_OUTROOT.eepic"
+fi
+EOF
+## end of script ##

@@ -1,0 +1,63 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+const double neg = -0.125, pos = 0.75, delta=0.25, ht=0.5*pos;
+const double MAX=1.125;
+
+void coordinates2(triple origin)
+{
+  dart(P(neg,0) + origin, P(pos,0) + origin);
+  dart(P(0,neg) + origin, P(0,pos) + origin);
+}
+
+void coordinates3(triple origin)
+{
+  dart(P(neg,0) + origin, P(pos,0) + origin);
+  dart(P(0,neg) + origin, P(0,pos) + origin);
+  dart(neg*cis(210) + origin, 0.5*pos*cis(210) + origin);
+}
+
+main() {
+  bounding_box(P(0,-0.5),P(6,1));
+  unitlength("0.5in");
+  picture(P(8,2));
+
+  begin();
+  degrees();
+
+  dashed();
+  rect(P(-0.5,-0.5), P(5,MAX));
+
+  gray(0.1);
+  swatch(P(5.5,-0.5), P(7.25, MAX));
+  solid();
+
+  coordinates3(P(0,0));
+  coordinates3(P(2,0));
+  coordinates2(P(4,0));
+  coordinates2(P(6,0));
+  //  coordinates2(P(8,0));
+
+  fprintf (stdout, "\n\\scriptsize");
+  label(P(-0.5,MAX), P(2,-2), "Child", br);
+
+  label(P(1,ht), P(0,4), "User", t);
+  label(P(3,ht), P(0,4), "Camera", t);
+  //  label(P(5,ht), P(0,0), "Markup", t);
+  masklabel(P(5,ht), P(0,-2), "Import", t);
+
+  label(P(0,0), P(0,-6), "Abstract", br);
+  label(P(2,0), P(0,-6), "Object", br);
+  label(P(4,0), P(1,-6), "Screen", br);
+  //  label(P(6,0), P(0,-6), "Markup", br);
+  label(P(6,0), P(0,-6), "Ambient", br);
+
+  label(P(7.25,MAX), P(-2,-2), "Parent", bl);
+
+  arrow(P(delta,ht), P(2-delta,ht));
+  arrow(P(2+delta,ht), P(4-delta,ht));
+  arrow(P(4+delta,ht), P(6-delta,ht));
+  //  arrow(P(6+delta,ht), P(8-delta,ht));
+
+  end();
+}

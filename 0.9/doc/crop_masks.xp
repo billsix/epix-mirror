@@ -1,0 +1,40 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+const double radius = 0.5;
+
+main() {
+  bounding_box(P(-3,-1),P(3,1));
+  unitlength("1in");
+  picture(P(3,1));
+
+  begin();
+  degrees();
+
+  grid(1,1);
+  
+  bold();
+  // diamond
+  line(P(x_max,0), P(0,y_max));
+  line(P(0,y_max), P(x_min,0));
+  line(P(x_min,0), P(0,y_min));
+  line(P(0,y_min), P(x_max,0));
+
+  // rounded corners
+  arc(P(x_max - radius, y_max - radius), radius, 0, 90);  
+  line(P(x_max - radius, y_max), P(x_min + radius, y_max));
+
+  arc(P(x_min + radius, y_max - radius), radius, 90, 180);  
+  line(P(x_min, y_max - radius), P(x_min, y_min + radius));
+
+  arc(P(x_min + radius, y_min + radius), radius, 180, 270);  
+  line(P(x_min + radius, y_min), P(x_max - radius, y_min));
+
+  arc(P(x_max - radius, y_min + radius), radius, 270, 360);  
+  line(P(x_max, y_min + radius), P(x_max, y_max - radius));
+
+  // ellipse
+  native_ellipse(P(0,0), P(x_max,y_max));
+
+  end();
+}
