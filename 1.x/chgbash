@@ -2,8 +2,8 @@
 #
 EPIX_PATH_TO_BASH="$(which bash)"
 EPIX_NEW_PATH_TO_BASH=""
-EPIX_FILE_LIST="elaps laps make_header post-uninst.sh pre-install.sh prepix \
-	samples/sample.sh samples/makefigs Makefile"
+EPIX_FILE_LIST="make_{epix,elaps,flix,header,laps} post-uninst.sh \
+        pre-install.sh samples/sample.sh helpfiles.sh"
 REPLY="x"
 COUNT=0 # number of missing files
 
@@ -17,9 +17,9 @@ MESSAGE
 epix_chg_greeting () {
 cat <<GREETING
     Greetings, and thank you for installing ePiX! My purpose in life is to 
-    assist you by doing some tedious file editing for you. According to my
-    information, you need this change done because on your system, the GNU
-    shell "bash" is located in $EPIX_PATH_TO_BASH instead of /bin/bash.
+    do some tedious file editing for you. According to my information, you
+    need this change done because on your system, the GNU shell "bash" is 
+    located in $EPIX_PATH_TO_BASH instead of /bin/bash.
 
     If this information is incorrect, please enter "c" to change, or "q" to
     quit without changing anything. Otherwise press ENTER to accept the

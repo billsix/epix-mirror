@@ -1,6 +1,6 @@
 ePiX -- INSTALL
 
-Last Change: January 05, 2005
+Last Change: January 11, 2005
 
 This file contains detailed installation instructions for ePiX-1.x
 
@@ -31,9 +31,8 @@ be in your PATH.
 --- Synopsis ---
 
 (1) Unpack
-(2) Edit the Makefile if installing somewhere other than /usr/local
-(3) Edit and run newbash.sh if bash is not /bin/bash
-(4) Build:
+(2) Edit the config file if necessary
+(3) Build:
 
 % make [contrib] test 
 % make install
@@ -61,32 +60,17 @@ be in your PATH.
 % cd epix-x.y.z
 
 
-(2) To install in /usr/local, skip to step (3). Otherwise, edit the
-  following line of the config file as desired:
+(2) By default, ePiX installs in /usr/local, and uses /bin/bash and
+  g++ to compile files. If these assumptions are correct, please skip
+  to step (3). Otherwise, edit the config file, changing the following
+  lines as necessary:
 
   EPIX_ROOTDIR=/usr/local
+  EPIX_CXX=g++
+  EPIX_BASH_PATH=/bin/bash
 
 
-(3) As already noted, ePiX is strongly bash-dependent.
-
-  If bash is in /bin/bash on your system, skip to step (4).
-
-  If bash is NOT in /bin/bash, then edit the file newbash.sh, replacing
-  "/usr/local/bin/bash" in the indicated line with the path to bash on
-  your system, then run the script:
-
-% ./newbash.sh
-
-  When the script finishes, you may safely remove the ".orig" files left 
-  behind. If the script fails, something is seriously wrong, e.g., you
-  don't have write permission in the source directory, or "sed" is not
-  installed. Speak to your sysadmin for assistance. The action of the 
-  script can be accomplished manually (but painfully) as follows: For
-  each file listed in the script, replace each occurrence of "/bin/bash"
-  with the full path to bash on your system (about 10 changes in all).
-
-
-(4) Compile:
+(3) Compile and install:
 
 % make
 
@@ -94,20 +78,23 @@ be in your PATH.
   installation:
   * A static library (libepix.a)
   * A header file (epix.h)
-  * The shell scripts
+  * Four shell scripts
 
-  If desired, build the (separately documented, see the contrib/ directory)
-  contributed package:
-
-% make contrib
+  Next, compile the documentation and sample files. These may be
+  built/cleaned individually ("make doc", "make samples-clean", etc.)
 
 % make test
 
-  Builds the documentation and sample files. These may be built/cleaned 
-  individually ("make doc", "make samples-clean", etc.)
+  Compiling the figures will take a minute or two.
+  
+  Finally, if desired build the contributed package:
 
+% make contrib
 
-(5) Install:
+  These steps may be issued in a single command:
+
+% make contrib test
+
 
   You must have write permission in the install directory you selected
   in step (2). If you have been logged on as yourself until now (a Very
@@ -128,7 +115,38 @@ Password: <your root password>
 % make install
 
 
-(6) Post-Install:
+  Installing and using multiple versions:
+
+  More than one version of ePiX can be installed on a machine. To
+  install a version older than 1.0.3 (in the example below, version
+  0.8.9 is installed in the user's home directory), download and build
+  the source code as usual; please visit
+
+    http://savannah.nongnu.org/cgi-bin/viewcvs/epix/epix/archive/
+
+  for source tarballs. Next, MANUALLY install the header and library,
+
+# install -m 644 epix.h ~/include/epix-0.8.9.h
+# install -m 644 libepix.a ~/lib/libepix-0.8.9.a
+
+  The version number must be specified in the target names, and old
+  shell scripts must NOT be installed. To use version 0.8.9, the
+  source file must #include "epix-0.8.9.h", and is compiled with the
+  epix flag "--no-defaults":
+
+% epix --no-defaults -I ~/include -L ~/lib -lepix-0.8.9 file.c
+
+
+(4) Post-Install:
+
+  Documentation is installed in $INSTALL_DIR/share/doc/epix, as compiled
+  files (ps, pdf) and tarred LaTeX sources.
+
+  The directory $INSTALL_DIR/share/epix/config contains miscellaneous
+  optional files, notably Jay Belanger's emacs mode for working with
+  ePiX source files, and completions for users of Ian MacDonald's bash
+  completions package. POST-INSTALL has instructions on installing and
+  using these files.
 
   From the source directory, do
   
@@ -137,54 +155,28 @@ Password: <your root password>
   to clean the source tree of compiled files, documentation, and samples.
   It is safe to run "make clean" repeatedly.
 
-  The documentation and sample files are installed in $INSTALL_DIR/doc,
-  as compiled files (ps, pdf) and tarred LaTeX sources.
 
-  The directory $INSTALL_DIR/share/epix/config contains miscellaneous
-  optional files, notably Jay Belanger's emacs mode for working with
-  ePiX source files, and completions for users of Ian MacDonald's bash
-  completions package. POST-INSTALL has instructions on installing and
-  using these files.
+(5) Uninstalling:
 
-
-(7) Uninstalling:
-
-  To remove ePiX from your system, go to the directory where the 
-  sources were unpacked, "su root" if necessary, and do:
+  To remove ePiX from your system, go to the directory where the
+  sources were unpacked and do:
 
 % make -n uninstall-all
-       ^^ N.B.!
+       ^^----------------- *** N.B. ***
 
-  FAILURE TO PERFORM THIS SANITY CHECK MAY DAMAGE YOUR FILESYSTEM!!
+  The "-n" flag prints the commands that will be run, but does not
+  remove anything.
 
-  If the install path (in make's output) is correct, it is safe to do
+  ***  SKIPPING THIS SANITY CHECK MAY DAMAGE YOUR FILESYSTEM!!  ***
 
-% make uninstall-all
+  Verify carefully that the install path is correct, particularly that
+  there are no extra spaces.  If the install path in make's output is
+  correct, "su root" if necessary and do
+
+# make uninstall-all
 
   ePiX also provides a "make uninstall" target, which removes only the
   version corresponding to the source directory. 
-
-
---- Installing Multiple Versions ---
-
-More than one version of ePiX can be installed on the same machine. To
-install a version older than 1.0.3, download and build the source code
-as usual -- please visit
-
-  http://savannah.nongnu.org/cgi-bin/viewcvs/epix/epix/archive/
-
-for older versions -- then manually install the header and library, e.g.
-
-# install -m 644 epix.h /usr/local/include/epix-0.6.5.h
-# install -m 644 libepix.a /usr/local/lib/libepix-0.6.5.a
-
-Note that the version number must be specified in the target names, and
-that old shell scripts must NOT be installed. To use version 0.6.5 (say),
-the source file must #include "epix-0.6.5.h" and be compiled with the
-epix flag "--no-defaults", e.g.
-
-% epix --no-defaults -I/usr/local/include -L/usr/local/lib -lepix-0.6.5 file.c
-
 
 
 --- Contact Information ---

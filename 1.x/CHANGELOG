@@ -2,12 +2,12 @@ ePiX -- CHANGELOG
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
-January 02-06, 2005 (v1.0.3)
+January 02-12, 2005 (v1.0.3)
  * (New file: config) Configurable parts of the old Makefile
   - Install paths conform to the Filesystem Hierarchy Standard
+    (See README-porting for details)
   - No environment variables passed by Makefile during build
- * (New files: make_{elaps,epix,flix,laps}) 
-  - Create all shell scripts at build
+ * (New files: make_{elaps,epix,flix,laps}) Generate scripts at build
  * epix, elaps, laps re-written
   - (All) Can compile multiple files in one run
   - (epix) Output file specified by -o option, not as final argument
@@ -19,6 +19,9 @@ January 02-06, 2005 (v1.0.3)
   - Makefile handles cleanup (instead of relying on helpfiles.sh)
   - Compiled tutorial, samples, and tarred source files in doc/epix
   - Header and lib files' names contain version number, and are symlinked
+  - newbash.sh run automatically if necessary
+  - "make contrib" can be re-run safely
+  - Run ranlib on installed library (Alan Sill, very belated)
 
 December 31, 2004 (v1.0.2)
  * (dataplot.*, samples/extras) Histogram functions

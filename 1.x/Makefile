@@ -1,10 +1,6 @@
 # Makefile for ePiX v1.x
 #
 
-## ePiX is bash-centric; apologies if you're not... ##
-SHELL=/bin/bash
-
-
 ##############################################################
 ##############################################################
 ########                                              ########
@@ -15,7 +11,13 @@ SHELL=/bin/bash
 
 include ./config
 
-## Directories (full paths) -- assume names set by config ##
+## ePiX is bash-centric; apologies if you're not... ##
+
+SHELL=/bin/sh
+#SHELL=${EPIX_BASH_PATH}
+
+
+## Directories (full paths) -- names set by config ##
 bindir=${EPIX_ROOTDIR}/bin
 libdir=${EPIX_ROOTDIR}/lib
 hdrdir=${EPIX_ROOTDIR}/include
@@ -25,7 +27,6 @@ docdir=${EPIX_DOC_PATH}
 
 ## Binutils ##
 CFLAGS=-c -Wall
-LINT=lint
 RANLIB=ranlib
 
 ## Miscellaneous commands ##
@@ -61,10 +62,9 @@ EPIX_CONTRIB_TAR=${EPIX_CONTRIB}_src.tar
 EPIX_MAN=epix.1
 
 # notes, configs
-
 EPIX_CONFFILES=bash_completions config epix.ebuild epix.el epix.spec
 EPIX_NOTEFILES=BUGS CHANGELOG COPYING INSTALL POST-INSTALL \
-	README README-changes THANKS
+	README README-changes README-porting THANKS
 
 ## Source, object, and header files ##
 CONFIG=config
@@ -90,14 +90,45 @@ PATHS=domain.h path.h curves.h plots.h dataplot.h
 
 
 ## Targets ##
-:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(ELAPS) $(FLIX) $(LAPS)
+:	$(CONFIG)
+	@if [ ${EPIX_BASH_PATH} != /bin/bash ]; then ./newbash.sh; fi
+	make $(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(ELAPS) $(FLIX) $(LAPS)
 
-all:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(ELAPS) $(FLIX) $(LAPS)
+all:	$(CONFIG)
+	@if [ ${EPIX_BASH_PATH} != /bin/bash ]; then ./newbash.sh; fi
+	make $(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(ELAPS) $(FLIX) $(LAPS)
 
+# epix.h
+$(EPIX_HDR):	$(HDRS) $(CONFIG)
+	@./make_header
+
+# libepix.a
 $(EPIX_LIB):	$(OBJS)
 	ar -ru $(EPIX_LIB) $(OBJS)
 	$(RANLIB) $(EPIX_LIB)
 
+# shell scripts
+$(ELAPS):	make_elaps $(EPIX_FCNS) $(CONFIG)
+	@./make_elaps
+
+$(EPIX):	make_epix $(EPIX_FCNS) $(CONFIG)
+	@./make_epix
+
+$(FLIX):	make_flix $(EPIX_FCNS) $(CONFIG)
+	@./make_flix
+
+$(LAPS):	make_laps $(EPIX_FCNS) $(CONFIG)
+	@./make_laps
+
+contrib:	$(EPIX_LIB)
+	@-$(RM) epix.h $(EPIX_HDR)
+	@./make_header
+	@$(LINK) $(EPIX_HDR) epix.h
+	@$(LINK) $(EPIX_LIB) libepix.a
+	cd contrib; make contrib; cd ..
+	make contrib-doc
+
+# the pieces...
 triples.o:	triples.cc $(GLOBALS) triples.h
 	$(CXX) $(CFLAGS) triples.cc
 
@@ -131,9 +162,6 @@ plane.o:	plane.cc $(GLOBALS) $(OBJECTS) plane.h
 output.o:	output.cc $(GLOBALS) $(OUTPUTS) output.h
 	$(CXX) -O2 $(CFLAGS) output.cc
 
-# Style.o:	Style.cc $(GLOBALS) Style.h
-#	$(CXX) $(CFLAGS) Style.cc
-
 Label.o:	Label.cc $(GLOBALS) $(OBJECTS) Label.h
 	$(CXX) $(CFLAGS) Label.cc
 
@@ -156,35 +184,7 @@ geometry.o:	geometry.cc $(GLOBALS) $(OUTPUTS) $(OBJECTS) $(PATHS) \
 functions.o:	functions.cc $(GLOBALS) functions.h
 	$(CXX) $(CFLAGS) functions.cc
 
-$(EPIX_HDR):	$(HDRS) $(CONFIG)
-	@./make_header
-
-$(ELAPS):	make_elaps $(EPIX_FCNS) $(CONFIG)
-	@./make_elaps
-
-$(EPIX):	make_epix $(EPIX_FCNS) $(CONFIG)
-	@./make_epix
-
-$(FLIX):	make_flix $(EPIX_FCNS) $(CONFIG)
-	@./make_flix
-
-$(LAPS):	make_laps $(EPIX_FCNS) $(CONFIG)
-	@./make_laps
-
-contrib:	$(EPIX_LIB)
-	@-$(RM) epix.h $(EPIX_HDR)
-	@./make_header
-	@$(LINK) $(EPIX_HDR) epix.h
-	@$(LINK) $(EPIX_LIB) libepix.a
-	cd contrib; make contrib; cd ..
-	make contrib-doc
-
-#legacy:	$(EPIX_HDR) $(LEGACY_HDR)
-#	@echo "Making legacy target. DO NOT use legacy features in new files!"
-#	@cat $(LEGACY_HDR) | grep -v "\#if" | grep -v "include \"" \
-#	| grep -v endif >> $(EPIX_HDR)
-
-
+# documentation
 doc:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
 	@./helpfiles.sh --doc
 
@@ -197,6 +197,7 @@ contrib-doc:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
 test:	
 	@make doc samples
 
+# (un)install, clean
 install:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(FLIX) $(ELAPS) $(LAPS)
 	@./pre-install.sh
 

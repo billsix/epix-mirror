@@ -1,21 +1,34 @@
 # Set these variables before building
 #
 
-###### Install directory; modify as desired, leave no spaces ######
+######  Install directory  ######
+
+## Uncomment only one, beware of trailing spaces.
 
 EPIX_ROOTDIR=/usr/local
 
 #EPIX_ROOTDIR=/opt
 #EPIX_ROOTDIR=/sw
-
-#EPIX_ROOTDIR=/home/my_home 
-#EPIX_ROOTDIR=/Users/my_home
+#EPIX_ROOTDIR=${HOME}
 
 
-###### Compiler; use full path/version if necessary ######
+######  Runtime compiler  ######
+
+## Use full path if necessary, see Makefile for build compiler.
 
 EPIX_CXX=g++
+
 #EPIX_CXX=/usr/local/bin/g++-3.4
+
+
+######  Bash  ######
+
+## GNU/Linices should leave this alone
+
+EPIX_BASH_PATH=/bin/bash
+
+#EPIX_BASH_PATH=/sw/bin/bash
+#EPIX_BASH_PATH=/usr/local/bin/bash
 
 
 ###### Modify below at your own risk ######
