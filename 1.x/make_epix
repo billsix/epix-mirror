@@ -64,6 +64,7 @@ DEFAULT_LIB="-L$LIB_PATH"
 
 # Use default library unless we're called by version number
 LIBS="-lm -lepix"
+EPIX_SRC_EXT=cc
 
 declare EPIX_MYINCLUDES
 declare EPIX_MYLIBDIRS
@@ -99,6 +100,9 @@ cat <<"HELP" >&1
 
     --no-defaults
       Do not use default include/library directories
+
+    -cc|--compiler)
+      Specify the compiler (e.g., gcc)
 
     All other options are passed to the compiler. Valid options, 
     one per line, may be placed in $HOME/.epixrc. 
@@ -186,10 +190,15 @@ while [ "$1" != "${1#"-"}" ]; do
 	;;
 
     --no-defaults)
-        DEFAULT_INC=""
-        DEFAULT_LIB=""
         LIBS="-lm"
         shift; continue
+        ;;
+
+    -cc|--compiler)
+        COMPILER=$2
+        COMP_NAME=$(basename $COMPILER)
+        if [ ${COMP_NAME:$((-2))} = cc ]; then EPIX_SRC_EXT=c; fi
+        shift 2; continue
         ;;
 
     *)
@@ -207,7 +216,8 @@ function epix_compile_files {
 while [ "$1" != "${1#"-"}" ]; do 
     case "$1" in
 
-    -V|-b|-i*|-o|-u|-x|-I|-L|-l|-W)
+    -V|-b|-i*|-o|-u|-x|-I|-L|-l|-W|-cc|--compiler)
+
 	shift 2;
 	;;
 
@@ -281,7 +291,7 @@ done
         fi
 
         # Create symlink to input file with appropriate extension for compiler
-        EPIX_TEMP_INPUT=$EPIX_TEMPDIR/epix-$PID.cc # temporary input file
+        EPIX_TEMP_INPUT=$EPIX_TEMPDIR/epix-$PID.$EPIX_SRC_EXT
         ln -s $(pwd)/$EPIX_INFILE $EPIX_TEMP_INPUT
 
         # Compile executable (temporary binary written in cwd)
