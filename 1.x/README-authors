@@ -1,0 +1,40 @@
+General information, mostly for authors of ePiX modules :)
+
+January 30, 2003
+
+
+ePiX is a preprocessor that creates high-quality, mathematically
+accurate figures for the mathematical typesetting program LaTeX . The
+"program" is implementated as a C++ library and a shell script. A
+source file is a short C/C++ program that is linked against the
+library, and whose executable writes the desired output file. The C++
+compiler is therefore an integral part of ePiX.
+
+
+DESIGN
+
+The design philosophy of ePiX is evolving, but there are a few short
+guidelines that are likely to be permanent: ePiX should be
+
+1. largely backward-compatible.
+2. easy to learn and use.
+3. easily customized at compile time.
+
+In particular, function names should be well-chosen (or private:) so
+as not to require renaming in the future. Mnemonic names are best; if
+possible, function names should mimic LaTeX or standard mathematical
+usage, e.g., 
+  cis(t), which defines the <pair> cos(t) + i*sin(t),
+  marker(P(a,b), OPLUS), which puts an \oplus at (a,b).
+
+
+NAMESPACES
+
+In Version 0.8.8, a C++ ePiX namespace was introduced. Eventually
+there will be a core library that provides basic geometric objects
+(points and vectors), coordinate systems and mappings, and methods for
+creating labels and plots. Non-core functionality (solving ODEs,
+plotting surfaces meshes, etc.) will be placed in separate ePiX_*
+namespaces. The remaining issues discussed in the original version of
+this file will then be moot.
+

@@ -1,0 +1,28 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// the function to be plotted
+double f(double x) { return x*x; }
+
+main() {
+  bounding_box(P(-2,0),P(2,4));
+  unitlength("1in");
+  picture(P(3,3));
+  offset(P(1.5,-1));
+
+  begin();
+
+  grid(32,32); // fine grid
+
+  bold();
+  grid(4,4); // and coarse
+
+  h_axis_labels(4, P(0,-2), b);
+  v_axis_masklabels(P(0, 1), P(0, y_max), 3, P(0,0), c); // omit 0
+
+  red();
+  plot(f,x_min,x_max,20);
+  
+  end();
+}

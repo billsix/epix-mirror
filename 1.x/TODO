@@ -1,0 +1,24 @@
+ePiX -- TODO
+
+July 28, 2002
+
+The features listed here are vague plans for the future of ePiX; there
+is no time-table for implementing these changes, nor any guarantee the
+changes will ever occur. Please feel free to contact the author if you
+have a feature you would like added.
+
+* Better index for tutorial (user feedback is very important)
+
+* Format line breaks in output by number of characters printed, rather
+ than by the number of points printed
+* Phase out pairs as predominant internal data structure, replacing them 
+ with triples (x,y,0).
+
+* General polylines and splines
+* Error bar plotting, histograms
+* Clipped plotting for ODEs
+* Log scales for plotting
+
+* Convex polyhedra with hidden line removal
+* Axes for 3-D plotting
+* Non-orthogonal projection functions

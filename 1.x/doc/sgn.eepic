@@ -1,0 +1,30 @@
+%% Generated from sgn.xp on Mon Aug 23 23:28:07 EDT 2004 by
+%% ePiX-0.8.11rc16
+%%
+%%   Cartesian bounding box: [-2,2] x [-1,1]
+%%   Actual size: 1.5in x 0.75in
+%%   Figure offset: right by 0in, up by 0in
+%%
+\setlength{\unitlength}{1in}
+\begin{picture}(1.5,0.75)(-0,-0)
+%% ---
+\path(0,0.375)(1.5,0.375)
+\put(0,0.375){\makebox(0,0)[c]{\rule{0.5pt}{4pt}}}
+\put(0.375,0.375){\makebox(0,0)[c]{\rule{0.5pt}{4pt}}}
+\put(0.75,0.375){\makebox(0,0)[c]{\rule{0.5pt}{4pt}}}
+\put(1.125,0.375){\makebox(0,0)[c]{\rule{0.5pt}{4pt}}}
+\put(1.5,0.375){\makebox(0,0)[c]{\rule{0.5pt}{4pt}}}
+%% ---
+\path(0.75,0)(0.75,0.75)
+\put(0.75,0){\makebox(0,0)[c]{\rule{4pt}{0.5pt}}}
+\put(0.75,0.75){\makebox(0,0)[c]{\rule{4pt}{0.5pt}}}
+%% ---
+\thicklines
+\path(0,0)(0.75,0)
+\path(1.5,0.75)(0.75,0.75)
+\thinlines
+\put(0.75,0.375){\makebox(0,0)[c]{{\circle*{0.041511}}}}
+\whiten\put(0.75,0){\makebox(0,0)[c]{{\circle{0.041511}}}}
+\whiten\put(0.75,0.75){\makebox(0,0)[c]{{\circle{0.041511}}}}
+\put(0.75,-0.055348){\makebox(0,0)[t]{\code{sgn}}}
+\end{picture}

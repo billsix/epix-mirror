@@ -1,0 +1,67 @@
+ePiX -- THANKS
+
+ePiX is built on the work of many people (unfortunately, most of whom 
+I am unaware). A few of the obvious ones are, in alphabetical order:
+
+Donald E. Knuth		TeX, and so much more
+Conrad Kwok		the eepic style
+Leslie Lamport		LaTeX
+Tim Morgan		tpic
+Piet van Oostrum	updates and maintenance of eepic
+Sunil Podar 		the epic style
+Richard M. Stallman	the GNU project
+
+----------------------------------------------------------------------
+
+Special thanks to:	For:
+
+Jay Belanger		the emacs mode
+Robin Blume-Kohout	design help
+Guido Gonzato		creating and maintaining the RPM
+Svend Daugaard Pedersen	the contrib package
+Andrew Sterian		Pyepix and its Windows package
+
+----------------------------------------------------------------------
+
+Many thanks to the following people, who have helped publicize ePiX
+or reported and/or patched bugs (in both code and documentation:)
+
+<Anonymous>
+
+Jay Belanger
+Felipe Paulo Guazzi Bergo
+Robin Blume-Kohout
+
+Patrick Cousot
+
+Stephen Gibson
+Dov Grobgeld
+Bob Grover
+
+Jim Hefferon
+Yvon Henel
+Hartmut Henkel
+
+Herng-Jeng Jou
+
+Walter A. Kehowski
+
+Jacques L'helgoual
+
+Ross Moore
+
+Thorsten Riess
+
+Neel Smith
+Michael Somos
+Andrew Sterian
+
+Ryszard Tanas
+Kai Trukenmueller
+
+Torbjorn Vik
+
+Wenguang Wang
+Gabe Weaver
+Mariusz Wodzicki
+

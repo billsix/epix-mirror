@@ -1,0 +1,68 @@
+/* -*-ePiX-*- */
+/* marker.c -- types of marker */
+#include "epix.h"
+using namespace ePiX;
+
+main()
+{
+  unitlength("0.25in");
+  picture(P(15,4));
+  bounding_box(P(0,0), P(5,1));
+  //  offset(P(-1,0));
+
+  begin();
+
+  double x1 = x_min;
+  double x2 = x_min + x_size/4;
+  double x3 = x_min + 2*x_size/4;
+  double x4 = x_min + 3*x_size/4;
+  double x5 = x_max;
+
+  double y1 = y_min;
+  double y2 = y_min + y_size/2;
+  double y3 = y_max;
+
+  label(P(x1,y3), P(12,-4), "{\\tt{CIRC}}");
+  circ(P(x1,y3));
+
+  label(P(x2,y3), P(12,-4), "{\\tt{SPOT}}");
+  spot(P(x2,y3));
+
+  label(P(x3,y3), P(12,-4), "{\\tt{RING}}");
+  ring(P(x3,y3));
+
+  label(P(x4,y3), P(12,-4), "{\\tt{DOT}}");
+  dot(P(x4,y3));
+
+  label(P(x5,y3), P(12,-4), "{\\tt{DDOT}}");
+  ddot(P(x5,y3));
+
+  label(P(x1,y2), P(12,-4), "{\\tt{PLUS}}");
+  marker(P(x1,y2), PLUS);
+
+  label(P(x2,y2), P(12,-4), "{\\tt{OPLUS}}");
+  marker(P(x2,y2), OPLUS);
+
+  label(P(x3,y2), P(12,-4), "{\\tt{TIMES}}");
+  marker(P(x3,y2), TIMES);
+
+  label(P(x4,y2), P(12,-4), "{\\tt{OTIMES}}");
+  marker(P(x4,y2), OTIMES);
+
+  label(P(x1,y1), P(12,-4), "{\\tt{DIAMOND}}");
+  marker(P(x1,y1), DIAMOND);
+
+  label(P(x2,y1), P(12,-4), "{\\tt{UP}}");
+  marker(P(x2,y1),UP);
+
+  label(P(x3,y1), P(12,-4), "{\\tt{DOWN}}");
+  marker(P(x3,y1), DOWN);
+
+  label(P(x4,y1), P(12,-4), "{\\tt{BOX}}");
+  marker(P(x4,y1), BOX);
+
+  label(P(x5,y1), P(12,-4), "{\\tt{BBOX}}");
+  marker(P(x5,y1), BBOX);
+
+  end();
+}

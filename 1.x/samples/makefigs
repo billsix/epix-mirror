@@ -1,0 +1,22 @@
+#!/bin/bash
+#
+# makefigs: run epix on all files in cwd
+# 
+# August 4, 2001  Andrew D. Hwang  ahwang@mathcs.holycross.edu
+# Last change: June 28, 2002
+#
+if [ -f epix ] && [ -x epix ]; then
+    for file in $(ls *.xp); do ./epix $file ; done
+
+elif [ -f ../epix ] && [ -x ../epix ]; then
+    for file in $(ls *.xp); do ../epix $file; done
+
+elif [ "$(which epix)" != "" ]; then
+    echo "Using $(which epix)"
+    for file in $(ls *.xp); do epix $file; done
+
+else
+    echo "Sorry, no wrapper script found" && exit 1
+fi
+exit 0
+

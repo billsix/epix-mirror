@@ -1,0 +1,26 @@
+%% Generated from scaling.xp on Wed Aug 18 09:41:31 EDT 2004 by
+%% ePiX-0.8.11rc16
+%%
+%%   Cartesian bounding box: [0,5] x [-0.125,1]
+%%   Actual size: 300pt x 60pt
+%%   Figure offset: right by 0pt, up by 5pt
+%%
+\setlength{\unitlength}{1pt}
+\begin{picture}(300,60)(-0,-5)
+%% ---
+\path(0,6.66667)(90,6.66667)(90,46.6667)(0,46.6667)(0,6.66667)
+\path(180,6.66667)(240,6.66667)(240,60)(180,60)(180,6.66667)
+\put(0,6.66667){\makebox(0,0)[c]{{\circle*{2}}}}
+\put(90,46.6667){\makebox(0,0)[c]{{\circle*{2}}}}
+\put(180,6.66667){\makebox(0,0)[c]{{\circle*{2}}}}
+\put(240,60){\makebox(0,0)[c]{{\circle*{2}}}}
+\special{sh 1}%
+\path(105,20)(156.75,20)(156.75,21.5)(165,20)(156.75,18.5)(156.75,20)
+\put(135,24){\makebox(0,0)[b]{\code{epix}}}
+\put(2,8.66667){\makebox(0,0)[bl]{\scriptsize$(x_\mathrm{min},y_\mathrm{min})$}}
+\put(88,44.6667){\makebox(0,0)[tr]{\scriptsize$(x_\mathrm{max},y_\mathrm{max})$}}
+\put(45,2.66667){\makebox(0,0)[t]{Cartesian bounding box}}
+\put(182,8.66667){\makebox(0,0)[bl]{\scriptsize$(0,0)$}}
+\put(238,58){\makebox(0,0)[tr]{\scriptsize$(h_\mathrm{size},v_\mathrm{size})$}}
+\put(210,2.66667){\makebox(0,0)[t]{\LaTeX\ picture box}}
+\end{picture}

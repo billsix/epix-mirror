@@ -1,0 +1,19 @@
+%% Generated from dots.xp on Fri Aug 20 21:29:56 EDT 2004 by
+%% ePiX-0.8.11rc16
+%%
+%%   Cartesian bounding box: [0,8] x [0,1]
+%%   Actual size: 72pt x 12pt
+%%   Figure offset: right by 10pt, up by 2pt
+%%
+\setlength{\unitlength}{1pt}
+\begin{picture}(72,12)(-10,-2)
+%% ---
+\put(0,0){\makebox(0,0)[c]{{\circle*{4.5}}}}
+\put(9,0){\makebox(0,0)[c]{{\circle*{3}}}}
+\put(18,0){\makebox(0,0)[c]{{\circle*{2}}}}
+\put(36,0){\makebox(0,0)[c]{\rule{3pt}{3pt}}}
+\put(45,0){\makebox(0,0)[c]{\rule{2pt}{2pt}}}
+\path(58.5,0)(78.75,0)
+\put(63,0){\makebox(0,0)[c]{{\circle{4.5}}}}
+\whiten\put(72,0){\makebox(0,0)[c]{{\circle{3}}}}
+\end{picture}

@@ -1,0 +1,32 @@
+%% Generated from pathstyle.xp on Wed Jun 23 11:01:25 EDT 2004 by
+%% ePiX-0.8.11rc9
+%%
+%%   Cartesian bounding box: [0,10] x [-0.5,0]
+%%   Actual size: 5in x 0.25in
+%%   Figure offset: right by 0in, up by 0in
+%%
+\setlength{\unitlength}{0.5in}
+\begin{picture}(10,0.5)(-0,-0)
+%% ---
+\thicklines
+\put(0,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\put(1,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\put(2,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\path(0,0.5)(0,0.5)(0.5,0.5)(1,0.5)(1.5,0.5)(2,0.5)
+%% ---
+\put(1,0.333956){\makebox(0,0)[t]{Solid}}
+\put(4,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\put(5,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\put(6,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\path(4,0.5)(4,0.5)(4.3,0.5)
+%% ---
+\path(4.7,0.5)(4.7,0.5)(5.3,0.5)
+%% ---
+\path(5.7,0.5)(5.7,0.5)(6,0.5)
+%% ---
+\put(5,0.333956){\makebox(0,0)[t]{Dashed}}
+\put(8,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\put(9,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\put(10,0.5){\makebox(0,0)[c]{{\circle*{0.083022}}}}
+\put(9,0.333956){\makebox(0,0)[t]{Dotted}}
+\end{picture}

@@ -1,0 +1,124 @@
+/* -*-ePiX-*- */
+/* monkey_saddle.xp -- shaded surface plotting */
+#include "epix.h"
+using namespace ePiX;
+
+const int N=8;
+
+const int MIN=4;
+const int MESH=12;
+
+const P VIEWPT=P(18,10,7);
+const P LIGHT=E_3;
+
+P x_0=P(3,2);
+
+const double EPS=0.001;
+const double vert = 1.0/32;
+
+double f(double u, double v)
+{
+  return vert*v*(v*v-3*u*u);
+}
+
+double g(int i) { return MIN*i*1.0/N; }
+
+P Df_x(double t) 
+{ 
+  double x=t+x_0.x1();
+  double y=x_0.x2();
+
+  return P(x, y, f(x, y));
+}
+
+P Df_y(double t) 
+{ 
+  double x=x_0.x1();
+  double y=t+x_0.x2();
+
+  return P(x, y, f(x, y));
+}
+
+double density(int i, int j)
+{
+  double f_x = 0.5*(f(g(i)+EPS, g(j)) - f(g(i)-EPS, g(j)))/EPS;
+  double f_y = 0.5*(f(g(i), g(j)+EPS) - f(g(i), g(j)-EPS))/EPS;
+
+  P normal = P(-f_x, -f_y, 1);
+  normal *= 1/sqrt(normal|normal);
+  //  return 0.0125+0.75*
+  return 0.5*(1-sgn(normal|VIEWPT)*pow(normal|VIEWPT, 2)/(VIEWPT|VIEWPT));
+}
+
+main() {
+  picture(P(2.5, 2.5));
+  bounding_box(P(-6,-6), P(6,6));
+  unitlength("1in");
+
+  begin();
+  viewpoint(VIEWPT);
+  camera.range(15);
+
+  green(0.7);
+
+  grid(P(-MIN,-MIN,-MIN), P(-MIN, MIN, MIN), MESH, MESH);
+  grid(P(-MIN,-MIN,-MIN), P( MIN,-MIN, MIN), MESH, MESH);
+  grid(P(-MIN,-MIN,-MIN), P( MIN, MIN,-MIN), MESH, MESH);
+
+  black();  
+  label(P(0,1+MIN,0), P(4,0), "$y$", r);
+  label(P(0,0,1+MIN), P(0,4), "$z$", t);
+
+  clip_box(P(-MIN,-MIN,-3), P(MIN,MIN,2));
+  clip();
+
+  fill();
+  for (int i=-N; i < 0; ++i)
+    for (int j=-N; j < N; ++j)
+      {
+	gray(density(i,j));
+	quad(P(g(i),   g(j),   f(g(i),   g(j))), 
+	     P(g(i+1), g(j),   f(g(i+1), g(j))),
+	     P(g(i+1), g(j+1), f(g(i+1), g(j+1))), 
+	     P(g(i),   g(j+1), f(g(i),   g(j+1))));
+      }
+  clip(false);
+
+  bold();
+  arrow(P(0,0,0), P(0,1+MIN,0));
+  arrow(P(0,0,0), P(0,0,1+MIN));
+
+  plain();
+
+  clip();
+  for (int i=0; i < N; ++i)
+    for (int j=-N; j < N; ++j)
+      {
+	gray(density(i,j));
+	quad(P(g(i),   g(j),   f(g(i),   g(j))), 
+	     P(g(i+1), g(j),   f(g(i+1), g(j))),
+	     P(g(i+1), g(j+1), f(g(i+1), g(j+1))), 
+	     P(g(i),   g(j+1), f(g(i),   g(j+1))));
+      }
+  clip(false);
+
+  bold();
+  arrow(P(0,0,0), P(1+MIN,0,0));
+  label(P(1+MIN,0,0), P(-1,-1), "$x$", bl);
+
+  fill(false);
+
+  red();
+  plot(Df_x, -3, 1, 20);
+  label(Df_x(1), P(0,-2), "$\\displaystyle\\frac{\\partial f}{\\partial x}$: $y$ constant", bl);
+
+  magenta();
+  plot(Df_y, -2, 2, 20);
+  label(Df_y(2), P(2,0), "$\\displaystyle\\frac{\\partial f}{\\partial y}$: $x$ constant", r);
+
+  black();
+  label(P(0, 0, MIN), P(2,2), "$z=\\displaystyle\\frac{1}{32}y(y^2-3x^2)$", tr);
+
+  end();
+}
+

@@ -1,0 +1,41 @@
+/* -*-ePiX-*- */
+/* calculus.c -- May 29, 2002 */
+#include "epix.h"
+using namespace ePiX;
+
+double MAX=2*M_PI;
+double f(double t)
+{
+  return t*ePiX::sin(t);
+}
+
+main() {
+
+  unitlength("1pt");
+  picture(P(240, 120));
+  bounding_box(P(-MAX,-MAX), P(MAX,MAX));
+  offset(P(80, 0));
+
+  begin();
+
+  // Coordinate axes and labels
+  h_axis(8);
+  v_axis(4);
+
+  label(P(0,y_max), P(-4,0), "$2\\pi$", l);
+  label(P(0,y_min), P(-4,0), "$-2\\pi$", l);
+
+  label(P(x_min,0), P(0,2), "$-2\\pi$", t);
+  label(P(x_max,0), P(0,2), "$2\\pi$", t);
+
+  bold();
+  plot(f, x_min, x_max, 90);
+  green();
+  plot(D(f), x_min, x_max, 90);
+
+  /* Definite integral from x=0 */
+  blue();
+  plot(I(f, 0), x_min, x_max, 90);
+
+  end();
+}

@@ -1,0 +1,70 @@
+/* template.c, August 16, 2001
+ *
+ * ePiX template file, commented for users who don't know C.
+ * Please see the tutorial/ directory for companion information.
+ */
+
+/* 
+ * The mandatory include and namespace lines.
+ */
+#include "epix.h"
+using namespace ePiX;
+
+/*
+ * Examples of function definitions. C knows the following 
+ * functions of one variable: 
+ *
+ * sqrt, ceil, floor, fabs (abs val),
+ * sin, cos, tan, sinh, cosh, tanh, exp, log, log10, 
+ * asin, acos, atan (principle branches).
+ *
+ * pow(x,y) returns x^y when legal (i.e., real)
+ * atan2(y,x) returns Arg(x+iy) (principle branch of arg)
+ *
+ * GNU C knows more exotic functions; see the GNU C manual.
+ */
+double f(double t)
+{
+  return log(sin(t));
+}
+
+double phi(double t)
+{
+  return 1/(1-t*t);
+}
+
+double elliptic_curve_half(double x_1)
+{
+  return sqrt(4*pow(x_1, 3) + x_1 * x_1);
+}
+
+double r1(double theta)
+{
+  return exp(-2*theta);
+}
+
+/* Program starts here */
+main() 
+{
+  /* ePiX commands start here */
+  bounding_box(P(-2,-1), P(2,2)); // [-2,2] x [-1,2]
+
+  picture(P(300, 150)); // picture is 300 x 150 units
+  
+  /* optional definitions */
+  offset(P(0,0)); // picture offset right and up, zero by default
+
+  unitlength("1pt");
+
+  /* Start picture */
+  begin();
+
+  /* 
+   * Objects, labels, and plots go here
+   */
+
+  /* End picture */
+  end();
+
+  /* Mandatory closing brace ends main() */
+}

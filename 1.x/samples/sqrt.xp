@@ -1,0 +1,48 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P f(double x, double y)
+{
+  pair z = pair(x,y);
+  pair temp = z*z;
+  return P(temp.x1(), temp.x2(), x);
+}
+
+inline P F(double r, double t)
+{ return f(r*ePiX::cos(t), r*ePiX::sin(t)); }
+
+P g(double t) { return t*P(t,0,1); }
+const double MAX=1.5;
+
+domain R(P(0,0), P(1.25,0.5), mesh(6,24), mesh(12,60));
+
+main() {
+  bounding_box(P(-MAX,-MAX),P(MAX,MAX));
+  unitlength("1in");
+  picture(P(2.5,2.5));
+  offset(P(1.5,0));
+
+  begin();
+  revolutions();
+  viewpoint(4,-2,3);
+
+  pen(0.15);  rgb(0.7,0.7,1); 
+  plot(F, R);
+
+  plain();  blue(); 
+  plot(F, R.resize2(0.5,1));
+
+  black();  pen(0.5);
+  arrow(P(0,0,0), 2*E_1);
+  arrow(P(0,0,0), 2*E_2);
+  arrow(P(0,0,0), 1.5*E_3);
+
+  masklabel(2*E_1, P(0,0), "$\\mathrm{Re}\\,z$", r);
+  label(2*E_2, P(0,0), "$\\mathrm{Im}\\,z$", r);
+  label(1.5*E_3, P(2,0), "$\\mathrm{Re}\\,\\sqrt{z}$", r);
+
+  bold(); red();
+  plot(g, -1.25, 1.25, 40);
+  end();
+}

@@ -1,0 +1,24 @@
+/* -*-ePiX-*- */
+/* graphpaper.c -- July 6, 2002 */
+#include "epix.h"
+using namespace ePiX;
+
+main()
+{
+  bounding_box(P(-2,-1), P(2,1));
+  picture(P(200,100));
+  unitlength("0.01in");
+
+  begin();
+
+  pen(0.25);
+  grid(10*x_size, 10*y_size);
+
+  pen(0.5);
+  grid(2*x_size, 2*y_size);
+
+  pen(1);
+  grid(x_size, y_size);
+
+  end();
+}

@@ -1,0 +1,186 @@
+ePiX -- INSTALL
+
+Last Change: August 26, 2004
+
+This file contains detailed installation instructions for ePiX-1.x
+
+Lines starting with a "%" denote commands typed at a shell prompt. 
+Lines starting with a "#" denote commands run as root.
+Don't type the prompt characters "%" or "#". :)
+
+Please note the special instructions for Mac OS X (see Section 5).
+
+ePiX contains four shell scripts (epix, elaps, flix, and laps) that
+automate file processing by running auxiliary programs. The packages
+GhostScript, ImageMagick, and teTeX must be installed on your system
+in order for you to use ePiX. (In case you're curious, the specific
+programs are: convert, dvips, g++, latex, and ps2epsi.) The shell
+scripts must be in your PATH.
+
+Please consult your system documentation for information on
+installing these components. The POST-INSTALL file has potentially
+helpful information, as well.
+
+
+--- Synopsis ---
+
+(1) Unpack
+(2) Edit the Makefile if installing somewhere other than /usr/local
+(3) Edit and run newbash.sh if bash is not /bin/bash
+(4) Build:
+
+% make [contrib] test 
+% make install
+
+
+--- Step-by-step Instructions ---
+
+(1) Tarballs are available gzip or bzip2 compressed. GNU/Linux comes with
+  bzip2 utilities, while Solaris (e.g.) does not. To unpack the tarball,
+  use the appropriate version number, package name (src or complete), and
+  tar options (z for .gz, j for .bz2, v to see filenames unpacked):
+
+% tar -zxf epix-x.y.z_complete.tar.gz
+
+% tar -jxf epix-x.y.z_complete.tar.bz2
+
+  If your "tar" doesn't understand decompression, do
+
+% gunzip -c epix-x.y.z_complete.tar.gz | tar -xf -
+
+% bzcat epix-x.y.z_complete.tar.bz2 | tar -xf -
+
+  Change to the source directory:
+
+% cd epix-x.y.z
+
+
+(2) To install in /usr/local, skip to step (3). Otherwise, edit the
+  following line of the Makefile as desired:
+
+  prefix=/usr/local
+
+
+(3) As already noted, ePiX is strongly bash-dependent.
+
+  If bash is in /bin/bash on your system, please skip to step (4).
+
+  If bash is NOT in /bin/bash on your system, then edit the file
+  newbash.sh, replacing "/usr/local/bin/bash" in the indicated line
+  with the path to bash on your system, then run the script:
+
+% ./newbash.sh
+
+  When the script finishes, you may safely remove the ".orig" files left 
+  behind. If the script fails, something is seriously wrong, e.g., you
+  don't have write permission in the source directory, or "sed" is not
+  installed. Speak to your sysadmin for assistance. The action of the 
+  script can be accomplished manually (but painfully) as follows: For
+  each file listed in the script, replace each occurrence of "/bin/bash"
+  with the full path to bash on your system (about 10 changes in all).
+
+
+(4) Compile:
+
+% make
+
+  This builds several object files, and the following files for
+  installation:
+  * A static library (libepix.a)
+  * Shell scripts (epix, flix)
+  * A header file (epix.h)
+
+  If desired, build the (separately documented, see the contrib/ directory)
+  contributed package:
+
+% make contrib
+
+  If LaTeX and dvips are installed, you may test the build before installing:
+
+% make test
+
+  If all goes well, you'll have a dvi file "sample.dvi" and a Postscript
+  file "sample.ps" that you can preview or print. 
+
+  If one of these steps fails, run "make clean" before proceeding.
+
+
+(5) Install:
+
+  You must have write permission in the install directory you selected
+  in step (2). If you have been logged on as yourself until now (a Very
+  Good Idea:) and are installing in a system directory, do:
+
+% su
+Password: <your root password>
+
+# make install
+
+  (The root prompt on many systems is # rather than %.) If the install
+  succeeds, you're done:
+
+# exit
+
+  If you are installing in your HOME directory, just type
+
+% make install
+
+
+  On Mac OS X, the commands are slightly different:
+
+% sudo make install
+Password: <your user password>
+
+% sudo ranlib /usr/local/lib/libepix.a
+
+
+(6) Post-Install:
+
+  From the source directory, do
+  
+% make clean
+
+  to clean the source tree of compiled files and sample output. It is
+  safe to run "make clean" repeatedly.
+
+  The sample files are installed in $INSTALL_DIR/share/epix. For users'
+  convenience, they are available both unpacked and tarred up in the file
+
+  $INSTALL_DIR/share/epix/epix_samples.tar
+
+  This tar file does not create a subdirectory when unpacked. To look at
+  the sample .eepic files, create a directory, say "samples", then do:
+
+% cd samples
+% cp /usr/local/share/epix/epix_samples.tar .
+% tar -xvf epix_samples.tar
+% ./makefigs
+
+  These commands assume ePiX is installed under /usr/local, of course.
+
+  The directory $INSTALL_DIR/share/epix/config contains miscellaneous
+  optional files, notably Jay Belanger's emacs mode and info file for
+  working with ePiX source files, and completions for users of Ian
+  MacDonald's bash completions package. POST-INSTALL has instructions
+  on installing and using these files.
+
+
+(7) Uninstalling:
+
+  To remove ePiX from your system (should it come to this), "su root"
+  if necessary and from the source directory do:
+
+% make uninstall
+
+  Any files (such as epix.el) installed manually in a directory not
+  under $INSTALL_DIR/share/epix must be removed separately.
+
+
+--- Contact Information ---
+
+If you have questions, comments, suggestions, etc., please write to:
+
+Andrew D. ("Andy") Hwang  <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+Dept. of Mathematics and Computer Science
+College of the Holy Cross
+Worcester, MA, 01610-2395, USA

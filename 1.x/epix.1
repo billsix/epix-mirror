@@ -1,0 +1,91 @@
+.TH ePiX 1 "December 21, 2002"
+.LO 1
+.fi
+.SH NAME
+ePiX \- A LaTeX pre-processor for creating mathematically accurate figures
+.SH SYNOPSIS
+.in +7n
+.ti -7n
+epix [-I<include>] [-L<libdir>] [-l<lib>] infile[.xp] [outfile[.eepic]]
+.in -7n
+.SH DESCRIPTION
+.B epix 
+is a powerful, flexible, lightweight, text-based preprocessor for
+creating mathematically accurate, publication-quality line figures in
+.B LaTeX. 
+Plots and picture objects are specified entirely in Cartesian
+coordinates, not in
+.B LaTeX
+picture coordinates.  Output resizes robustly, and may include
+mathematical typography.
+.B epix
+uses enhancements to the
+.B LaTeX
+picture environment: Sunil Podar's
+.B epic.sty
+and Conrad Kwok's
+.B eepic.sty
+packages. Color figures may be generated from
+.B epix
+output with the
+.B pstcol.sty
+or
+.B color.sty
+packages. The included shell script
+.B laps
+converts
+.B LaTeX
+to PostScript. The shell script
+.B elaps
+converts .eepic to Encapsulated PostScript.
+.P 
+The source code, samples files, and primary documentation are
+available from the project home page:
+
+	http://mathcs.holycross.edu/~ahwang/current/ePiX.html
+
+The latest stable version is also available from CTAN:
+
+	http://www.ctan.org/tex-archive/graphics/epix
+.P
+.B epix
+is implemented as a 
+.B C++
+library (libepix.a), header (epix.h), and a shell script (epix). An 
+.B epix
+source file is a 
+.B C++
+program that calls high-level library drawing functions. Under
+direction of the shell script, the source file is compiled. The
+resulting executable prints the .eepic file, with output redirected to
+the specified file. 
+.P
+
+.B epix
+is primarily for 2-dimensional plotting. There is good-quality wire
+mesh plotting, but no hidden line removal yet.
+
+.SH PYTHON WRAPPER
+Andrew Sterian has written a Python wrapper,
+.B pyepix
+that requires Python 2.2 but does not require either a compiler or GNU
+.B bash.
+.B pyepix
+(a *nix tarball and a Windows package) is available from the
+.B epix
+home page.
+
+.SH DOCUMENTATION
+Complete documentation is distributed with the "complete" source
+package, and may be downloaded in several formats from the
+.B epix
+home page.
+
+.SH "AUTHOR"
+.nf
+.na
+Andrew D. Hwang (rot 13 email: nujnat at zngupf dot ubylpebff dot rqh)
+Department of Mathematics and Computer Science
+College of the Holy Cross
+Worcester, MA 01610-2395, USA
+

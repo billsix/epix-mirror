@@ -1,0 +1,39 @@
+%% Generated from marker.xp on Fri Aug 20 21:40:00 EDT 2004 by
+%% ePiX-0.8.11rc16
+%%
+%%   Cartesian bounding box: [0,5] x [0,1]
+%%   Actual size: 3.75in x 1in
+%%   Figure offset: right by 0in, up by 0in
+%%
+\setlength{\unitlength}{0.25in}
+\begin{picture}(15,4)(-0,-0)
+%% ---
+\put(0.664176,3.77861){{\tt{CIRC}}}
+\whiten\put(0,4){\makebox(0,0)[c]{{\circle{0.166044}}}}
+\put(4.41418,3.77861){{\tt{SPOT}}}
+\put(3.75,4){\makebox(0,0)[c]{{\circle*{0.249066}}}}
+\put(8.16418,3.77861){{\tt{RING}}}
+\put(7.5,4){\makebox(0,0)[c]{{\circle{0.249066}}}}
+\put(11.9142,3.77861){{\tt{DOT}}}
+\put(11.25,4){\makebox(0,0)[c]{{\circle*{0.166044}}}}
+\put(15.6642,3.77861){{\tt{DDOT}}}
+\put(15,4){\makebox(0,0)[c]{{\circle*{0.110696}}}}
+\put(0.664176,1.77861){{\tt{PLUS}}}
+\put(0,2){\makebox(0,0)[c]{+}}
+\put(4.41418,1.77861){{\tt{OPLUS}}}
+\put(3.75,2){\makebox(0,0)[c]{$\oplus$}}
+\put(8.16418,1.77861){{\tt{TIMES}}}
+\put(7.5,2){\makebox(0,0)[c]{$\times$}}
+\put(11.9142,1.77861){{\tt{OTIMES}}}
+\put(11.25,2){\makebox(0,0)[c]{$\otimes$}}
+\put(0.664176,-0.221392){{\tt{DIAMOND}}}
+\put(0,0){\makebox(0,0)[c]{$\diamond$}}
+\put(4.41418,-0.221392){{\tt{UP}}}
+\put(3.75,0){\makebox(0,0)[c]{$\bigtriangleup$}}
+\put(8.16418,-0.221392){{\tt{DOWN}}}
+\put(7.5,0){\makebox(0,0)[c]{$\bigtriangledown$}}
+\put(11.9142,-0.221392){{\tt{BOX}}}
+\put(11.25,0){\makebox(0,0)[c]{\rule{3pt}{3pt}}}
+\put(15.6642,-0.221392){{\tt{BBOX}}}
+\put(15,0){\makebox(0,0)[c]{\rule{2pt}{2pt}}}
+\end{picture}

@@ -1,0 +1,198 @@
+/* 
+ *  path.h -- ePiX classes for polygons and paths
+ *
+ * This file is part of ePiX, a preprocessor for creating high-quality 
+ * line figures in LaTeX 
+ *
+ * Version 0.8.11rc14
+ * Last Change: July 16, 2004
+ */
+
+/* 
+ * Copyright (C) 2001, 2002, 2003, 2004
+ * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+ * Department of Mathematics and Computer Science
+ * College of the Holy Cross
+ * Worcester, MA, 01610-2395, USA
+ */
+
+/*
+ * ePiX is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * ePiX is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+ * or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+ * License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with ePiX; if not, write to the Free Software Foundation, Inc.,
+ * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ */
+
+/*
+ *   This file provides:
+ *
+ */
+
+
+#ifndef EPIX_PATHS
+#define EPIX_PATHS
+
+#include <vector>
+
+#include "globals.h"
+#include "triples.h"
+#include "domain.h"
+#include "map.h"
+
+namespace ePiX {
+
+  class crop_mask;
+  class enclosure;
+  class sphere;
+
+  class vertex {
+
+  private:
+    P location;
+    bool onscreen;
+    bool in_world;
+
+  public:
+    vertex(const double a1=0, const double a2=0, const double a3=0)
+      {
+	location   = P(a1,a2,a3);
+
+	onscreen = true;
+	in_world = true;
+      }
+
+    vertex(const P arg)
+      {
+	location   = arg;
+
+	onscreen = true;
+	in_world = true;
+      }
+
+    P here(void) const      { return location; }
+    bool is_onscreen(void) const { return onscreen; }
+    bool is_in_world(void) const { return in_world; }
+
+    void set_crop(const bool arg) { onscreen = !arg; }
+    void set_clip(const bool arg) { in_world = !arg; }
+
+  }; //end of class vertex
+
+
+  class path {
+  private:
+    std::vector<vertex> vertices;
+
+    bool closed;
+    bool filled;
+
+  public:
+
+    path(const std::vector<vertex>& data, bool loop)
+      {
+	vertices = data;
+	closed = loop;
+	filled = epix::fill_paths;
+      }
+
+    path(int num_pts)
+      {
+	vertices = std::vector<vertex> (num_pts);
+	closed = false;
+	filled = epix::fill_paths;
+      }
+
+    // line constructors
+    path(const P tail, const P head, const double expand=0);
+    path(const P tail, const P head, const double expand, int num_pts);
+
+    // finite-data paths (ellipse, spline)
+    path(const P center, const P axis1, const P axis2, 
+	      const double t_min, const double t_max,
+	      int num_pts=EPIX_NUM_PTS);
+
+    path(const P p1, const P p2, const P p3, 
+	      int num_pts=EPIX_NUM_PTS);
+
+    path(const P p1, const P p2, 
+	      const P p3, const P p4, 
+	      int num_pts=EPIX_NUM_PTS);
+
+
+    path(P f(double), double t_min, double t_max, int num_pts=EPIX_NUM_PTS);
+    path(double f(double), double t_min, double t_max, 
+	 int num_pts=EPIX_NUM_PTS);
+
+    // polygon/polyline with variable number of vertices
+    friend path polygon(int num_pts ...);
+    friend path polyline(int num_pts ...);
+
+
+    // concatenate path segments
+    path& operator+= (const path& vertices);
+    // concatenate, reversing second sequence
+    path& operator-= (const path& vertices);
+
+    bool is_closed(void) const { return closed; }
+    bool is_filled(void) const { return filled; }
+
+    void close(const bool arg=true) { closed = arg; }
+    void set_fill(const bool arg=true) { filled = arg; }
+
+    void set_crop_all(const bool arg);
+    void set_clip_all(const bool arg);
+
+    // defined in output.cc
+    void crop_to(const crop_mask& screen, const bool arg=true);
+    void clip_to(const enclosure& world, const bool arg=true);
+    //    void hide_by(bool hiding(const P));
+    void draw(void); // defined in output.cc
+
+    void draw(sphere, bool); // spherical plotting (front/back), in sphere.cc
+
+  }; // end of class path
+
+
+  class path_pt {
+
+  private:
+    P location;
+    bool start; // start/end of path segment
+    bool end;
+
+  public:
+    path_pt(const P arg, bool is_start, bool is_end)
+      {
+	location   = arg;
+
+	start = is_start;
+	end = is_end;
+      }
+
+    path_pt(const vertex arg, bool is_start, bool is_end)
+      {
+	location   = arg.here();
+
+	start = is_start;
+	end = is_end;
+      }
+    void unset(void) { start = end = false; }
+
+    P here(void) const   { return location; }
+    bool is_start(void) const { return start; }
+    bool is_end(void) const   { return end; }
+
+  }; //end of class path_pt
+
+} /* end of namespace */
+
+#endif /* EPIX_PATHS */

@@ -1,0 +1,219 @@
+ePiX -- README-changes
+
+August 26, 2004
+
+Further development will focus on epix-2.x (The Next Generation), so
+epix-1.x (formerly Version 0.8.11) syntax is essentially finalized.
+Fairly substantial extensions were introduced after Version 0.8.10, so
+it may be difficult to make older files compile. Thus, the information
+below may not be up-to-date. Please see the archive section of the web
+site or contact the author if you need an old version of ePiX.
+
+
+Last Change: April 15, 2003
+
+This file describes (essentially) mandatory changes to input file
+syntax that are important to users. Please see the CHANGELOG for a
+detailed list of modifications to the source code, and the current
+documentation for suggested/encouraged usage changes.
+
+
+Version 0.8.10rc5
+
+With this release, ePiX became much more 3-D capable. Particularly:
+
+* The <pair> type is now used only to refer to points in the "screen
+ plane", and should almost never be directly used in an input file. The
+ correct type is <triple>. An easy but crude method of updating is to
+ search and replace the string "pair" with "triple", either manually in
+ a text editor, or with sed or perl:
+
+--- bash script ---
+  #!/bin/bash
+  for file in $@; do
+      mv -i $file $file.bak
+      sed 's/pair/triple/g' $file.bak > $file
+  done
+  exit 0
+--- end of script ---
+ Comments: This script will change legitimate uses of "pair", so use it
+ with caution. Save the snippet as <filename> and set the executable
+ bit with "chmod 700 <filename>". (Replace "<filename>" with any name
+ you like, of course:) The script replaces all occurrances of the
+ string "pair" with "triple" in all files specified on the comand line, 
+ keeping a copy with extension ".bak" and asking before overwriting an
+ existing file.
+
+--- perl command ---
+perl -pi.bak -e 's/\bpair\b/triple/g' *.xp
+
+ Comments: This command replaces the string "pair" iff it is a perl
+ word, i.e. is surrounded by punctuation and whitespace, and acts on
+ all files in the current directory with extension ".xp".
+
+* The "V" command has been removed; most instances should be replaced
+ with "P". A perl command such as above is safer, since V is a literal
+ identifier, so it is fairly safe to replace the character "V" iff it
+ is a perl word. (A variable named "V_1" will be changed to "P_1", so
+ use care if you are prone to name variables in ways that will clash
+ after the substitution.)
+
+* In order to use the contrib package, you must either put the line
+
+  using namespace ePiX_contrib;
+
+ in your preamble or use "ePiX_contrib::" for contrib functions.
+
+* Several functions have been removed:
+  - ellipse_half (rotated half ellipse)
+  - twist et. al
+  - boldvector et. al.
+  - adaptive plotting for vector-valued functions
+  - shadowplot (is *anyone* using this...?:)
+
+
+Version 0.8.9
+
+Users running gcc-3.2 have reported problems with the handling of
+namespaces in 0.8.8. These problems are fixed; it is no longer
+necessary to use the standard namespace, only the ePiX namespace:
+
+#include <epix.h>
+using namespace ePiX;
+
+---
+
+Unfortunately, the "fill" macro conflicts with the gcc-3.2 STL. As a
+result, macro-ized style and width commands have been re-implemented 
+as functions, undoing the changes introduced in Version 0.8.5. The 
+update_figs.sh script has been modified to automate these changes; 
+it accepts filenames to be processed on the command line. If no files 
+are specified, the script acts on all files with extension ".xp", ".c",
+".cc", and ".C" in the current directory.
+
+Updating Source Files to 0.8.9
+
+The source package contains a script, update_figs.sh, that when run in
+a directory updates all files with extension .c, .cc, or .C under the
+assumption the files are ePiX source files. The script asks for
+confirmation before making changes, but in any case a single run is
+non-destructive; existing files are either saved with the extension
+.old, or are archived.  A second run is potentially destructive, since
+the archive file's name is hard-wired, and the script overwrites any
+.old files that arise from a prior run (though it does ask for
+confirmation). update_figs.sh should not be run heedlessly, but only
+in a directory containing multiple broken files that worked with a
+version of ePiX between 0.8.5 and 0.8.8, but that no longer compile
+properly because of macro errors.
+
+
+Version 0.8.8
+
+ePiX is implemented as a library together with a shell script that
+controls compilation and linking. In order to prevent names in the
+ePiX library from colliding with names from standard libraries, an
+ePiX "namespace" has been introduced. User files must now begin with
+the lines:
+
+#include <epix.h>
+using namespace std;
+using namespace ePiX;
+
+As usual, case matters. The "std" namespace makes available the
+functionality of the C++ standard library. If for some reason it is
+necessary to use the legacy package, the line 
+
+using namespace ePiX_legacy;
+
+must also be used. Pre-namespace files can be brought up to date with
+a sed command, such as (on GNU/Linux)
+
+for file in *.cc; do mv $file ${file}.orig; \
+  sed -e 's/\"epix.h\"/\"epix.h\"\nusing namespace std;\nusing namespace ePiX;/g' ${file}.orig > $file; done
+
+which will add the required lines after the include line in all ".cc"
+files in the current directory. Jay Belanger's emacs mode adds
+these lines automatically to new ePiX files, which are recognized by 
+the extension ".xp". See POST_INSTALL and epix.el for more details.
+
+
+Version 0.8.6
+
+By default, path styles (plain, dashed, dotted) MAY NOT be specified
+by name prefixing. Instead, the declarations "solid;", "dashed;", and
+"dotted;" must be used. Further, several alternative plot command
+names (from Version 0.6.x, such as "paramplot", "plot3d", etc.) are no
+longer recognized by default. To enable ePiX to recognize these
+deprecated routines, you must compile the "legacy" subpackage: In the
+source directory, do "make legacy". If you are building the "contrib"
+package, use the command "make clean contrib legacy test". 
+
+It is *not* currently possible to bring old input files into
+compliance with the script update_figs.sh (see below). New files
+should not use the old syntax, as the legacy subpackage will be
+removed eventually. (The legacy files will be available separately,
+and there are no plans to make the legacy subpackage deliberately
+obsolete, but it is not guaranteed to work with future versions of
+ePiX.)
+
+Users are strongly encouraged to employ the new, simplified syntax for
+plotting: instead of providing a list of component functions, declare
+a pair- or triple-valued function as appropriate and replace the list
+of functions with the "tuple"-valued function in the plot command.
+
+The author apologizes for poor planning in the distant past, but intends
+that these will be the last major changes in user syntax until true 3D
+plotting is implemented (a very long-term goal).
+
+
+Version 0.8.5
+
+Function-style color declarations, such as red(); and cyan();, and the
+line-width delimiters bold(); and end_bold(); are no longer permitted.
+Instead, use the constant-style declarations red;, cyan;, bold;, etc.
+
+
+Updating Source Files to 0.8.5
+
+The source package contains a script, update_figs.sh, that when run in
+a directory updates all files with extension .c, .cc, or .C under the
+assumption the files are ePiX source files. The script asks for
+confirmation before making changes, but in any case a single run is
+non-destructive; existing files are either saved with the extension
+.old, or are archived.  A second run is potentially destructive, since
+the archive file's name is hard-wired, and the script overwrites any
+.old files that arise from a prior run. update_figs.sh should not be
+run heedlessly, but only in a directory containing multiple broken
+files that worked with a prior version of ePiX.
+
+
+Version 0.8.1
+
+The old style (pre-Version 0.6.5) of variable declaration, e.g.
+double x_min = -1, x_max = 1, ...
+is no longer supported. The functions bounding_box, picture, and
+unitlength must be used instead. It is possible, but non-trivial, to
+automate the updating of these changes. update_figs.sh does not do so;
+please write to the author for assistance.
+
+
+COPYLEFT and DISTRIBUTION
+
+ePiX is distributed under the terms of the GNU GPL. You are free to
+copy, modify and distribute this program freely as long as this
+copyleft notice remains intact IN ITS ENTIRETY. This program comes
+with ABSOLUTELY NO WARRANTY OF ANY KIND, INCLUDING ANY WARRANTY OF
+MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Lest this lack
+of guarantee sound dire, please note that it is the same guarantee
+granted by all common software, including expensive, proprietary
+software whose quality you have no way to verify directly, and whose
+license you tacitly accept merely by opening the package.
+
+Feedback about this program (suggestions for features, etc.) is 
+welcome. If you find this program useful, please consider making a
+contribution to the Free Software Foundation; see
+http://www.fsf.org
+
+Andrew D. Hwang (rhymes with "song", not "sang")
+
+<rot 13 nujnat at zngupf dot ubylpebff dot rqh>

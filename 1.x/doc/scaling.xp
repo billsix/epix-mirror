@@ -1,0 +1,43 @@
+/* -*-ePiX-*- */
+/* scaling.c */
+#include "epix.h"
+using namespace ePiX;
+
+P bb_ll(0,0), bb_ur(1.5,0.75), bb_lm(0.75,0);
+P pb_ll(3,0), pb_ur(4,1), pb_lm(3.5,0);
+
+main()
+{
+  unitlength("1pt");
+  bounding_box(P(0,-0.125), P(5, 1));
+  picture(P(300, 60));
+  offset(P(0,5));
+
+  begin();
+
+  rect(bb_ll, bb_ur);
+  rect(pb_ll, pb_ur);
+
+  ddot(bb_ll);
+  ddot(bb_ur);
+
+  ddot(pb_ll);
+  ddot(pb_ur);
+
+  fill();
+  gray(1);
+  arrow(P(1.75, 0.25), P(2.75,0.25));
+  label(P(2.25, 0.25), P(0,4), "\\code{epix}", t);
+
+  label(bb_ll, P(2,2), 
+	"\\scriptsize$(x_\\mathrm{min},y_\\mathrm{min})$", tr);
+  label(bb_ur, P(-2,-2), 
+	"\\scriptsize$(x_\\mathrm{max},y_\\mathrm{max})$", bl);
+  label(bb_lm, P(0,-4), "Cartesian bounding box", b);
+
+  label(pb_ll, P(2,2), "\\scriptsize$(0,0)$", tr);
+  label(pb_ur, P(-2,-2), 
+	"\\scriptsize$(h_\\mathrm{size},v_\\mathrm{size})$", bl);
+  label(pb_lm, P(0, -4), "\\LaTeX\\ picture box", b);
+  end();
+}

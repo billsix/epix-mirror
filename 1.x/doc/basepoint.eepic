@@ -1,0 +1,16 @@
+%% Generated from basepoint.xp on Thu Aug 19 14:02:34 EDT 2004 by
+%% ePiX-0.8.11rc16
+%%
+%%   Cartesian bounding box: [0,3.75] x [0,1]
+%%   Actual size: 3.75pc x 1pc
+%%   Figure offset: right by 0pc, up by 0pc
+%%
+\setlength{\unitlength}{1pc}
+\begin{picture}(3.75,1)(-0,-0)
+%% ---
+\path(0,-0.375)(3.75,-0.375)(3.75,1)(0,1)(0,-0.375)
+\allinethickness{0.15pt}%
+\path(0,0)(3.75,0)
+\put(0,0){$y=f(x)$}
+\put(0,0){\makebox(0,0)[c]{{\circle*{0.111111}}}}
+\end{picture}

@@ -1,0 +1,42 @@
+/* -*-ePiX-*- */
+/* weierstrass.c -- August 16, 2001 */
+#include "epix.h"
+using namespace ePiX;
+
+const int N=8; // Number of summands
+
+inline double weierstrass(double t)
+{
+  double y=0;
+  for(int i=0; i < N; ++i)
+    y += pow(2,-i)*cb(pow(2,i)*t);
+
+  return y;
+}
+
+main() {
+
+  bounding_box(P(-2, 0), P(2, 1.5));
+  picture(P(320, 120));
+  unitlength("0.01in");
+  offset(P(160,-120));
+
+  begin();
+
+  h_axis(2*x_size);
+  v_axis(2*y_size);
+  h_axis_labels(x_size, P(-12,-14));
+  
+  blue();
+  plot(cb, x_min - 0.25, x_max+0.25, 4*x_size + 2);
+
+  bold();
+  black();
+  plot(weierstrass, x_min, x_max, pow(2,N));
+
+  red();
+  plot(weierstrass, 0.5, 1.5, pow(2,N-2));
+
+  end();
+}
+

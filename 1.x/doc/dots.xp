@@ -1,0 +1,28 @@
+/* -*-ePiX-*- */
+/* dots.c -- Dot primitives */
+#include "epix.h"
+using namespace ePiX;
+
+main()
+{
+  unitlength("1pt");
+  bounding_box(P(0,0), P(8,1));
+  picture(P(72,12));
+  offset(P(10,2));
+
+  begin();
+
+  spot(P(0,0));
+  dot(P(1,0));
+  ddot(P(2,0));
+
+  box(P(4,0));
+  bbox(P(5,0));
+
+  line(P(6.5,0), P(8.75,0));
+
+  ring(P(7,0));
+  circ(P(8,0));
+
+  end();
+}

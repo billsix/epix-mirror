@@ -1,0 +1,58 @@
+/* -*-ePiX-*- */
+/* torus.xp -- July 6, 2004 */
+#include "epix.h"
+using namespace ePiX;
+
+//#define CLIP
+#define CROP
+
+int N = 6;
+double MAX1=3.5;
+double MAX2=2;
+double MIN3=-1;
+double MAX3=1;
+
+triple F(double t1, double t2)
+{
+  return polar(2.5+ePiX::sin(t2), t1) + ePiX::cos(t2)*E_3;
+}
+
+domain R=domain(P(0,0), P(1,1), mesh(4*N, 2*N), mesh(12*N, 6*N));
+
+main() 
+{
+  unitlength("1in");
+  bounding_box(P(-3,-3), P(3,3));
+  picture(P(1,1));
+
+  begin();
+
+#ifdef CROP
+  crop();
+  grid(1,1);
+#endif
+
+  revolutions();
+  viewpoint(1, 0.5, 0.75);
+  camera.range(10);
+
+#ifdef CLIP
+  clip_box(P(-MAX1, -MAX2, MIN3), P(MAX1, MAX2, MAX3));
+
+  clip();
+  grid(P(-MAX1, -MAX2, MIN3), P(-MAX1,  MAX2, MAX3));
+  grid(P(-MAX1, -MAX2, MIN3), P( MAX1, -MAX2, MAX3));
+#endif // CLIP
+  plot(F, R);
+
+#ifdef CLIP
+  grid(P(-MAX1,  MAX2, MIN3), P( MAX1,  MAX2, MAX3));
+  grid(P( MAX1, -MAX2, MIN3), P( MAX1,  MAX2, MAX3));
+#endif // CLIP
+
+  bold();
+  plot(F, R.slice2(0));
+
+  end();
+}
+

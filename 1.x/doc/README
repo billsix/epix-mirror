@@ -1,0 +1,20 @@
+ePiX Tutorial  
+
+Version 0.8.x
+June 30, 2002
+
+To compile the ePiX tutorial, do "latex tutorial.tex", or (if ePiX
+is installed) "laps tutorial" to get PostScript.
+
+If the .eepic files are missing or damaged and ePiX is installed, do
+
+for i in *.xp ; do epix $i ; done
+
+
+Copyright 2001, 2002, 2003 Andrew D. Hwang <ahwang@mathcs.holycross.edu>
+This document may be copied and distributed in any medium, so
+long as this copyright notice remains IN ITS ENTIRETY.
+
+This document comes with ABSOLUTELY NO WARRANTY WHATSOEVER,
+INCLUDING BUT NOT LIMITED TO ANY WARRANTY OF MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.

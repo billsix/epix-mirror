@@ -1,0 +1,175 @@
+ePiX -- README
+
+Last Change: August 26, 2004
+
+Please consult the following files as appropriate:
+
+INSTALL -- Detailed installation instructions
+README (this file) -- General overview and information
+README-authors -- Information for authors of ePiX modules
+README-changes -- Please glance at this file to see if the version you
+                  are installing is affected by changes to USER FILES
+
+
+DESCRIPTION
+
+ePiX (pronounced like "epic" with a soft "k", as in "TeX") is a
+lightweight command-based utility for generating camera quality,
+mathematically accurate line figures for LaTeX from user-friendly
+source files.  The utility consists of a library written in C++ and
+some shell scripts; GNU bash and a C++ compiler are *required* for
+ordinary use.
+
+ePiX is developed and tested on an Intel x86 (GNU/Linux), and less
+stringently tested under Solaris. Andrew Sterian's pyepix wrapper
+(which requires Python 2.2 or newer) is also tested on Windows '98.
+
+
+MAILING LIST
+
+There is a mailing list devoted to all things ePiX-related. To
+subscribe, send an empty message to
+
+  ahwang-epix-subscribe@mathcs.holycross.edu
+
+You must complete a three-way handshake: The list software will send
+you a reply, to which you must reply.  To post to the list, send an
+email with *non-empty Subject: line* to
+
+  ahwang-epix@mathcs.holycross.edu
+
+To unsubscribe, send a message to
+
+  ahwang-epix-unsubscribe@mathcs.holycross.edu
+
+from the address you wish to remove, and complete the three-way handshake.
+
+
+INTERNET DOWNLOAD SITES
+
+The "project home page" has links to currently available packages and
+documentation, general information, screenshots, and summaries of the
+latest developments:
+
+  http://math.holycross.edu/~ahwang/current/ePiX.html
+
+The latest version of this file is at
+
+  http://math.holycross.edu/~ahwang/software/README
+
+Announcements of recent releases, project stats, and links are at
+
+  http://freshmeat.net/projects/epix
+
+Stable tarballs with synchronized documentation are available from
+
+  http://www.ctan.org/tex-archive/graphics/epix/
+
+As with all free (GPL) software, the source code can be obtained on a
+floppy disk from the author by post ("snail mail"), in this case from:
+
+Andrew D. Hwang   <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+Dept. of Mathematics and Computer Science
+College of the Holy Cross
+Worcester, MA, 01610-2395, USA
+
+
+PYEPIX
+
+Windows users are likely to be more interested in Andrew Sterian's
+Pyepix package, an implementation of ePiX in Python. Pyepix is
+available from
+
+  http://claymore.engineer.gvsu.edu/~steriana/Python/index.html
+
+and requires Python 2.2 or newer.
+
+
+INSTALLATION
+
+Please see the "INSTALL" file.
+
+
+SHELL SCRIPTS
+
+ePiX comes with two general-purpose conversion scripts, laps and elaps:
+
+laps converts LaTeX files to Postscript by running LaTeX (or pslatex),
+then calling dvips. Several options can be passed to dvips from the
+command line; do "laps --verbose --help" (or "laps -v -h") for
+detailed information.
+
+elaps converts ePiX and eepic files to encapsulated Postscript; that
+is, elaps is "epix2eps" and "eepic2eps". Options can be passed to the
+compiler from the command line. Do "elaps --help" (or "elaps -h") for
+usage.
+
+
+DOCUMENTATION
+
+In addition to the sample document packaged with the source code and
+installed in $EPIX_ROOTDIR/share/epix, there is a complete users'
+guide/tutorial and a short technical overview. Both are available from
+the author's web site:
+
+  http://math.holycross.edu/~ahwang/current/ePiX.html
+
+If you downloaded the "complete" (not "src") package, you already have
+the LaTeX source files for the tutorial, in the directory 
+doc/
+
+If ePiX is installed, do
+
+% cd doc
+% laps tutorial
+
+then preview the dvi or Postscript with your favorite previewer.
+
+
+IMPLEMENTATION and RATIONALE
+
+LaTeX has styles (epic and eepic) for drawing connect-the-dots paths
+given a set of points. The functions in ePiX take (human-readable) C++
+source files and print lists of points, suitably marked up for use by
+LaTeX. The shell script controls the process by invoking the C++
+compiler, running the compiled binary, and directing the output to a 
+user-specified .eepic file:
+
+	ePiX source --> temporary executable --> .eepic file
+
+This two-stage process avoided the problem of writing a program to
+parse functions (instead using the g++ for this purpose), while
+permitting the input file to have fairly easy-to-use syntax (even for
+non-C++ users, since Maple and Mathematica use C-like syntax). This
+design allows ePiX to be run in the most common LaTeX environment:
+Unix and clones. There are no serious plans to implement ePiX as a
+stand-alone binary program.
+
+There is also no plan to design a graphical front end for ePiX. One of
+the great advantages of ePiX is its use of variables and control
+structures, which allow picture parameters to be represented
+symbolically and modified easily while preserving quality and logical
+structure of the figure. A graphical interface would thus undermine
+some of ePiX's greatest strengths without making it easier to use.
+
+
+COPYLEFT and DISTRIBUTION
+
+ePiX is distributed under the terms of the GNU GPL. You are free to
+copy, modify and distribute this program freely as long as this
+copyleft notice remains intact IN ITS ENTIRETY. This program comes
+with ABSOLUTELY NO WARRANTY OF ANY KIND, INCLUDING ANY WARRANTY OF
+MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Lest this lack
+of guarantee sound dire, please note that it is the same guarantee
+granted by all common software, including expensive, proprietary
+software whose quality you have no way to verify directly, and whose
+license you tacitly accept merely by opening the package.
+
+Feedback about this program (suggestions for features, etc.) is 
+welcome. If you find this program useful, please consider making a
+contribution to the Free Software Foundation; see
+http://www.fsf.org
+
+Andrew D. Hwang (rhymes with "song", not "sang")
+
+<rot 13 nujnat at zngupf dot ubylpebff dot rqh>

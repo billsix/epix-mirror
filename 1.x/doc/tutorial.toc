@@ -1,0 +1,37 @@
+\contentsline {chapter}{\numberline {1}Introduction}{2}{chapter.1}
+\contentsline {section}{\numberline {1.1}Software Dependencies}{4}{section.1.1}
+\contentsline {section}{\numberline {1.2}Installation}{5}{section.1.2}
+\contentsline {chapter}{\numberline {2}Getting Started}{8}{chapter.2}
+\contentsline {section}{\numberline {2.1}Running \texttt {ePiX}}{8}{section.2.1}
+\contentsline {section}{\numberline {2.2}A Sample File}{10}{section.2.2}
+\contentsline {section}{\numberline {2.3}Basic Picture Concepts}{12}{section.2.3}
+\contentsline {section}{\numberline {2.4}Logical Size, and Aspect Ratio}{12}{section.2.4}
+\contentsline {section}{\numberline {2.5}Creating and Drawing Objects}{13}{section.2.5}
+\contentsline {section}{\numberline {2.6}The Camera}{16}{section.2.6}
+\contentsline {section}{\numberline {2.7}Drawing Attributes}{17}{section.2.7}
+\contentsline {section}{\numberline {2.8}Typography}{19}{section.2.8}
+\contentsline {section}{\numberline {2.9}\texttt {C++}\ Basics}{21}{section.2.9}
+\contentsline {section}{\numberline {2.10}High-Level Picture Elements}{25}{section.2.10}
+\contentsline {section}{\numberline {2.11}Basic Plotting}{27}{section.2.11}
+\contentsline {chapter}{\numberline {3}Reference Manual}{30}{chapter.3}
+\contentsline {section}{\numberline {3.1}More About \texttt {C++}}{30}{section.3.1}
+\contentsline {section}{\numberline {3.2}The Camera}{37}{section.3.2}
+\contentsline {section}{\numberline {3.3}Clipping and Cropping}{38}{section.3.3}
+\contentsline {section}{\numberline {3.4}Attributes}{39}{section.3.4}
+\contentsline {section}{\numberline {3.5}The Path Class}{41}{section.3.5}
+\contentsline {section}{\numberline {3.6}Geometric Data Structures}{44}{section.3.6}
+\contentsline {section}{\numberline {3.7}Domains and Plotting}{48}{section.3.7}
+\contentsline {section}{\numberline {3.8}Non-Euclidean Geometry}{52}{section.3.8}
+\contentsline {section}{\numberline {3.9}Animation}{53}{section.3.9}
+\contentsline {section}{\numberline {3.10}Troubleshooting}{54}{section.3.10}
+\contentsline {paragraph}{Hanging scripts}{56}{section*.49}
+\contentsline {paragraph}{Command not found}{56}{section*.50}
+\contentsline {paragraph}{Permission denied}{56}{section*.51}
+\contentsline {chapter}{\numberline {4}Advanced Topics}{58}{chapter.4}
+\contentsline {section}{\numberline {4.1}Hidden Object Removal}{58}{section.4.1}
+\contentsline {section}{\numberline {4.2}Extensions}{60}{section.4.2}
+\contentsline {chapter}{\numberline {A}Software Freedom}{64}{appendix.A}
+\contentsline {chapter}{\numberline {B}Acknowledgements}{66}{appendix.B}
+\contentsline {paragraph}{Infrastructure}{66}{section*.56}
+\contentsline {paragraph}{Enhancements}{66}{section*.57}
+\contentsline {paragraph}{Debugging, advice, and other assistance}{66}{section*.58}

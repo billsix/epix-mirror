@@ -1,0 +1,36 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+main() {
+  bounding_box(P(0,0),P(3.75,1));
+  unitlength("1pc");
+  picture(3.75,1);
+  //  offset(-0.5,0);
+
+  begin();
+
+  rect(P(x_min, y_min-0.375), P(x_max, y_max));
+
+  pen(0.15);
+  line(P(x_min,0), P(x_max,0));
+
+  dot_size(2);
+
+  //  std::cout << "\n\\LARGE";
+  /*
+  label(P(0,0), P(0,0), "$b$");
+  ddot(P(0,0));
+
+  label(P(1,0), P(0,0), "$f$");
+  ddot(P(1,0));
+
+  label(P(2,0), P(0,0), "$p$");
+  ddot(P(2,0));
+  */
+
+  label(P(0,0), P(0,0), "$y=f(x)$");
+  ddot(P(0,0));
+
+  end();
+}

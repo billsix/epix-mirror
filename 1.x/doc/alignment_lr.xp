@@ -1,0 +1,33 @@
+/* -*-ePiX-*- */
+/* alignment_lr.c -- ePiX's reverse-LaTeX label alignment option */
+#include "epix.h"
+using namespace ePiX;
+
+triple O=P(0,0);
+
+main()
+{
+  bounding_box(P(-1,-1), P(1,1));
+  picture(P(72,24));
+  unitlength("1pt");
+
+  begin();
+
+  dot(O);
+
+  // The offset is not *logically* O below :)
+  label(O, P(0,0), "\\texttt{[l]}", l); 
+  label(O, P(0,0), "\\texttt{[r]}", r); 
+
+  end();
+
+  begin();
+
+  dot(O);
+
+  // The offset is not *logically* O below :)
+  label(O, P(0,0), "\\texttt{[t]}", t); 
+  label(O, P(0,0), "\\texttt{[b]}", b); 
+
+  end();
+}

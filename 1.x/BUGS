@@ -1,0 +1,10 @@
+Bugs under Mac OSX -- March 08, 2004
+
+After libepix.a is archived (ar -ru in the Makefile), ranlib should be
+run. With the Dec2002 Developer Tools (other versions unknown), it is 
+necessary to run ranlib manually on the installed library:
+
+  make install
+  sudo ranlib /usr/local/lib/libepix.a
+
+(Adjust accordingly, using your INSTALL directory.)

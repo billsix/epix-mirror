@@ -1,0 +1,173 @@
+#!/bin/bash
+# 
+# laps: Runs latex, then converts output to Postscript
+# 
+# April 15, 2001, Andrew D. Hwang, rot 13 nujnat at zngupf dot ubylpebff dot rqh
+# Sep 02, 2002, Printer options to dvips added (Walter A. Kehowski)
+# Oct 04, 2002, Complete re-write, options added, defaults changed (ADH)
+# Aug 17, 2004, Construct email address
+# Aug 24, 2004, --tex option
+#
+PROG=$(basename $0)
+DVIPS_OPTS="-f"
+
+LAPS_FILEROOT=
+LAPS_VERBOSE=
+LAPS_PREFIX="la"
+
+function laps_parse_options {
+# Command-line options start with "-"
+while [ "$1" != "${1#"-"}" ]; do
+    case "$1" in
+ 
+    -vv|--verbose)
+	LAPS_VERBOSE=1;
+        shift;
+        ;;
+ 
+    -h|--help)
+	laps_help;
+        ;;
+ 
+    -p|-ps|--ps)
+	LAPS_PREFIX="psla";
+	shift;
+	;;
+
+    -P*)
+	DVIPS_OPTS="$1 $DVIPS_OPTS";
+	shift;
+	;;
+
+    -t|--tex)
+	LAPS_PREFIX="";
+	shift;
+	;;
+
+    -v|--version)
+	laps_version;
+	;;
+
+    *)
+	laps_warn $1;
+        shift;
+        ;;
+    esac
+done
+
+if [ "$1" = "" ]; then
+    laps_die "You must specify an input file!"
+else
+    LAPS_FILEROOT=${1%%".tex"} # Strip .tex from filename if necessary
+fi
+}
+
+function laps_compile {
+if [ "$LAPS_VERBOSE" != "" ]; then
+    ${LAPS_PREFIX}tex $1.tex
+    dvips $DVIPS_OPTS -o $1.ps $1.dvi
+else
+    ${LAPS_PREFIX}tex $1.tex 1>/dev/null
+    dvips $DVIPS_OPTS -o $1.ps $1.dvi &>/dev/null
+fi
+}
+
+function laps_die {
+    echo "$PROG: ERROR: $1" >&2 && exit 1
+}
+
+function laps_warn {
+    echo "$PROG: WARNING: Ignoring unknown option \"$1\""
+}
+
+function laps_help {
+    echo "Usage: $PROG [options] <filename>[.tex]" >&1
+
+if [ "$LAPS_VERBOSE" != "" ]; then
+cat <<EOF >&1
+
+  Recognized options are:
+
+    -vv, --verbose
+      Show output messages. Mostly useful if this script hangs silently.
+
+    -p, -ps, --ps
+      Use pslatex instead of latex.
+
+    -P<printer>
+      dvips printer options, e.g. "-Pamz", may be given on the command 
+      line. They are also read from ~/.dvipsrc if this file exists.
+
+    -t, --tex
+      Use tex instead of latex
+
+    -h, --help
+      Print help message; accepts --verbose option.
+
+    -v, --version
+      Print version information; use --verbose option for license.
+
+EOF
+else
+    echo "  \"$PROG --verbose -h\" for detailed help"
+fi
+    exit 0
+} # End of laps_help
+
+function laps_version {
+SPAMMY="<$(echo nujnat|rot)@$(echo zngupf|rot)."
+SPAMMY="${SPAMMY}$(echo ubylpebff|rot).$(echo rqh|rot)>"
+
+cat <<VERSION1 >&1
+$PROG is part of ePiX, Version EPIX_VERSION_NUMBER
+
+Copyright (C) 2001, 2002, 2003, 2004
+Andrew D. Hwang $SPAMMY
+Department of Mathematics and Computer Science
+College of the Holy Cross
+Worcester, MA, 01610-2395, USA
+
+VERSION1
+
+if [ "$LAPS_VERBOSE" != "" ]; then
+cat <<VERSION2 >&1
+  ePiX is free software; you can redistribute it and/or modify it
+  under the terms of the GNU General Public License as published by
+  the Free Software Foundation; either version 2 of the License, or
+  (at your option) any later version.
+ 
+  ePiX is distributed in the hope that it will be useful, but WITHOUT
+  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
+  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
+  License for more details.
+ 
+  You should have received a copy of the GNU General Public License
+  along with ePiX; if not, write to the Free Software Foundation, Inc.,
+  59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+
+VERSION2
+else
+    echo "  \"$PROG --verbose -v\" for license"
+fi
+    exit 0
+} # End of laps_version
+
+### main ###
+
+if [ $# -eq 0 ]; then
+    laps_help;
+else
+    laps_parse_options $@
+fi
+
+if [ ! -f $LAPS_FILEROOT.tex ]; then
+    laps_die "\"$LAPS_FILEROOT.tex\" not found"
+
+else
+    laps_compile $LAPS_FILEROOT && exit 0
+fi
+# All branches have exited by now
+
+
+
+

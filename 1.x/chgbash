@@ -1,0 +1,116 @@
+#!/bin/sh
+#
+EPIX_PATH_TO_BASH="$(which bash)"
+EPIX_NEW_PATH_TO_BASH=""
+EPIX_FILE_LIST="elaps laps make_header post-uninst.sh pre-install.sh prepix \
+	samples/sample.sh samples/makefigs Makefile"
+REPLY="x"
+COUNT=0 # number of missing files
+
+epix_no_change () {
+cat <<MESSAGE
+    According to my information, you do not need to run this script.
+
+MESSAGE
+}
+
+epix_chg_greeting () {
+cat <<GREETING
+    Greetings, and thank you for installing ePiX! My purpose in life is to 
+    assist you by doing some tedious file editing for you. According to my
+    information, you need this change done because on your system, the GNU
+    shell "bash" is located in $EPIX_PATH_TO_BASH instead of /bin/bash.
+
+    If this information is incorrect, please enter "c" to change, or "q" to
+    quit without changing anything. Otherwise press ENTER to accept the
+    changes.
+
+GREETING
+}
+
+epix_confirm_choice () {
+while [ "$REPLY" != "" -a "$REPLY" != "q" -a "$REPLY" != "c" ]; do
+    echo -n "Your choice? [c/q]: "
+    read REPLY
+done
+}
+
+epix_config_warning () {
+    echo -e "\tWARNING: \"$1\" not found"
+}
+
+epix_get_bash_path () {
+echo "On your system, bash seems to be in: $EPIX_PATH_TO_BASH"
+
+while [ "1" ]; do
+    echo -n "Please type in the full path to bash: "
+    read EPIX_NEW_PATH_TO_BASH
+    echo -n "You entered \"$EPIX_NEW_PATH_TO_BASH\". Is this correct? [y/n/q] "
+    read REPLY_PATH
+
+    if [ "$REPLY_PATH" = "y" ]; then
+	EPIX_PATH_TO_BASH="$EPIX_NEW_PATH_TO_BASH" && break
+    elif [ "$REPLY_PATH" = "q" ]; then
+	echo "OK, no changes made" && exit 0
+    else
+	continue
+    fi
+    
+done
+}
+
+epix_new_bash_path () {
+if [ ! -f $1 ]; then epix_config_warning $1; let COUNT=COUNT+1;
+else
+    mv $1 $1.orig
+    sed "s+/bin/bash+$EPIX_PATH_TO_BASH+g" $1.orig > $1
+    chmod 755 $1
+    echo -e "\t$1"
+fi
+}
+
+epix_post_process () {
+if [ $COUNT -eq 0 ]; then
+cat <<AFTER
+
+    Everything seems to have worked. I saved the original scripts with ".orig"
+    extension. If the changes are correct, you may safely remove the original
+    scripts.
+
+AFTER
+else
+cat <<AFTER
+
+    WARNING: $COUNT missing file(s). I saved the original scripts with ".orig"
+    extension. If the changes are correct, you may safely remove the original
+    scripts.
+
+AFTER
+fi
+}
+
+## "main"
+if [ "$EPIX_PATH_TO_BASH" = "/bin/bash" ]; then
+    epix_no_change && exit 0
+else
+    epix_chg_greeting
+    epix_confirm_choice
+
+    if [ "$REPLY" = "c" ]; then
+	epix_get_bash_path
+    elif [ "$REPLY" = "q" ]; then
+	exit 0
+    elif [ "$REPLY" != "" ]; then
+	echo "Internal error, exiting" && exit 1
+    fi
+
+    echo "Processing scripts:"
+    for FILE in $EPIX_FILE_LIST; do
+	epix_new_bash_path $FILE 2> /dev/null
+    done
+
+    epix_post_process
+fi
+
+exit 0
+

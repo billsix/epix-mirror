@@ -1,0 +1,34 @@
+/* -*-ePiX-*- */
+/* polar.c -- August 16, 2001 */
+#include "epix.h"
+using namespace ePiX;
+
+double f(double t) 
+{ 
+  return 2*ePiX::cos(3*t); 
+}
+
+main() {
+
+  unitlength("1pt");
+  bounding_box(P(-2,-2), P(2,2));
+  picture(P(180, 180));
+  offset(P(100,-40));
+
+  begin();
+  degrees();
+
+  h_axis(P(x_min, y_min), P(x_max, y_min), 8);
+  v_axis(P(x_min, y_min), P(x_min, y_max), 8);
+  
+  polar_grid(2, 4, 24); // radius, rings, sectors
+
+  h_axis_labels(P(x_min,y_min), P(x_max,y_min), x_size, P(-12,-14));
+  v_axis_labels(P(x_min,y_min), P(x_min,y_max), y_size, P(-4,0), l);
+
+  bold();
+  polarplot(f, 0, 180, 120);
+
+  end();
+}
+
