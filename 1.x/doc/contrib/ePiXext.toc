@@ -1,0 +1,18 @@
+\select@language {english}
+\contentsline {section}{\numberline {1}Introduction}{3}
+\contentsline {section}{\numberline {2}Installation}{3}
+\contentsline {section}{\numberline {3}Cartesian Coordinate System}{3}
+\contentsline {section}{\numberline {4}Logarithmic Coordinate Systems}{9}
+\contentsline {subsection}{\numberline {4.1}SingleLog Cordinate System}{9}
+\contentsline {subsection}{\numberline {4.2}DoubleLog Cordinate System}{13}
+\contentsline {subsection}{\numberline {4.3}Graphs in Logarithmic Cordinate System}{14}
+\contentsline {subsection}{\numberline {4.4}Printing Coordinate Axis}{15}
+\contentsline {section}{\numberline {5}Hatched figures}{16}
+\contentsline {subsection}{\numberline {5.1}Hatched area}{16}
+\contentsline {subsection}{\numberline {5.2}Hatched polygon}{16}
+\contentsline {section}{\numberline {6}Setting Line Thickness}{17}
+\contentsline {section}{\numberline {7}ePiX\_ext reference}{18}
+\contentsline {subsection}{\numberline {7.1}Member functions for all coordinate systems}{18}
+\contentsline {subsection}{\numberline {7.2}Member functions for class CartesianCoord}{21}
+\contentsline {subsection}{\numberline {7.3}Member functions for class SingleLogCoord}{26}
+\contentsline {subsection}{\numberline {7.4}Member functions for class DoubleLogCoord}{30}

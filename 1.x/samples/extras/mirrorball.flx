@@ -1,0 +1,154 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+void red3d() { rgb(1,0.4,0.4); }
+
+const double r_0=1; //0.75;
+const double golden=0.5*(1+sqrt(5));
+
+P f(double t) { return P(Cos(t), Sin(2*t), Sin(3*t)); }
+
+void sphere_draw(circle C)
+{
+  if ((C.center()|camera.get_viewpt()) >= 0)
+    bold();
+  else plain();
+
+  C.draw();
+}
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix=temp1/temp2;
+    }
+
+  bounding_box(P(-2,-2),P(2,2));
+  unitlength("1in");
+  picture(P(6,6));
+
+  begin();
+
+  rgb(0.95,0.95,0.95);
+  grid(1,1);
+
+  revolutions();
+  sphere S0=sphere(P(0,0,0), sqrt(3));
+
+  sphere S1=sphere(P( 1, golden, 0), r_0);
+  sphere S2=sphere(P(-1, golden, 0), r_0);
+  sphere S3=sphere(P( 1,-golden, 0), r_0);
+  sphere S4=sphere(P(-1,-golden, 0), r_0);
+
+  sphere S5=sphere(P( 0, 1, golden), r_0);
+  sphere S6=sphere(P( 0,-1, golden), r_0);
+  sphere S7=sphere(P( 0, 1,-golden), r_0);
+  sphere S8=sphere(P( 0,-1,-golden), r_0);
+
+  sphere S9=sphere(P( golden, 0, 1), r_0);
+  sphere Sa=sphere(P( golden, 0,-1), r_0);
+  sphere Sb=sphere(P(-golden, 0, 1), r_0);
+  sphere Sc=sphere(P(-golden, 0,-1), r_0);
+
+  circle C1=(S0*S1);
+  circle C2=(S0*S2);
+  circle C3=(S0*S3);
+  circle C4=(S0*S4);
+  circle C5=(S0*S5);
+  circle C6=(S0*S6);
+  circle C7=(S0*S7);
+  circle C8=(S0*S8);
+  circle C9=(S0*S9);
+  circle Ca=(S0*Sa);
+  circle Cb=(S0*Sb);
+  circle Cc=(S0*Sc);
+
+  bold();
+
+  viewpoint(sph(12, 0.5*tix, 0));
+  camera.rotate_sea(1.0/8);
+
+  cyan();
+  //  S0.draw();
+  sphere_draw(C1);
+  sphere_draw(C2);
+  sphere_draw(C3);
+  sphere_draw(C4);
+  sphere_draw(C5);
+  sphere_draw(C6);
+  sphere_draw(C7);
+  sphere_draw(C8);
+  sphere_draw(C9);
+  sphere_draw(Ca);
+  sphere_draw(Cb);
+  sphere_draw(Cc);
+
+  viewpoint(sph(12, 0.01+0.5*tix, 0));
+  camera.rotate_sea(1.0/8);
+
+  red3d();
+  //  S0.draw();
+  sphere_draw(C1);
+  sphere_draw(C2);
+  sphere_draw(C3);
+  sphere_draw(C4);
+  sphere_draw(C5);
+  sphere_draw(C6);
+  sphere_draw(C7);
+  sphere_draw(C8);
+  sphere_draw(C9);
+  sphere_draw(Ca);
+  sphere_draw(Cb);
+  sphere_draw(Cc);
+
+  /*
+  if (toward(C1))
+    C1.draw();
+  if (toward(C2))
+    C2.draw();
+  if (toward(C3))
+    C3.draw();
+  if (toward(C4))
+    C4.draw();
+  if (toward(C5))
+    C5.draw();
+  if (toward(C6))
+    C6.draw();
+  if (toward(C7))
+    C7.draw();
+  if (toward(C8))
+    C8.draw();
+  if (toward(C9))
+    C9.draw();
+  if (toward(Ca))
+    Ca.draw();
+  if (toward(Cb))
+    Cb.draw();
+  if (toward(Cc))
+    Cc.draw();
+  */
+
+  /*
+  C1.draw();
+  C2.draw();
+  C3.draw();
+  C4.draw();
+  C5.draw();
+  C6.draw();
+  C7.draw();
+  C8.draw();
+  C9.draw();
+  Ca.draw();
+  Cb.draw();
+  Cc.draw();
+  */
+
+  end();
+}

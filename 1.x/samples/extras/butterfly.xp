@@ -1,0 +1,184 @@
+/* -*-ePiX-*- */
+// July 18, 2004
+#include "epix.h"
+using namespace ePiX;
+
+const int N1=60;
+const int N2=15;
+const int N3=60;
+
+const double du=8.0/N1, dv=4.0/N2;
+
+const double TMIN=2/sqrt(3);
+const double dt=2*TMIN/N3;
+
+const triple LIGHT=E_1-2*E_2-2*E_3; // location of light, for shading
+
+// const triple VIEWPT=P(4,-1,2);
+const triple VIEWPT=P(0,6,18);
+
+const double MAX=4;
+
+// const double EPS=0.005;
+const double EPS=0;
+
+class mesh_elt {
+private:
+  double ht;
+  double distance;
+  static bool last_was_seg;
+  bool is_segment;
+
+  triple pt1, pt2, pt3, pt4, pt5, pt6, pt7, pt8;
+
+public:
+  double how_far() const { return distance; }
+  double height() const { return ht; }
+
+  mesh_elt(triple f(double u, double v), double u0, double v0)
+  {
+    // shrink mesh quad by EPS
+    pt1=f(u0+EPS,v0+EPS);
+    pt2=f(u0+0.5*du,v0+EPS);
+    pt3=f(u0+du-EPS,v0+EPS);
+    pt4=f(u0+du-EPS,v0+0.5*dv);
+
+    pt5=f(u0+du-EPS,v0+dv-EPS);
+    pt6=f(u0+0.5*du,v0+dv-EPS);
+    pt7=f(u0+EPS,v0+dv-EPS);
+    pt8=f(u0+EPS,v0+0.5*dv);
+
+    triple center = 0.25*(pt1 + (pt3 + (pt5 + pt7)));
+    triple temp = camera.get_viewpt();
+
+    ht=center.x3();
+    distance = norm(center-temp);
+    is_segment=false;
+  }
+
+  mesh_elt(triple f(double), double t0)
+  {
+    pt1=f(t0);
+    pt2=f(t0+0.25*dt);
+    pt3=f(t0+0.5*dt);
+    pt4=f(t0+0.75*dt);
+    pt5=f(t0+dt);
+
+    triple center = 0.333*(pt1 + (pt3 + pt5));
+    triple temp = camera.get_viewpt();
+
+    ht=center.x3();
+    distance = min(min(norm(temp-pt1), norm(temp-pt3)), norm(temp-pt5))-0.5;
+
+    is_segment=true;
+  }
+
+  void draw() 
+  { 
+    if (!is_segment) {
+      triple normal = (pt2 - pt1)*(pt4 - pt1);
+      normal *= 1/norm(normal);
+
+      double dens  = 0.625*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
+
+      if (mesh_elt::last_was_seg)
+	{
+	  mesh_elt::last_was_seg=false;
+	  //	  pen(0.01);
+	  plain();
+	}
+
+      path border 
+	= polygon(8, &pt1, &pt2, &pt3, &pt4, &pt5, &pt6, &pt7, &pt8);
+
+      gray(dens);
+      border.set_fill();
+      border.draw();
+    }
+    else { 
+      if (!mesh_elt::last_was_seg)
+	{
+	  mesh_elt::last_was_seg=true;
+	  pen(1.5);
+	  rgb(0.8, 0.6, 0.5);
+	  //	  red(0.8);
+	}
+      path border = polyline(5, &pt1, &pt2, &pt3, &pt4, &pt5);
+
+      border.draw();
+    }
+
+  } // end of mesh_elt::draw()
+
+}; // end of class mesh_elt
+
+bool mesh_elt::last_was_seg = false;
+
+class by_distance {
+public:
+  bool operator() (const mesh_elt arg1, const mesh_elt arg2)
+  { return (arg1.how_far()) > (arg2.how_far()); }
+};
+
+triple Phi(double u, double v)
+{
+  return P(0.75*(u*u-2*v)*u, 2*u, 4*v);
+}
+
+inline triple Phi1(double t) { return Phi(t, 1.5*t*t); }
+
+inline P cusp(double t) 
+{ 
+  P temp = Phi1(t);
+  return P(temp.x1(), -8, temp.x3()); 
+}
+
+main() {
+  bounding_box(P(-8,-20),P(8,4));
+  unitlength("1in");
+  picture(P(4,6));
+
+  begin();
+  degrees();
+  viewpoint(VIEWPT);
+
+  crop();
+  camera.rotate_eye(180);
+  camera.rotate_sky(20);
+
+  std::vector<mesh_elt> mesh;
+
+  for (int i=0; i<N1; ++i)
+    for (int j=0; j<N2; ++j)
+      mesh.push_back(mesh_elt(Phi, -4+du*i, -2+dv*j));
+
+  for (int i=0; i<N3; ++i)
+    mesh.push_back(mesh_elt(Phi1, -TMIN+i*dt));
+
+  grid(P(-6, -8, -8), P(6, -8, 8));
+
+  //  viewpoint(0,0,EPIX_INFTY);
+  red(0.8);
+  pen(1.5);
+  plot(cusp, -TMIN, TMIN, 80);
+
+  plain();
+  stable_sort(mesh.begin(), mesh.end(), by_distance());
+
+  //  camera.range(20);
+  //  for_each(mesh.begin(), mesh.end(), std::mem_fun(mesh_elt::draw));
+  for (int i=0; i<N1*N2+N3; ++i)
+    mesh.at(i).draw();
+
+  plain();
+  red(0.8);
+  plot(cusp, -TMIN, TMIN, 80);
+  //  plain();
+  //cyan(0.875);
+  rgb(1,0.6,0.6);
+  dashed();
+  line(Phi1( TMIN), cusp( TMIN));
+  line(Phi1(-TMIN), cusp(-TMIN));
+
+  end();
+}

@@ -1,0 +1,36 @@
+/* -*-ePiX-*- */
+/* demoivre.c -- July 22, 2001 */
+#include "epix.h"
+using namespace ePiX;
+int n=24;
+
+inline triple to_triple(pair arg) 
+{ return P(arg.x1(), arg.x2()); }
+
+main()
+{
+  pair power = pair(1,0);
+  pair alpha = pair(1, (M_PI/n));
+
+  bounding_box(P(-1.5,0), P(1,1.25));
+  picture(P(200,100));
+  unitlength("1pt");
+  offset(P(75,-50));
+
+  begin();
+  for(int i=0; i<n; ++i)
+    {
+      line(P(0,0), to_triple(alpha*power));            // draw two sides
+      line(to_triple(power), to_triple(alpha*power));  // of triangle
+      power *= alpha;            // and increment power
+    }
+
+  label(to_triple(alpha), P(2,0), "$\\alpha=1+\\frac{i\\pi}{n}$", r);
+  label(to_triple(power), P(-1,0), "$\\alpha^n$", l);
+
+  red();
+  bold();
+  triangle(P(0, 0), E_1, to_triple(alpha));
+  end();
+}
+

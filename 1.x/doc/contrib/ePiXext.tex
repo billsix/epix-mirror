@@ -1,0 +1,1535 @@
+\documentclass[12pt,a4paper]{article}
+
+\usepackage[english]{babel}
+\usepackage[latin1]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{listings}
+\usepackage{epic,eepic}
+
+\setlength{\oddsidemargin}{0cm}
+\parindent = 0pt
+\parskip = 1pc
+
+\newcommand{\memberitem}[1]{
+                              \vspace{-0.5pc}
+                              \end{minipage}\\
+                              \phantom{M}#1:\\
+                              \phantom{MM}
+                              \begin{minipage}[t]{12cm}
+
+                           }
+\newcommand{\memdsc}{\memberitem{Description}}
+\newcommand{\meminp}{\memberitem{Parameters}}
+\newcommand{\memdef}{\memberitem{Constructor settings}}
+\newcommand{\memret}{\memberitem{Return values}}
+
+\newenvironment{MemberDescr}
+  {
+    \begin{minipage}{15cm}
+    \bf
+  }
+  {
+    \end{minipage}
+  }
+
+\newcommand{\pntr}{\raisebox{-0.25em}{*}\ }
+\newcommand{\ppntr}{\raisebox{-0.25em}{**}\ }
+
+
+\begin{document}
+
+  \lstset{language=C++,
+          extendedchars=true,
+          showstringspaces=false,
+          stringstyle = \ttfamily,
+          basicstyle=\footnotesize
+         }
+
+  \thispagestyle{empty}
+
+  \title{\Huge \textbf{Extension to ePiX}}
+  \author{\\ \\ Svend Daugaard Pedersen}
+  \maketitle
+
+  \newpage
+  \tableofcontents
+  \newpage
+
+  \pagestyle{headings}  % empty plain headings myheadings
+
+  \section{Introduction}
+
+  ePiX\_ext is an extension to the ePiX pre-processor. This extension offers
+  a new style cartesian coordinate system and logarithmic coordinate systems
+  (both single and double) with a lot of parameters that can be set by
+  the user. Further more it offers drawing of a hatched polygon as well as
+  hatched area between two function graphs.
+
+  You need some familiarity with ePiX to be able to use this extension.
+
+  \section{Installation}
+
+  To install ePiX\_ext do the following:
+
+  \begin{enumerate}
+  \item
+    put \textit{epix\_ext.h} in the search path for header files. The same
+    directory as epix.h is the most obvious choice.
+  \item
+    compile the .cc files and put the output in the search path for your
+    linker or simp\-ly add the files to the make file of ePiX and remake ePiX
+    (you may have to change the include lines in the files).
+  \end{enumerate}
+
+
+  \section{Cartesian Coordinate System}
+
+  The declaration statement
+
+  \begin{lstlisting}
+    CartesianCoord cs(-3,5,-2,6);
+  \end{lstlisting}
+
+  creates a cartesian coordinate system with x-bounds $-3\ldots5$ and y-bounds
+  $-2\ldots6$. To draw the coordinate system using the standard layout set by
+  the constructor of \textit{CartesianCoord}, execute the member function
+  \textit{draw} in \textit{cs}:
+
+  \begin{lstlisting}
+    cs.draw();
+  \end{lstlisting}
+
+  Here is an example of a complete C++ program making such a standard coordinate
+  system:
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  int main()
+  {
+    CartesianCoord cs(-3,5,-2,6);
+
+    picture(P(12, 12));
+    unitlength("5mm");
+
+    begin();
+    cs.draw();
+    end();
+
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf01.eepic}
+  \end{minipage}
+
+  To make more division points you have to execute the member function
+  \textit{xMark()} and/or \textit{yMark()} with the position of the first
+  mark and the number of marks as parameters.
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  int main()
+  {
+    CartesianCoord cs(-3,5,-2,6);
+
+    picture(P(12, 12));
+    unitlength("5mm");
+
+    begin();
+    cs.xMarks(-2,6);
+    cs.yMarks(-1,6);
+    cs.draw();
+    end();
+
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    %\begin{center}
+      \input{graf02.eepic}
+    %\end{center}
+  \end{minipage}
+
+  The member functions \textit{xMark()} and \textit{yMarks()} accept a third
+  parameter spe\-ci\-fying the the distance between the marks. The default value
+  of this is 1.
+
+  The member functions \textit{xLabels()} and \textit{yLabels()} are setting
+  other labels on the axis than the default. These member functions have one,
+  two or three parameters. The first (mandatory) parameter is a NULL
+  ter\-mi\-na\-ted array of string pointers. The second parameter is used to
+  specify the position af the first label (default is position of the first
+  mark) and the third the distance between the labels (default is distance
+  between marks).
+
+  \begin{minipage}[c]{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  static char* xlabels[] = {"-2","-1","","1","2","3",NULL};
+  static char* ylabels[] = {"-1","","1","2","3","4",NULL};
+
+  int main()
+  {
+    CartesianCoord cs(-3,5,-2,6);
+
+    picture(P(12,12));
+    unitlength("5mm");
+
+    begin();
+    cs.xMarks(-2,6);
+    cs.yMarks(-1,6);
+    cs.xLabels(xlabels);
+    cs.yLabels(ylabels);
+    cs.draw();
+    end();
+
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \vspace{5pc}
+      \input{graf03.eepic}
+  \end{minipage}
+
+  Note the empty string at the 0-position to avoid collision between a label
+  and the axis.
+
+  The length and position of the marks as well as the position of the labels can
+  be specified. The position values are POSITIVE, NEGATIVE and (for the marks)
+  CENTER. The marks are placed with the member function \textit{markLayout()}
+  with four parameters: the mark length (in pt) and the position for x-axis
+  and the same for the y-axis. The labels position is set using the member
+  function \textit{labelPos()} with one or two parameters. The one parameter
+  version sets the position to the same for both axis.
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+   #include "epix.h"
+   int main()
+   {
+     CartesianCoord cs(-3,5,-2,6);
+     picture(P(12,12));
+     unitlength("5mm");
+     begin();
+     cs.markLayout(2,POSITIVE,2,NEGATIVE);
+     cs.labelPos(NEGATIVE);
+     cs.draw();
+     end();
+     return 0;
+   }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf04.eepic}
+  \end{minipage}
+
+  The axis name and the position of the name can be set with the member
+  functions \textit{xName()} and \textit{yName()}. The parameters are the
+  name and the position.% (use \textbf{NULL} for the name to keep the default).
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+  int main()
+  {
+    CartesianCoord cs(-3,5,-2,6);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    cs.xName("t/s",POSITIVE);
+    cs.yName("E/kJ",NEGATIVE);
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf05.eepic}
+  \end{minipage}
+
+  The CENTER position of the names places the names at the end of the axis. If
+  this position is used you probably need to shorten the length of the axis (or
+  the names will be written outside the picture bounds). This is done by calling
+  the member function \textit{axisBounds())}. This function accepts one or two
+  parameters. The one-parameter version will set the upper right "corner" (most
+  probably what you need), or both lower left and upper right corner.
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+  int main()
+  {
+    CartesianCoord cs(-3,5,-2,6);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    cs.axisBounds(P(4,5));
+    cs.xName(CENTER);
+    cs.yName(CENTER);
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf06.eepic}
+  \end{minipage}
+
+  Also the crossing point for the axis can be specified (default is (0,0))
+  and you can ask for a "broken" axis:
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+  static char* ylabels[] = {"22","23","24","25","26",NULL};
+  int main()
+  {
+    CartesianCoord cs(-1,7,19,27);
+    picture(P(12, 12));
+    unitlength("5mm");
+    begin();
+
+    cs.axisCross(P(0,20));
+    cs.xMarks(1,6);
+    cs.yMarks(22,5);
+    cs.yLabels(ylabels);
+    cs.yName(POSITIVE);
+    cs.yBroken();
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \vspace{1.0cm}
+    \input{graf07.eepic}
+  \end{minipage}
+
+  A graph paper can be added simply by calling the member function
+  \textit{grid()}.
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include <epix.h>
+  int main()
+  {
+    CartesianCoord cs(-2,4,-1,5);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    cs.grid();
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf08.eepic}
+  \end{minipage}
+
+
+  The position of the paper is set by calling the member function
+  \textit{gridPosition()} with a bold line crossing point as parameter (default:
+  axis crossing point). The density of the gridlines is set by calling the
+  member function \textit{gridDensity()} (see reference section for more details):
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include <epix.h>
+  static char* ylabels[] = {"10",NULL};
+  int main()
+  {
+    CartesianCoord cs(-2,4,-10,50);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    cs.yMarks(10,1);
+    cs.yLabels(ylabels);
+    cs.grid();
+    cs.gridDensity(1,9,5,10,9,0);
+    cs.draw();
+
+    end();           
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \vspace{1.0cm}
+    \input{graf09.eepic}
+  \end{minipage}
+
+
+  \newpage
+  \section{Logarithmic Coordinate Systems}
+
+  Logarithmic coordinate systems are made in much the same way as the cartesian
+  coordinate system.
+
+  \subsection{SingleLog Cordinate System}
+
+  A single logarithmic coordinate system has a horizontal linear axis and a
+  vertical logarithmic axis.
+
+  The declaration statement
+
+  \begin{lstlisting}
+    SingleLogCoord cs(0,10,1,100);
+  \end{lstlisting}
+
+  creates a logarithmic coordinate system with x-bounds $0\ldots10$ and y-bounds
+  $1\ldots10$. To draw the coordinate system using the standard layout set by
+  the constructor of \textit{SingleLogCoord}, execute the member function
+  \textit{draw} in \textit{cs}:
+
+  \begin{lstlisting}
+    cs.draw();
+  \end{lstlisting}
+
+  Here is an example of a complete C++ program making such a standard coordinate
+  system:
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  int main()
+  {
+    SingleLogCoord sc(0,8,1,100);
+
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    sc.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf10.eepic}
+  \end{minipage}
+
+  The logaritmic axis need not contain only full decades. The following C++
+  program is used to create a coordinate system with one and a "half" decades
+  from 0.1 to 5:
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  int main()
+  {
+    SingleLogCoord sc(0,8,0.1,5);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    sc.logStyle(3);
+    sc.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf11.eepic}
+  \end{minipage}
+
+
+  In this case the standard logaritmic style number 3 is used to set the division
+  of the logaritmic axis.
+
+  There are six standard styles giving an increasing number of division points:
+
+  \begin{center}
+    \input{stylegraf1.eepic}
+  \end{center}
+  \begin{center}
+    \input{stylegraf2.eepic}
+  \end{center}
+  \begin{center}
+    \input{stylegraf3.eepic}
+  \end{center}
+  \begin{center}
+    \input{stylegraf4.eepic}
+  \end{center}
+  \begin{center}
+    \input{stylegraf5.eepic}
+  \end{center}
+  \begin{center}
+    \input{stylegraf6.eepic}
+  \end{center}
+
+  The default \textit{stdstyle} is 4.
+
+  The start of each decade is labeled as shown inside the range 0.01 to 1000.
+  Outside this range powers of ten are used.
+
+  To customize marking and labelling call the member function \textit{logStyle()}
+  as shown here:
+
+  \begin{minipage}{8.0cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  Mark mrk[] =
+   {
+    {1,"1000",3},{2,"2000",1},
+    {3,"3000",1},{4,"4000",1},
+    {5,"5000",0},{6,"6000",0},
+    {7,"7000",0},{8,"8000",0},
+    {9,"9000",0},{1,"10000",3},
+    {2,"20000",1},{3,"30000",1},
+    {4,"40000",1},{5,"50000",0},
+    {6,"60000",0},{7,"70000",0},
+    {8,"80000",0},{9,"90000",0},
+    {1,"100000",0},{10,NULL,0}
+   };
+  int main()
+  {
+    SingleLogCoord
+      cs(-1,10,1000,100000);
+    picture(P(12,24));
+    unitlength("5mm");
+    begin();
+
+    cs.logStyle(mrk);
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf12.eepic}
+  \end{minipage}
+
+  The variable \textit{mrk} is a table of structures each containing three
+  fields. The first field holds the position of the mark (the position within
+  the actual decade). The next field is the label to be printed. And the third
+  is the number of subdivisons following this mark. The table ends with
+  position 10.
+
+  \newpage
+  Another example:
+
+  \begin{minipage}{8.0cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  Mark mrk[] =
+   {
+    {1,NULL,9},
+    {2,"\\scriptsize 2",9},
+    {3,"\\scriptsize 3",9},
+    {4,"\\scriptsize 4",9},
+    {5,"\\scriptsize 5",4},
+    {6,"\\scriptsize 6",4},
+    {7,"\\scriptsize 7",4},
+    {8,"\\scriptsize 8",4},
+    {9,"\\scriptsize 9",4},
+    {10,NULL,0}
+   };
+
+  int main()
+  {
+    SingleLogCoord cs(0,10,1,100);
+    picture(P(12,24));
+    unitlength("5mm");
+    begin();
+
+    cs.logStyle(mrk);
+    cs.labelAttr("");
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf13.eepic}
+  \end{minipage}
+
+  \textit{mrk} is here a one-decade table. It is used for both decades on the
+  axis. The NULL label at position 1 has the effect that the current decade value
+  is printed (here 1.0, 10 and 100).
+
+  The member function \textit{labelAttr()} can be used to set any attribute, for
+  instance $\backslash$it and/or $\backslash$tiny. But note that you have to use
+  a double backslash in a C++ string, because in C++ strings (like in \TeX) a
+  backslash is a command introducer. In the example the attribute is set to
+  the empty string so that the numbers at the start of each decade are printed
+  in normal size (default attribute string is "$\backslash\backslash$scriptsize").
+  All other numbers are printed using $\backslash$scriptsize as specified in the
+  Mark table.
+
+  \newpage
+  A graph paper can be added in the same way as for the cartesian coordinate
+  system:
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+  int main()
+  {
+    SingleLogCoord cs(0,10,1,10);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    cs.logStyle(6);
+    cs.grid();
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf14.eepic}
+  \end{minipage}
+
+  \subsection{DoubleLog Cordinate System}
+
+  A double logarithmic coordinate system has two logarithmic axisis. It is
+  handled in much the same way as the Single Logarithmic Coordinate System.
+  Just change \textit{Single} to \textit{Double}.
+
+  Here is an example:
+
+  \begin{minipage}{7.7cm}
+    \begin{lstlisting}
+  #include "epix.h"
+  int main()
+  {
+    DoubleLogCoord cs(0.1,10,1,100);
+
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    cs.logStyle(4);
+    cs.grid();
+    cs.draw();
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf15.eepic}
+  \end{minipage}
+
+  \subsection{Graphs in Logarithmic Cordinate System}
+
+  In the coordinate systems the member functions \textit{plot()}, \textit{adplot()},
+  \textit{label()} and \textit{marker()} are used in the same way as the
+  corresponding ePiX functions. But they can be used in  logarithmic coordinate
+  systems, too.
+
+
+  %Here is a simple example of the use of these:
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+  double f(double x)
+  { return 1.5*pow(1.2,x); }
+  int main()
+  {
+    SingleLogCoord cs(0,10,1,10);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+    cs.logStyle(6);
+    cs.grid();
+    cs.draw();
+    cs.plot((*f),0,10,10);
+    cs.label(P(5,f(5)),P(0,0),
+       "$1.5\\cdot1.2^x$",br);
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf16.eepic}
+  \end{minipage}
+
+  By changing \textit{SingleLog} to \textit{Cartesian} (and doing some other natural
+  changes), you get:
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+  double f(double x)
+  { return 1.5*pow(1.2,x); }
+  int main()
+  {
+    CartesianCoord cs(0,10,0,10);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+    cs.grid();
+    cs.draw();
+    cs.plot((*f),0,10,10);
+    cs.label(P(5,f(5)),P(0,0),
+       "$1.5\\cdot1.2^x$",br);
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf17.eepic}
+  \end{minipage}
+
+
+  \subsection{Printing Coordinate Axis}
+
+  Coordinate axis can be printed alone. The output of the program below shows
+  the theory behind logarithmic axis:
+
+  \begin{lstlisting}
+    #include "epix.h"
+    static char* linLabels[] =
+      {"\\scriptsize 0","\\scriptsize 0.1","\\scriptsize 0.2",
+       "\\scriptsize 0.3","\\scriptsize 0.4","\\scriptsize 0.5",
+       "\\scriptsize 0.6","\\scriptsize 0.7","\\scriptsize 0.8",
+       "\\scriptsize 0.9","\\scriptsize 1.0",NULL
+      };
+    int main()
+    {
+      HorizLinAxis linAs;
+      HorizLogAxis logAs;
+
+      bounding_box(P(0,0),P(1,1.17));
+      picture(P(10,1.5));
+      unitlength("1cm");
+      begin();
+
+      linAs.nummrk = 11;
+      linAs.distmrk = 0.1;
+      linAs.mrk1 = 0; linAs.mrkpos = POSITIVE;
+      linAs.labels = linLabels; linAs.labpos = POSITIVE;
+      linAs.name = "$\\log(x)$"; linAs.nampos = POSITIVE;
+      linAs.draw(P(0,0.75),1.17);
+
+      logAs.drawaxis = false;
+      logAs.arrow = true; logAs.arrowextra = 5;
+      logAs.stdstyle = 6;
+      logAs.mrkpos = NEGATIVE;
+      logAs.name = "$x$";
+      logAs.draw(P(0,0.75),1);
+
+      end();
+      return 0;
+    }
+  \end{lstlisting}
+
+  \begin{minipage}{5.5cm}
+    \input{graf18.eepic}
+  \end{minipage}
+
+  See \textit{epix\_ext.h} for a description of the fields in the axis structures.
+
+  %\newpage
+  \section{Hatched figures}
+
+  \subsection{Hatched area}
+
+  Commands to draw a hatched area between two graphs (or one graph and the
+  x-axis) in a cartesian coordinate system are generated by calling the
+  member functions:
+
+  \begin{lstlisting}
+  void hatchArea(double angle,double dist,
+                   double f(double),double g(double),
+                   double a, double b, int n);
+
+  void hatchArea(double angle,double dist,
+                   double f(double),double a,double b, int n)
+  \end{lstlisting}
+
+  The first two parameters \textit{angle} and \textit{dist} specifies the angle of
+  and the distance between the hatch lines. The next are the function(s), the start
+  and the end point and the number of points used to draw the graphs.
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  double f(double x)
+  {
+    return 4.5-(x-3)*(x-3)/2;
+  }
+
+  int main()
+  {
+    CartesianCoord cs(-1,7,-2,6);
+    picture(P(12,12));
+    unitlength("5mm");
+    begin();
+
+    cs.draw();
+    cs.hatchArea(150,0.2,f,std::sin,0,5.5,100);
+
+    end();
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \input{graf20.eepic}
+    \vspace{1.8cm}
+  \end{minipage}
+
+  %\pagebreak
+
+  \subsection{Hatched polygon}
+
+  The member function \textit{hatchArea()} is based on routines for drawing
+  hatched polygons. They are generated by the procedures:
+
+  \begin{lstlisting}
+    void hatch_polygon(double angle,double dist,
+                       int corners,triple* points);
+    void hatch_polygon(double angle,double dist,
+                       int corners,triple& points, ...);
+
+    void hatch(double angle,double dist,
+               int corners,triple* points);
+    void hatch(double angle,double dist,
+               int corners,triple& points, ...);
+  \end{lstlisting}
+
+  The difference between \textit{hatch\_polygon()} and \textit{hatch()} is that
+  \textit{hatch()} will not draw the polygon. The meaning of the first two
+  parameters are the same as for the \textit{hatchArea()} member function. The
+  next parameter is the number of corners in the polygon and then the corners.
+
+  \begin{minipage}{7.5cm}
+    \begin{lstlisting}
+  #include "epix.h"
+
+  triple corners[] =
+    {P(-2,-3),P(-3,1),P(1,0),P(2,3),P(4,-2),P(-1,-1)};
+
+  int main()
+  {
+    bounding_box(P(-4,-3),P(4,2));
+    picture(P(12,7.5));
+    unitlength("5mm");
+
+    begin();
+
+    hatch_polygon(45,0.2,6,corners);
+
+    end();
+
+    return 0;
+  }
+    \end{lstlisting}
+  \end{minipage}
+  \begin{minipage}{5.5cm}
+    \vspace{1.5cm}
+    \input{graf22.eepic}
+  \end{minipage}
+
+  As is seen from the example, the polygon need not be convex. But the
+  result is unpredictable if some of the edges cosses each other.
+
+  \section{Setting Line Thickness}
+
+  The line thickness used to draw axis (bold and normal), bold, medium and
+  fine grid lines can be changed simply by setting variables to new values.
+  These variables and their standard values are:
+
+  \begin{lstlisting}
+    char* normalThickness     = "\\thinlines";
+    char* normalAxisThickness = "\\thinlines";
+    char* boldAxisThickness   = "\\thicklines";
+    char* boldGridThickness   = "\\thinlines";
+    char* mediumGridThickness = "\\allinethickness{0.075mm}";
+    char* fineGridThickness   = "\\allinethickness{0.03mm}";
+    char* crossHatchThickness = "\\allinethickness{0.04mm}";
+  \end{lstlisting}
+
+
+  \section{ePiX\_ext reference}
+
+  \subsection{Member functions for all coordinate systems}
+
+  \begin{MemberDescr}
+    void bounds(double xmin,double xmax,double ymin,double ymax)\\
+    \memdsc
+      Set bounds of coordinate system.\\
+    \meminp
+      xmin: lower x-bound of picture.\\
+      xmax: upper x-bound of picture.\\
+      ymin: lower y-bound of picture.\\
+      ymax: upper y-bound of picture.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void draw()\\
+    \memdsc
+      Draw the coordinate system.\\
+    \meminp
+      none.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void showAxis(bool b)\\
+    void showAxis(bool bx,bool by)\\
+    \memdsc
+      Draw axis or not.\\
+    \meminp
+      b:  if true draw both x- and y-axis.\\
+      bx: if true draw x-axis.\\
+      by: if true draw y-axis.\\
+    \memdef
+      \textbf{true} for both axis.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+     void showArrow(bool b)\\
+     void showArrow(bool xb, bool yb)\\
+    \memdsc
+      Draw axis with or without an arrow.\\
+    \meminp
+      b:  if true draw arrow on both x- and y-axis.\\
+      bx: if true draw arrow on x-axis.\\
+      by: if true draw arrow on y-axis.\\
+    \memdef
+      \textbf{true} for both axis.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+     void xName(Position pos)\\
+     void xName(char\pntr name,Position pos)\\
+    \memdsc
+      Place name at the end of the x-axis.\\
+    \meminp
+      name: name of the x-axis.\\
+      pos:  position of name (POSITIVE, NEGATIVE or CENTER).\\
+    \memdef
+      name: "(1)" for linear axis and \textbf{NULL} for logarithmic.\\
+      pos:  NEGATIVE.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+     void yName(Position pos)\\
+     void yName(char\pntr name,Position pos)\\
+    \memdsc
+      Place name at the end of the y-axis.\\
+    \meminp
+      name: name of the y-axis.\\
+      pos:  position of name (POSITIVE, NEGATIVE or CENTER).\\
+    \memdef
+      name: "(2)" for linear axis and \textbf{NULL} for logarithmic.\\
+      pos:  NEGATIVE.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+     void labelPos(Position pos)\\
+     void labelPos(Position xpos,Position ypos)\\
+    \memdsc
+      Set position of (mark) labels on the axis.\\
+    \meminp
+      pos:  position for labels on both x- and y-axis.\\
+      xpos: position for labels on x-axis.\\
+      ypos: position for labels on y-axis.\\
+    \memdef
+      NEGATIVE for both axis.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void markLayout(double length,Position pos=CENTER)\\
+    void markLayout(double lx,Position px,double ly,Position py)\\
+    \memdsc
+      Set length and position of marks on the axis.\\
+    \meminp
+      length: length (in pt) of marks on both x-axis and y-axis.\\
+      pos:    position of marks on both x-axis and y-axis.\\
+      lx:     length (in pt) of marks on x-axis.\\
+      px:     position of marks on x-axis.\\
+      ly:     length (in pt) of marks on y-axis.\\
+      py:     position of marks on y-axis.\\
+    \memdef
+      length: 3 pt.\\
+      pos:    CENTER.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void boldAxis(bool b=true)\\
+    void boldAxis(bool bx,bool by)\\
+    \memdsc
+      draw axis with bold line.\\
+    \meminp
+      b:  if true draw both x- and y-axis with bold line.\\
+      bx: if true draw x-axis with bold line.\\
+      by: if true draw y-axis with bold line.\\
+    \memdef
+      For both axis \textbf{true} if grid is selected, otherwise \textbf{false}.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void adplot(double f(double), double xmin, double xmax, int n)\\
+    void plot(double f(double), double xmin, double xmax, int n)\\
+    \memdsc
+      Works like ePiX adplot and plot but takes care of the the actual type of
+      coordinate system (cartesian or logarithmic).\\
+    \meminp
+      f: function to draw graph of.\\
+      xmin: lower x-bound of graph.\\
+      xmax: upper x-bound of graph.\\
+      n: number of points used to draw (straight lines between each point).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void label(triple base,triple offset,char\pntr text)\\
+    void label(triple base,char *text)\\
+    void label(triple base,triple offset,char\pntr text,epix\_label\_posn pos)\\
+    \memdsc
+      Works like ePiX label but takes care of the the actual type of
+      coordinate system (cartesian or logarithmic).\\
+    \meminp
+      base:   base point of label.\\
+      offset: offset (in pt) of label.\\
+      text:   text to write.\\
+      pos:    position relative to base (c,r,tr,rt,t,tl,lt,l,bl,lb,b,br,rb).\\
+  \end{MemberDescr}
+
+
+  \subsection{Member functions for class CartesianCoord}
+
+  \begin{MemberDescr}
+    CartesianCoord()\\
+    CartesianCoord(double xmin,double xmax,double ymin,double ymax)\\
+    \memdsc
+      Constructor for class CartesianCoord.\\
+    \meminp
+      xmin: lower x-bound of picture (default -1).\\
+      xmax: upper x-bound of picture (default 10).\\
+      ymin: lower y-bound of picture (default -1).\\
+      ymax: upper y-bound of picture (default 10).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void axisCross(triple point)\\
+    \memdsc
+      Set the axis crossing point.\\
+    \meminp
+      point: crossing point for the axis.\\
+    \memdef
+      (0,0).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void axisBounds(triple upperRight)\\
+    void axisBounds(triple lowerLeft,triple upperRight)\\
+    \memdsc
+      Set bouds of axis in coordinate system.\\
+    \meminp
+      lowerLeft:  lower left corner of axis.\\
+      upperRight: upper right corner of axis.\\
+    \memdef
+      Bounds of coordinate system.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void xMarks(double first,int num)\\
+    void xMarks(double first,int num,double dist)\\
+    \memdsc
+      Specify number and position of marks on x-axis.\\
+    \meminp
+      first: position of first mark.\\
+      num:   number of marks to set.\\
+      dist:  distance between marks (default is 1.0).\\
+    \memdef
+      first: 1.\\
+      num:   1.\\
+      dist:  1.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void yMarks(double first,int num).\\
+    void yMarks(double first,int num,double dist).\\
+    \memdsc
+      Specify number and position of marks on y-axis.\\
+    \meminp
+      first: position of first mark.\\
+      num:   number of marks to set.\\
+      dist:  distance between marks (default is 1.0).\\
+    \memdef
+      first: 1.\\
+      num:   1.\\
+      dist:  1.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void xLabels(char\ppntr lab)\\
+    void xLabels(char\ppntr lab,double first)\\
+    void xLabels(char\ppntr lab,double first,double dist)\\
+    \memdsc
+      Labels to place on x-axis.\\
+    \meminp
+      lab:   the labels in a \textbf{NULL}-terminated array of string pointers.\\
+      first: position of label (default is position of first mark).\\
+      dist:  distance between labels (default distance between marks).\\
+    \memdef
+      lab: \{"1",\textbf{NULL}\}.\\
+      first: first mark.\\
+      dist: distance between marks.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void yLabels(char\ppntr lab)\\
+    void yLabels(char\ppntr lab,double first)\\
+    void yLabels(char\ppntr lab,double first,double dist)\\
+    \memdsc
+      Labels to place on y-axis.\\
+    \meminp
+      lab:   the labels in a \textbf{NULL}-terminated array of string pointers.\\
+      first: position of label (default is position of first mark).\\
+      dist:  distance between labels (default distance between marks).\\
+    \memdef
+      lab: \{"1",\textbf{NULL}\}.\\
+      first: first mark.\\
+      dist: distance between marks.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void xBroken()\\
+    \memdsc
+      Make x-axis broken (to show that axis cross is not zero).\\
+    \meminp
+      None.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void yBroken()\\
+    \memdsc
+      Make y-axis broken (to show that axis cross is not zero).\\
+    \meminp
+      None.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void grid()\\
+    void grid(double xmin,double xmax,double ymin,double ymax)\\
+    \memdsc
+      Add a grid to the coordinate system. Draw coordinate axis in bold unless
+      otherwise specified.\\
+    \meminp
+      xmin: left edge of grid (default is left edge of coordinate system).\\
+      xmax: right edge of grid (default is right edge of coordinate system).\\
+      ymin: bottom edge of grid (default is bottom edge of coordinate system).\\
+      ymax: top edge of grid (default is top edge of coordinate system).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void gridPosition(triple boldCross)\\
+    \memdsc
+      Set position of grid in coordinate system.\\
+    \meminp
+      boldCross: a crossing point for bold lines.\\
+    \memdef
+      Axis crossing point.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void gridDensity(double dist)\\
+    void gridDensity(double dist,int num)\\
+    void gridDensity(double dist,int num,int mid)\\
+    void gridDensity(double xd,int xn,int xm,double yd,int yn,int ym)\\
+    \memdsc
+      Set density of grid lines.\\
+    \meminp
+      dist: distance between grid lines.\\
+      num:  number of fine lines (default is 9).\\
+      mid:  the fine line to draw half bold (default is 0 meaning no half bold).\\
+      xd,xn,xm: dist, num and mid for x-axis.\\
+      yd,yn,ym: dist, num and mid for y-axis.\\
+    \memdef
+      dist: 1.\\
+      num:  9.\\
+      mid:  5.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void hatchArea(double v,double d,double f(double),\\
+    \phantom{void hatchArea(}double a,double b,int n)\\
+    \memdsc
+      Hatched area between graph and x-axis.\\
+    \meminp
+      v: angle between x-axis and hatch line.\\
+      d: distance between hatch lines.\\
+      f: graph function.\\
+      a: left edge af area.\\
+      b: right edge of area.\\
+      n: number of points used to draw the graphs (see plot and adplot).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void hatchArea(double v,double d,double f(double),double g(double)\\
+    \phantom{void hatchArea(}double a,double b,int n)\\
+    \memdsc
+      Hatched area between two graphs.\\
+    \meminp
+      v: angle between x-axis and hatch line.\\
+      d: distance between hatch lines.\\
+      f: upper graph function.\\
+      g: lower graph function.\\
+      a: left edge af area.\\
+      b: right edge of area.\\
+      n: number of points used to draw the graphs (see plot and adplot).\\
+  \end{MemberDescr}
+
+  \subsection{Member functions for class SingleLogCoord}
+
+  \begin{MemberDescr}
+    SingleLogCoord()\\
+    SingleLogCoord(double xmin,double xmax,double ymin,double ymax)\\
+    \memdsc
+      Constructor for class SingleLogCoord.\\
+    \meminp
+      xmin: lower x-bound of picture (default -1).\\
+      xmax: upper x-bound of picture (default 10).\\
+      ymin: lower y-bound of picture (default 1).\\
+      ymax: upper y-bound of picture (default 100).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void axisCross(triple point)\\
+    \memdsc
+      Set crossing point for coordinate axis. Set to (xmin,ymin) by
+      the constructor.\\
+    \meminp
+      point: crossing point.\\
+    \memdef
+      (xmin,ymin).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void axisBounds(triple upperRight)\\
+    void axisBounds(triple lowerLeft,triple upperRight)\\
+    \memdsc
+      Set bounds of axis in coordinate system. Set by constructor to bounds
+      of picture.\\
+    \meminp
+      lowerLeft:  lower left corner of axis.\\
+      upperRight: upper right corner of axis.\\
+    \memdef
+      lowerLift: (xmin,ymin).\\
+      upperRight: (xmax,ymax).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void xMarks(double first,int num)\\
+    void xMarks(double first,int num,double dist)\\
+    \memdsc
+      Specify number and position of marks on x-axis.\\
+    \meminp
+      first: position of first mark.\\
+      num:   number of marks to set.\\
+      dist:  distance between marks (default is 1.0).\\
+    \memdef
+      first: 1.\\
+      num:   1.\\
+      dist:  1.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void yMarks(double first,double last)\\
+    \memdsc
+      Set bounds of marks on logarithmic axis.\\
+    \meminp
+      first: lower bound of marks.\\
+      last: upper bounds marks.\\
+    \memdef
+      first: ymin.\\
+      last: ymax.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void xLabels(char\ppntr lab)\\
+    void xLabels(char\ppntr lab,double first)\\
+    void xLabels(char\ppntr lab,double first,double dist)\\
+    \memdsc
+      Labels to place on x-axis.\\
+    \meminp
+      lab:   the labels in a \textbf{NULL}-terminated array of string pointers.\\
+      first: position of label (default is position of first mark).\\
+      dist:  distance between labels (default distance between marks).\\
+    \memdef
+      lab: \{"1",\textbf{NULL}\}.\\
+      first: first mark.\\
+      dist: distance between marks.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void showArrow(bool b)\\
+    void showArrow(double extra)\\
+    void showArrow(bool b,double extra)\\
+    \memdsc
+      Draw axis with or without an arrow and add extra length to logarithmic
+      axis.\\
+
+      \textbf{void showArrow(bool b)} will only affect x-axis.\\
+      \textbf{void showArrow(double extra)} will only affect y-axis.\\
+      \textbf{void showArrow(bool b,double extra)} affects both axis.\\
+    \meminp
+      b:  if true draw arrow on x-axis.\\
+      extra: add extra length (in pt) to y-axis and draw arrow.\\
+    \memdef
+      Arrow on x-axis, no arrow on y-axis.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void xBroken()\\
+    \memdsc
+      Make x-axis broken (to show that axis cross is not zero).\\
+    \meminp
+      None.\\
+    \memdef
+      No broken axis.\\
+  \end{MemberDescr}
+
+
+  \begin{MemberDescr}
+    void logStyle(int style)\\
+    void logStyle(Mark\pntr mrk)\\
+    \memdsc
+      Set style of logarithmic axis. \textit{Mark} is defined as:\\
+    \vspace{-1pc}
+\begin{lstlisting}
+  class Mark
+  {
+    public:
+     double position; // position of main mark
+     char*  label;    // label to print at main mark
+     int    numsub;   // number of submarks until next main mark
+  };
+
+\end{lstlisting}
+
+    \meminp
+      style: standard style number ($1\ldots6$).\\
+      mrk:   pointer to an array of marks describing the logarithmic axis.\\
+    \memdef
+      Standard style 4.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void labelAttr(char\pntr attr)\\
+    \memdsc
+      Label attribute to use if label is not specified (\textbf{NULL}).\\
+    \meminp
+      attr: attribute string.\\
+    \memdef
+      attr = "$\backslash\backslash$scriptsize".\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void grid()\\
+    void grid(double xmin,double xmax)\\
+    \memdsc
+      Add a grid to the coordinate system. Draw coordinate axis in bold unless
+      otherwise specified.\\
+    \meminp
+      xmin: left edge of grid (default is left edge of coordinate system).\\
+      xmax: right edge of grid (default is right edge of coordinate system).\\
+    \memdef
+      xmin: left edge of coordinate system.\\
+      xmax: right edge of coordinate system.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void gridPosition(double crossX)\\
+    \memdsc
+      Set position of grid lines perpendicular to x-axis.\\
+    \meminp
+      crossX: position for a bold line.\\
+    \memdef
+      logarithmic axis position.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void gridDensity(double dist)\\
+    void gridDensity(double dist,int num)\\
+    void gridDensity(double dist,int num,int mid)\\
+    \memdsc
+      Density of grid lines perpendicular to x-axis.\\
+    \meminp
+      dist: distance between grid lines.\\
+      num:  number of fine lines (default is 9).\\
+      mid:  the fine line to draw half bold (default 0 meaning no half bold).\\
+    \memdef
+      dist: 1.\\
+      num:  9.\\
+      mid:  5.\\
+  \end{MemberDescr}
+
+
+  \subsection{Member functions for class DoubleLogCoord}
+
+  \begin{MemberDescr}
+    DoubleLogCoord()\\
+    DoubleLogCoord(double xmin,double xmax,double ymin,double ymax)\\
+    \memdsc
+      Constructor for class DoubleLogCoord.\\
+    \meminp
+      xmin: lower x-bound of picture (default 1).\\
+      xmax: upper x-bound of picture (default 100).\\
+      ymin: lower y-bound of picture (default 1).\\
+      ymax: upper y-bound of picture (default 100).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void axisCross(triple point)\\
+    \memdsc
+      Set crossing point for coordinate axis.\\
+    \meminp
+      point: crossing point.\\
+    \memdef
+      (xmin,ymin).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void axisBounds(triple upperRight)\\
+    void axisBounds(triple lowerLeft,triple upperRight)\\
+    \memdsc
+      Set bounds of axis in coordinate system. Set by constructor to bounds
+      of picture.\\
+    \meminp
+      lowerLeft:  lower left corner of axis.\\
+      upperRight: upper right corner of axis.\\
+    \memdef
+      lowerLeft: (xmin,ymin).\\
+      upperRight: (xmax,ymax).\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void xMarks(double first,double last)\\
+    \memdsc
+      Set bounds of marks on horizontal logarithmic axis.\\
+    \meminp
+      first: lower bound of marks.\\
+      last: upper bounds marks.\\
+    \memdef
+      first: xmin.\\
+      last: xmax.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void yMarks(double first,double last)\\
+    \memdsc
+      Set bounds of marks on vertical logarithmic axis.\\
+    \meminp
+      first: lower bound of marks.\\
+      last: upper bounds marks.\\
+    \memdef
+      first: ymin.\\
+      last: ymax.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void showArrow(double extra)\\
+    void showArrow(bool bx,double extrax,bool by,double extray)\\
+    \memdsc
+      Draw axis with or without an arrow and add extra length to logarithmic
+      axis.\\
+    \meminp
+      extra: add extra length (in pt) and draw arrow (for both axis).\\
+      extrax: add extra length (in pt) to horizontal axis and draw arrow.\\
+      extray: add extra length (in pt) to vertical axis and draw arrow.\\
+    \memdef
+      No arrows.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void logStyle(int style)\\
+    void logStyle(Mark\pntr mrk)\\
+    void logStyle(int stylex,int styley)\\
+    void logStyle(Mark\pntr mrkx,Mark\pntr mrky)\\
+    void logStyle(int stylex,Mark\pntr mrky)\\
+    void logStyle(Mark\pntr mrkx,int styley)\\
+    \memdsc
+      Set style of axis. \textit{Mark} is defined as:\\
+    \vspace{-1pc}
+\begin{lstlisting}
+  class Mark
+  {
+    public:
+     double position; // position of main mark
+     char*  label;    // label to print at main mark
+     int    numsub;   // number of submarks until next main mark
+  };
+
+\end{lstlisting}
+
+    \meminp
+      style: standard style ($1\ldots6$) to be used for both axis.\\
+      stylex: standard style ($1\ldots6$) to be used for horizontal axis.\\
+      styley: standard style ($1\ldots6$) to be used for vertical axis.\\
+      mrk:   pointer to an array of marks describinging both axis.\\
+      mrkx:   pointer to an array of marks describinging horizontal axis.\\
+      mrky:   pointer to an array of marks describinging vertical axis.\\
+    \memdef
+      Standard style 4 for both axis.\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void labelAttr(char\pntr attr)\\
+    void labelAttr(char\pntr attrx,char\pntr attry)\\
+    \memdsc
+      Label attribute to use if label is not specified (\textbf{NULL}).\\
+    \meminp
+      attr: attribute string for both axis.\\
+      attrx: attribute string for horizontal axis.\\
+      attry: attribute string for vertical axis.\\
+    \memdef
+      attr = "$\backslash\backslash$scriptsize".\\
+  \end{MemberDescr}
+
+  \begin{MemberDescr}
+    void grid()\\
+    \memdsc
+      Add a grid to the coordinate system. Draw coordinate axis in bold unless
+      otherwise specified.\\
+    \meminp
+      None.\\
+  \end{MemberDescr}
+
+\end{document}
+

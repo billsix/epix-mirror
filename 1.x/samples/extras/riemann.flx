@@ -1,0 +1,89 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P F(P arg)
+{ 
+  double t=arg.x1(), r=arg.x2(), theta=arg.x3();
+
+  return P(r*r*Cos(2*theta), 
+           r*r*Cos(t)*Sin(2*theta) + r*Sin(t)*Sin(theta),
+           r*Cos(theta));
+}
+
+domain R(P(0,0,0), P(1, 1.5, 1), mesh(24, 8, 32), mesh(24, 40, 80));
+
+int main(int argc, char* argv[])
+{
+  double tix;
+  if (argc == 0)
+    tix=0;
+  else
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix=temp1/temp2;
+    }
+
+  domain R1=R.slice1(tix);
+
+  bounding_box(P(-4,-4),P(4,4));
+  unitlength("1in");
+  picture(P(5,5));
+
+  begin();
+  revolutions();
+
+  grid(1,1);
+
+  const P ctr=P(3.25,-3.25); // "clock" center
+  bold();
+  ellipse(ctr, P(0.5,0.5)); // clock face
+
+  line(ctr,ctr+polar(0.4,tix)); // hands
+  label(ctr+polar(0.6,tix), "$y$");
+
+  line(ctr,ctr+polar(0.4,tix+0.25));
+  label(ctr+polar(0.6,tix+0.25), "$w$");
+
+  viewpoint(4,5,3);
+  camera.range(0);
+
+  line(P(0,0,0), P(3,0,0));
+  line(P(0,0,0), P(0,3,0));
+  line(P(0,0,0), P(0,0,2));
+
+/*
+  h_axis_labels(P(-4,-4), P(4,-4), 4, P(-4,-2), bl);
+  v_axis_labels(P(4,-4), P(4,4), 4, P(0,-2), br);
+*/
+
+  plain();
+  red();
+
+  plot(F, R1.resize3(0, 0.5));
+  //  plot(f, P(0,0), P(1.5,0.5), Net(8,16), Net(40,80));
+
+  blue();
+
+  plot(F, R1.resize3(0.5, 1));
+  //  plot(f, P(0,0.5), P(1.5,1), Net(8,16), Net(40,80));
+
+  bold();
+  magenta();
+  plot(F, R.slice3(0));
+  plot(F, R.slice3(0.5));
+
+  //  plot(f, P(0,0), P(1.5,0), Net(8, 1), Net(40,1));
+  //  plot(f, P(0,0.5), P(1.5,0.5), Net(8, 1), Net(40,1));
+
+  black();
+  masklabel(P(3,0,0), "$x$");
+  masklabel(P(0,3,0), "$y$");
+  masklabel(P(0,0,2), P(-4,0), "$z=\\textrm{Re}\\,\\sqrt{x+iy}$", tr);
+
+  end();
+}

@@ -1,0 +1,63 @@
+/* -*-flix-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P F(double u, double v)
+{
+  return P(v, -Sin(u));
+}
+
+double theta0=5*M_PI/6; // 30 degrees
+
+P posn0(theta0, 0);
+
+P pivot(0,5.5);
+double ell=3;
+
+double K=-Cos(theta0);
+double f(double t)
+{
+  return recip(sqrt(2*(K+Cos(t))));
+}
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix=temp1/temp2;
+    }
+  bounding_box(P(-2*M_PI,-1),P(2*M_PI,ell+pivot.x2()));
+  unitlength("0.5in");
+  picture(4*M_PI, 1+ell+pivot.x2());
+
+  begin();
+
+  double period=4*I(f).eval(theta0);
+
+  rgb(0.95,0.95,0.95);
+  grid();
+  black();
+
+  P posn=flow(F, posn0, period*tix, 120*tix); // phase position
+  double x_t = Sin(posn.x1());
+  double y_t = Cos(posn.x1());
+
+  slope_field(F, P(-2*M_PI,-2), P(2*M_PI,2), 48, 12);
+
+  bold();
+  line(pivot, pivot-3*P(x_t, y_t));
+
+  red();
+  ode_plot(F, posn0, period, 120);
+
+  blue();
+  box(posn);
+  box(pivot-3*P(x_t, y_t));
+
+  end();
+}

@@ -1,0 +1,61 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix=temp1/temp2;
+    }
+
+  bounding_box(P(-4,-4),P(4,4));
+  unitlength("1in");
+  picture(P(5,5));
+
+  begin();
+  revolutions();
+
+  grid(1,1);
+
+  P ctr=P(3.25,-3.25); // "clock" center
+  bold();
+  ellipse(ctr, P(0.5,0.5)); // clock face
+
+  line(ctr,ctr+polar(0.4,tix)); // hands
+  label_angle(tix-0.25);
+  label(ctr+polar(0.6,tix), "$\\theta$");
+
+  plain();
+
+  viewpoint(sph(10,0,0));
+  camera.rotate_sea(0.05);
+  camera.rotate_sky(tix);
+
+  rgb(1,0.4,0.4);
+
+  rect(P(-2,-2,-2), P(2,2,-2));
+  rect(P(-2,-2, 2), P(2,2, 2));
+
+  rect(P(-2,-2,-2), P( 2,-2,2));
+  rect(P(-2, 2,-2), P( 2, 2,2));
+
+  viewpoint(sph(10,0,0));
+  camera.rotate_sea(0.05);
+  camera.rotate_sky(0.01+tix);
+
+  cyan();
+
+  rect(P(-2,-2,-2), P(2,2,-2));
+  rect(P(-2,-2, 2), P(2,2, 2));
+
+  rect(P(-2,-2,-2), P( 2,-2,2));
+  rect(P(-2, 2,-2), P( 2, 2,2));
+
+  end();
+}

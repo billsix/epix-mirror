@@ -1,0 +1,14 @@
+ePiX -- samples/extras/README
+
+Last Change: August 25, 2004
+
+This directory contains additional sample files. Files with extension
+".flx" may be converted to mng animations. "cube.flx" compiles into a
+stereoscopic movie of a rotating cube, meant to be viewed with 3-D
+glasses.
+
+Please do
+
+  flix -vv -h
+
+for details on using flix.

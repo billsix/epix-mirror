@@ -1,0 +1,13 @@
+#!/bin/bash
+#
+for file in *.cc
+  do 
+  EEPIC=${file%%"cc"}eepic
+
+      if [ $file -nt $EEPIC -o ! -f $EEPIC ]; then
+          epix $file || exit 1
+	  echo -n "."; 
+      fi
+  done
+echo
+exit 0

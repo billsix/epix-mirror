@@ -1,0 +1,35 @@
+/* -*-ePiX-*- */
+/* heightfield.cc -- December 03, 2002 */
+#include <epix.h>
+using namespace ePiX;
+
+const int MAX=20;
+
+double f(double u, double v)
+{
+  using ePiX::cos;
+  return 0.25*(1+pow(cos(0.5*sqrt(u*u+(v-10)*(v-10))),2)
+    + pow(cos(0.5*sqrt(u*u+(v+10)*(v+10))),2));
+}
+
+main()
+{
+  picture(P(1,1));
+  bounding_box(P(-MAX,-MAX), P(MAX,MAX));
+  unitlength("1in");
+
+  begin();
+  //  viewpoint(-2,0,5);
+  camera.range(30);
+
+  for (int i=-MAX; i<=MAX; ++i)
+    for (int j=-MAX; j<=MAX; ++j)
+      {
+	gray(f(i,j));
+	swatch(P(i-0.5,j-0.5), P(i+0.5,j+0.5));
+      }
+
+  red;
+  rect(P(x_min, y_min), P(x_max, y_max));
+  end(); 
+}
