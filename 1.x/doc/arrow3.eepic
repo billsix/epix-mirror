@@ -1,0 +1,28 @@
+%% Generated from arrow3.xp on Thu Jan  6 22:27:25 EST 2005 by
+%% ePiX-1.0.3
+%%
+%%   Cartesian bounding box: [0,6] x [-1,1]
+%%   Actual size: 72pt x 24pt
+%%   Figure offset: right by 0pt, up by 0pt
+%%
+\setlength{\unitlength}{12pt}
+\begin{picture}(6,2)(0,0)
+%% ---
+\allinethickness{1.5pt}%
+\path(0,1)(1.375,1)
+\special{sh 0.5}%
+\path(1.375,1)(0,2)(5.5,1)(0,0)(1.375,1)
+\thinlines
+\path(0,0)(0,2)
+\path(1,0)(1,2)
+\path(2,0)(2,2)
+\path(3,0)(3,2)
+\path(4,0)(4,2)
+\path(5,0)(5,2)
+\path(6,0)(6,2)
+\path(0,0)(6,0)
+\path(0,1)(6,1)
+\path(0,2)(6,2)
+%% ---
+\put(3,-0.333333){\makebox(0,0)[t]{\footnotesize Camber $=0.25$}}
+\end{picture}

@@ -1,24 +1,23 @@
 #!/bin/bash
 #
-# preflix -- Automatically generate shell script "flix" from Makefile.
+# make_flix -- Generate shell script "flix" from config
 #
-# Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+# Andrew D. Hwang <"laps -v" for email>
 #
-# August 12, 2004
-# August 15, 2004: Compute TIME with bc
-# August 17, 2004: Construct email address
-# August 24, 2004: Pad frame names with 0s
+# January 03, 2005
 #
 
 ## Don't modify anything below unless you know what you're doing :) ##
 
-FLIX_WRAPPER=${FLIX_SCRIPT:-flix}
+FLIX_WRAPPER=flix
+
+source ./config || ( echo "Can't find config file" && exit 1 )
 
 ## Unquoted HERE document ##
 cat <<HEADER > $FLIX_WRAPPER
 #!/bin/bash
 #
-# flix: Convert an ePiX file to mng animation
+# flix: Convert ePiX file(s) to png/mng
 #
 # Options: --help for usage, --version for version and license
 #
@@ -28,13 +27,18 @@ cat <<HEADER > $FLIX_WRAPPER
 # LaTeX packages may be specified on the command line or in the config
 # file ~/.dvipsrc, just as for elaps
 #
-# Copyright (C) 2004
+# Copyright (C) 2004, 2005
 # Andrew D. Hwang   <For address, do "flix -v">
 # 
 
-INSTALL_DIR=${EPIX_ROOTDIR:-/usr/local}
-COMPILER=${EPIX_CXX:-g++}
+INSTALL_DIR=$EPIX_ROOTDIR
+COMPILER=$EPIX_CXX
+
 HEADER
+# End of header
+
+# Common functions
+cat epix_functions >> $FLIX_WRAPPER
 
 # Now for phase two...
 cat <<"EOF" >> $FLIX_WRAPPER
@@ -47,7 +51,7 @@ FLIX_CONFIG_FILE="$HOME/.flixrc"
 
 # Search these extensions in order of preference
 FLIX_EXTENSIONS="flx xp cc c C cpp" # or NULL
-FLIX_DOT_EXT=".flx|.xp|.cc|.c|.C|.cpp" # output string for "usage"
+FLIX_DOT_EXT=".${FLIX_EXTENSIONS// /|.}" # for usage message
 
 # default values
 FLIX_TMAX=1
@@ -73,7 +77,7 @@ FLIX_ONLY_PNG="no"    # Create png and eepic files only?
 FLIX_SAVE_EEPIC="no"  # Save eepic files after run?
 FLIX_SAVE_PNG="no"    # Save png files after run?
 
-FLIX_STDOUT=/dev/null # Pipe output messages here
+FLIX_STDERR=/dev/null # Pipe output messages here
 
 FLIX_FRAME_PAD=""
 
@@ -89,14 +93,6 @@ GXX_LIBS="-lm -lepix"
 HDR_PATH=$INSTALL_DIR/include
 LIB_PATH=$INSTALL_DIR/lib
 
-
-function flix_die {
-    echo "$PROG: ERROR: $1" && exit 1
-}
-
-function flix_warn {
-    echo "$PROG: WARNING: $1" > $FLIX_STDOUT
-}
 
 function flix_pad_init()
 {
@@ -114,7 +110,7 @@ function flix_get_fileroot {
 
     if [ "$FLIX_INFILE" = "" ]; 
 	then 
-	flix_die "You must specify an input file!" 
+	ePiX_die "You must specify an input file!" 
     fi
 
 # Get fileroot and extension; first match wins
@@ -149,11 +145,11 @@ function flix_get_fileroot {
 
 	if [ $infile_count -eq 0 ]
 	    then
-	    flix_die "No completions of \"$FLIX_FILEROOT\" found"
+	    ePiX_die "No completions of \"$FLIX_FILEROOT\" found"
 
 	elif [ $infile_count -ge 2 ]
 	    then
-	    flix_warn "Found $infile_count completions of \"$FLIX_FILEROOT\", using $FLIX_INFILE"
+	    ePiX_warn "Found $infile_count completions of \"$FLIX_FILEROOT\", using $FLIX_INFILE"
 
 	# else one file found, FLIX_INFILE already set
 	fi
@@ -162,7 +158,7 @@ function flix_get_fileroot {
 
 
     if [ "$2" != "" ]; then
-	flix_warn "Discarding \"$@\""
+	ePiX_warn "Discarding \"$@\""
     fi
 } # end of flix_get_fileroot
 
@@ -170,122 +166,144 @@ function flix_get_fileroot {
 # Parse command line/config file for compiler flags/options
 function flix_parse_options 
 {
-    while [ "$1" != "${1#"-"}" ]; do
-	case "$1" in
+while [ "$1" != "${1#"-"}" ]; do
+    case "$1" in
 
-	    -h|--help)
-		flix_help; # exit normally
-		;;
+        -vv|--verbose)
+            FLIX_STDERR=/dev/stderr
+            FLIX_VERBOSE="yes"
+            shift;
+            ;;
 
-	    -v|--version)
-		flix_version; # exit normally
-		;;
+        -h|--help)
+	    ePiX_basic_help $FLIX_DOT_EXT &&
+            if [ "$FLIX_VERBOSE" = "yes" ]; then 
+                flix_help
+            else
+                ePiX_terse_help
+            fi && 
+            exit 0
+	    ;;
 
-	    -vv|--verbose)
-		FLIX_STDOUT=/dev/stdout
-		FLIX_VERBOSE="1"
-		shift;
-		;;
+        -v|--version)
+            ePiX_version &&
+            if [ "$ELAPS_VERBOSE" = "yes" ]; then 
+                ePiX_license
+            else
+                echo "$PROG --verbose -v\" for license" 
+            fi && 
+            exit 0
+	    ;;
 
-	    -d|--delay)
-		FLIX_DELAY=$2
-		shift 2
-		;;
+        -d|--delay)
+            FLIX_DELAY=$2
+            shift 2
+            ;;
 
-	    --frames)
-		FLIX_FRAME_COUNT=$2
-		shift 2
-		;;
+        --frames)
+            FLIX_FRAME_COUNT=$2
+            shift 2
+            ;;
 
-	    --only-eepic)
-		FLIX_ONLY_EEPIC="yes"
-		FLIX_SAVE_EEPIC="yes"
-		shift
-		;;
+        --only-eepic)
+            FLIX_ONLY_EEPIC="yes"
+            FLIX_SAVE_EEPIC="yes"
+            shift
+            ;;
 
-	    --only-png)
-		FLIX_ONLY_PNG="yes"
-		FLIX_SAVE_PNG="yes"
-		shift
-		;;
+        --only-png)
+            FLIX_ONLY_PNG="yes"
+            FLIX_SAVE_PNG="yes"
+            shift
+            ;;
 
-	    -o|--output)
-		FLIX_OUTFILE=${2%%".mng"}
-		shift 2
-		;;
+        -o|--output)
+            FLIX_OUTFILE=${2%%".mng"}
+            shift 2
+            ;;
 
-	    --save-eepic)
-		FLIX_SAVE_EEPIC="yes"
-		shift
-		;;
+        --save-eepic)
+            FLIX_SAVE_EEPIC="yes"
+            shift
+            ;;
 
-	    --save-png)
-		FLIX_SAVE_PNG="yes"
-		shift
-		;;
+        --save-png)
+            FLIX_SAVE_PNG="yes"
+            shift
+            ;;
 
-	    -t|--tmax)
-		FLIX_TMAX=$2
-		shift 2;
-		;;
+        -t|--tmax)
+            FLIX_TMAX=$2
+            shift 2;
+            ;;
 
-	    -I*)
-		GXX_INCLUDES="$GXX_INCLUDES $1"; shift; continue
-		;;
+        -I)
+            GXX_INCLUDES="$GXX_INCLUDES -I$2"; shift 2; continue
+            ;;
 
-	    -L*)
-		GXX_LIBDIRS="$GXX_LIBDIRS $1"; shift; continue
-		;;
+        -L)
+            GXX_LIBDIRS="$GXX_LIBDIRS -L$2"; shift 2; continue
+            ;;
 
-	    -l*)
-		GXX_LIBS="$GXX_LIBS $1"; shift; continue
-		;;
+        -l)
+            GXX_LIBS="$GXX_LIBS -l$2"; shift 2; continue
+            ;;
 
-	    -W*)
-		FLIX_WARNS="$FLIX_WARNS $1"; shift; continue
-		;;
+        -W)
+            FLIX_WARNS="$FLIX_WARNS -W$2"; shift 2; continue
+            ;;
+
+        -I*)
+            GXX_INCLUDES="$GXX_INCLUDES $1"; shift; continue
+            ;;
+
+        -L*)
+            GXX_LIBDIRS="$GXX_LIBDIRS $1"; shift; continue
+            ;;
+
+        -l*)
+            GXX_LIBS="$GXX_LIBS $1"; shift; continue
+            ;;
+
+        -W*)
+            FLIX_WARNS="$FLIX_WARNS $1"; shift; continue
+            ;;
 
             # Relatively obscure compiler options
-	    -V|-i*|-u|-x)
-		FLIX_FLAGS="$FLIX_FLAGS $1 $2"; shift 2; continue
-		;;
+        -V|-i*|-u|-x)
+            FLIX_FLAGS="$FLIX_FLAGS $1 $2"; shift 2; continue
+            ;;
 
-	    *)  # Pass other options to elaps
-		if [ "$2" != "${2#"-"}" -o "$2" = "" ]; then
-		    ELAPS_OPTS="$ELAPS_OPTS $1";
-		    shift 1;
-		else
-		    ELAPS_OPTS="$ELAPS_OPTS $1 $2";
-		    shift 2;
-		fi
-		;;
-	esac
-    done # Assume remaining argument is input file
+        *)  # Pass other options to elaps
+            if [ "$2" != "${2#"-"}" -o "$2" = "" ]; then
+                ELAPS_OPTS="$ELAPS_OPTS $1";
+                shift 1;
+            else
+                ELAPS_OPTS="$ELAPS_OPTS $1 $2";
+                shift 2;
+            fi
+            ;;
+    esac
+done # Assume remaining argument is input file
 
-    if [ "$1" != "" ]; then
-	flix_get_fileroot $@
-    fi
+if [ "$1" != "" ]; then
+    flix_get_fileroot $@
+fi
 
 } # End of flix_parse_options
 
 
 function flix_help 
 {
-    echo "Usage: $PROG [options] <infile>[$FLIX_DOT_EXT]" >&1
-
-if [ "$FLIX_VERBOSE" != "" ]; then
 cat <<HELP >&1
-
-  Recognized options are:
+    -vv, --verbose
+      Show output/error messages, or option list/license (before -h/-v)
 
     -d, --delay
       Set frame delay in 1/100 sec (default 8)
 
     --frames
       Set number of frames (default 24).
-
-    -h, --help
-      Print help message; accepts --verbose option.
 
     --only-eepic
       Create only eepic files (default no); implies --save-eepic
@@ -305,54 +323,13 @@ cat <<HELP >&1
     -t, --tmax
       Set maximum time on animation interval (default 1.0).
 
-    -v, --version
-      Print version information; use --verbose option for license.
-
-    -vv, --verbose
-      Show warnings
-
     -I*, -L*, -l*, -W*, -V, -i*, -u, -x
       Passed to g++ (q.v.)
 
     Other options are passed to elaps (q.v.)
+
 HELP
-    else
-	echo "  \"$PROG --verbose -h\" for detailed help"
-    fi
-    exit 0
 } # End of flix_help
-
-function flix_version {
-my_decode="tr '[a-m][n-z]' '[n-z][a-m]'" # Mac OS X has no 'rot'
-SPAMMY="<$(echo nujnat|$my_decode)@$(echo zngupf|$my_decode)."
-SPAMMY="${SPAMMY}$(echo ubylpebff|$my_decode).$(echo rqh|$my_decode)>"
-
-cat <<VERSION >&1
-$PROG is part of ePiX, Version EPIX_VERSION_NUMBER
-
-Copyright (C) 2004
-Andrew D. Hwang $SPAMMY
-Department of Mathematics and Computer Science
-College of the Holy Cross
-Worcester, MA, 01610-2395, USA
-
-  ePiX is free software; you can redistribute it and/or modify it
-  under the terms of the GNU General Public License as published by
-  the Free Software Foundation; either version 2 of the License, or
-  (at your option) any later version.
- 
-  ePiX is distributed in the hope that it will be useful, but WITHOUT
-  ANY WARRANTY; without even the implied warranty of MERCHANTABILITY
-  or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public
-  License for more details.
- 
-  You should have received a copy of the GNU General Public License
-  along with ePiX; if not, write to the Free Software Foundation, Inc.,
-  59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
-
-VERSION
-    exit 0
-} # End of flix_version
 
 
 # compile infile outfile.exe
@@ -365,7 +342,7 @@ function flix_compile()
     if [ ! -f "$2" ]; 
 	then # clean up and exit
 	rm -Rf $FLIX_TEMPDIR && 
-	flix_die "Compilation failed; use epix to debug \"$FLIX_INFILE\""; 
+	ePiX_die "Compilation failed; use epix to debug \"$FLIX_INFILE\""; 
     fi
 }
 
@@ -430,7 +407,8 @@ function flix_make_movie()
 
 ## Script proper starts here ##
 
-if [ $# -eq 0 ]; then flix_help; 
+if [ $# -eq 0 ]; then 
+    ePiX_basic_help $ELAPS_DOT_EXT && ePiX_terse_help && exit 0
 
 else
     # Command line options
@@ -458,7 +436,7 @@ fi
 # Create temporary directory
 PID=$$
 FLIX_TEMPDIR=/tmp/$PROG-$PID
-mkdir $FLIX_TEMPDIR || flix_die "Can't create $FLIX_TEMPDIR"
+mkdir $FLIX_TEMPDIR || ePiX_die "Can't create $FLIX_TEMPDIR"
 
 # Give temporary binary a unique name (securely if possible...)
 FLIX_EXE=$(mktemp -q $FLIX_TEMPDIR/flix-$PID.XXXXXX 2>/dev/null)
@@ -505,4 +483,6 @@ rm -Rf $FLIX_TEMPDIR
 
 exit 0
 EOF
+
+chmod 700 $FLIX_WRAPPER
 ## end of script ##

@@ -4,7 +4,7 @@
  *    version 3
  *
  *    Svend Daugaard Pedersen
- *    mail: Svend@DaugaardPedersen.dk
+ *    mail: rot 13 Firaq at QnhtnneqCrqrefra dot qx
  *
  * Implementation of DoubleLogCoord
  *

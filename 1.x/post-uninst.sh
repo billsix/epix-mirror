@@ -4,18 +4,24 @@
 #
 # Remove empty directories when uninstalling ePiX
 #
-# June 29, 2002  Andrew D. Hwang,  rot 13 nujnat at zngupf dot ubylpebff dot rqh
+# Jan 02, 2005 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 #
 
-# Check whether we were called by the Makefile's uninstall target
-if [ "$EPIX_ROOTDIR" = "" ]
-then
-    echo "post-uninst.sh: Please do not run this script manually!" && exit 1
+source ./config 2>/dev/null || ( echo "Can't find config file" && exit 1 )
+
+
+if [ -d $EPIX_ROOTDIR ]; then
+    cd $EPIX_ROOTDIR
+else
+cat<<UNINST_WARN
+  The config file seems to have changed since ePiX was installed.
+  Please ensure that EPIX_ROOTDIR points to the install tree.
+
+UNINST_WARN
+    exit 1
 fi
 
-cd $EPIX_ROOTDIR
-
-for DIR in bin lib include man/man1 man share
+for DIR in $EPIX_SUB_DIRS $EPIX_TOP_DIRS $EPIX_ROOTDIR
 do
     rmdir $DIR 2> /dev/null # fail silently if directory is not empty
 done

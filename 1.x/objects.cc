@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc13
- * Last Change: July 08, 2004
+ * Version 1.0.2
+ * Last Change: December 31, 2004
  */
 
 /* 
@@ -95,39 +95,69 @@ namespace ePiX {
     Label(arg, "", TYPE, c).draw();
   }
 
-  void circ(P arg)
+  // Markers with labels
+  void circ(P posn, P offset, std::string label_text,
+	    epix_label_posn align)
   {
-    Label(arg, "", CIRC, c).draw();
-  }  
-
-  void ring(P arg)
-  {
-    Label(arg, "", RING, c).draw();
-  }  
-
-  void spot(P arg)
-  {
-    Label(arg, "", SPOT, c).draw();
-  }  
-
-  void dot(P arg)
-  {
-    Label(arg, "", DOT, c).draw();
+    if (label_text != "")
+      label(posn, offset, label_text, align);
+    Label(posn, "", CIRC, c).draw();
   }
 
-  void ddot(P arg)
+  void ring(P posn, P offset, std::string label_text,
+	    epix_label_posn align)
   {
-    Label(arg, "", DDOT, c).draw();
+    if (label_text != "")
+      label(posn, offset, label_text, align);
+    Label(posn, "", RING, c).draw();
   }
 
-  void box(P arg)
+  void spot(P posn, P offset, std::string label_text,
+	    epix_label_posn align)
   {
-    Label(arg, "", BOX, c).draw();
+    if (label_text != "")
+      label(posn, offset, label_text, align);
+    Label(posn, "", SPOT, c).draw();
   }
 
-  void bbox(P arg)
+  void dot(P posn, P offset, std::string label_text,
+	   epix_label_posn align)
   {
-    Label(arg, "", BBOX, c).draw();
+    if (label_text != "")
+      label(posn, offset, label_text, align);
+    Label(posn, "", DOT, c).draw();
+  }
+
+  void ddot(P posn, P offset, std::string label_text,
+	    epix_label_posn align)
+  {
+    if (label_text != "")
+      label(posn, offset, label_text, align);
+    Label(posn, "", DDOT, c).draw();
+  }
+
+  void box(P posn, P offset, std::string label_text,
+	   epix_label_posn align)
+  {
+    if (label_text != "")
+      label(posn, offset, label_text, align);
+    Label(posn, "", BOX, c).draw();
+  }
+
+  void bbox(P posn, P offset, std::string label_text,
+	    epix_label_posn align)
+  {
+    if (label_text != "")
+      label(posn, offset, label_text, align);
+    Label(posn, "", BBOX, c).draw();
+  }
+
+  // arrow with label
+  void arrow(P tail, P head, P offset, std::string label_text,
+	     epix_label_posn align, double scale)
+  {
+    arrow(tail, head, scale);
+    label(tail, offset, label_text, align);
   }
 
   // Axis ticks (h_tick = tall, thin rectangle, for a *horizontal* axis)

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc12
- * Last Change: July 01, 2004
+ * Version 1.0.2
+ * Last Change: December 31, 2004
  */
 
 /* 
@@ -69,15 +69,25 @@ namespace ePiX {
 		 epix_label_posn);
 
   // Empty and filled LaTeX circles of diameter get_dotsize() true pt
-  void circ(P); // filled white circ
-  void ring(P); // unfilled circ 
+  void circ(P posn, P offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none); // filled white circ
+  void ring(P posn, P offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none); // unfilled circ 
 
-  void spot(P arg);
-  void dot(P arg);
-  void ddot(P arg);
+  void spot(P posn, P offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none);
+  void dot(P posn, P offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none);
+  void ddot(P posn, P offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none);
 
-  void box(P arg);
-  void bbox(P arg);
+  void box(P posn, P offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none);
+  void bbox(P posn, P offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none);
+
+  void arrow(P tail, P head, P offset, std::string label_text,
+	     epix_label_posn align, double scale=1);
 
   void marker (P, epix_mark_type);
 

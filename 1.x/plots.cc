@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 16, 2004
+ * Version 1.0.1
+ * Last Change: December 26, 2004
  */
 
 /* 
@@ -280,6 +280,55 @@ namespace ePiX {
 	}
     end_stanza();
   } // end of draw_field F(x, y)
+
+
+  void riemann_sum(double f(double), const double a, const double b,
+		   unsigned int n, epix_integral_type TYPE)
+  {
+    double x=a, dx=(b-a)/n;
+
+    for (unsigned int i=0; i < n; ++i)
+      {
+	x = a + i*dx;
+
+	switch (TYPE) {
+
+	case LEFT:
+
+	  rect(P(x, f(x)), P(x+dx,0));
+	  break;
+
+	case RIGHT:
+
+	  rect(P(x, 0), P(x+dx, f(x+dx)));
+	  break;
+
+	case UPPER:
+
+	  rect(P(x, 0), P(x+dx, sup(f, x, x+dx)));
+	  break;
+
+	case LOWER:
+
+	  rect(P(x, 0), P(x+dx, inf(f, x, x+dx)));
+	  break;
+
+	case TRAP:
+
+	  quad(P(x, 0), P(x+dx, 0), P(x+dx, f(x+dx)), P(x, f(x)));
+	  break;
+
+	case MIDPT:
+	  
+	  rect(P(x, 0), P(x+dx, f(x+0.5*dx)));
+	  break;
+
+	default:
+	  ;
+
+	} // end of switch(TYPE)
+      }
+  } // end of riemann_sum()
 
 
   // Jay Belanger's shaded plot routines -- December 1, 2002

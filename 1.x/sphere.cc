@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.0
- * Last Change: September 04, 2004
+ * Version 1.0.1
+ * Last Change: December 26, 2004
  */
 
 /* 
@@ -43,6 +43,8 @@
 #include "path.h"
 #include "cropping.h"
 
+#include "objects.h"
+
 #include "camera.h"
 #include "sphere.h"
 #include "output.h"
@@ -50,7 +52,6 @@
 namespace ePiX {
 
   extern epix_camera camera;
-  void box(P);
 
   // defined in output.cc
   void dash_seg(const P& arg0, const P& arg1, const P& arg2);

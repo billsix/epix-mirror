@@ -1,10 +1,10 @@
 /*
  * plots.h -- parametrized plotting algorithms
  *
- * Andrew D. Hwang            <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+ * Andrew D. Hwang   <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *
- * Version 0.8.11rc16
- * Last Change: August 24, 2004
+ * Version 1.0.1
+ * Last Change: December 19, 2004
  *
  */
 
@@ -364,6 +364,9 @@ namespace ePiX {
     return flow(vf, start, t_max, num_pts);
   }
 
+
+  void riemann_sum(double f(double), const double a, const double b,
+		   unsigned int n, epix_integral_type TYPE);
 
   // Jay Belanger's shaded plot routines -- December 1, 2002
 

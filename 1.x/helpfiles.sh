@@ -1,53 +1,47 @@
 #!/bin/bash
 #
-# helpfiles.sh: (un)install/test sample files
-#
-# This script is NOT INTENDED TO BE RUN MANUALLY!!
-#
-#   Options: --install, --uninstall, --test
-#   Assumes EPIX_ROOTDIR is set to install directory from Makefile
+# helpfiles.sh: Build documentation/sample files
 #
 # Andrew D. Hwang, <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 #
-# September 11, 2004
+# January 06, 2005
 #
 
-PROG=$(basename $0)
-INSTALL="install -m 644"
-COMPILER=${EPIX_CXX:-g++}
+# We only require EPIX_VERSION from config
+source ./config || ( echo "Can't find config file" && exit 1 )
 
-if [ "$EPIX_ROOTDIR" = "" ]
-then 
-    echo "$PROG: Please do not run this script manually!" && exit 1
-fi
+## anchor
+EPIX_SRC_DIR=$(pwd)
 
-EPIX_SHAREDIR=${EPIX_ROOTDIR}/share
-EPIX_EPIXDIR=${EPIX_SHAREDIR}/epix
+## firm-coded names
+EPIX_MANUAL=epix-${EPIX_VERSION}_manual
+EPIX_CONTRIB=epix-${EPIX_VERSION}_contrib
+EPIX_SAMPLE=epix-${EPIX_VERSION}_sample
 
-EPIX_CONFDIR=${EPIX_EPIXDIR}/config
-EPIX_NOTEDIR=${EPIX_EPIXDIR}/notes
-EPIX_SAMPDIR=${EPIX_EPIXDIR}/samples
-EPIX_TTRLDIR=${EPIX_EPIXDIR}/tutorial
+## hard-coded names
+MANUAL_SRC_DIR=doc
+MANUAL_SRC=tutorial
 
-EPIX_CONFFILES="bash_completions epix.el epix.spec update_figs.sh"
-EPIX_NOTEFILES="BUGS CHANGELOG COPYING INSTALL POST-INSTALL README README-changes THANKS TODO"
+CONTRIB_SRC_DIR=doc/contrib
+CONTRIB_SRC=ePiXext
 
-EPIX_DOCDIR=doc
-EPIX_VERSION=epix-$(cat VERSION)
-EPIX_TARBALL=${EPIX_VERSION}_samples.tar
+SAMPLE_SRC_DIR=samples
+SAMPLE_SRC=sample
 
-# Mimic run of epix on sample file, using newly-compiled library
-ePiX() 
+
+# Mimic run of epix
+function ePiX()
 {
-    FILEROOT=${1%%".xp"}
-    ln $FILEROOT.xp $FILEROOT.c # compiler doesn't know about .xp files
+    EXT=${2:-xp}
 
-    $COMPILER $CFLAGS $FILEROOT.c -o $FILEROOT.exe -I. -L. -lm -lepixtest &&
-    rm $FILEROOT.c
+    FILEROOT=${1%%".$EXT"}
+    if [ "$EXT" != "cc" ]; then ln $FILEROOT.$EXT $FILEROOT.cc; fi
 
-    if [ -x "$FILEROOT.exe" ] 
-	then ./$FILEROOT.exe > $FILEROOT.eepic
-    fi
+    $EPIX_CXX -w $FILEROOT.cc -o $FILEROOT.exe -I. -L. -lm -lepix &&
+
+    if [ "$EXT" != "cc" ]; then rm $FILEROOT.cc; fi
+
+    if [ -x "$FILEROOT.exe" ]; then ./$FILEROOT.exe > $FILEROOT.eepic; fi
 
     if [ -f "$FILEROOT.eepic" ] 
 	then
@@ -57,126 +51,91 @@ ePiX()
 
     else 
 	echo "failed, exiting"
-	rm -f $FILEROOT.exe libepixtest.a 2>/dev/null
+	rm -f $FILEROOT.exe libepix.a 2>/dev/null
 	exit 1;
     fi
 } # end of ePiX()
 
 # Assuming we're in a child of the srcdir, compile eepic-less xp files
-makefigs()
+function makefigs()
 {
-    cp -p ../libepix.a libepixtest.a
-    cp -p ../epix.h epix.h
+    ln -sf $EPIX_SRC_DIR/libepix-$EPIX_VERSION.a libepix.a
+    ln -sf $EPIX_SRC_DIR/epix-$EPIX_VERSION.h epix.h
+    ranlib libepix.a # for Apple devtools
 
-    for file in *.xp; do
-	if [ ! -f ${file%%"xp"}eepic ]
-	    then ePiX $file
-	fi
+    EXT=${1:-xp}
+
+    for FILE in *.$EXT ; do 
+        if [ ! -f ${FILE%%"$EXT"}eepic ] ||
+           [ $FILE -nt ${FILE%%"$EXT"}eepic ]; then
+            ePiX $FILE $EXT # N.B. Shell function ePiX
+        fi
     done
 
-    rm -f libepixtest.a epix.h
+    # clean up
+    rm -f libepix.a epix.h
 } # end of makefigs
+
+# makedocs $SRCDIR $MSG $EXT $SRCFILE $OUTFILE $FILES
+function makedocs()
+{
+    if [ ! -d $1 ]; then
+        echo "$1 not found, skipping" && exit 0;
+
+    else
+        cd $1 &&
+        echo -n "Compiling $2..." && 
+	if [ $1 = $SAMPLE_SRC_DIR ]; then ./sample.sh; fi
+
+        makefigs $3 &&
+        $EPIX_SRC_DIR/laps -Pamz -Pcmz --pdf $4.tex &&
+
+        mv -f $4.pdf ../$5.pdf &&
+        mv -f $4.ps  ../$5.ps  &&
+        echo "done"
+
+        cd $EPIX_SRC_DIR
+    fi
+} # end of makedocs
 
 case "$1" in
 
-    --install)
-	if [ ! -d $EPIX_EPIXDIR ]; then
-	    # pre-install script has failed...
-	    echo "$PROG: Can't find \"$EPIX_EPIXDIR\""
-	    exit 1;
-	fi
+    --doc)
 
-	### Notes and misc config files ###
-	$INSTALL $EPIX_NOTEFILES $EPIX_NOTEDIR
+        makedocs $MANUAL_SRC_DIR manual xp $MANUAL_SRC $EPIX_MANUAL
 
-	$INSTALL $EPIX_CONFFILES $EPIX_CONFDIR
+        tar -cf ${EPIX_MANUAL}_src.tar \
+            $MANUAL_SRC_DIR/$MANUAL_SRC.{aux,idx,ind,tex,toc} \
+            $MANUAL_SRC_DIR/*.{xp,eepic}
+        gzip -9 ${EPIX_MANUAL}*
+        ;;
 
-	### Tutorial ###
-	if [ "$EPIX_DOCDIR" != "" ]; then # we're "complete"
-	    cd $EPIX_DOCDIR && makefigs && 
-	    ../laps -Pamz -Pcmz tutorial.tex && ps2pdf tutorial.ps
-	    # Put tutorial in $INSTALL_DIR/share/epix/tutorial
-	    $INSTALL tutorial.ps  $EPIX_TTRLDIR/${EPIX_VERSION}_howto.ps
-	    $INSTALL tutorial.pdf $EPIX_TTRLDIR/${EPIX_VERSION}_howto.pdf
 
-	    rm tutorial.{dvi,log,ps,pdf}
+    --contrib-doc)
 
-	    # Tutorial source files
-	    $INSTALL tutorial.{aux,idx,ind,tex,toc} *.{xp,eepic} $EPIX_TTRLDIR
+        echo -n "Compiling contrib figures..."
+        cd $CONTRIB_SRC_DIR && makefigs cc && cd $EPIX_SRC_DIR
+        echo "done"
 
-	    # Contrib documentation
-	    if [ ! -d $EPIX_TTRLDIR/contrib ]; then
-		mkdir $EPIX_TTRLDIR/contrib
-	    fi
+        tar -cf ${EPIX_CONTRIB}_src.tar \
+            $CONTRIB_SRC_DIR/$CONTRIB_SRC.{aux,tex,toc} \
+            $CONTRIB_SRC_DIR/*.{cc,eepic}
+        gzip -9 ${EPIX_CONTRIB}_src.tar
+        ;;
 
-	    $INSTALL contrib/* $EPIX_TTRLDIR/contrib
 
-	    cd .. # back to src directory
-	fi
+    --samples)
 
-	### Sample files ###
-	tar -cf $EPIX_TARBALL samples/{*.xp,sample.*,makefigs,template,extras}
-	# Put samples tarball in $INSTALL_DIR/share/epix/samples
-	$INSTALL $EPIX_TARBALL $EPIX_SAMPDIR/$EPIX_TARBALL &&
-	rm $EPIX_TARBALL
+        makedocs $SAMPLE_SRC_DIR samples xp $SAMPLE_SRC $EPIX_SAMPLE
 
-	# Fix ownership/permissions in $INSTALL_DIR/share/epix
-	cd $EPIX_EPIXDIR && chown -R $USER:$GROUPS *
-	
-	if [ $UID -eq 0 ]; then # Public installation
-	    chmod -R go+rX * # Give everyone read permission
-	fi
-	;;
+        tar -cf ${EPIX_SAMPLE}_src.tar \
+            $SAMPLE_SRC_DIR/{$SAMPLE_SRC.*,*.xp,template,extras}
+        gzip -9 ${EPIX_SAMPLE}*
+        ;;
 
-    --uninstall)
-	# Delete $EPIX_EPIXDIR; Makefile handles the rest
-	cd $EPIX_SHAREDIR 
-	if [ -d epix ]; then rm -Rf epix; fi
-	;;
-
-    --test)
-	CFLAGS="-w"
-
-	if [ -d samples ] 
-	then cd ./samples
-	else echo "$PROG: Directory \"samples\" does not exist" && exit 1;
-	fi
-
-	# Now we're in samples
-	cp -p ../libepix.a libepixtest.a
-	cp -p ../epix.h epix.h
-
-	# generate sample.tex
-	echo -n "Creating sample.tex..."
-	./sample.sh
-	echo "done"
-	echo -n "Creating .eepic files"
-	for FILE in *.xp ; do 
-	    if [ ! -f ${FILE%%"xp"}eepic ] || [ $FILE -nt ${FILE%%"xp"}eepic ]
-	    then
-		ePiX $FILE # N.B. Shell function ePiX
-	    fi
-	done
-	echo "done"
-
-	# Clean up
-	rm -f libepixtest.a epix.h
-
-	echo; echo -n "Testing laps..."
-
-	../laps sample.tex &>/dev/null
-
-	if [ -f "sample.ps" ] 
-	then echo "success"
-	     mv -f sample.dvi  sample.ps ..
-	     rm -f sample.log
-	     echo "You may now preview sample.dvi or sample.ps"; exit 0;
-	else echo "failed"; exit 1;
-	fi
-	;;
 
     *)
-	echo "$PROG: Unknown option $1" && exit 1
+	exit 1
 	;;
 esac
 

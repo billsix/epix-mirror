@@ -5,11 +5,11 @@
  * line figures in LaTeX 
  *
  * Version EPIX_VERSION_NUMBER
- * Last Change: August 24, 2004
+ * Last Change: January 07, 2005
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -91,6 +91,9 @@ namespace ePiX {
     static bool using_pstricks;
     static std::string fillcolor; // no effect unless using_pstricks
 
+    static std::string fontsize; // valid LaTeX font size
+    static std::string fontface; // valid LaTeX font face
+
     // functions for setting style parameters
     friend void dash_fill(double t=0.5)    { dashfill = snip_to(t,0.05,0.95); }
     friend void dash_length(double len=12) { separation = snip_to(len,2,200); }
@@ -128,7 +131,22 @@ namespace ePiX {
     friend void fill(bool arg = true)   { fill_paths = arg; }
     friend void use_pstricks(bool arg = true)   { using_pstricks = arg; }
 
+    // set font size and face
+    friend void font_size(std::string arg="normalsize") { fontsize = arg; }
+    friend void font_face(std::string arg="default")    { fontface = arg; }
+
     friend void begin(void); // defined in output.cc
+
+    // set arrowhead parameters
+    friend void arrow_width(double w=3) { arrowwidth=fabs(0.5*w); }
+    friend void arrow_ratio(double r=5.5) { arrowratio=fabs(r); }
+    friend void arrow_camber(double arg=0)
+      { arrowcamber=snip_to(arg,0,1); }
+    friend void arrow_fill(double dens=0) { arrowfill=snip_to(dens,0,1);}
+    static double get_arrow_width(void)  { return arrowwidth; }
+    static double get_arrow_ratio(void)  { return arrowratio; }
+    static double get_arrow_camber(void) { return arrowcamber; }
+    static double get_arrow_fill(void)   { return arrowfill; }
 
     // for internal use
     static double get_dashfill(void)   { return dashfill; }
@@ -148,6 +166,12 @@ namespace ePiX {
 
     static double angle_units;
     static double labelangle;  // rotate labels this amount in degrees
+
+    // arrowhead parameters
+    static double arrowwidth; // Half-width of arrowheads in pt
+    static double arrowratio; // 2*Length/width ratio of arrowheads
+    static double arrowcamber;// Base indentation (fraction of width*ratio)
+    static double arrowfill;  // Fill density for arrowheads
 
     //    static epix_output_type OUTPUT_TYPE;
     //    static std::string font;
@@ -174,10 +198,6 @@ namespace ePiX {
   const int EPIX_FILE_WIDTH=70;  // Width of output file
   const int EPIX_PATH_LENGTH=60; // Number of points per path segment
 
-  // Sizes of markers et. al.
-  const double EPIX_ARROWHEAD_WIDTH=1.5; // Half-width of arrowheads in pt
-  const double EPIX_ARROWHEAD_RATIO=5.5; // 2*Length/width ratio of arrowheads
-
   // Enumeration types:
   enum epix_mark_type {PATH, CIRC, SPOT, RING, DOT, DDOT, PLUS, OPLUS, 
 		       TIMES, OTIMES, DIAMOND, UP, DOWN, BOX, BBOX, 
@@ -188,6 +208,8 @@ namespace ePiX {
   enum epix_tick_type {TICK_NULL, H_AXIS, V_AXIS};
 
   enum epix_field_type {SLOPE, DART, VECTOR};
+
+  enum epix_integral_type {LEFT, RIGHT, UPPER, LOWER, TRAP, MIDPT};
 
   // Deprecated constants
 

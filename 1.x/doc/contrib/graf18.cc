@@ -1,4 +1,6 @@
 #include "epix.h"
+using namespace ePiX;
+using namespace ePiX_contrib;
 
 static char* linLabels[] =
   {"\\scriptsize 0","\\scriptsize 0.1","\\scriptsize 0.2",

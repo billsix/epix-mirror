@@ -1,0 +1,25 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+int main() 
+{
+  bounding_box(P(0,-1),P(6,1));
+  unitlength("12pt");
+  picture(6,2);
+
+  begin();
+
+  pen(1.5);
+  arrow_width(12);
+  //  arrow_ratio(4);
+  //  arrow_camber(0.125);
+  arrow_fill(0.5);
+  arrow(P(0,0), P(5.5,0));
+
+  plain();
+  grid(6,2);
+  font_size("footnotesize");
+  label(P(3,-1), P(0,-4), "Camber $=0$", b);
+  end();
+}

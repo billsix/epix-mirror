@@ -5,127 +5,129 @@
 \indexentry{Windows|(hyperpage}{5}
 \indexentry{Windows|)}{6}
 \indexentry{Installation|)}{7}
-\indexentry{Graphical interface|hyperpage}{9}
-\indexentry{Offset!figure|hyperpage}{13}
-\indexentry{Aspect Ratio|(hyperpage}{13}
-\indexentry{Bounding Box|(hyperpage}{13}
-\indexentry{Aspect Ratio|)}{14}
-\indexentry{Screen|hyperpage}{14}
-\indexentry{Bounding Box|)}{14}
-\indexentry{Angular mode|hyperpage}{15}
-\indexentry{Arrow|hyperpage}{16}
-\indexentry{Camera|(hyperpage}{17}
-\indexentry{Screen|(hyperpage}{17}
-\indexentry{Bounding Box|hyperpage}{17}
-\indexentry{Screen|)}{17}
-\indexentry{Camera!manipulation|hyperpage}{17}
-\indexentry{Camera|)}{18}
-\indexentry{Filling|hyperpage}{18}
-\indexentry{Path!width|hyperpage}{18}
-\indexentry{Path!style|(hyperpage}{18}
-\indexentry{Path!style|)}{19}
-\indexentry{Color|(hyperpage}{19}
-\indexentry{PSTricks|hyperpage}{19}
-\indexentry{Color|)}{20}
-\indexentry{Filling|hyperpage}{20}
-\indexentry{Path|hyperpage}{20}
-\indexentry{Labels|(emph}{20}
-\indexentry{Aspect Ratio|hyperpage}{20}
-\indexentry{Marker types|(emph}{20}
-\indexentry{Marker types|)}{21}
-\indexentry{Offset!label|(hyperpage}{21}
-\indexentry{Labels!offset|hyperpage}{21}
-\indexentry{Labels!alignment|(hyperpage}{21}
-\indexentry{Labels!alignment|)}{22}
-\indexentry{Offset!label|)}{22}
-\indexentry{Labels|)}{22}
-\indexentry{Arrow|(emph}{26}
-\indexentry{Filling|hyperpage}{27}
-\indexentry{PSTricks|hyperpage}{27}
-\indexentry{Arrow|)}{27}
-\indexentry{Axes|(hyperpage}{27}
-\indexentry{Bounding Box|hyperpage}{27}
-\indexentry{Labels!axis|(hyperpage}{27}
-\indexentry{Offset!label|hyperpage}{27}
-\indexentry{Labels!axis|)}{27}
-\indexentry{Graph paper|(hyperpage}{28}
-\indexentry{Graph paper|)}{28}
-\indexentry{Axes|)}{28}
-\indexentry{Plotting|(hyperpage}{28}
-\indexentry{Plotting!polar|hyperpage}{28}
-\indexentry{Plotting!data|(hyperpage}{28}
-\indexentry{Marker types|hyperpage}{29}
-\indexentry{Linear regression|hyperpage}{29}
-\indexentry{Plotting!data|)}{30}
-\indexentry{Plotting|)}{30}
-\indexentry{Functions|(hyperpage}{32}
-\indexentry{Angular mode|hyperpage}{34}
-\indexentry{Functions|)}{36}
-\indexentry{Labels|hyperpage}{38}
-\indexentry{Camera|(emph}{39}
-\indexentry{Screen|(hyperpage}{39}
-\indexentry{Camera!lens|(hyperpage}{39}
-\indexentry{Screen|)}{39}
-\indexentry{Camera!lens|)}{39}
-\indexentry{Camera!manipulation|(hyperpage}{40}
-\indexentry{Camera!manipulation|)}{40}
-\indexentry{Camera|)}{40}
-\indexentry{Clipping|(hyperpage}{40}
-\indexentry{Cropping|(hyperpage}{40}
-\indexentry{Screen|hyperpage}{40}
-\indexentry{Bounding Box|hyperpage}{40}
-\indexentry{Clipping|)}{41}
-\indexentry{Cropping|)}{41}
-\indexentry{Path!width|hyperpage}{41}
-\indexentry{Path!style|hyperpage}{41}
-\indexentry{Filling|hyperpage}{42}
-\indexentry{Labels!rotated|hyperpage}{42}
-\indexentry{Angular mode|hyperpage}{42}
-\indexentry{Color|(hyperpage}{42}
-\indexentry{PSTricks|(emph}{43}
-\indexentry{Filling!color|(hyperpage}{43}
-\indexentry{Color!shading|(hyperpage}{43}
-\indexentry{Path!in PSTricks|hyperpage}{43}
-\indexentry{Color!shading|)}{43}
-\indexentry{Filling!color|)}{43}
-\indexentry{PSTricks|)}{43}
-\indexentry{Color|)}{43}
-\indexentry{Path|(emph}{43}
-\indexentry{Filling|(hyperpage}{45}
-\indexentry{Filling!color|hyperpage}{45}
-\indexentry{PSTricks|hyperpage}{45}
-\indexentry{Filling|)}{45}
-\indexentry{Arrow|hyperpage}{46}
-\indexentry{Path|)}{46}
-\indexentry{Plotting|(emph}{50}
-\indexentry{Domain|(emph}{50}
-\indexentry{Domain!coarse mesh|(hyperpage}{50}
-\indexentry{Domain!fine mesh|(hyperpage}{50}
-\indexentry{Plotting!wiremesh|hyperpage}{51}
-\indexentry{Domain!fine mesh|)}{51}
-\indexentry{Domain!coarse mesh|)}{51}
-\indexentry{Domain!resizing|hyperpage}{51}
-\indexentry{Domain!slicing|hyperpage}{51}
-\indexentry{Domain|)}{52}
-\indexentry{Plotting|)}{52}
-\indexentry{Plotting!calculus|(hyperpage}{53}
-\indexentry{Plotting!vector fields|(hyperpage}{53}
-\indexentry{Plotting!vector fields|)}{54}
-\indexentry{Plotting!calculus|)}{54}
-\indexentry{Path!fractal|(hyperpage}{54}
-\indexentry{Path!fractal|)}{54}
-\indexentry{Plotting!spherical|(hyperpage}{55}
-\indexentry{Path!on sphere|hyperpage}{55}
-\indexentry{Plotting!spherical|)}{56}
-\indexentry{Animation|(hyperpage}{56}
-\indexentry{Animation|)}{56}
-\indexentry{Installation|(hyperpage}{57}
-\indexentry{Mac OS X|hyperpage}{58}
-\indexentry{Installation|)}{59}
-\indexentry{Hidden object removal|(hyperpage}{61}
-\indexentry{Plotting!surface|(hyperpage}{61}
-\indexentry{Camera|hyperpage}{61}
-\indexentry{Plotting!surface|)}{63}
-\indexentry{Hidden object removal|)}{63}
-\indexentry{Free software|(hyperpage}{67}
-\indexentry{Free software|)}{68}
+\indexentry{Graphical interface|hyperpage}{10}
+\indexentry{Offset!figure|hyperpage}{14}
+\indexentry{Aspect Ratio|(hyperpage}{14}
+\indexentry{Bounding Box|(hyperpage}{14}
+\indexentry{Aspect Ratio|)}{15}
+\indexentry{Screen|hyperpage}{15}
+\indexentry{Bounding Box|)}{15}
+\indexentry{Angular mode|hyperpage}{16}
+\indexentry{Arrow|hyperpage}{17}
+\indexentry{Camera|(hyperpage}{18}
+\indexentry{Screen|(hyperpage}{18}
+\indexentry{Bounding Box|hyperpage}{18}
+\indexentry{Screen|)}{18}
+\indexentry{Camera!manipulation|hyperpage}{18}
+\indexentry{Camera|)}{19}
+\indexentry{Filling|hyperpage}{19}
+\indexentry{Path!width|hyperpage}{19}
+\indexentry{Path!style|(hyperpage}{19}
+\indexentry{Path!style|)}{20}
+\indexentry{Color|(hyperpage}{20}
+\indexentry{PSTricks|hyperpage}{20}
+\indexentry{Color|)}{21}
+\indexentry{Filling|hyperpage}{21}
+\indexentry{Path|hyperpage}{21}
+\indexentry{Labels|(emph}{21}
+\indexentry{Aspect Ratio|hyperpage}{21}
+\indexentry{Marker types|(emph}{21}
+\indexentry{Marker types|)}{22}
+\indexentry{Offset!label|(hyperpage}{22}
+\indexentry{Labels!offset|hyperpage}{22}
+\indexentry{Labels!alignment|(hyperpage}{22}
+\indexentry{Labels!alignment|)}{23}
+\indexentry{Offset!label|)}{23}
+\indexentry{Fonts|hyperpage}{23}
+\indexentry{Labels|)}{24}
+\indexentry{Arrow|(emph}{27}
+\indexentry{PSTricks|hyperpage}{28}
+\indexentry{Arrow|)}{28}
+\indexentry{Axes|(hyperpage}{29}
+\indexentry{Bounding Box|hyperpage}{29}
+\indexentry{Labels!axis|(hyperpage}{29}
+\indexentry{Offset!label|hyperpage}{29}
+\indexentry{Labels!axis|)}{29}
+\indexentry{Graph paper|(hyperpage}{29}
+\indexentry{Graph paper|)}{30}
+\indexentry{Axes|)}{30}
+\indexentry{Plotting|(hyperpage}{30}
+\indexentry{Plotting!polar|hyperpage}{30}
+\indexentry{Plotting!data|(hyperpage}{30}
+\indexentry{Marker types|hyperpage}{31}
+\indexentry{Linear regression|hyperpage}{31}
+\indexentry{Histograms|hyperpage}{32}
+\indexentry{Plotting!data|)}{32}
+\indexentry{Plotting|)}{32}
+\indexentry{Functions|(hyperpage}{34}
+\indexentry{Angular mode|hyperpage}{36}
+\indexentry{Functions|)}{38}
+\indexentry{Labels|hyperpage}{40}
+\indexentry{Camera|(emph}{41}
+\indexentry{Screen|(hyperpage}{41}
+\indexentry{Camera!lens|(hyperpage}{41}
+\indexentry{Screen|)}{41}
+\indexentry{Camera!lens|)}{41}
+\indexentry{Camera!manipulation|(hyperpage}{42}
+\indexentry{Camera!manipulation|)}{42}
+\indexentry{Camera|)}{42}
+\indexentry{Clipping|(hyperpage}{42}
+\indexentry{Cropping|(hyperpage}{42}
+\indexentry{Screen|hyperpage}{42}
+\indexentry{Bounding Box|hyperpage}{42}
+\indexentry{Clipping|)}{43}
+\indexentry{Cropping|)}{43}
+\indexentry{Path!width|hyperpage}{43}
+\indexentry{Path!style|hyperpage}{43}
+\indexentry{Filling|hyperpage}{44}
+\indexentry{Labels!rotated|hyperpage}{44}
+\indexentry{Angular mode|hyperpage}{44}
+\indexentry{Color|(hyperpage}{44}
+\indexentry{PSTricks|(emph}{45}
+\indexentry{Filling!color|(hyperpage}{45}
+\indexentry{Color!shading|(hyperpage}{45}
+\indexentry{Path!in PSTricks|hyperpage}{45}
+\indexentry{Color!shading|)}{45}
+\indexentry{Filling!color|)}{45}
+\indexentry{PSTricks|)}{45}
+\indexentry{Color|)}{45}
+\indexentry{Path|(emph}{45}
+\indexentry{Filling|(hyperpage}{47}
+\indexentry{Filling!color|hyperpage}{47}
+\indexentry{PSTricks|hyperpage}{47}
+\indexentry{Filling|)}{47}
+\indexentry{Arrow|hyperpage}{48}
+\indexentry{Path|)}{48}
+\indexentry{Plotting|(emph}{52}
+\indexentry{Domain|(emph}{52}
+\indexentry{Domain!coarse mesh|(hyperpage}{52}
+\indexentry{Domain!fine mesh|(hyperpage}{52}
+\indexentry{Plotting!wiremesh|hyperpage}{53}
+\indexentry{Domain!fine mesh|)}{53}
+\indexentry{Domain!coarse mesh|)}{53}
+\indexentry{Domain!resizing|hyperpage}{53}
+\indexentry{Domain!slicing|hyperpage}{53}
+\indexentry{Domain|)}{54}
+\indexentry{Plotting|)}{54}
+\indexentry{Calculus|(hyperpage}{54}
+\indexentry{Plotting!calculus|(hyperpage}{55}
+\indexentry{Plotting!vector fields|(hyperpage}{55}
+\indexentry{Plotting!vector fields|)}{56}
+\indexentry{Plotting!calculus|)}{56}
+\indexentry{Calculus|)}{56}
+\indexentry{Path!fractal|(hyperpage}{56}
+\indexentry{Path!fractal|)}{57}
+\indexentry{Plotting!spherical|(hyperpage}{57}
+\indexentry{Path!on sphere|hyperpage}{57}
+\indexentry{Plotting!spherical|)}{58}
+\indexentry{Animation|(hyperpage}{58}
+\indexentry{Animation|)}{59}
+\indexentry{Installation|(hyperpage}{59}
+\indexentry{Installation|)}{61}
+\indexentry{Hidden object removal|(hyperpage}{63}
+\indexentry{Plotting!surface|(hyperpage}{63}
+\indexentry{Camera|hyperpage}{63}
+\indexentry{Plotting!surface|)}{65}
+\indexentry{Hidden object removal|)}{65}
+\indexentry{Free software|(hyperpage}{69}
+\indexentry{Free software|)}{70}

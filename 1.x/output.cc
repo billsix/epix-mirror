@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc16
- * Last Change: August 24, 2004
+ * Version 1.0.2
+ * Last Change: December 31, 2004
  */
 
 /* 
@@ -87,6 +87,14 @@ namespace ePiX {
 
   bool epix::using_pstricks=false;
   std::string epix::fillcolor="white";
+
+  std::string epix::fontsize="normalsize";
+  std::string epix::fontface="default";
+
+  double epix::arrowwidth=1.5;
+  double epix::arrowratio=5.5;
+  double epix::arrowcamber=0.0;
+  double epix::arrowfill=0.0;
 
     //     epix_output_type epix::OUTPUT_TYPE;
     //     std::string epix::font;

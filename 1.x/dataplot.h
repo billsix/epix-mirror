@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 24, 2004
+ * Version 1.0.2
+ * Last Change: December 31, 2004
  */
 
 /* 
@@ -73,6 +73,17 @@ namespace ePiX {
   double covar(FILEDATA data, unsigned int col1, unsigned int col2);
 
   void regression(FILEDATA data, unsigned int col1=1, unsigned int col2=2);
+
+  // Histogram plot of designated column, in the specified interval with
+  // equal-length data subdivisions. By default the total area is unity;
+  // v_scale adjusts height.
+  void histogram(const FILEDATA& data_columns, unsigned int column, 
+		 double low=x_min, double high=x_max, int subdivs=(int)x_size,
+		 double v_scale=1);
+
+  void histogram(const char* filename, int columns, unsigned int column, 
+		 double low=x_min, double high=x_max, int subdivs=(int)x_size,
+		 double v_scale=1);
 
 } /* end of namespace */ 
 

@@ -18,6 +18,7 @@ int main()
 
   begin();
   crop();
+
   blue(0.4);
   dart_field(F, P(x_min, y_min), P(x_max, y_max), 4*x_size, 4*y_size);
 

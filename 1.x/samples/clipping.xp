@@ -69,7 +69,7 @@ double density(int i, int j)
 inline void draw_mesh_quad(int i, int j)
 {
   gray(density(i,j));
-  quad(P(g(i),   g(j),   f(g(i),   g(j))), 
+  ePiX::quad(P(g(i),   g(j),   f(g(i),   g(j))), 
        P(g(i+1), g(j),   f(g(i+1), g(j))),
        P(g(i+1), g(j+1), f(g(i+1), g(j+1))), 
        P(g(i),   g(j+1), f(g(i),   g(j+1))));

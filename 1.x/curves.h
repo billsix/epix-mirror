@@ -4,13 +4,13 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 0.8.11rc16
- * Last Change: August 22, 2004
+ * Version 1.0.3
+ * Last Change: January 05, 2005
  *
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -112,12 +112,13 @@ namespace ePiX {
 		  const double scale=1);
 
 
-  // Quadratic and cubic splines
-  void spline (const P p1, const P p2, const P p3,
+  // Quadratic and cubic splines/spline arrows
+  void spline (const P p1, const P p2, const P p3, int num_pts=EPIX_NUM_PTS);
+  void arrow(const P p1, const P p2, const P p3, double scale=1);
+
+  void spline (const P p1, const P p2, const P p3, const P p4,
 	       int num_pts=EPIX_NUM_PTS);
-  void spline (const P p1, const P p2, 
-	       const P p3, const P p4,
-	       int num_pts=EPIX_NUM_PTS);
+  void arrow(const P p1, const P p2, const P p3, const P p4, double scale=1);
 
 
   // A "mesh" is an ordered pair of positive integers, and is used to

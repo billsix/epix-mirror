@@ -1,5 +1,5 @@
-%% September 03, 2004
-%% Version 1.0
+%% January 06, 2004
+%% Version 1.0.3
 \documentclass[12pt]{report}
 \usepackage{amsmath,latexsym,epic,eepic,pstcol,comment}%,framed}
 \usepackage[dvips,hyperref]{hyperref}
@@ -30,7 +30,7 @@
 \author{Andrew D. Hwang \\ 
   Department\ of Math and CS \\ 
   College of the Holy Cross}
-\date{Version 1.0,  September, 2004}
+\date{Version 1.0.3,  January, 2005}
 
 \begin{document}
 
@@ -68,7 +68,7 @@ and~\code{mng}.
   be altered dramatically, yet precisely, with minor changes to the
   input file.
   
-\item Power and extendability: \ePiX\ inherits the power of \CXX\ as a
+\item Power and extendibility: \ePiX\ inherits the power of \CXX\ as a
   programming language; variables, data structures, loops, and
   recursion can be used to draw complicated plots and figures with
   just a few lines of input. External code can be incorporated in an
@@ -118,7 +118,7 @@ Dependencies'' before investing additional time.
 In any case, please don't hesitate to contact the author or join the
 mailing list if you have questions or comments (good or bad) about the
 software or manual, or if you are willing and able to join in
-developmment.
+development.
 
 Under the philosophy that people learn most easily when ideas are
 introduced in context, this manual is relatively conversational, and
@@ -237,23 +237,23 @@ doesn't do decompression,
   gunzip -c epix-x.y.z_complete.tar.gz | tar -xvf -
   bzcat epix-x.y.z_complete.tar.bz2 | tar -xvf -
 \end{verbatim}
-\code{cd} to the source directory, which is named \filename{epix-x.y.z}.
-The \filename{INSTALL} file contains detailed installation instructions.
-If you're impatient, the short of it is \code{make [test]; make install}.
-Respectively, these steps build the program, optionally run a test
-compile on the included sample files, and install the library, header
-file, and shell scripts.
+\code{cd} to the source directory, \filename{epix-x.y.z}.  The
+\filename{INSTALL} file contains detailed installation instructions.
+If you're impatient, the short of it is \code{make test; make
+install}.  Respectively, these steps build the program, documentation
+(this manual), and sample files; and install the library, header file,
+shell scripts, and documentation.
 
 There is an optional package, contributed by Svend Daug{\aa}rd
 Pedersen, that supplies extensions for enhanced Cartesian and
 logarithmic coordinate systems, and for hatching polygons and planar
-regions. To build this package, do \code{make contrib} before
-\code{make install}.
+regions. To build this package, do \code{make contrib test} instead of
+\code{make test} above.
 
 In order to use the \filename{contrib} package, an input file must
-contain the line ``\code{using namespace ePiX\_contrib;}'' For
-documentation, please see the directory
-\filename{\$INSTALL/share/epix/tutorial/contrib}.
+contain the line ``\code{using namespace ePiX\_contrib;}'' The
+documentation sources are installed in
+\filename{\$INSTALL/share/doc/epix}.
 
 By default, \ePiX\ installs in subdirectories of \filename{/usr/local};
 if you want to install elsewhere, see the \filename{INSTALL} file for
@@ -262,7 +262,7 @@ detailed instructions. You may also want to consult
 variable so your shell can find \ePiX.  \index{Installation|)}
 
 To re-iterate, \ePiX\ is not a stand-alone program, but consists of a
-\C/\CXX\ library, header, and a shell script, and therefore requires a
+\C/\CXX\ library, header, and shell scripts, and therefore requires a
 compiler \emph{for normal use}. The GNU compiler (\code{g++}) and
 \CXX\ library are strongly preferred, both because they are used to
 develop \ePiX, and because they implement many mathematical features
@@ -289,14 +289,14 @@ build and install \ePiX\ with the command (as \code{root})
 rpm -ta epix_complete.tar.gz
 \end{verbatim}
 An \filename{rpm} source file is available from the project page at
-Holy Cross. Separately maintained packages exist for FreeBSD and
-Gentoo:
+Holy Cross. Packages exist for Fink (written by Steven Bellenot),
+FreeBSD (maintained by Tsuguru Kato), and Gentoo (maintained by
+Olivier Fisette):
 \begin{verbatim}
   http://www.freshports.org/graphics/epix/
   http://packages.gentoo.org/search/?sstring=epix
 \end{verbatim}
-The very latest source code for Versions 1.x~and 2.x (a.k.a.\ The
-Next Generation) is available by CVS from
+The very latest source code is available by CVS from
 \begin{verbatim}
   http://savannah.nongnu.org/cgi-bin/viewcvs/epix/epix/
 \end{verbatim}
@@ -332,85 +332,134 @@ bit of grammar (roughly \code{C}~grammar, without pointers) that is
 easily absorbed by example.  As you read, please study the sample
 files that are distributed with \ePiX. If you have installed in the
 default location, the samples are under
-\filename{/usr/local/share/epix}. The quickest way to learn is to copy
-sample files to a convenient location and experiment by modifying them
-and seeing how your changes affect the figure's appearance.
+\filename{/usr/local/share/doc/epix}. The quickest way to learn is to
+copy sample files to a convenient location and experiment by modifying
+them and seeing how your changes affect the figure's appearance.
 
 \section{Running \ePiX}
 \label{section:running}
 
-The sample and tutorial figures carry the preferred file extension,
-\filename{.xp}. To convert \filename{file.xp} to a viewable figure, do
-``\filename{elaps file.xp}'' to produce an \code{eps} file, or
-``\filename{elaps --pdf file.xp}'' for PDF.  Like \LaTeX, \ePiX\ is
-non-interactive, and run from the command line.  Each shell script
-accepts a \code{--help} (or~\code{-h}) option that prints a short
-summary of available options.  Under~\code{X}, a graphical environment
-may be simulated by using \code{emacs} (with Jay Belanger's \ePiX\ 
-mode) to edit and compile files, and a previewer such as~\code{gv} to
-view figures as they are processed. In~\code{gv}, select ``Watch
-file'' from the ``State'' menu to have images update
-automatically.\index{Graphical interface}
+Like \LaTeX, \ePiX\ is non-interactive, and run from the command
+line. An \ePiX\ input file, which carries the preferred file extension
+\filename{.xp} (for eXtended Picture), is a plain-text figure
+specification written in a human-friendly description language. An
+output file---\code{eepic}, \code{eps}, \code{pdf}, or~\code{png}---is
+included directly into a \LaTeX\ document with the appropriate
+\LaTeX\ packages. Conversion is accomplished with four shell
+scripts---\code{laps}, \code{epix}, \code{elaps}, and
+\code{flix}---described below. Each script accepts a \code{--help}
+(or~\code{-h}) option, which prints a short help message, and a
+\code{--verbose} (or~\code{-vv}) \code{--help} option, which describes
+all of the command line options. Portions of a command enclosed in
+square brackets are optional.
 
-While \code{elaps} produces output files suitable for immediate
-previewing, \code{epix} is far preferable for documents processed with
-\LaTeX\ (rather than PDF\LaTeX). The output of~\code{epix} is
-\filename{eepic}, an enhancement to the \LaTeX\ picture environment
-that allows lines of arbitrary length, slope, and width. An
-\filename{eepic} file is typically a few percent the size of a
-comparable \filename{eps} file, and is a text file that can be read
-(and edited) with only knowledge of \LaTeX.
+Under~\code{X}, a graphical environment may be simulated by using
+\code{emacs} (with Jay Belanger's \ePiX\ mode) to edit and compile
+files, and a previewer such as~\code{gv} to view figures as they are
+processed. In~\code{gv}, select ``Watch file'' from the ``State'' menu
+to have images update automatically.\index{Graphical interface}
 
-An \filename{eepic} file is included directly into a \LaTeX\ document,
-say \filename{sample.tex}, that contains the line
+The code snippets below refer to a hypothetical \LaTeX\ file,
+\filename{sample.tex}, which contains a figure compiled from an \ePiX\
+file \filename{sample1.xp}. All packages mentioned are standard parts
+of modern \LaTeX\ distributions, and an ellipsis connotes \LaTeX\ code
+separating preamble commands from the document proper.
+
+
+\subsubsection*{\code{laps}}
+
+The script~\code{laps} performs \LaTeX\ to Postscript conversion, and
+is independent of the rest of \ePiX. By default, \code{laps} invokes
+\LaTeX~and \code{dvips}. The command
+\begin{verbatim}
+  laps sample[.tex]
+\end{verbatim}
+creates \filename{sample.ps}. The option \code{--pdf} creates a
+PDF~file by post-processing the PostScript with~\code{ps2pdf}.
+Alternatively, other \TeX-family processors (\code{pslatex},
+\code{pdftex}, etc.) may be used instead of~\LaTeX.
+
+
+\subsubsection*{\code{epix}}
+
+The output of~\code{epix} is \filename{eepic}, Conrad Kwok's
+enhancement to the \LaTeX\ picture environment that allows lines of
+arbitrary length, slope, and width. An~\filename{eepic} file is
+typically a few percent the size of a comparable \filename{eps} file,
+and can be read (and edited) with only knowledge of \LaTeX.
+
+An \filename{eepic} file is included directly into a \LaTeX\ document:
 \begin{verbatim}
 \usepackage{epic,eepic,pstcol}
-\end{verbatim}
-Somewhere in \filename{sample.tex} is the figure itself:
-\begin{verbatim}
+  ...
 \begin{figure}[hbt]
   \begin{center}
-    \input{example.eepic}
+    \input{sample1.eepic}
     \caption{A compiled \ePiX\ figure.}
     \label{fig:example}
   \end{center}
 \end{figure}
 \end{verbatim}
-In a text editor, create an \ePiX\ input file for the figure, say
-\filename{file.xp}, then issue the command
+A plain \filename{eepic} file does not require~\code{pstcol}, but
+some of \ePiX's features are implemented through specials,
+\code{PSTricks}, and color capabilities. Rotated text requires the
+\code{rotating} package.
+
+In a text editor, create an \ePiX\ input file \filename{sample1.xp}
+for the figure, then issue the command
 \begin{verbatim}
-epix file.xp example.eepic
+  epix sample1[.xp]
 \end{verbatim}
-File extensions may be omitted, as can the name of the output file if
-you want it to be the same as the name of the input
-(\filename{file.eepic} in this example).
+Multiple files can be specified, e.g. ``\code{epix sample*.xp}''.  By
+default, the output file has the same name as the input, here
+``\filename{sample1.eepic}''. If only one input file is given, the
+name of the output file may be specified with a command line option.
 
-The preferred extension for an \ePiX\ file is ``\filename{.xp}'' (for
-eXtended Picture), but the source code extensions ``\filename{.c}'',
-``\filename{.cc}'', ``\filename{.C}'', and ``\filename{.cpp}'' are also
-permitted. If the \code{emacs} configuration file is properly set
-up, \code{emacs} can recognize~``\filename{.xp}'' files, automatically
-enter \ePiX\ mode, and insert a preamble template. The file
-\filename{POST-INSTALL} has detailed instructions.
+The file extensions ``\filename{.cc}'', ``\filename{.c}'',
+``\filename{.C}'', and ``\filename{.cpp}'' are recognized. However, if
+the \code{emacs} configuration file is properly set up, \code{emacs}
+automatically enters \ePiX\ mode when an~\filename{.xp} file is
+opened, and inserts a preamble template when a new file is created.
+The file \filename{POST-INSTALL} has detailed instructions.
 
-To process the \LaTeX\ file,
-either run \LaTeX\ as usual, or do
+File extensions are optional; if no extension is given, the script
+searches the current directory for matches, and prints a warning if
+multiple matches are found. The help message lists recognized
+extensions in decreasing order of preference.
+
+\subsubsection*{\code{elaps}}
+
+Stand-alone \LaTeX\ figures (\filename{eps}~or \filename{pdf}, as
+opposed to \filename{eepic}) are useful in a variety of contexts:
+individual figures can be changed without recompiling an entire
+document, color is available when previewing in~\code{xdvi}, figures
+can be used with PDF\LaTeX, and so forth. The primary downside is that
+\filename{eps} files created from \code{dvips} tend to be enormous,
+tens or hundreds of times larger than their \filename{eepic}~or
+\code{pdf} counterparts.
+
+The commands
 \begin{verbatim}
-laps sample
+  elaps sample1.xp
+  elaps --pdf sample1.xp
 \end{verbatim}
-which runs \LaTeX\ on \filename{sample.tex}, then uses \code{dvips} to
-convert the \filename{dvi} to the Postscript file
-\filename{sample.ps}. \code{laps} stands for ``\LaTeX\ to
-Postscript''.
+produce the files \filename{sample1.eps}~and \filename{sample1.pdf}
+respectively. Multiple input files, and the name of the output file,
+are given on the command line just as for \code{epix}. Additional
+\LaTeX\ packages and \code{dvips} options may also be specified on the
+command line.
 
-Figures in graphical format (as opposed to \filename{eepic}) can be
-useful if you use \code{xdvi} to preview (color is available in
-included files), or if you are tweaking the figures in a large
-document, and do not want to recompile the entire document to change
-just one figure.  \code{elaps} also handles \filename{eepic} files
-(i.e., acts as \code{eepic2eps}~and \code{eepic2pdf}), even those not
-produced with \ePiX.
+\code{elaps} can process \filename{eepic} files (i.e., act as
+\code{eepic2eps}~and \code{eepic2pdf}), even those not produced with
+\ePiX.
 
+\begin{comment}
+\subsubsection*{\code{flix}}
+
+\code{flix} creates bitmapped images (\filename{png}) and movies
+(\filename{mng}). Section~\ref{section:animation} describes the use of
+\code{flix}.
+\end{comment}
 
 \section{A Sample File}
 
@@ -478,11 +527,12 @@ are adequate, but the importance of structuring increases rapidly with
 the size of the input file, and good habits are best formed from the
 start. The function definition is mostly for illustration, though does
 provide slightly better organization than
+
 \begin{footnotesize}
 \begin{verbatim}
-double width = 0.6, height = sqrt(1-width*width);
-double lab_x = 0.5;
-P label_here(lab_x, sqrt(1-lab_x*lab_x));
+  double width = 0.6, height = sqrt(1-width*width);
+  double lab_x = 0.5;
+  P label_here(lab_x, sqrt(1-lab_x*lab_x));
 \end{verbatim}
 \end{footnotesize}
 
@@ -502,20 +552,20 @@ if no matching function is found.
 
 \CXX\ allows functions to be given \emph{default arguments}; when a
 function has defaults, the corresponding argument(s) may be omitted in
-a call. A command is usually described by listing the types and names
-of the arguments. For brevity, the type \code{double} may be left
-tacit.  Default arguments are denoted by square brackets. The command
+a call. Commands are described below by listing the types and names of
+the arguments. For brevity, the type \code{double} is sometimes left
+tacit.  Default arguments are denoted by square brackets. For example,
 \begin{verbatim}
   line(P pt1, P pt2, [double stretch], [int n]);
 \end{verbatim}
-defines a ``\code{line}'' command that accepts two mandatory arguments
-of type~\code{P}, an optional real-valued \code{stretch} parameter,
-and an optional integer~\code{n}.  When a function is called in an
-input file, arguments' types are not given: 
+describes a ``\code{line}'' command that accepts two mandatory
+arguments of type~\code{P}, an optional real-valued \code{stretch}
+parameter, and an optional integer~\code{n}. In an input file,
+arguments' types are not given, e.g.
 \begin{verbatim}
   line(P(-2,1), P(1,0), 6.4);
 \end{verbatim}
-The last argument is assigned its default value in this case.
+The last argument would be assigned its default value in this example.
 
 
 \section{Basic Picture Concepts}
@@ -600,7 +650,7 @@ Conceptually, \ePiX\ builds a 3-dimensional virtual ``world'', then
 photographs the world on a 2-dimensional ``screen''. The screen
 contains the bounding box, which is affinely scaled to a \LaTeX\ 
 picture environment. By default, the screen is the $(x_1,x_2)$-plane
-and the world is renderd by looking straight down the $x_3$-axis.
+and the world is rendered by looking straight down the $x_3$-axis.
 \index{Bounding Box|)}
 
 \subsection*{Geometric Data Structures}
@@ -782,7 +832,7 @@ These commands must come in the figure body.
 objects are either pointlike (\LaTeX\ glyphs, text boxes) or pathlike
 (everything else). The appearance of a pathlike object depends on the
 line style, width, filling,\index{Filling} and color. Each attribute
-is a declaration, remaining in effect until superceded or the file
+is a declaration, remaining in effect until superseded or the file
 ends.  When a file starts, paths are drawn solid, black, unfilled, and
 with \code{thinlines} (a width of $0.4$~pt) in effect.
 Attribute-setting commands should come in the figure body.
@@ -812,7 +862,7 @@ e.g., \code{dashed()}.  Every pathlike object in \ePiX\ is drawn using
 a list of points. When the path style is \code{solid}, the points are
 joined connect-the-dots fashion. A \code{dotted} path is drawn by
 placing a small dot at each point of the path. When the style is
-\code{dashed}, line segments are drawn partway from each vertex to its
+\code{dashed}, line segments are drawn part way from each vertex to its
 neighbors.
 \begin{center}
   \input{pathstyle.eepic}
@@ -960,7 +1010,7 @@ these alignment options specify the position of the label
 alignment option~\code{br} puts the label below and to the right
 of~$p$.
 \begin{center}
-  \input{alignment_lr.eepic}
+  \input{alignment_lr.eepic}\qquad
   \input{alignment.eepic}
 \end{center}
 \index{Labels!alignment|)}
@@ -989,6 +1039,37 @@ mind that
   label. Backslashes are doubled.
 \end{itemize}
 \index{Offset!label|)}
+
+
+\subsection*{Fonts and Type Size}
+\index{Fonts}
+
+By default, the font in an \ePiX\ figure is that of the enclosing
+document. The font size and face are changed with
+``declaration-style'' commands such as
+\begin{verbatim}
+font_size("Large");
+font_face("sc");
+\end{verbatim}
+The argument of \verb+font_size+ is a valid \LaTeX\ size,
+\code{normalsize} by default; \verb+font_face+ accepts a two-letter
+string that is appended to the string ``\code{text}'' to give a
+\LaTeX\ font declaration command (``\code{textsc}'' above).
+
+Finer-grained control, such as different fonts or sizes in a single
+label, must be accomplished by hard-coding \LaTeX\ commands into an
+ordinary label.
+
+
+\subsection*{Labeled Markers}
+
+Basic markers---\code{circ}, \code{ring}, \code{spot}, \code{(d)dot},
+and \code{(b)box}---accept label arguments. For example, 
+\begin{verbatim}
+dot(P(0,0), P(4,2), "The Origin", tr);
+\end{verbatim}
+places and labels a dot at~$(0,0)$. 
+
 \index{Labels|)}
 
 
@@ -1039,7 +1120,7 @@ begins with the lines
 using namespace ePiX;
 \end{verbatim}
 The first line is analogous to a \LaTeX\ \code{usepackage} command: It
-causes the pre-processor to replace the line with the contants of a
+causes the pre-processor to replace the line with the contents of a
 file, thereby importing the names of commands provided by~\ePiX.  To
 avoid name conflicts, \ePiX's commands are enclosed in a
 ``namespace''. For example, the \code{label} command is actually known
@@ -1126,8 +1207,8 @@ int main()
   begin();
   < ... ePiX commands ... >
   end();
-  cout << "\\caption{A \\LaTeX\\ figure.}\n" // N.B. line con-
-       << "\\label{fig:example}\n"           // tinues, no ";"
+  cout << "\\caption{A \\LaTeX\\ figure.}\n" // N.B. no ";"
+       << "\\label{fig:example}\n"           // line continues.
        << "\\end{figure}\n%%%%\n";           // LaTeX formatting
 } // End of main()
 \end{verbatim}
@@ -1190,25 +1271,39 @@ differential equations, and non-Euclidean geometry.
 
 \subsection*{Arrows} 
 
-\index{Arrow|(emph}
-An arrow is specified by its tail and tip. An optional third argument
-scales the arrowhead.
+\index{Arrow|(emph} A straight arrow is specified by its tail and
+tip. Quad- and cubic-spline arrows are described by their control
+points. An optional final argument scales the arrowhead.
 \begin{verbatim}
   arrow(P tail, P tip, [double scale]);
+  arrow(P p1, P p2, P p3, [double scale]);
+  arrow(P p1, P p2, P p3, P p4, [double scale]);
   dart (P p1, P p2);  // same as arrow(p1, p2, 0.5);
   aarrow(P p1, P p2); // double-headed arrow <--->
 \end{verbatim}
 
 Pictorially, an \code{arrow} consists of a line segment (the shaft)
-surmounted by a triangle (the arrowhead). In profile, an arrowhead's
-width is \code{3pt}, and its height is 5.5~times the width.  The
-actual printed height depends on the \code{arrow}'s orientation with
-respect to the camera.  
+surmounted by an arrowhead. In profile, an arrowhead's width is
+\code{3pt}, and its height is 5.5~times the width.  The actual printed
+height depends on the \code{arrow}'s orientation with respect to the
+camera.  By default, an arrowhead is a hollow triangle. The shading,
+shape, and size are adjusted with declarations:
+\begin{verbatim}
+  arrow_fill(dens); // gray density, between 0 and 1
+  arrow_width(w);   // width in pt, 3 by default
+  arrow_ratio(r);   // height-to-width, 5.5 by default
+  arrow_camber(c);  // base indent as frac of ht, 0 by default
+\end{verbatim}
+\begin{center}
+  \input{arrow1.eepic} \qquad
+  \input{arrow2.eepic} \qquad
+  \input{arrow3.eepic}
+\end{center}
 
-By default, an arrowhead is a hollow triangle, which can be colored.
-The \code{fill()}\index{Filling} command produces solid, uncolorable
-arrowheads.  \code{PSTricks}\index{PSTricks} commands can be used for
-solid colored \code{arrow}s.  \index{Arrow|)}
+Hollow arrowheads are drawn in the current path color; filled
+arrowheads are drawn in black. \code{PSTricks}\index{PSTricks}
+commands (\emph{q.v.}) can be used for solid colored \code{arrow}s.
+\index{Arrow|)}
 
 
 \subsection*{Coordinate Axes and Labels} 
@@ -1379,6 +1474,24 @@ The covariance of two columns is obtained by subtracting the
 respective averages entry by entry, then taking the dot product. The
 regression line is the least-squares best fit for predicting
 column~$i_2$ from column~$i_1$.
+
+
+\subsection*{Histograms}
+
+\index{Histograms} \ePiX\ can read data from a file and plot a
+histogram with equal-length subdivisions. The syntax is similar to the
+\code{plot} commands for data:
+\begin{verbatim}
+  histogram("mydata.dat", cols, col_index, [low, high, n, scale]);
+  histogram(my_cols, col_index, [low, high, n, scale]);
+\end{verbatim}
+As with data-plotting commands, the number of columns in a data file
+and the column index are mandatory. The data bins span the interval
+from \code{low}~to \code{high}, with \code{n+2}~bins---\code{n} in the
+interval itself, a bin below \code{low}, and one above \code{high}. By
+default, bins run from \verb+x_min+~to \verb+x_max+ and have unit
+width, and the area under the histogram is unity. The final parameter
+acts as a multiplier (possibly negative) on the vertical scale.
 \index{Plotting!data|)}
 \index{Plotting|)}
 
@@ -1401,7 +1514,7 @@ study of~\code{C} or~\CXX. Go with the masters: \emph{The \code{C}
 Ritchie~\cite{KnR}, is an excellent, manageable resource for the
 basics of procedural programming, while \emph{The \CXX~Programming
   Language}, by Bjarne Stroustrup~\cite{S}, is a definitive,
-encyclopedaic reference.
+encyclopedic reference.
 
 \CXX\ is a powerful, complex language whose syntax is similar to that
 of~\C, or to the scripting languages of Maple~and Mathematica. An
@@ -1867,7 +1980,7 @@ By default, clipping and cropping are off. The command
   clip_box(P pt);         // opposite corners pt and -pt
   clip_to (P pt);         //                  pt and P(0,0,0)
 \end{verbatim}
-Analogously, cropping is (de)activted with \code{crop(bool)}. The crop
+Analogously, cropping is (de)activated with \code{crop(bool)}. The crop
 box is given by a pair of opposite corners, \code{crop\_box(pt1,pt2)};
 third coordinates are discarded. With no arguments, the command
 \code{crop\_box()} re-sets the crop box to the bounding box.
@@ -2040,7 +2153,7 @@ arguments; consequently, their arguments must be passed as
 \end{verbatim}
 This makes polylines and polygons inconvenient for quick-and-dirty
 use, but imposes little burden if the vertices have been defined
-elewhere, as they might be in a logically structured file.
+elsewhere, as they might be in a logically structured file.
 
 Compound paths may be built by concatenation. If \code{path1}~and
 \code{path2} are paths, then the commands
@@ -2361,8 +2474,7 @@ to the ``true'' surface without requiring many quadrilaterals.
   \begin{center}
     \input{plot_a.eepic}\hspace*{0.5in}
     \input{plot_b.eepic}
-    \caption{A surface with coarse ($6\times18$) and fine
-      ($12\times60$) meshes.}
+    \caption{A surface drawn with coarse and fine meshes.}
     \label{fig:plot}
   \end{center}\index{Plotting!wiremesh}
 \end{figure}
@@ -2444,6 +2556,7 @@ domain, while a function of 2~variables cannot be plotted over a
 
 \subsection*{Utility Functions}
 
+\index{Calculus|(}
 In this section, \code{f}~and \code{g} are \code{double}-valued
 functions of one variable. \ePiX\ defines numerical functions that
 return the maximum or minimum value on an interval, approximate the
@@ -2489,29 +2602,38 @@ illustrate these features.
 \index{Plotting!calculus|(}
 \index{Plotting!vector fields|(}
 \ePiX\ can plot the derivative or definite integral of real-valued
-functions, solve ODEs in two or three variables, and graph slope- or
-vector fields. Let \code{f}~be a real-valued function of one variable,
-\code{F}~a \code{P}-valued function of two or three variables.
+functions, and draw approximating sums for definite integrals. Let
+\code{f}~be a real-valued function of one variable.
 \begin{verbatim}
   plot(D(f), a, b, n);  // plot f' over [a,b]
   plot(I(f, x0), a, b, n);
+  riemann_sum(f, a, b, n, TYPE);
+\end{verbatim}
+The second command graphs the definite integral $x\mapsto\int_{x_0}^x
+f(t)\,dt$ over~$[a,b]$. As above, $x_0$~defaults to~0. The third
+draws rectangles or trapezoids whose area approximates the definite
+integral of~$f$ over~$[a,b]$. The \code{TYPE} may be \code{UPPER},
+\code{LOWER}, \code{LEFT}, \code{RIGHT}, \code{MIDPT},
+or~\code{TRAP}.
 
+\ePiX\ solves ODEs in two or three variables, and graphs slope- and
+vector fields. Let \code{F}~be a \code{P}-valued function of two or
+three variables.
+\begin{verbatim}
   ode_plot(F, p_0, t_min, t_max, n); 
   flow(F, p_0, t_max, n);
 \end{verbatim}
-The second command graphs the definite integral $x\mapsto\int_{x_0}^x
-f(t)\,dt$ over~$[a,b]$. As above, $x_0$~defaults to~0.
-
-The third command plots the solution curve of the initial-value
-problem $\dot{x}=F(x)$, $x(0)=p_0$, over the specified time interval.
-If $t_\mathrm{min}$ is omitted, its value is~0, so the curve starts
+The first plots the solution curve of the initial-value problem
+$\dot{x}=F(x)$, $x(0)=p_0$, over the specified time interval.  If
+$t_\mathrm{min}$ is omitted, its value is~0, so the curve starts
 at~$p_0$. With manual calculation to rotate a planar field a quarter
 turn, \code{ode\_plot} can be used to draw level curves (isobars) of a
-function; see the sample file \filename{dipole.xp}. The fourth command
-returns the result of starting at~$p_0$ and flowing by~$F$ for
-time~$t_\mathrm{max}$, using Euler's method with~$n$ timesteps.  This
-is useful for placing markers or arrowheads precisely along a flow
-line. A vector field itself may be drawn in three ways:
+function of two variables; see the sample file
+\filename{dipole.xp}. The \code{flow} function returns the result of
+starting at~$p_0$ and flowing by~$F$ for time~$t_\mathrm{max}$, using
+Euler's method with~$n$ timesteps.  This is useful for placing markers
+or arrowheads precisely along a flow line. A vector field itself may
+be drawn in three ways:
 \begin{verbatim}
   vector_field(F, p, q, n1, n2); // proportional length
   dart_field  (F, p, q, n1, n2); // constant length
@@ -2521,6 +2643,7 @@ The field is sampled at the grid points of the coordinate rectangle
 whose corners are specified.
 \index{Plotting!vector fields|)}
 \index{Plotting!calculus|)}
+\index{Calculus|)}
 
 
 \subsection*{Recursive Fractal Curves}  
@@ -2607,6 +2730,7 @@ and/or style that suggests hidden lines.
 
 \section{Animation}
 
+\label{section:animation}
 \index{Animation|(}
 \ePiX\ is ideally suited to the creation of mathematically accurate
 animations: If a figure depends suitably upon a ``time'' parameter,
@@ -2622,7 +2746,7 @@ A \code{flix} file is an \code{epix} file with two restrictions:
   \item The \code{double} variable \code{tix} is used as
   ``clock''.
 
-  \item \code{main} accepts two commandline arguments and sets
+  \item \code{main} accepts two command line arguments and sets
   \code{tix} accordingly.
 \end{itemize}
 Jay Belanger's \code{emacs} mode recognizes the file
@@ -2657,9 +2781,9 @@ library (\filename{libepix.a}), and five shell scripts (\code{epix},
 \code{elaps}, \code{laps}, \code{flix}, and \code{keywords}). Four of
 these files are generated at compile time, using variables found in
 the \filename{Makefile}.  In addition to the executable portions of
-the program, there are a few dozen sample files, configuration files,
-\filename{README}s, and miscellaneous documentation.  These components
-are placed into standard locations where they can find each other.
+the program, there are sample files, documentation, configuration
+files, and miscellaneous notes.  These components are placed into
+standard locations.
 
 \subsection*{Installation Problems}
 \index{Installation|(}
@@ -2672,15 +2796,13 @@ the tar file, then \code{cd} to the source directory
 \begin{verbatim}
 make
 make contrib (optional)
-make test    (optional)
+make test
 make install
 \end{verbatim}
 (the last as \code{root}, if necessary). If \code{bash} is not in
 \filename{/bin/bash}, edit the script \filename{newbash.sh} and run it
 in the source directory.  If the install directory or compiler are not
-as above, edit the \code{Makefile} accordingly, then build. If a
-failed partial compile creates the header file \filename{epix.h}, you
-\emph{must}\/ do \code{make clean} before re-compiling.
+as above, edit the \code{config} file accordingly, then build.
 
 If you have installed in \filename{\$HOME}, please see the
 \filename{POST-INSTALL} file for additional instructions. 
@@ -2690,24 +2812,17 @@ The directory in which you install \ePiX\ is denoted
 following files:
 \begin{verbatim}
   $INSTALL/bin/{epix,elaps,laps,flix,keywords}
-  $INSTALL/include/epix.h
-  $INSTALL/lib/libepix.a
-  $INSTALL/man/man1/epix.1
+  $INSTALL/include/epix-VERSION.h  $INSTALL/include/epix.h
+  $INSTALL/lib/libepix-VERSION.a   $INSTALL/lib/libepix.a
+  $INSTALL/share/man/man1/epix.1
 \end{verbatim}
-Sample files, notes and README files, configuration snippets, and (if
-the \code{complete} package is installed) this tutorial are
-installed in subdirectories of \filename{\$INSTALL/share/epix}.
+The documentation and samples are placed in
+\filename{\$INSTALL/share/doc/epix}.  Sample files, notes and README
+files, and configuration snippets are installed in subdirectories of
+\filename{\$INSTALL/share/epix}.
 
 
 \subsection*{Known Issues}
-
-\index{Mac OS X}
-If you install \ePiX\ on MacOS~X with the December, 2002 Apple
-Developer Tools, you must manually run \code{ranlib} on the compiled
-library:
-\begin{verbatim}
-  sudo ranlib /usr/local/lib/libepix.a
-\end{verbatim}
 
 Buggy versions of the conversion script \code{ps2epsi} have been
 distributed with recent versions of RedHat and Mandrake. The author
@@ -3055,17 +3170,14 @@ compiler. The most commonly used options are those of the form
 \begin{verbatim}
    -I<include>     -L<libdir>     -l<lib>
 \end{verbatim}
-There must be no space between the option flags \code{-I},
-\code{-L}, and~\code{-l} and their arguments.  For example, to
-link \filename{figure.xp} against \filename{mylibs/libcustom.a}, run
-the command
+For example, to link \filename{figure.xp} against
+\filename{mylibs/libcustom.a}, run the command
 \begin{verbatim}
    epix -Lmylibs -lcustom figure
 \end{verbatim}
 The options \code{-I. -L.} tell the compiler to look in the current
 directory for header and library files.  Compiler options may appear
-in any order, but must come before the name of the input file; options
-that come after the input file are silently discarded.
+in any order, but must come before the name of the input file(s).
 
 Compiler options may be placed in the configuration file
 \filename{\$HOME/.epixrc}, with syntax as above. A line in the config
@@ -3073,6 +3185,33 @@ file that contains a pound sign~(\code{\#}) is a comment, no matter
 where in the line the~\code{\#} appears. If any non-comment line
 fails to start with a dash, the rest of the file is silently
 discarded.  Command-line options are read before the config file.
+
+
+\subsection*{Using Multiple Versions}
+
+The script \filename{epix}~links by default against the \code{C}~math
+library \code{libm.a}~and the \ePiX\ library \code{libepix.a}. As of
+Version~1.0.3, the command option \code{--no-defaults} clears the
+header and include paths and removes \code{libepix.a} from the link
+list. The script may therefore be used with multiple versions of
+\ePiX, a potentially useful feature if you regularly need to compile
+old source files, or simply prefer the syntax of an older version.
+
+To install and use (say) Version~0.8.5, build the package as usual,
+but \emph{do not use the makefile to install}. Instead, manually
+install the header and library only, using their version number:
+\begin{verbatim}
+# install -m 644 epix.h /usr/local/include/epix-0.8.5.h
+# install -m 644 libepix.a /usr/local/lib/libepix-0.8.5.a
+\end{verbatim}
+A non-system directory may be used instead of \filename{/usr/local}.
+To use the old version, a source file must \code{include} the
+appropriate header file (which is identified by its version number).
+To compile, issue a command such as
+\begin{verbatim}
+epix --no-defaults -I/usr/local -L/usr/local -lepix-0.8.5 file.c
+\end{verbatim}
+
 
 % \clearpage
 % \setcounter{chapter}{0}
@@ -3124,26 +3263,30 @@ Please visit the Free Software Foundation, at
 you can contribute to its development and adoption.
 \index{Free software|)}
 
-
-\chapter{Acknowledgements}
+\chapter{Acknowledgments}
 
 \ePiX\ is built on the work of many people (unfortunately, most of
 whom I am unaware). The following people have contributed, sometimes
 unknowingly but always generously: 
 
-\paragraph{Infrastructure} Donald E. Knuth, Conrad Kwok, Leslie
-Lamport, Tim Morgan, Piet van Oostrum, Sunil Podar, Richard Stallman
+\paragraph{Infrastructure} Donald Knuth, Conrad Kwok, Leslie Lamport,
+Tim Morgan, Piet van~Oostrum, Sunil Podar, Richard Stallman, Herbert
+Voss, Timothy van~Zandt
 
-\paragraph{Enhancements} Jay Belanger, Robin Blume-Kohout, Guido
-Gonzato, Svend Daug{\aa}rd Pedersen, Andrew Sterian
+\paragraph{Enhancements} Jay Belanger, Robin Blume-Kohout, Svend
+Daug{\aa}rd Pedersen, Andrew Sterian
+
+\paragraph{Porting and packaging} Steven Bellenot (Fink); Tsuguru Kato
+(FreeBSD); Danny van Dyk, Olivier Fisette, Marcus Hanwell, Peter
+Johanson, and Patrick Kursawe (Gentoo); Guido Gonzato (RPM)
 
 \paragraph{Debugging, advice, and other assistance} Jay Belanger,
 Felipe Paulo Guazzi Bergo, Robin Blume-Kohout, Patrick Cousot, Stephen
 Gibson, Dov Grobgeld, Bob Grover, Jim Hefferon, Jacques L'helgoual,
-Yvon Henel, Hartmut Henkel, Herng-Jeng Jou, Walter Kehowski, Ross
-Moore, Thorsten Riess, Neel Smith, Michael Somos, Andrew Sterian,
-Ryszard Tanas, Kai Trukenmueller, Torbjorn Vik, Wenguang Wang, Gabe
-Weaver, Mariusz Wodzicki
+Yvon Henel, Hartmut Henkel, Herng-Jeng Jou, Walter Kehowski, Kevin
+McCormick, Ross Moore, Thorsten Riess, Alan Sill, Neel Smith, Michael
+Somos, Andrew Sterian, Ryszard Tanas, Kai Trukenmueller, Torbjorn Vik,
+Wenguang Wang, Gabe Weaver, Mariusz Wodzicki
 
 \begin{thebibliography}{9}
 %

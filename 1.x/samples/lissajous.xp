@@ -19,6 +19,7 @@ int main()
   red();
   plot(f, 0, 2, 200);
 
+  arrow_camber(0.2);
   plain();
   blue();
   tan_field(f, 0, 2, 81);

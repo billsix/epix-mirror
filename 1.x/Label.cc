@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 16, 2004
+ * Version 1.0.2
+ * Last Change: December 31, 2004
  */
 
 /* 
@@ -89,7 +89,7 @@ namespace ePiX {
 	  }
 
 	if (the_label_type == TEXT)
-	  epix_grouping(the_label_text);
+	  epix_label_text(the_label_text);
 
 	else
 	  print_marker(the_label_type);

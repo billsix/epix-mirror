@@ -1,4 +1,6 @@
 #include "epix.h"
+using namespace ePiX;
+using namespace ePiX_contrib;
 
 Mark mrk[] =
  {

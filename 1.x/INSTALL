@@ -1,6 +1,6 @@
 ePiX -- INSTALL
 
-Last Change: August 26, 2004
+Last Change: January 05, 2005
 
 This file contains detailed installation instructions for ePiX-1.x
 
@@ -8,18 +8,24 @@ Lines starting with a "%" denote commands typed at a shell prompt.
 Lines starting with a "#" denote commands run as root.
 Don't type the prompt characters "%" or "#". :)
 
-Please note the special instructions for Mac OS X (see Section 5).
 
-ePiX contains four shell scripts (epix, elaps, flix, and laps) that
-automate file processing by running auxiliary programs. The packages
-GhostScript, ImageMagick, and teTeX must be installed on your system
-in order for you to use ePiX. (In case you're curious, the specific
-programs are: convert, dvips, g++, latex, and ps2epsi.) The shell
-scripts must be in your PATH.
+The following software must be installed on your system in order for
+you to use ePiX:
 
-Please consult your system documentation for information on
-installing these components. The POST-INSTALL file has potentially
-helpful information, as well.
+  * The GNU shell, bash
+  * A C++ compiler and development libraries, preferably g++
+  * GhostScript, ImageMagick, and teTeX
+  * GNU binutils, textutils, and fileutils (ar, sed, grep, ln, rm...)
+
+(For the curious, the specific programs are: convert, dvips, g++,
+latex, and ps2epsi.) Please consult your system documentation for
+information on installing these components. The POST-INSTALL file has
+potentially helpful information, as well.
+
+ePiX comprises a header file (epix.h), a compiled library (libepix.a),
+and four shell scripts (epix, elaps, flix, and laps) that automate
+file processing by running auxiliary programs.  The shell scripts must
+be in your PATH.
 
 
 --- Synopsis ---
@@ -36,8 +42,8 @@ helpful information, as well.
 --- Step-by-step Instructions ---
 
 (1) Tarballs are available gzip or bzip2 compressed. GNU/Linux comes with
-  bzip2 utilities, while Solaris (e.g.) does not. To unpack the tarball,
-  use the appropriate version number, package name (src or complete), and
+  bzip2 utilities, while some Unices may not. To unpack the tarball, use
+  the appropriate version number, package name (src or complete), and
   tar options (z for .gz, j for .bz2, v to see filenames unpacked):
 
 % tar -zxf epix-x.y.z_complete.tar.gz
@@ -56,18 +62,18 @@ helpful information, as well.
 
 
 (2) To install in /usr/local, skip to step (3). Otherwise, edit the
-  following line of the Makefile as desired:
+  following line of the config file as desired:
 
-  prefix=/usr/local
+  EPIX_ROOTDIR=/usr/local
 
 
 (3) As already noted, ePiX is strongly bash-dependent.
 
-  If bash is in /bin/bash on your system, please skip to step (4).
+  If bash is in /bin/bash on your system, skip to step (4).
 
-  If bash is NOT in /bin/bash on your system, then edit the file
-  newbash.sh, replacing "/usr/local/bin/bash" in the indicated line
-  with the path to bash on your system, then run the script:
+  If bash is NOT in /bin/bash, then edit the file newbash.sh, replacing
+  "/usr/local/bin/bash" in the indicated line with the path to bash on
+  your system, then run the script:
 
 % ./newbash.sh
 
@@ -87,22 +93,18 @@ helpful information, as well.
   This builds several object files, and the following files for
   installation:
   * A static library (libepix.a)
-  * Shell scripts (epix, flix)
   * A header file (epix.h)
+  * The shell scripts
 
   If desired, build the (separately documented, see the contrib/ directory)
   contributed package:
 
 % make contrib
 
-  If LaTeX and dvips are installed, you may test the build before installing:
-
 % make test
 
-  If all goes well, you'll have a dvi file "sample.dvi" and a Postscript
-  file "sample.ps" that you can preview or print. 
-
-  If one of these steps fails, run "make clean" before proceeding.
+  Builds the documentation and sample files. These may be built/cleaned 
+  individually ("make doc", "make samples-clean", etc.)
 
 
 (5) Install:
@@ -126,54 +128,63 @@ Password: <your root password>
 % make install
 
 
-  On Mac OS X, the commands are slightly different:
-
-% sudo make install
-Password: <your user password>
-
-% sudo ranlib /usr/local/lib/libepix.a
-
-
 (6) Post-Install:
 
   From the source directory, do
   
 % make clean
 
-  to clean the source tree of compiled files and sample output. It is
-  safe to run "make clean" repeatedly.
+  to clean the source tree of compiled files, documentation, and samples.
+  It is safe to run "make clean" repeatedly.
 
-  The sample files are installed in $INSTALL_DIR/share/epix. For users'
-  convenience, they are available both unpacked and tarred up in the file
-
-  $INSTALL_DIR/share/epix/epix_samples.tar
-
-  This tar file does not create a subdirectory when unpacked. To look at
-  the sample .eepic files, create a directory, say "samples", then do:
-
-% cd samples
-% cp /usr/local/share/epix/epix_samples.tar .
-% tar -xvf epix_samples.tar
-% ./makefigs
-
-  These commands assume ePiX is installed under /usr/local, of course.
+  The documentation and sample files are installed in $INSTALL_DIR/doc,
+  as compiled files (ps, pdf) and tarred LaTeX sources.
 
   The directory $INSTALL_DIR/share/epix/config contains miscellaneous
-  optional files, notably Jay Belanger's emacs mode and info file for
-  working with ePiX source files, and completions for users of Ian
-  MacDonald's bash completions package. POST-INSTALL has instructions
-  on installing and using these files.
+  optional files, notably Jay Belanger's emacs mode for working with
+  ePiX source files, and completions for users of Ian MacDonald's bash
+  completions package. POST-INSTALL has instructions on installing and
+  using these files.
 
 
 (7) Uninstalling:
 
-  To remove ePiX from your system (should it come to this), "su root"
-  if necessary and from the source directory do:
+  To remove ePiX from your system, go to the directory where the 
+  sources were unpacked, "su root" if necessary, and do:
 
-% make uninstall
+% make -n uninstall-all
+       ^^ N.B.!
 
-  Any files (such as epix.el) installed manually in a directory not
-  under $INSTALL_DIR/share/epix must be removed separately.
+  FAILURE TO PERFORM THIS SANITY CHECK MAY DAMAGE YOUR FILESYSTEM!!
+
+  If the install path (in make's output) is correct, it is safe to do
+
+% make uninstall-all
+
+  ePiX also provides a "make uninstall" target, which removes only the
+  version corresponding to the source directory. 
+
+
+--- Installing Multiple Versions ---
+
+More than one version of ePiX can be installed on the same machine. To
+install a version older than 1.0.3, download and build the source code
+as usual -- please visit
+
+  http://savannah.nongnu.org/cgi-bin/viewcvs/epix/epix/archive/
+
+for older versions -- then manually install the header and library, e.g.
+
+# install -m 644 epix.h /usr/local/include/epix-0.6.5.h
+# install -m 644 libepix.a /usr/local/lib/libepix-0.6.5.a
+
+Note that the version number must be specified in the target names, and
+that old shell scripts must NOT be installed. To use version 0.6.5 (say),
+the source file must #include "epix-0.6.5.h" and be compiled with the
+epix flag "--no-defaults", e.g.
+
+% epix --no-defaults -I/usr/local/include -L/usr/local/lib -lepix-0.6.5 file.c
+
 
 
 --- Contact Information ---

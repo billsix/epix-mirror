@@ -1,4 +1,6 @@
 #include "epix.h"
+using namespace ePiX;
+using namespace ePiX_contrib;
 
 triple corners[] = {P(-2,-3),P(-3,1),P(1,0),P(2,3),P(4,-2),P(-1,-1)};
 

@@ -3,7 +3,7 @@
 #include "epix.h"
 using namespace ePiX;
 
-main()
+int main()
 {
   unitlength("0.25in");
   picture(P(15,4));

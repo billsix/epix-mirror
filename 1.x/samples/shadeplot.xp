@@ -8,7 +8,7 @@ double x = 1/sqrt(k); // position of thin shaded region
 double dy = 0.25;     // for vertical distance between labels; kludgey
 
 double f(double t) { return sqrt(fabs(k)/(2*M_PI))*exp(-k*t*t); }
-P pt1 = P(x, f(x)+2*dy), pt2 = P(x+dx,f(x)+dy), pt3 = P(x+2*dx,f(x));
+P pt1 = P(x, f(x)+2*dy), pt2 = P(x+dx,f(x)+dy), pt3 = P(x+3*dx,f(x));
 
 int main() 
 {
@@ -24,14 +24,15 @@ int main()
   gray(0.6);     shadeplot(f, x, x+dx, 10);
   fill(false);
 
-  label(pt1, P(0,0), "$F(x)=\\displaystyle\\int_a^x f(t)\\,dt$", tr);
-  arrow(pt1, P(0.5*(x_min+x), 0.5*f(0.5*(x_min+x))));
+  arrow_camber(0.25);  arrow_fill(1);
+  arrow(pt1, P(0.5*(x_min+x), 0.5*f(0.5*(x_min+x))),
+        P(0,0), "$F(x)=\\displaystyle\\int_a^x f(t)\\,dt$", tr);
 
-  label(pt2, P(0,0), "Area of rectangle = $f(x)\\,dx$", tr);
-  arrow(pt2, P(x+0.5*dx, f(x)));
+  arrow(pt2, P(x+0.5*dx, f(x)), 
+        P(0,0), "Area of rectangle = $f(x)\\,dx$", tr);
 
-  label(pt3, P(0,0), "Area = $F(x+dx)-F(x)$", tr);
-  arrow(pt3, P(x+dx, 0.5*f(x+dx)));
+  arrow(pt3, P(x+dx, 0.5*f(x+dx)), 
+        P(0,0), "Area = $F(x+dx)-F(x)$", tr);
 
   bold();
   plot(f, x_min, x_max, 120);

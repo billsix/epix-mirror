@@ -21,6 +21,22 @@ Guido Gonzato		creating and maintaining the RPM
 Svend Daugaard Pedersen	the contrib package
 Andrew Sterian		Pyepix and its Windows package
 
+
+                        Ports contributors and maintainers:
+
+                        Fink
+Steve Bellenot
+
+                        FreeBSD
+Tsuguru Kato
+                        Gentoo
+Danny van Dyk
+Olivier Fisette
+Marcus Hanwell
+Peter Johanson
+Patrick Kursawe
+
+
 ----------------------------------------------------------------------
 
 Many thanks to the following people, who have helped publicize ePiX
@@ -48,6 +64,7 @@ Walter A. Kehowski
 
 Jacques L'helgoual
 
+Kevin McKormick
 Ross Moore
 
 Thorsten Riess

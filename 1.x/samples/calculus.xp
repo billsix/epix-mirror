@@ -21,6 +21,7 @@ int main()
   // Coordinate axes and labels
   h_axis(8);
   v_axis(4);
+  font_size("scriptsize");
 
   label(P(0,y_max), P(-4,0), "$2\\pi$", l);
   label(P(0,y_min), P(-4,0), "$-2\\pi$", l);

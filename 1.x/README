@@ -1,12 +1,12 @@
 ePiX -- README
 
-Last Change: September 11, 2004
+Last Change: January 06, 2005
 
 Please consult the following files as appropriate:
 
 INSTALL -- Detailed installation instructions
 README (this file) -- General overview and information
-README-changes -- Syntax changes to USER FILES (nearly obsolete)
+README-changes -- Changes visible to users (see also CHANGELOG)
 
 
 DESCRIPTION
@@ -55,19 +55,16 @@ options "-vv -h" (verbose help)
 
 DOCUMENTATION
 
-The "complete" package (as opposed to "src") includes documentation,
-and is highly recommended. All packages include sample files. The
-tutorial/manual and samples are installed in $EPIX_ROOTDIR/share, by
-default /usr/local/share.
+ePiX documentation is installed in $EPIX_ROOTDIR/share/doc, by default
+/usr/local/share/doc.
 
 The tutorial/manual, a complete description of ePiX's features and
-use, is installed in $EPIX_ROOTDIR/share/tutorial as PostScript (for
-printing) and hyperlinked PDF (for online reading).
+use, is installed as PostScript (for printing), hyperlinked PDF (for
+online reading), and as LaTeX sources (for study/archiving).
 
 The sample document consists of about two dozen figures, side-by-side
-with their source files, and is in $EPIX_ROOTDIR/share/samples. Unpack
-the tar file in a convenient directory, compile the document, and use
-the sample files for experimentation.
+with their source files, and is also installed as PostScript, PDF, and
+tarred LaTeX sources.
 
 
 INTERNET DOWNLOAD SITES
@@ -105,9 +102,9 @@ Worcester, MA, 01610-2395, USA
 
 PYEPIX
 
-Windows users may be more interested in Andrew Sterian's Pyepix
-package, an implementation of ePiX-0.8.9 in Python. Pyepix is
-available from
+Though ePiX can be compiled and run using CygWin, Windows users may be
+more interested in Andrew Sterian's Pyepix package, an implementation
+of ePiX-0.8.9 in Python. Pyepix is available from
 
   http://claymore.engineer.gvsu.edu/~steriana/Python/index.html
 

@@ -3,7 +3,7 @@
 #include "epix.h"
 using namespace ePiX;
 
-main()
+int main()
 {
   bounding_box(P(-2,-1), P(2,1));
   picture(P(200,100));

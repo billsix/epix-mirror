@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 24, 2004
+ * Version 1.0.2
+ * Last Change: December 31, 2004
  */
 
 /* 
@@ -217,6 +217,66 @@ namespace ePiX {
     P dir = P(1, m);
 
     Line(mean, mean+dir);
+  }
+
+
+  // Histogram plot
+  void histogram(const FILEDATA& data_columns, unsigned int column, 
+		 double low, double high, int subdivs, double v_scale)
+  {
+    std::vector<unsigned int> data_count(subdivs+2);
+    double step=(high-low)/subdivs; // length of subintervals
+
+    unsigned int num_entries = data_columns.at(0).size();
+    double curr, temp;
+
+    std::vector<vertex> data(num_entries);
+
+    // count data points in each bin
+    for (unsigned int i=0; i < num_entries; ++i)
+      try 
+	{
+	  curr = data_columns.at(column-1).at(i);
+	  if (curr < low)
+	    ++data_count.at(0);
+
+	  else
+	    {
+	      temp=low;
+
+	      unsigned int j=0;
+	      while ( (temp < curr) && (temp < high) )
+		{
+		  temp += step;
+		  ++j;
+		}
+	      ++data_count.at(j);
+	    }
+	}
+
+      catch (std::out_of_range) 
+	{
+	  epix_warning("Invalid column index");
+	  return;
+	}
+
+    // draw rectangles
+    for (unsigned int j=0; j < (unsigned int) subdivs+1; ++j)
+      if (data_count.at(j) > 0)
+	rect(P(low+(j-0.5)*step,0), 
+	     P(low+(j+0.5)*step, 
+	       data_count.at(j)*v_scale/(step*num_entries)));
+
+  } // end of histogram()
+
+  void histogram(const char* filename, int columns, unsigned int column, 
+		 double low, double high, int subdivs, double v_scale)
+  {
+    FILEDATA data_columns(columns);
+    read(filename, data_columns);
+
+    histogram(data_columns, column, low, high, subdivs, v_scale);
+    end_stanza();
   }
 
 } /* end of namespace */

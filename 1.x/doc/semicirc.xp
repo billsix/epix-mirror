@@ -6,7 +6,7 @@ double f(double x) { return sqrt(1-x*x); }
 double width = 0.6, height = f(width);
 double  posn = 0.5, y_posn = f(posn);
 
-main() {
+int main() {
   picture(P(2.5, 1.25));
   unitlength("1in");
   bounding_box(P(-1, 0), P(1, 1));

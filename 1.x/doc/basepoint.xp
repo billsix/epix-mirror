@@ -2,7 +2,7 @@
 #include "epix.h"
 using namespace ePiX;
 
-main() {
+int main() {
   bounding_box(P(0,0),P(3.75,1));
   unitlength("1pc");
   picture(3.75,1);

@@ -1,23 +1,27 @@
-# Makefile for ePiX v0.8.x
+# Makefile for ePiX v1.x
 #
-
-### Modify these lines as appropriate ###
-
-## Compiler ##
-CXX=g++
-#CXX=g++-2.95.3
-#CXX=g++-3.0.1
-#CXX=g++-3.2
-
-## Install directory: uncomment exactly one ##
-prefix=/usr/local
-#prefix=/opt/epix
-#prefix=$(HOME)
 
 ## ePiX is bash-centric; apologies if you're not... ##
 SHELL=/bin/bash
 
-############### Nothing below should require modification ###############
+
+##############################################################
+##############################################################
+########                                              ########
+########  Please edit the "config" file to configure  ########
+########                                              ########
+##############################################################
+##############################################################
+
+include ./config
+
+## Directories (full paths) -- assume names set by config ##
+bindir=${EPIX_ROOTDIR}/bin
+libdir=${EPIX_ROOTDIR}/lib
+hdrdir=${EPIX_ROOTDIR}/include
+mandir=${EPIX_MAN_PATH}
+shrdir=${EPIX_SHR_PATH}
+docdir=${EPIX_DOC_PATH}
 
 ## Binutils ##
 CFLAGS=-c -Wall
@@ -25,26 +29,47 @@ LINT=lint
 RANLIB=ranlib
 
 ## Miscellaneous commands ##
-CHMOD=chmod
-MKDIR=mkdir
 RM=rm -f
+LINK=ln -sf
 
-INSTALL=install
-INSTALL_BIN=${INSTALL} -m 755
-INSTALL_PROGRAM=${INSTALL} -m 644
+INSTALL_BIN=install -m 755
+INSTALL_DATA=install -m 644
 
-## Directories ##
-srcdir=.
 
-bindir=${prefix}/bin
-libdir=${prefix}/lib
-hdrdir=${prefix}/include
-mandir=${prefix}/man/man1
-shrdir=${prefix}/share/epix
+## Installed files ##
+EPIX_HDR=epix-$(EPIX_VERSION).h
+EPIX_LIB=libepix-$(EPIX_VERSION).a
 
-LEGACY_HDR=legacy.h
+# shell scripts
+ELAPS=elaps
+EPIX=epix
+FLIX=flix
+LAPS=laps
+
+KEYWORDS=keywords
+
+# docs, samples
+EPIX_MANUAL=epix-${EPIX_VERSION}_manual
+EPIX_MANUAL_TAR=${EPIX_MANUAL}_src.tar
+
+EPIX_SAMPLES=epix-${EPIX_VERSION}_sample
+EPIX_SAMPLES_TAR=${EPIX_SAMPLES}_src.tar
+
+EPIX_CONTRIB=epix-${EPIX_VERSION}_contrib
+EPIX_CONTRIB_TAR=${EPIX_CONTRIB}_src.tar
+
+EPIX_MAN=epix.1
+
+# notes, configs
+
+EPIX_CONFFILES=bash_completions config epix.ebuild epix.el epix.spec
+EPIX_NOTEFILES=BUGS CHANGELOG COPYING INSTALL POST-INSTALL \
+	README README-changes THANKS
 
 ## Source, object, and header files ##
+CONFIG=config
+EPIX_FCNS=epix_functions
+
 SRCS=triples.cc domain.cc segment.cc circle.cc lengths.cc camera.cc \
 	cropping.cc path.cc sphere.cc plane.cc output.cc Label.cc \
 	objects.cc curves.cc plots.cc dataplot.cc geometry.cc functions.cc
@@ -57,35 +82,19 @@ HDRS=globals.h triples.h domain.h map.h pairs.h segment.h circle.h lengths.h \
 	camera.h cropping.h path.h sphere.h plane.h output.h \
 	Label.h objects.h curves.h plots.h dataplot.h geometry.h functions.h
 
+# header groups for build deps
 GLOBALS=globals.h triples.h functions.h map.h pairs.h
 OUTPUTS=camera.h cropping.h lengths.h output.h 
 OBJECTS=Label.h sphere.h segment.h circle.h plane.h objects.h
 PATHS=domain.h path.h curves.h plots.h dataplot.h
 
-## Installed files ##
-# Main wrapper script
-EPIX=epix
-EPIX_HDR=epix.h
-EPIX_LIB=libepix.a
-EPIX_MAN=epix.1
-
-# bash script to convert latex to Postscript
-LAPS=laps
-# convert epix/eepic files to encapsulated Postscript
-ELAPS=elaps
-# convert epix files to mng animation
-FLIX=flix
-
-# lookup script for C/C++ keywords
-KEYWORDS=keywords
 
 ## Targets ##
+:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(ELAPS) $(FLIX) $(LAPS)
 
-:	$(EPIX_LIB) $(EPIX) $(EPIX_HDR)
+all:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(ELAPS) $(FLIX) $(LAPS)
 
-all:	$(EPIX_LIB) $(EPIX) $(EPIX_HDR)
-
-libepix.a:	$(OBJS)
+$(EPIX_LIB):	$(OBJS)
 	ar -ru $(EPIX_LIB) $(OBJS)
 	$(RANLIB) $(EPIX_LIB)
 
@@ -147,64 +156,126 @@ geometry.o:	geometry.cc $(GLOBALS) $(OUTPUTS) $(OBJECTS) $(PATHS) \
 functions.o:	functions.cc $(GLOBALS) functions.h
 	$(CXX) $(CFLAGS) functions.cc
 
-epix.h:	$(HDRS)
+$(EPIX_HDR):	$(HDRS) $(CONFIG)
 	@./make_header
 
-epix:	prepix
-	@export EPIX_ROOTDIR=${prefix} && \
-	export EPIX_CXX=${CXX} && \
-	export EPIX_SCRIPT=$(EPIX) && \
-	./prepix && chmod 755 $(EPIX)
+$(ELAPS):	make_elaps $(EPIX_FCNS) $(CONFIG)
+	@./make_elaps
 
-flix:	preflix
-	@export EPIX_ROOTDIR=${prefix} && \
-	export EPIX_CXX=${CXX} && \
-	export FLIX_SCRIPT=$(FLIX) && \
-	./preflix && chmod 755 $(FLIX)
+$(EPIX):	make_epix $(EPIX_FCNS) $(CONFIG)
+	@./make_epix
 
-contrib:	$(EPIX_LIB) $(EPIX_HDR)
-	cd contrib; make contrib
+$(FLIX):	make_flix $(EPIX_FCNS) $(CONFIG)
+	@./make_flix
 
-legacy:	$(EPIX_HDR) $(LEGACY_HDR)
-	@echo "Making legacy target. DO NOT use legacy features in new files!"
-	@cat $(LEGACY_HDR) | grep -v "\#if" | grep -v "include \"" \
-	| grep -v endif >> $(EPIX_HDR)
+$(LAPS):	make_laps $(EPIX_FCNS) $(CONFIG)
+	@./make_laps
+
+contrib:	$(EPIX_LIB)
+	@-$(RM) epix.h $(EPIX_HDR)
+	@./make_header
+	@$(LINK) $(EPIX_HDR) epix.h
+	@$(LINK) $(EPIX_LIB) libepix.a
+	cd contrib; make contrib; cd ..
+	make contrib-doc
+
+#legacy:	$(EPIX_HDR) $(LEGACY_HDR)
+#	@echo "Making legacy target. DO NOT use legacy features in new files!"
+#	@cat $(LEGACY_HDR) | grep -v "\#if" | grep -v "include \"" \
+#	| grep -v endif >> $(EPIX_HDR)
 
 
-test:	$(EPIX_LIB) $(EPIX) $(EPIX_HDR) $(FLIX)
-	@export EPIX_ROOTDIR="${prefix}" && export EPIX_CXX=${CXX} && \
-		./helpfiles.sh --test
+doc:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
+	@./helpfiles.sh --doc
 
-install:$(EPIX_LIB) $(EPIX) $(EPIX_HDR) $(FLIX)
-	@echo -n "Preparing samples and documentation..."
-	@if [ ! -d ${prefix} ]; then $(MKDIR) ${prefix}; fi
-	@export EPIX_ROOTDIR="${prefix}" && ./pre-install.sh
-	@export EPIX_ROOTDIR="${prefix}" && ./helpfiles.sh --install
-	@echo "done"
-	$(INSTALL_PROGRAM) $(EPIX_HDR) ${hdrdir}/$(EPIX_HDR)
-	$(INSTALL_PROGRAM) $(EPIX_LIB) ${libdir}/$(EPIX_LIB)
-	$(INSTALL_PROGRAM) $(EPIX_MAN) ${mandir}/$(EPIX_MAN)
+samples:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
+	@./helpfiles.sh --samples
+
+contrib-doc:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
+	@./helpfiles.sh --contrib-doc
+
+test:	
+	@make doc samples
+
+install:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(FLIX) $(ELAPS) $(LAPS)
+	@./pre-install.sh
+
+	$(INSTALL_DATA) $(EPIX_HDR) ${hdrdir}/$(EPIX_HDR)
+	$(INSTALL_DATA) $(EPIX_LIB) ${libdir}/$(EPIX_LIB)
+
 	$(INSTALL_BIN) $(EPIX) ${bindir}/$(EPIX)
 	$(INSTALL_BIN) $(LAPS) ${bindir}/$(LAPS)
 	$(INSTALL_BIN) $(ELAPS) ${bindir}/$(ELAPS)
 	$(INSTALL_BIN) $(FLIX) ${bindir}/$(FLIX)
 	$(INSTALL_BIN) $(KEYWORDS) ${bindir}/$(KEYWORDS)
 
+	$(INSTALL_DATA) ${EPIX_NOTEFILES} ${EPIX_NOTE_PATH}
+	$(INSTALL_DATA) ${EPIX_CONFFILES} ${EPIX_CONF_PATH}
+	$(INSTALL_DATA) $(EPIX_MAN) ${mandir}/$(EPIX_MAN)
+
+	$(INSTALL_DATA) \
+		${EPIX_MANUAL}.ps.gz \
+		${EPIX_MANUAL}.pdf.gz \
+		${EPIX_MANUAL_TAR}.gz ${EPIX_DOC_PATH}
+
+	$(INSTALL_DATA) \
+		${EPIX_SAMPLES}.ps.gz \
+		${EPIX_SAMPLES}.pdf.gz \
+		${EPIX_SAMPLES_TAR}.gz ${EPIX_DOC_PATH}
+
+	$(RANLIB) ${libdir}/$(EPIX_LIB)
+	$(LINK) ${hdrdir}/$(EPIX_HDR) ${hdrdir}/epix.h
+	$(LINK) ${libdir}/$(EPIX_LIB) ${libdir}/libepix.a
+
+	$(INSTALL_DATA) ${EPIX_CONTRIB_TAR}.gz ${EPIX_DOC_PATH}
+
+doc-clean:
+	@-$(RM) $(LAPS) doc/*.{c,dvi,log} doc/{koch,plot_?,torus}.eepic \
+	doc/{epix.h,libepix.a} epix-*manual*.gz
+
+samples-clean:
+	@-$(RM) $(LAPS) samples/*.{c,dvi,eepic,log,tex} \
+	samples/{epix.h,libepix.a} epix-*sample*.gz
+
+contrib-doc-clean:
+	@-$(RM) epix-*contrib*.gz doc/contrib/*.{dvi,eepic,log}
+
 clean:
-	@-$(RM) $(OBJS) $(LEGACY_OBJ) $(EPIX_LIB) $(EPIX) $(FLIX) \
-	$(EPIX_HDR) sample.{dvi,ps} samples/{*.eepic,sample.{dvi,log,tex}}
+	@-$(RM) $(OBJS)	epix.h libepix.a \
+	$(EPIX_LIB) $(EPIX) $(FLIX) $(ELAPS) $(LAPS) $(EPIX_HDR)
+	make doc-clean
+	make samples-clean
+	make contrib-doc-clean
 	cd contrib; make clean
 
 uninstall:
-	@echo -n "Uninstalling..."
-	@-$(RM)	${hdrdir}/$(EPIX_HDR) \
+	@echo "Uninstalling ePiX-$(EPIX_VERSION)"
+	@-$(RM)	${hdrdir}/epix.h \
+		${libdir}/libepix.a \
+		${hdrdir}/$(EPIX_HDR) \
 		${libdir}/$(EPIX_LIB) \
 		${mandir}/$(EPIX_MAN) \
+		${shrdir}/{config,notes}/* \
+		${docdir}/epix-$(EPIX_VERSION)* \
 		${bindir}/$(EPIX) \
 		${bindir}/$(LAPS) \
 		${bindir}/$(ELAPS) \
 		${bindir}/$(FLIX) \
 		${bindir}/$(KEYWORDS)
-	@export EPIX_ROOTDIR="${prefix}" && ./helpfiles.sh --uninstall
-	@export EPIX_ROOTDIR="${prefix}" && ./post-uninst.sh
+	@./post-uninst.sh
+
+
+uninstall-all:
+	@echo -n "Uninstalling all versions of ePiX..."
+	@-$(RM)	${hdrdir}/epix*.h \
+		${libdir}/libepix*.a \
+		${mandir}/$(EPIX_MAN) \
+		${shrdir}/{config,notes}/* \
+		${docdir}/epix-* \
+		${bindir}/$(EPIX) \
+		${bindir}/$(LAPS) \
+		${bindir}/$(ELAPS) \
+		${bindir}/$(FLIX) \
+		${bindir}/$(KEYWORDS)
+	@./post-uninst.sh
 	@echo "done. Sorry it didn't work out."

@@ -1,4 +1,6 @@
 #include "epix.h"
+using namespace ePiX;
+using namespace ePiX_contrib;
 
 static char* xlabels[] = {"-2","-1","","1","2","3",NULL};
 static char* ylabels[] = {"-1","","1","2","3","4",NULL};

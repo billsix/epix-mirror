@@ -1,10 +1,11 @@
 /*
  * Extensions to ePiX made by 
  *
- *    Svend Daugaard Pedersen
- *    mail: Svend@DaugaardPedersen.dk 
+ *    Svend Daugaard Pedersen 
+ *    mail: rot 13 Siraq at DnhtnneqPrqrefra dot qx
  *
- *    Andrew D. Hwang <ahwang@mathcs.holycross.edu>
+ *    Andrew D. Hwang 
+ *    mail: rot 13 nujnat at zngupf dot ubylpebff dot rqh
  *    Re-write for Version 0.8.x
  *
  * Changes:

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 16, 2004
+ * Version 1.0.2
+ * Last Change: December 31, 2004
  */
 
 /* 
@@ -88,6 +88,26 @@ namespace ePiX {
   // same, in math mode
   template<class T>void epix_math_grouping(T arg)
     { cout << "{$" << arg << "$}"; }
+
+  // label txt, with font information
+  template<class T>void epix_label_text(T arg)
+    { 
+      cout << '{';
+      if ( epix::fontsize != "normalsize" )
+	{
+	  cout << '\\' << epix::fontsize << " ";
+	}
+
+      if ( epix::fontface != "default" )
+	cout << "\\text" << epix::fontface << '{';
+
+      cout << arg;
+
+      if ( epix::fontface != "default" )
+	cout << '}';
+
+      cout << '}'; 
+    }
 
   inline void epix_neg(void)      { cout << "\\phantom{-}"; }
 

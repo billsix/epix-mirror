@@ -19,7 +19,7 @@ P P2 = P(1,    -1.25, -0.75);
 P P3 = P(0.5,  -1.5,  -0.5 );
 P midpt = (1.0/3)*(P1+P2+P3);
 
-main() {
+int main() {
   bounding_box(P(-3.5,-2.5),P(3.5,2.5));
   unitlength("0.375in");
   picture(P(7,5));

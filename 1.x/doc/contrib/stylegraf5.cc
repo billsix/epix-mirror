@@ -1,4 +1,7 @@
 #include "epix.h"
+using namespace ePiX;
+using namespace ePiX_contrib;
+
 #include <math.h>
 
 int main()

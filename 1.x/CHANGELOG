@@ -2,6 +2,49 @@ ePiX -- CHANGELOG
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
+January 02-06, 2005 (v1.0.3)
+ * (New file: config) Configurable parts of the old Makefile
+  - Install paths conform to the Filesystem Hierarchy Standard
+  - No environment variables passed by Makefile during build
+ * (New files: make_{elaps,epix,flix,laps}) 
+  - Create all shell scripts at build
+ * epix, elaps, laps re-written
+  - (All) Can compile multiple files in one run
+  - (epix) Output file specified by -o option, not as final argument
+  - (elaps) Size option (for 10, 11, or 12-pt document)
+  - (laps) Compile with any of tex, latex, pslatex, pdftex, pdflatex
+ * (Makefile, make_header, pre-install.sh, post-uninst.sh, helpfiles.sh)
+  (Un)install process re-written:
+  - New targets (doc, doc-clean, samples, samples-clean, uninstall-all)
+  - Makefile handles cleanup (instead of relying on helpfiles.sh)
+  - Compiled tutorial, samples, and tarred source files in doc/epix
+  - Header and lib files' names contain version number, and are symlinked
+
+December 31, 2004 (v1.0.2)
+ * (dataplot.*, samples/extras) Histogram functions
+ * (globals.h, objects.cc, output.*, Label.cc) 
+  - Font size and face
+  - Rename arrowhead parameters
+ * (curves.*) Quad/cubic spline arrows
+
+December 26, 2004 (v1.0.1)
+ * (objects.*) 
+  - Basic markers (circ, dot, box, etc.) accept label arguments
+  - Labeled arrows
+ * (globals.h, objects.cc) 
+  - Move arrowhead parameters to epix::
+  - Add "camber" parameter (indentation at base of arrowhead)
+ * (curves.*) Use arrowhead parameters
+ * (samples/*) Miscellaneous updates
+
+December 19, 2004
+ * (globals.h, plots.*) Riemann sums (LEFT, RIGHT, UPPER, LOWER, TRAP, MIDPT)
+
+November 14, 2004
+ * (doc/) Several .xp files
+  - Declare main() to return int (Kevin McCormick)
+  - Miscellaneous syntax updates
+
 September 11, 2004 (v1.0.0)
  * (helpfiles.sh) Install tutorial/manual as pdf (and ps)
  * (README-authors) File removed
@@ -360,7 +403,7 @@ April 22, 2003 (v0.8.10rc8)
  * (samples/) Extensive reworking, new sample files
 
 April 21, 2003
- * (triples.h, camera.cc) Orthognalization denoted "%" 
+ * (triples.h, camera.cc) Orthogonalization denoted "%" 
  * (objects.*) 
    - New functions draw_polygon (data only), polyline(open)
    - polygon() draws closed polygon

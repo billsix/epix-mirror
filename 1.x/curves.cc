@@ -4,12 +4,13 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.0
- * Last Change: September 03, 2004
+ * Version 1.0.3
+ * Last Change: January 05, 2005
+ *
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -241,17 +242,18 @@ namespace ePiX {
 
 
   // Arrows joining two specified <P>s. An arrow consists of a head
-  // and a shaft; the head is a cone 2*width true points wide and width*ratio
-  // true points high (in perpendicular), while the shaft is long enough to
-  // join the <tail> to <base> (see below). If the projection of the arrow
-  // is so short that the <tail> would be inside the arrowhead (with head
-  // at <tip3>), the shaft is not drawn. 
+  // and a shaft; the head is a quadrilateral 2*width true points wide,
+  // width*ratio true points high (in perpendicular), and with an undercamber
+  // as specified in globals.h. The shaft is long enough to join the <tail>
+  // to <base> (see below). If the projection of the arrow is so short that
+  // the <tail> would be inside the arrowhead (with head at <tip3>), the 
+  // shaft is not drawn. 
   //
   // Vertices of arrow:
   //
-  //                       <tip1>
+  //                     <tip1>
   // <tail> ====shaft====  <base>    <tip3> (aka <head>)
-  //                       <tip2>
+  //                     <tip2>
   //
   // Some of the points defining an arrowhead must be computed from true 
   // coords, since the aspect ratio of a figure is not generally unity. 
@@ -262,10 +264,10 @@ namespace ePiX {
   //    camera.eye and the Cartesian direction vector; call this cos_theta.
   //
   // (2) If the true length of the printed arrow is less than the height of 
-  //    a tilted arrowhead, put <base> at <tail> and do not draw the shaft.
-  //    Otherwise, put <tip3> at <head> and calculate <base> so that
-  //    <tip3 - base> projects to a vector of true length width*ratio*sin_theta
-  //    in the screen plane.
+  //    a tilted arrowhead, put <stem> at <tail> and do not draw the shaft.
+  //    Otherwise, put <tip3> at <head> and calculate <stem> so that
+  //    <tip3 - stem> projects to a vector of true length width*ratio*sin_theta
+  //    in the screen plane. Place <base> at <stem> plus camber.
   //
   // (3) Find a vector in page coordinates that is perpendicular to the
   //    <direction> and is 2 true pt long. Lift to object space, using the
@@ -290,14 +292,16 @@ namespace ePiX {
   void arrow(const P tail, const P head, double scale)
   {
     // may assume head-tail is not the zero vector in object/screen
-    double ratio=EPIX_ARROWHEAD_RATIO;
-    double width = EPIX_ARROWHEAD_WIDTH*fabs(scale);
+    double ratio = epix::get_arrow_ratio();
+    double width = epix::get_arrow_width()*fabs(scale);
+    double dens  = epix::get_arrow_fill();
 
-    P tip1, tip2, tip3, base;
+    P tip1, tip2, tip3, base, stem;
     P object_dir = head - tail;
     double cos_theta = (object_dir|camera.eye())/norm(object_dir);
     double sin_theta = sqrt(1 - cos_theta*cos_theta);
     double arrowhead_height = sin_theta*width*ratio; // in true pt
+    double camber = arrowhead_height*epix::get_arrow_camber();
 
     pair screen_dir = camera(head) - camera(tail);
     pair picture_dir = c2s(screen_dir);
@@ -308,14 +312,16 @@ namespace ePiX {
     if (arrowhead_height  < true_sep) // <tail> outside arrowhead
       {
 	tip3 = head;
-	base = tip3 - arrowhead_height*object_unit;
+	stem = tip3 - arrowhead_height*object_unit;
       }
 
     else // <tail> inside arrowhead
       {
-	base = tail;
-	tip3 = base + arrowhead_height*object_unit;
+	stem = tail;
+	tip3 = stem + arrowhead_height*object_unit;
       }
+
+    base = stem + camber*object_unit;
 
     // compute page normals in object coordinates
     // 1 true pt, in picture coords
@@ -326,20 +332,22 @@ namespace ePiX {
     P object_perp = ((screen_perp.x1())*camera.sea()) +
       ((screen_perp.x2())*camera.sky());
 
-    tip1 = base + width*object_perp;
-    tip2 = base - width*object_perp;
+    tip1 = stem + width*object_perp;
+    tip2 = stem - width*object_perp;
 
     line(tail, base);
     epix_path_style TEMP = epix::path_style(); // save path style
     solid();
-    triangle(tip1, tip2, tip3);
+    if (dens != 0)
+      std::cout << "\n\\special{sh " << dens << "}%";
+
+    polygon(4, &base, &tip1, &tip3, &tip2).draw();
     // restore path style
     if (TEMP == DASHED)
       dashed();
     else if (TEMP == DOTTED)
       dotted();
   }
-
 
 
   // Standard half-ellipse functions
@@ -371,7 +379,7 @@ namespace ePiX {
   // Angle subtended by arrowhead at Cartesian distance r
   static double subtended(double r, double scale)
   {
-    return scale*EPIX_ARROWHEAD_WIDTH*EPIX_ARROWHEAD_RATIO/arc_scale(r);
+    return scale*epix::get_arrow_width()*epix::get_arrow_ratio()/arc_scale(r);
   }
 
   void arc_arrow(const P center, const double r, 
@@ -400,12 +408,50 @@ namespace ePiX {
     data.draw();
   }
 
+  // spline arrowhead
+  static void sparrowhead(P tail, P head, double scale=1)
+  {
+    double ratio = epix::get_arrow_ratio();
+    double width = epix::get_arrow_width()*fabs(scale);
+
+    P object_dir = head - tail;
+
+    double cos_theta = (object_dir|camera.eye())/norm(object_dir);
+    double sin_theta = sqrt(1 - cos_theta*cos_theta);
+    double ht = sin_theta*width*ratio; // in true pt
+
+    pair screen_dir = camera(head) - camera(tail);
+    pair picture_dir = c2s(screen_dir);
+    double true_sep = true_length(picture_dir); // in true pt
+
+    P object_unit = (1.0/true_sep)*object_dir; // projects to 1 true pt
+
+    arrow(head-ht*object_unit, head, scale);
+  }
+
+  void arrow(const P p1, const P p2, const P p3, double scale)
+  {
+    path data(p1, p2, p3, EPIX_NUM_PTS);
+    data.draw();
+    // hack to align arrowhead when spline is highly curved
+    double wt=0.95; // Hardwired constant 0.95
+    sparrowhead(wt*p2+(1-wt)*p1, p3, scale);
+  }
+
   // cubic spline
   void spline(const P p1, const P p2, 
 	      const P p3, const P p4, int num_pts)
   {
     path data(p1, p2, p3, p4, num_pts);
     data.draw();
+  }
+
+  void arrow(const P p1, const P p2, const P p3, const P p4, double scale)
+  {
+    path data(p1, p2, p3, p4, EPIX_NUM_PTS);
+    data.draw();
+    double wt=0.95; // Hardwired constant 0.95
+    sparrowhead(wt*p3+(1-wt)*p2, p4, scale);
   }
 
 

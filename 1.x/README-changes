@@ -1,5 +1,28 @@
 ePiX -- README-changes
 
+January 05, 2005
+
+Starting with Version 1.0.3, ePiX (epix and elaps) can be used with
+multiple versions of the library, allowing "legacy" files to be
+compiled "natively". Please see the manual for details.
+
+As currently conceived, epix-2.x would overlap substantially with the
+Asymptote project. Development will continue on 1.x, and the scattered
+code for 2.x will probably be incorporated in 1.x
+
+As of Version 1.0.3, pre-compile configuration is handled in the text
+file "config", NOT by the Makefile. Variables mentioned below are
+defined in config.
+
+* Primary documentation is placed in $EPIX_ROOTDIR/share/doc/epix
+ - epix-${EPIX_VERSION}_manual.{pdf,ps}, epix-${EPIX_VERSION}_manual_src.tar
+ - epix-${EPIX_VERSION}_sample.{pdf,ps}, epix-${EPIX_VERSION}_sample_src.tar
+
+* Secondary documentation is placed in $EPIX_ROOTDIR/share/man/man1
+
+The directories $EPIX_ROOTDIR/share/epix/{samples,tutorial} are obsolete.
+
+
 September 11, 2004
 
 Further development will focus on epix-2.x (The Next Generation), so
