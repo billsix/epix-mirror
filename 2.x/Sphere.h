@@ -1,13 +1,13 @@
 /***
- *** Enums.h -- ePiX2 enumerated types
+ ***  Sphere.h -- epix2::Sphere class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality
- *** line figures in LaTeX
+ *** This file is part of ePiX, a preprocessor for creating high-quality 
+ *** line figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 27, 2005
+ *** Last Change: July 23, 2005
  ***
- ***
+ *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
  *** Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *** Department of Mathematics and Computer Science
@@ -28,31 +28,50 @@
  *** You should have received a copy of the GNU General Public License
  *** along with ePiX; if not, write to the Free Software Foundation, Inc.,
  *** 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ ***
  ***/
 
-#ifndef EPIX2_ENUMS
-#define EPIX2_ENUMS
+#ifndef EPIX2_SPHERE
+#define EPIX2_SPHERE
+
+#include <iostream>
+#include "Point.h"
+#include "Vector.h"
+#include "Object.h"
 
 namespace ePiX2 {
 
-  enum epix2_screen_shape { MASK_RECT, MASK_ELLIPSE, MASK_DIAMOND };
+  /* * * Sphere.h * * */
 
-  // subset of those provided by xcolor
-  enum epix2_color_model {rgb, cmy, cmyk, hsb, gray, natural};
+  class Sphere : public Shape {
 
-  enum epix2_shade_type {SHADE_NONE, SHADE_SOLID, SHADE_FLAT};
+  public:
 
-  enum epix2_align_type {none, c, r, tr, rt, t, tl, lt, l, bl, lb, b, br, rb};
+    Sphere(const Point& ctr=Origin, double rad=1);
 
-  enum epix2_mark_type {MK_PATH, MK_CIRC, MK_SPOT, MK_RING, 
-			MK_DOT, MK_DDOT, MK_PLUS, MK_OPLUS,
-			MK_TIMES, MK_OTIMES, MK_DIAMOND, 
-			MK_UP, MK_DOWN, MK_BOX, MK_BBOX,
-			MK_HTICK, MK_VTICK, MK_TEXT};
+    Sphere(const Point& ctr, double rad, const Basis& orient);
 
-  // type field for Pair Camera::operator(Point)
-  enum epix2_lens_type { orthogonal, perspective, fisheye, bubble };
+    // translation
+    Sphere& operator+= (const Vector&);
+    void move_to(const Point&);
+
+    // scale
+    Sphere& operator*= (const double);
+    void scale (const double arg);
+
+    void rotate(const double angle, const Vector& axis);
+
+    void shatter(Picture& world, int n1, int n2) const;
+    void shatter(Picture& world) const { shatter(world, 16, 16); }
+
+  private:
+
+    Point center;
+    double radius;
+    Basis my_orientation;
+
+  }; // end of class Sphere
 
 } /* end of namespace */
 
-#endif /* EPIX2_ENUMS */
+#endif /* EPIX2_SPHERE */

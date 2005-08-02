@@ -1,0 +1,49 @@
+#!/bin/bash
+#
+OUTPUT_FILE=epix2.h
+
+HEADERS="Enums.h Errors.h Constants.h Color.h Functions.h Pair.h Point.h \
+         Edge.h Domain.h Mapping.h Screen.h Tile.h \
+         Vector.h Basis.h Hiding.h Camera.h Object.h \
+         Segment.h Triangle.h Quad.h Sphere.h Disk.h Picture.h"
+
+#HEADERS="Enums.h Errors.h Constants.h Pair.h Point.h Functions.h \
+#         Vector.h Segment.h Circle.h Picture.h"
+
+cat <<HEADER_HEADER > $OUTPUT_FILE
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\\
+ * $OUTPUT_FILE -- Automatically created on $(date)  *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#ifndef EPIX2_HEADER_FILE
+#define EPIX2_HEADER_FILE
+
+#include <iostream>
+#include <sstream>
+#include <list>
+#include <vector>
+#include <set>
+#include <cstdlib>
+#include <cmath>
+
+namespace ePiX2 {
+
+  class Point;
+  class Tile;
+  class Glyph;
+  class Outline;
+  class Region;
+  class Picture;
+
+HEADER_HEADER
+
+cat $HEADERS | grep -v "\#if" | grep -v "\*\*\*" | grep -v "\#include" \
+    | grep -v "\#define EPIX2" | grep -v "endif" | grep -v "namespace" \
+    | grep -v "const char \*epix_version" >> $OUTPUT_FILE
+
+echo    "  Screen& page = Screen::the_page;" >> $OUTPUT_FILE
+echo -e "  Mapping& Id=Mapping::Identity;\n}"   >> $OUTPUT_FILE
+
+echo    "#endif // EPIX2_HEADER_FILE" >> $OUTPUT_FILE
+
+exit 0;

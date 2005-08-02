@@ -1,13 +1,13 @@
 /***
- *** Enums.h -- ePiX2 enumerated types
+ ***  Quad.h -- epix2::Quad class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality
- *** line figures in LaTeX
+ *** This file is part of ePiX, a preprocessor for creating high-quality 
+ *** line figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 27, 2005
+ *** Last Change: July 28, 2005
  ***
- ***
+ *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
  *** Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *** Department of Mathematics and Computer Science
@@ -28,31 +28,41 @@
  *** You should have received a copy of the GNU General Public License
  *** along with ePiX; if not, write to the Free Software Foundation, Inc.,
  *** 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+ ***
  ***/
 
-#ifndef EPIX2_ENUMS
-#define EPIX2_ENUMS
+#ifndef EPIX2_QUAD
+#define EPIX2_QUAD
+
+#include "Point.h"
+#include "Basis.h"
+#include "Object.h"
 
 namespace ePiX2 {
 
-  enum epix2_screen_shape { MASK_RECT, MASK_ELLIPSE, MASK_DIAMOND };
+  /* * * Quad.h * * */
 
-  // subset of those provided by xcolor
-  enum epix2_color_model {rgb, cmy, cmyk, hsb, gray, natural};
+  class Quad : public Shape {
 
-  enum epix2_shade_type {SHADE_NONE, SHADE_SOLID, SHADE_FLAT};
+  public:
 
-  enum epix2_align_type {none, c, r, tr, rt, t, tl, lt, l, bl, lb, b, br, rb};
+    // TO DO: Test for coplanarity
+    Quad(const Point& v0, const Point& v1, const Point& v2, const Point& v3)
+      : vtx0(v0), vtx1(v1), vtx2(v2), vtx3(v3) { }
 
-  enum epix2_mark_type {MK_PATH, MK_CIRC, MK_SPOT, MK_RING, 
-			MK_DOT, MK_DDOT, MK_PLUS, MK_OPLUS,
-			MK_TIMES, MK_OTIMES, MK_DIAMOND, 
-			MK_UP, MK_DOWN, MK_BOX, MK_BBOX,
-			MK_HTICK, MK_VTICK, MK_TEXT};
+    bool hides(const Point vpt, const Point X);
 
-  // type field for Pair Camera::operator(Point)
-  enum epix2_lens_type { orthogonal, perspective, fisheye, bubble };
+    void shatter(void);
+
+  private:
+
+    Point vtx0;
+    Point vtx1;
+    Point vtx2;
+    Point vtx3;
+
+  }; // end of class Quad
 
 } /* end of namespace */
 
-#endif /* EPIX2_ENUMS */
+#endif /* EPIX2_QUAD */
