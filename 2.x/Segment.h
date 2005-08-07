@@ -1,8 +1,8 @@
 /* 
  *  Segment.h -- epix2::Segment class
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
  * Last Change: August 01, 2005
@@ -34,7 +34,7 @@
 
 /*
  *   This file provides:
- *     - The Segment class (derived from Shape) and operators
+ *     - The Segment class (derived from Object) and operators
  */
 
 
@@ -46,7 +46,7 @@
 
 namespace ePiX2 {
 
-  class Segment : public Shape {
+  class Segment : public Object {
 
   public:
     Segment(const Point arg=Origin) : vtx0(Origin), vtx1(arg) { }

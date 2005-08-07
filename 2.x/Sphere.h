@@ -41,7 +41,7 @@ namespace ePiX2 {
 
   /* * * Sphere.h * * */
 
-  class Sphere : public Shape {
+  class Sphere : public Object {
 
   public:
 

@@ -5,7 +5,7 @@
  *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: August 03, 2005
+ *** Last Change: August 07, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -47,7 +47,7 @@
 namespace ePiX2 {
   class Pair;   /***/
   class Point;  /***/
-  class Object; /***/
+  class Object_Base; /***/
   class Shard;  /***/
   class Tile;   /***/
   class Layer;  /***/
@@ -64,9 +64,9 @@ namespace ePiX2 {
       ~Picture(void); // delete shards
 
       // modify scenery
-      Picture& operator<< (Object&);
-      //      void add(Object*);
-      void empty(void); // clear all Objects
+      Picture& operator<< (Object_Base&);
+      //      void add(Object_Base*);
+      void empty(void); // clear all Object_Bases
 
       void clip(void);
       void noclip(void);
@@ -76,9 +76,9 @@ namespace ePiX2 {
       void import(Picture& world, const Pair& arg1, const Pair& arg2);
 
       // map scenery to screen
-      void expose(epix2_shade_type shaded=SHADE_SOLID); // face-normal shading
-      void flash(void) { expose(SHADE_FLAT); }
-      void x_ray(void) { expose(SHADE_NONE); } // edges only, no hiding
+      void photo(epix2_shade_type shaded=SHADE_SOLID); // face-normal shading
+      void flash(void) { photo(SHADE_FLAT); } // flat shading
+      void x_ray(void) { photo(SHADE_NONE); } // edges only, no hiding
 
       void print(void); // map screen to page
       void draw(Tile*); // draw directly in screen
@@ -119,14 +119,14 @@ namespace ePiX2 {
       Camera camera;
       Screen screen;
 
-      std::list<Object*> scenery;
+      std::list<Object_Base*> scenery;
 
       Layer* shards; // binary space partition tree root
 
       //      void merge(Layer*);
 
-      void remove_backfaces(Object*);
-      void set_shard_distance(Object*); // compute min/max dist to viewer
+      void remove_backfaces(Object_Base*);
+      void set_shard_distance(Object_Base*); // compute min/max dist to viewer
 
       void clear_shard_tree(void);
       void build_shard_tree(void);

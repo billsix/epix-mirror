@@ -3,14 +3,20 @@ using namespace ePiX2;
 
 //#define TRIANGLES     // an octahedron with retracted faces
 //#define TETRAHEDRA    // two complementary regular tetrahedra
-//#define DISK_TEST     // stack of disks
-//#define CIRC_TEST     // bouquet of circles
-//#define POLYGON_TEST  // a cube and octahedron
+
+//#define POLYGON_TEST  // manual cube/octahedron, can be "imploded"
 //#define IMPLODE_FACES // use in conjunction with POLYGON_TEST
 //#define POLYGON2_TEST // 3 golden rectangles
-//#define SPHERE_TEST
-//#define CUBE_TEST     // 3 intersecting cubes
-#define BLOCK_TEST    // miscellaneous boxes
+
+//#define DISK_TEST     // stack of disks
+//#define CIRC_TEST     // bouquet of circles
+
+//#define SPHERE_TEST   // ugly...
+
+//#define CUBE3_TEST    // 3 intersecting cubes
+//#define CUBE5_TEST    // 5 intersecting cubes
+//#define CUBE_OCTA     // polyhedral cube and octahedron
+#define OCTAHEDRA
 
 #define FACE_COLOR
 #define EDGE_COLOR
@@ -44,7 +50,7 @@ int main() {
   world.view_from(20, 10, 6);
 #endif
 
-#ifdef CUBE_TEST
+#ifdef CUBE3_TEST
 
   Cube block0, block1, block2, block3;
 
@@ -68,42 +74,43 @@ int main() {
 
   world << block1 << block2 << block3 << block0;
 
-#endif // CUBE_TEST
+#endif // CUBE3_TEST
 
 
-#ifdef BLOCK_TEST
+#ifdef CUBE5_TEST
 
-  Cube block0(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
-  Cube block1(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
-  Cube block2(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
-  Cube block3(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
+  Cube block0, block1, block2, block3, block4, block5;
 
 #ifdef FACE_COLOR
-  block0.rgb(0.5, 0.4, 0.3);
-  block1.red(0.8);
-  block2.rgb(0.9, 0.7, 0.5);
-  block3.rgb(0.7, 0.6, 0.5);
+  double r=0.7, g=0.6, b=0.5; // (0.9, 0.7, 0.5), (0.7, 0.6, 0.5);
+
+  block0.red(0.8);
+  block1.rgb(r, g, b);
+  block2.rgb(r, g, b);
+  block3.rgb(r, g, b);
+  block4.rgb(r, g, b);
+  block5.rgb(r, g, b);
 #endif
 
 #ifdef EDGE_COLOR
-  block0.red0(0.8);
-  block1.red0(0.8);
+  block0.yellow0();
+  block1.yellow0();
   block2.yellow0();
   block3.yellow0();
+  block4.yellow0();
+  block5.yellow0();
 #endif
 
-  block0.rotate(90, E_3());
-  block2.rotate(90, E_3());
-  block0.rotate(30, Vector(Origin, 1, 1, 1));
-  block1.rotate(60, Vector(Origin, -1, 1, 1));
-  block2.rotate(60, Vector(Origin, 1, -1, 1));
-  block3.rotate(60, Vector(Origin, 1, 1, -1));
+  Vector axis(Origin, 1, 0.5*(1+sqrt(5)), 0);
 
-  block2 += 0.5*E_1();
+  block1.rotate(72, axis);
+  block2.rotate(144, axis);
+  block3.rotate(216, axis);
+  block4.rotate(288, axis);
 
-  world << block0 << block1 << block2 << block3;
+  world << block0 << block1 << block2 << block3 << block4;
 
-#endif // BLOCK_TEST
+#endif // CUBE5_TEST
 
 
 #ifdef SPHERE_TEST
@@ -153,6 +160,47 @@ int main() {
     }
 
 #endif
+
+
+#ifdef CUBE_OCTA
+
+  Cube cube;
+  Octahedron octa(2); // side length
+
+#ifdef FACE_COLOR
+  cube.rgb(0.5,0.7,0.6);
+  octa.red(0.8);
+#endif
+
+#ifdef EDGE_COLOR
+  cube.cyan0();
+  octa.yellow0();
+#endif
+
+  world << cube << octa;
+
+#endif // CUBE_OCTA
+
+#ifdef OCTAHEDRA
+
+  Octahedron octa0(2), octa1(2), octa2(2), octa3(2), octa4(2);
+
+  Vector axis(Origin, 1, 0.5*(1+sqrt(5)), 0);
+
+  octa1.rotate(72, axis);
+  octa2.rotate(144, axis);
+  octa3.rotate(216, axis);
+  octa4.rotate(288, axis);
+
+  octa0.red(0.8);
+  octa1.yellow(0.2);
+  octa2.yellow(0.4);
+  octa3.cyan(0.2);
+  octa4.cyan(0.4);
+
+  world << octa0 << octa1 << octa2 << octa3 << octa4;
+
+#endif // OCTAHEDRA
 
 
 #ifdef POLYGON_TEST
@@ -458,11 +506,11 @@ int main() {
 
   // "draw" the world in the screen
 #ifdef SOLID
-  world.expose();
+  world.photo();
 #endif
 
 #ifdef FLAT
-  world.expose(SHADE_FLAT);
+  world.flash();
 #endif
 
 #ifdef XRAY
@@ -477,11 +525,11 @@ int main() {
   world.view_from(20,10,6);
   world.range(10);
 #ifdef SOLID
-  world.expose();
+  world.photo();
 #endif
 
 #ifdef FLAT
-  world.expose(SHADE_FLAT);
+  world.flash();
 #endif
 
 #ifdef XRAY
@@ -494,11 +542,11 @@ int main() {
   world.view_from(20,8,6);
   world.range(10);
 #ifdef SOLID
-  world.expose();
+  world.photo();
 #endif
 
 #ifdef FLAT
-  world.expose(SHADE_FLAT);
+  world.flash();
 #endif
 
 #ifdef XRAY
@@ -511,52 +559,52 @@ int main() {
   // uncommenting these overflows some PostScript stack(s) 
   // on my (ancient) test platform
   /*
-  world.expose();
+  world.photo();
   paste(world, Pair(0, 0), Pair(2.75,2.75));
   world.clear();
 
-  world.expose();
+  world.photo();
   paste(world, Pair(3.25, 0), Pair(6,2.75));
   world.clear();
   */
 
   /*
-  world.expose();
+  world.photo();
   paste(world, Pair(0,3.5), Pair(1.5,5));
   world.clear();
 
 
-  world.expose();
+  world.photo();
   paste(world, Pair(1.75,3.5), Pair(3.25,5));
   world.clear();
 
-  world.expose();
+  world.photo();
   paste(world, Pair(3.5,3.5), Pair(5,5));
   world.clear();
 
 
-  world.expose();
+  world.photo();
   paste(world, Pair(0,1.75), Pair(1.5,3.25));
   world.clear();
 
-  world.expose();
+  world.photo();
   paste(world, Pair(1.75,1.75), Pair(3.25,3.25));
   world.clear();
 
-  world.expose();
+  world.photo();
   paste(world, Pair(3.5,1.75), Pair(5,3.25));
   world.clear();
 
 
-  world.expose();
+  world.photo();
   paste(world, Pair(0,0), Pair(1.5,1.5));
   world.clear();
 
-  world.expose();
+  world.photo();
   paste(world, Pair(1.75,0), Pair(3.25,1.5));
   world.clear();
 
-  world.expose();
+  world.photo();
   paste(world, Pair(3.5,0), Pair(5,1.5));
   world.clear();
   */

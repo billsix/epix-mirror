@@ -34,7 +34,7 @@
 
 /*
  *   This file provides:
- *     - The Disk class (derived from Shape) and operators
+ *     - The Disk class (derived from Object) and operators
  */
 
 #include "Functions.h"

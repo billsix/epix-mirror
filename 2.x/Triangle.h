@@ -1,8 +1,8 @@
 /***
  ***  Triangle.h -- epix2::Triangle class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
  *** Last Change: August 01, 2005
@@ -41,7 +41,7 @@ namespace ePiX2 {
   class Vector; /***/
   /* * * Triangle.h * * */
 
-  class Triangle : public Shape {
+  class Triangle : public Object {
 
   public:
 

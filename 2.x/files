@@ -31,6 +31,8 @@ Mapping.cc
 Mapping.h
 Object.cc
 Object.h
+Octa.cc
+Octa.h
 Output.cc
 Output.h
 Pair.cc
@@ -48,6 +50,8 @@ Segment.h
 Sphere.cc
 Sphere.h
 test.cc
+Tetra.cc
+Tetra.h
 Tile.cc
 Tile.h
 Triangle.cc

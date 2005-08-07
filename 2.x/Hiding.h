@@ -66,9 +66,9 @@
  ***   for orienting the tree according to a specified viewpoint, and
  ***   for drawing the entire tree in the following styles:
  ***
- ***   - render:      Interiors shaded according to lighting
- ***   - render_flat: Interiors white
- ***   - x_ray:       All edges of equal line width
+ ***   - photo:  Interiors shaded according to face normal
+ ***   - flash:  Interiors colored solid
+ ***   - x_ray:  Edges only, no hiding
  ***/
 
 
@@ -80,6 +80,7 @@
 #include "Enums.h"
 #include "Color.h"
 #include "Point.h"
+#include "Edge.h"
 #include "Vector.h"
 
 namespace ePiX2 {
@@ -99,7 +100,7 @@ namespace ePiX2 {
 	line_color=Color(0,0,0,rgb); // black
       }
 
-    // build, modify; used by Object::shatter() and Layer functions
+    // build, modify; used by Object_Base::shatter() and Layer functions
     void add_edge(Edge E) { boundary.push_back(E); }
     void set_normal(const Vector& N) { normal=N; }
     void set_solid(bool arg) { solid=arg; }
@@ -115,7 +116,7 @@ namespace ePiX2 {
 
     // Data members
 
-    // Object::shatter() must guarantee outward-oriented faces for
+    // Object_Base::shatter() must guarantee outward-oriented faces for
     // convex bodies, and that Edges of each face form a convex loop
     std::list<Edge> boundary;
 
@@ -173,7 +174,7 @@ namespace ePiX2 {
 
   }; // end of class Speck
 
-  class Label : public Shard, public Object {
+  class Label : public Shard, public Object_Base {
 
   public:
 

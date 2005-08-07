@@ -1,12 +1,12 @@
 /*
  * Color.cc -- ePiX2 Color functions
  *
- * This file is part of ePiX, a preprocessor for creating high-quality
- * line figures in LaTeX
+ * This file is part of ePiX, a program for creating high-quality
+ * figures in LaTeX
  *
  * Version 2.0pre
  *
- * Last Change: August 01, 2005
+ * Last Change: August 07, 2005
  */
 
 /*
@@ -44,6 +44,8 @@
 
 namespace ePiX2 {
 
+  const int COLORS=1000; // Magic number; must be a power of 10
+
   epix2_color_model Color::Model=natural; // define global color model
   std::set<std::string> Color::pallet;    // Colors seen so far
 
@@ -52,9 +54,9 @@ namespace ePiX2 {
   // represent a double in [0,1] by its first three digits
   static std::string dtoa(double arg) // assumes arg>0
   {
-    int digits=(int) floor(1000*arg); // strip off 3 decimals
-    if (digits == 1000) // kludge to distinguish 0 from 1 :)
-      digits=999;
+    int digits=(int) floor(COLORS*arg); // strip off 3 decimals
+    if (digits == COLORS) // kludge to distinguish 0 from 1 :)
+      digits=COLORS-1;
 
     std::ostringstream value;
     value << digits;
@@ -66,7 +68,7 @@ namespace ePiX2 {
   {
     if (arg >= 1 ) return 1;
     else if (arg <= 0) return 0;
-    else return arg;
+    else return floor(COLORS*arg)/COLORS;
   }
 
   static std::string curly_braces(const std::string msg)

@@ -1,11 +1,11 @@
 /***
- ***  Quad.h -- epix2::Quad class
+ ***  Octa.h -- epix2::Octahedron class
  ***
  *** This file is part of ePiX, a program for creating high-quality 
  *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 28, 2005
+ *** Last Change: August 07, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -31,38 +31,35 @@
  ***
  ***/
 
-#ifndef EPIX2_QUAD
-#define EPIX2_QUAD
+#ifndef EPIX2_OCTA
+#define EPIX2_OCTA
 
 #include "Point.h"
-#include "Basis.h"
 #include "Object.h"
 
 namespace ePiX2 {
 
-  /* * * Quad.h * * */
+  /* * * Octa.h * * */
 
-  class Quad : public Object {
+  class Octahedron : public Object {
 
   public:
 
-    // TO DO: Test for coplanarity
-    Quad(const Point& v0, const Point& v1, const Point& v2, const Point& v3)
-      : vtx0(v0), vtx1(v1), vtx2(v2), vtx3(v3) { }
+    Octahedron(double s1, double s2, double s3) 
+      : side1(s1), side2(s2), side3(s3) { }
 
-    bool hides(const Point vpt, const Point X);
+    Octahedron(double s) : side1(s), side2(s), side3(s) { }
+
+    Octahedron(void) : side1(1), side2(1), side3(1) { }
 
     void shatter(void);
 
   private:
 
-    Point vtx0;
-    Point vtx1;
-    Point vtx2;
-    Point vtx3;
+    double side1, side2, side3;
 
-  }; // end of class Quad
+  }; // end of class Octahedron
 
 } /* end of namespace */
 
-#endif /* EPIX2_QUAD */
+#endif /* EPIX2_OCTA */

@@ -34,7 +34,7 @@
 
 /*
  *   This file provides:
- *     - The Segment class (derived from Shape) and operators
+ *     - The Segment class (derived from Object) and operators
  */
 
 #include "Functions.h"

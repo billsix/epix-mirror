@@ -1,11 +1,11 @@
 /* 
- *  Object.h -- epix2::Object class
+ *  Object.cc -- epix2::Object_Base and Object classes
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: August 06, 2005
+ * Last Change: August 07, 2005
  */
 
 /* 
@@ -46,53 +46,53 @@
 namespace ePiX2 {
 
   // translate
-  Object& Object::operator+= (const Vector& dX)
+  Object_Base& Object_Base::operator+= (const Vector& dX)
   {    
     the_orient.move_to(the_orient.here()-dX); // N.B. apply *inverse* to basis
     return *this;
   }
 
-  void Object::move_to(const Point arg)
+  void Object_Base::move_to(const Point arg)
   {
     the_orient.move_to(arg);
   }
 
-  Object& Object::operator*= (const double c)
+  Object_Base& Object_Base::operator*= (const double c)
   {
     the_scale *= recip(c); // will detect *=0 in shatter()
     return *this;
   }
 
-  void Object::scale (const double c)
+  void Object_Base::scale (const double c)
   {
     the_scale *= recip(c);
   }
 
-  void Object::rotate(const double angle, const Vector& axis)
+  void Object_Base::rotate(const double angle, const Vector& axis)
   {
     the_orient.rotate(-angle, axis);
   }
 
-  void Object::reflect(const Vector& axis)
+  void Object_Base::reflect(const Vector& axis)
   {
     the_orient.reflect(axis); // reflection same as inverse
   }
 
-  Object operator+ (const Object& obj, const Vector& dX)
+  Object_Base operator+ (const Object_Base& obj, const Vector& dX)
   {
-    Object temp = obj;
+    Object_Base temp = obj;
     return temp += dX;
   }
 
-  Object operator* (const Object& obj, const double c)
+  Object_Base operator* (const Object_Base& obj, const double c)
   {
-    Object temp = obj;
+    Object_Base temp = obj;
     return temp *= c;
   }
 
-  // Shape operations
+  // Object operations
 
-  Shape::Shape(void) 
+  Object::Object(void) 
   {
     the_orient=Basis();
     the_scale=1;
@@ -102,19 +102,19 @@ namespace ePiX2 {
   }
 
   // set face colors
-  void Shape::rgb(const double r, const double g, const double b)
+  void Object::rgb(const double r, const double g, const double b)
   {
     style.rgb(r, g, b);
   }
 
-  void Shape::cmyk(const double c, const double m, const double y, 
+  void Object::cmyk(const double c, const double m, const double y, 
 		   const double k)
   {
     style.cmyk(c, m, y, k);
   }
 
 
-  void Shape::white(epix2_color_model cmod)
+  void Object::white(epix2_color_model cmod)
   {
     using ePiX2::rgb;
     using ePiX2::cmyk;
@@ -126,7 +126,7 @@ namespace ePiX2 {
     }
   }
 
-  void Shape::black(epix2_color_model cmod)
+  void Object::black(epix2_color_model cmod)
   {
     using ePiX2::rgb;
     using ePiX2::cmyk;
@@ -139,18 +139,18 @@ namespace ePiX2 {
   }
 
   // set edge colors
-  void Shape::rgb0(const double r, const double g, const double b)
+  void Object::rgb0(const double r, const double g, const double b)
   {
     style.rgb0(r,g,b);
   }
 
-  void Shape::cmyk0(const double c, const double m, const double y, 
+  void Object::cmyk0(const double c, const double m, const double y, 
 		    const double k)
   {
     style.cmyk0(c, m, y, k);
   }
 
-  void Shape::white0(epix2_color_model cmod)
+  void Object::white0(epix2_color_model cmod)
   {
     using ePiX2::rgb;
     using ePiX2::cmyk;
@@ -162,7 +162,7 @@ namespace ePiX2 {
     }
   }
 
-  void Shape::black0(epix2_color_model cmod)
+  void Object::black0(epix2_color_model cmod)
   {
     using ePiX2::rgb;
     using ePiX2::cmyk;
@@ -174,45 +174,103 @@ namespace ePiX2 {
     }
   }
 
+
   // private functions
-  Color Shape::get_line_color(void) { return style.line_color; }
-  Color Shape::get_fill_color(void) { return style.fill_color; }
-  Color Shape::get_back_color(void) { return style.back_color; }
+  Color Object::get_line_color(void) { return style.line_color; }
+  Color Object::get_fill_color(void) { return style.fill_color; }
+  Color Object::get_back_color(void) { return style.back_color; }
+
+
+  // add an Object
+  Object& Object::operator<< (Object& obj) 
+  { 
+    parts.push_back(&obj); 
+    return *this;
+  }
+
+  void Object::shatter(void)
+  {
+    if (parts.size() > 0)
+      {
+	std::list<Object*>::iterator obj;
+	for (obj=parts.begin(); obj!=parts.end(); ++obj)
+	  {
+	    (*obj)->the_orient = the_orient; // synchronize bases
+	    (*obj)->the_scale  = the_scale;  // and length scales
+	    (*obj)->shatter();               // child::shatter()
+	    fragments.merge((*obj)->fragments);
+	  }
+      }
+  }
+
+  bool Object::hides(const Point vpt, const Point X)
+  {
+    bool value=false;
+    if (parts.size() > 0)
+      {
+	std::list<Object*>::const_iterator obj=parts.begin();
+
+	while(!value && obj!=parts.end())
+	  {
+	    value = (value || (*obj)->hides(vpt, X)); // child::hides()
+	    ++obj;
+	  }
+      }
+
+    return value; // children should define their own hides()
+  }
 
 
   /*
   // Clump operations
-
-  Clump& Clump::operator+= (const Object obj) 
-  { 
-    parts.push_back(obj); 
+  Clump& Clump::operator+= (const Vector& dX)
+  {    
+    all_orient.move_to(all_orient.here()-dX); // N.B. apply *inverse* to basis
     return *this;
   }
 
-  void Clump::operator+ (const Object obj) 
-  { 
-    parts.push_back(obj); 
+  void Clump::move_to(const Point arg)
+  {
+    all_orient.move_to(arg);
   }
 
-  void Clump::shatter(void)
+  Clump& Clump::operator*= (const double c)
   {
-    std::list<Object>::iterator obj;
-    for (obj=parts.begin(); obj!=parts.end(); ++obj)
-      (*obj).shatter();
+    all_scale *= recip(c); // will detect *=0 in shatter()
+    return *this;
   }
 
-  bool Clump::hides(const Point vpt, const Point X)
+  void Clump::scale (const double c)
   {
-    bool value=false;
-    std::list<Object>::const_iterator obj=parts.begin();
+    all_scale *= recip(c);
+  }
 
-    while(!value && obj!=parts.end())
-      {
-	value = (value || (*obj).hides(vpt, X));
-	++obj;
-      }
+  void Clump::rotate(const double angle, const Vector& axis)
+  {
+    all_orient.rotate(-angle, axis);
+  }
 
-    return value;
+  void Clump::reflect(const Vector& axis)
+  {
+    all_orient.reflect(axis); // reflection same as inverse
+  }
+
+  Clump operator+ (const Clump& obj, const Vector& dX)
+  {
+    Clump temp = obj;
+    return temp += dX;
+  }
+
+  Clump operator* (const Clump& obj, const double c)
+  {
+    Clump temp = obj;
+    return temp *= c;
+  }
+
+  Clump operator+ (const Clump& clump, Object_Base& obj)
+  {
+    Clump temp = clump;
+    return temp << obj;
   }
   */
 

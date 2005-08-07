@@ -5,7 +5,7 @@
  *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: August 06, 2005
+ *** Last Change: August 07, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -41,22 +41,17 @@ namespace ePiX2 {
 
   /* * * Cube.h * * */
 
-  class Cube : public Shape {
+  class Cube : public Object {
 
   public:
 
-    Cube(double s1, double s2, double s3) 
-      : side1(s1), side2(s2), side3(s3), solid(true) { }
+    Cube(double s1, double s2, double s3) : side1(s1), side2(s2), side3(s3) { }
 
-    Cube(double s) : side1(s), side2(s), side3(s), solid(true) { }
+    Cube(double s) : side1(s), side2(s), side3(s) { }
 
-    Cube(void) : side1(1), side2(1), side3(1), solid(true) { }
+    Cube(void) : side1(1), side2(1), side3(1) { }
 
     Cube (const Point& arg1, const Point& arg2);
-
-    void skeleton(bool T=true) { solid = !T; }
-
-    bool hides(const Point vpt, const Point X);
 
     void shatter(void);
 
@@ -64,7 +59,6 @@ namespace ePiX2 {
 
     double side1, side2, side3;
 
-    bool solid;
   }; // end of class Cube
 
 } /* end of namespace */

@@ -5,7 +5,7 @@
  * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: August 02, 2005
+ * Last Change: August 07, 2005
  */
 
 /* 
@@ -120,7 +120,7 @@ namespace ePiX2 {
 	if (fillstyle_isnt("solid"))
 	  print_line("\\psset{fillstyle=solid}");
 
-	print_line("\\pspolygon");
+	print_line("\\pspolygon[linestyle=none]");
 	for(p = border.begin(); p != border.end(); ++p)
 	  {
 	    if (p==border.begin())

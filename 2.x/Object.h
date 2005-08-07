@@ -1,11 +1,11 @@
 /*** 
- ***  Object.h -- epix2::Object class
+ ***  Object.h -- epix2::Object_Base and Object classes
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: August 06, 2005
+ *** Last Change: August 07, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -30,17 +30,17 @@
  *** 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  ***
  ***
- ***   This file provides:
+ *** This file provides:
  ***
- *** The Object class, the base class for all visible elements of a Picture.
- *** Objects have an orientation (Basis) and scale factor; all geometric
- *** operations are expressed by their *inverse* ops on the basis/scale.
- *** When an Object is "shatter()"ed (converted to one or more Shards for
- *** hidden object removal), the basis and scale are used to compute the
- *** transformed Object.
+ ***   The Object_Base class, the base class for all visible elements
+ ***   of a Picture.  Object_Bases have an orientation (Basis) and scale
+ ***   factor; all geometric operations are expressed by their *inverse*
+ ***   ops on the basis/scale.  When an Object_Base is "shatter()"ed
+ ***   (converted to one or more Shards for hidden object removal), the
+ ***   basis and scale are used to compute the transformed Object_Base.
  ***
- *** shatter() is not virtual, allowing Objects (not just Object*s) to be
- *** stored in a Picture list.
+ ***   Though Object_Bases contain only orientation and scale data, they
+ ***   can be created, so their functions cannot be pure virtual.
  ***/
 
 #ifndef EPIX2_OBJECT
@@ -50,39 +50,42 @@
 #include <iostream>
 
 #include "Enums.h"
+#include "Basis.h"
+#include "Color.h"
+#include "Hiding.h"
 
 namespace ePiX2 {
 
   class Point;  /***/
   class Vector; /***/
-  class Basis;  /***/
-  class Color;  /***/
-  class Shard;  /***/
 
   /* * * Object.h * * */
 
-  class Object   // Marker, Label, Shape, Clump
+  class Object_Base   // Marker, Label, Object, Clump
     {
       friend class Picture;
 
     public:
 
-      Object(void) { closed_oriented=false; }
-      virtual ~Object(void) { }
+      Object_Base(void) { closed_oriented=false; }
+      virtual ~Object_Base(void) { }
 
-      Object& operator+= (const Vector&); // translate
-      void move_to(const Point arg);      // set origin
+      virtual Object_Base& operator+= (const Vector&); // translate
+      virtual void move_to(const Point arg);      // set origin
 
-      Object& operator*= (const double);  // scale
-      void scale (const double);
+      virtual Object_Base& operator*= (const double);  // scale
+      virtual void scale (const double);
 
-      void reflect(const Vector& axis);
-      void rotate(const double angle, const Vector& axis);
+      virtual void reflect(const Vector& axis);
+      virtual void rotate(const double angle, const Vector& axis);
 
       virtual void shatter(void) { }
 
       // we block vpt's view of X?
       virtual bool hides(const Point vpt, const Point X) const {return false;}
+
+      virtual void set_line_color(const Color&) { }
+      virtual void set_fill_color(const Color&) { }
 
     protected:
 
@@ -92,19 +95,26 @@ namespace ePiX2 {
       bool closed_oriented;
 
       std::list<Shard> fragments;
-    }; // end of class Object
 
-  Object operator+ (const Object&, const Vector&);
-  Object operator* (const Object&, const double);
+    }; // end of class Object_Base
+
+  Object_Base operator+ (const Object_Base&, const Vector&);
+  Object_Base operator* (const Object_Base&, const double);
 
 
-  class Shape : public Object {
+  class Object : public Object_Base {
 
     friend class Clump;
 
   public:
 
-    Shape(void);
+    Object(void);
+
+    // add an Object
+    Object& operator<< (Object& obj);
+
+    void shatter(void);
+    bool hides(const Point vpt, const Point X);
 
     void rgb(const double r, const double g, const double b);
     void cmyk(const double c, const double m, const double y, 
@@ -139,30 +149,54 @@ namespace ePiX2 {
 
     // TO DO: Functions to set back_color
 
+    void skeleton(bool T = true) { solid = !T; }
+
+    void set_line_color(const Color& col) { style.line_color = col; }
+    void set_fill_color(const Color& col) { style.fill_color = col; }
+    void set_back_color(const Color& col) { style.back_color = col; }
+
   protected:
+
+    std::list<Object*> parts;
+
+    bool solid;
+
     Style style;
 
     Color get_line_color(void);
     Color get_fill_color(void);
     Color get_back_color(void);
 
-  }; // end of class Shape
+  }; // end of class Object
 
 
-  /*  
-  class Clump : public Shape {
+  /*
+  class Clump : public Object {
 
   public:
 
+    // affine transformations
+    Clump& operator+= (const Vector&); // translate
+    void move_to(const Point arg);      // set origin
+
+    Clump& operator*= (const double);  // scale
+    void scale (const double);
+
+    void reflect(const Vector& axis);
+    void rotate(const double angle, const Vector& axis);
+
     // add an Object
-    Clump& operator+= (const Object obj);
-    void operator+ (const Object obj);
+    Clump& operator<< (Object_Base& obj);
 
     void shatter(void);
     bool hides(const Point vpt, const Point X);
 
-    std::list<Object*> parts;
-    std::list<Shard>  fragments;
+  protected:
+
+    std::list<Object_Base*> parts;
+
+    Basis all_orient;
+    double all_scale;
 
     //    double    line_width;
     //    line_type line_style;
@@ -171,11 +205,9 @@ namespace ePiX2 {
     Color default_fill_color;
     //    std::string default_fill_style;
 
-  private:
-
-    void polygonize(void);
-
   }; // end of class Clump
+
+  //  Clump operator+ (const Clump& clump, Object_Base& obj);
   */
 
 } /* end of namespace */

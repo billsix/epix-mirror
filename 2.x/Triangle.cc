@@ -1,5 +1,5 @@
 /* 
- *  Triangle.h -- epix2::Triangle class
+ * Triangle.cc -- epix2::Triangle class
  *
  * This file is part of ePiX, a program for creating high-quality 
  * figures in LaTeX 
@@ -34,7 +34,7 @@
 
 /*
  *   This file provides:
- *     - The Triangle class (derived from Shape) and operators
+ *     - The Triangle class (derived from Object) and operators
  */
 
 #include "Functions.h"
@@ -77,7 +77,7 @@ namespace ePiX2 {
     N *= recip(norm(N)); // normalize, returning (0,0,0) if N=0
     face.set_normal(N);
 
-    face.set_solid(true);
+    face.set_solid(solid);
     face.set_line_color(get_line_color());
     face.set_fill_color(get_fill_color());
 

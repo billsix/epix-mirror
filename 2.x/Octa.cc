@@ -1,5 +1,5 @@
 /* 
- *  Cube.h -- epix2::Cube class
+ *  Octa.h -- epix2::Octahedron class
  *
  * This file is part of ePiX, a program for creating high-quality 
  * figures in LaTeX 
@@ -34,49 +34,34 @@
 
 /*
  *   This file provides:
- *     - The Cube class (derived from Object) and operators
+ *     - The Octahedron class (derived from Object) and operators
  */
 
 #include <vector>
 
 #include "Functions.h"
 #include "Object.h"
-#include "Quad.h"
-#include "Cube.h"
+#include "Triangle.h"
+#include "Octa.h"
 
 namespace ePiX2 {
 
-  Cube::Cube(const Point& arg1, const Point& arg2)
-  {
-    side1=fabs(arg2.x1() - arg1.x1());
-    side2=fabs(arg2.x2() - arg1.x2());
-    side3=fabs(arg2.x3() - arg1.x3());
-
-    Vector dX = midpoint(arg1, arg2) - Origin;
-    (*this) += dX;
-  }
-
-
-  void Cube::shatter(void)
+  void Octahedron::shatter(void)
   {
     closed_oriented=true;
 
     // vertices
-    Point v_nnn(-side1,-side2,-side3), v_pnn( side1,-side2,-side3);
-    Point v_npn(-side1, side2,-side3), v_ppn( side1, side2,-side3);
-    Point v_nnp(-side1,-side2, side3), v_pnp( side1,-side2, side3);
-    Point v_npp(-side1, side2, side3), v_ppp( side1, side2, side3);
+    Point v_1n(-side1,0,0), v_1p(side1,0,0);
+    Point v_2n(0,-side2,0), v_2p(0,side2,0);
+    Point v_3n(0,0,-side3), v_3p(0,0,side3);
 
-    Quad f_1n(v_nnn, v_nnp, v_npp, v_npn);
-    Quad f_1p(v_ppp, v_pnp, v_pnn, v_ppn);
+    Triangle f_ppp(v_1p, v_2p, v_3p), f_ppn(v_2p, v_1p, v_3n);
+    Triangle f_npp(v_2p, v_1n, v_3p), f_npn(v_1n, v_2p, v_3n);
+    Triangle f_nnp(v_1n, v_2n, v_3p), f_nnn(v_2n, v_1n, v_3n);
+    Triangle f_pnp(v_2n, v_1p, v_3p), f_pnn(v_1p, v_2n, v_3n);
 
-    Quad f_2n(v_nnn, v_pnn, v_pnp, v_nnp);
-    Quad f_2p(v_ppp, v_ppn, v_npn, v_npp);
-
-    Quad f_3n(v_nnn, v_npn, v_ppn, v_pnn);
-    Quad f_3p(v_ppp, v_npp, v_nnp, v_pnp);
-
-    (*this) << f_1n << f_1p << f_2n << f_2p << f_3n << f_3p;
+    (*this) << f_ppp << f_ppn << f_npp << f_npn
+	    << f_nnp << f_nnn << f_pnp << f_pnn;
 
     std::list<Object*>::iterator faces;
 
@@ -89,6 +74,6 @@ namespace ePiX2 {
 
     this->Object::shatter();
 
-  } // end of Cube::shatter
+  } // end of Octahedron::shatter
 
 } /* end of namespace */

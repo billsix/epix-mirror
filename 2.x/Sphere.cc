@@ -1,5 +1,5 @@
 /* 
- *  Sphere.h -- epix2::Sphere class
+ * Sphere.cc -- epix2::Sphere class
  *
  * This file is part of ePiX, a program for creating high-quality 
  * figures in LaTeX 
@@ -34,7 +34,7 @@
 
 /*
  *   This file provides:
- *     - The Sphere class (derived from Shape) and operators
+ *     - The Sphere class (derived from Object) and operators
  */
 
 #include <vector>
@@ -150,7 +150,7 @@ namespace ePiX2 {
 	      face.add_edge(e3);
 	    }
 
-	  face.set_solid(true);
+	  face.set_solid(solid);
 	  face.set_line_color(get_line_color());
 	  face.set_fill_color(get_fill_color());
 

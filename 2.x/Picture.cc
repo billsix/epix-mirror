@@ -67,14 +67,14 @@ namespace ePiX2 {
   }
 
   // modify scenery
-  Picture& Picture::operator<< (Object& obj)
+  Picture& Picture::operator<< (Object_Base& obj)
   {
     //    obj.shatter(); unnec just yet; first remove fully hidden Objects
     scenery.push_back(&obj);
     return *this;
   }
 
-  //  void Picture::add(Object* obj) { scenery.push_back(obj); }
+  //  void Picture::add(Object_Base* obj) { scenery.push_back(obj); }
 
   void Picture::empty(void)
   {
@@ -106,7 +106,7 @@ namespace ePiX2 {
   // 3. print screen to page
  
   // map scenery to screen
-  void Picture::expose(epix2_shade_type shaded)
+  void Picture::photo(epix2_shade_type shaded)
   {
     build_shard_tree(); // shatter everything and build tree
 
@@ -217,7 +217,7 @@ namespace ePiX2 {
   */
 
   // shard mangling
-  void Picture::set_shard_distance(Object* obj)
+  void Picture::set_shard_distance(Object_Base* obj)
   {
     std::list<Shard>::iterator frag_ptr;  // current shard
     std::list<Edge>::const_iterator curr; // current edge
@@ -254,7 +254,7 @@ namespace ePiX2 {
   } // end of set_shard_distance
 
 
-  void Picture::remove_backfaces(Object* obj)
+  void Picture::remove_backfaces(Object_Base* obj)
   {
     if (obj->closed_oriented) // else do nothing
       {
@@ -274,12 +274,12 @@ namespace ePiX2 {
       }
   } // end of remove_backfaces()
 
-  // private functions to turn all our Objects into lists of Shards
+  // private functions to turn all our Object_Bases into lists of Shards
   void Picture::build_shard_tree(void)
   {
     std::list<Shard> all_fragments;
 
-    std::list<Object*>::iterator obj;
+    std::list<Object_Base*>::iterator obj;
 
     //    for (obj=scenery.begin(); obj!=scenery.end(); ++obj)
     //      set_distance(*obj); // distance from viewpt to object

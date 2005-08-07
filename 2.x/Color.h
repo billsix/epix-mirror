@@ -1,11 +1,11 @@
 /***
  ***  Color.h -- epix2::Color class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: August 01, 2005
+ *** Last Change: August 07, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -89,7 +89,7 @@ namespace ePiX2 {
 
   class Style {
 
-    friend class Shape;
+    friend class Object;
 
   public:
     // set face color; TO DO: Independent color for backs of faces
