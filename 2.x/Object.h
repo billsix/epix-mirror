@@ -5,7 +5,7 @@
  *** line figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 31, 2005
+ *** Last Change: August 06, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -57,7 +57,7 @@ namespace ePiX2 {
   class Vector; /***/
   class Basis;  /***/
   class Color;  /***/
-  class Layer;  /***/
+  class Shard;  /***/
 
   /* * * Object.h * * */
 
@@ -67,7 +67,7 @@ namespace ePiX2 {
 
     public:
 
-      Object(void);  
+      Object(void) { closed_oriented=false; }
       virtual ~Object(void) { }
 
       Object& operator+= (const Vector&); // translate
@@ -79,10 +79,7 @@ namespace ePiX2 {
       void reflect(const Vector& axis);
       void rotate(const double angle, const Vector& axis);
 
-      virtual void shatter(void)
-	{ 
-	  std::cerr << "Object::shatter()" << std::endl;
-	}
+      virtual void shatter(void) { }
 
       // we block vpt's view of X?
       virtual bool hides(const Point vpt, const Point X) const {return false;}
@@ -92,7 +89,9 @@ namespace ePiX2 {
       Basis the_orient; // contains location data
       double the_scale;
 
-      Layer* fragments;
+      bool closed_oriented;
+
+      std::list<Shard> fragments;
     }; // end of class Object
 
   Object operator+ (const Object&, const Vector&);
@@ -149,7 +148,8 @@ namespace ePiX2 {
 
   }; // end of class Shape
 
-  
+
+  /*  
   class Clump : public Shape {
 
   public:
@@ -161,8 +161,8 @@ namespace ePiX2 {
     void shatter(void);
     bool hides(const Point vpt, const Point X);
 
-    std::list<Object> parts;
-    Layer* fragments;
+    std::list<Object*> parts;
+    std::list<Shard>  fragments;
 
     //    double    line_width;
     //    line_type line_style;
@@ -176,6 +176,7 @@ namespace ePiX2 {
     void polygonize(void);
 
   }; // end of class Clump
+  */
 
 } /* end of namespace */
 

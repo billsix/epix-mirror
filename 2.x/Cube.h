@@ -1,5 +1,5 @@
 /***
- ***  Sphere.h -- epix2::Sphere class
+ ***  Cube.h -- epix2::Cube class
  ***
  *** This file is part of ePiX, a program for creating high-quality 
  *** figures in LaTeX 
@@ -31,21 +31,30 @@
  ***
  ***/
 
-#ifndef EPIX2_SPHERE
-#define EPIX2_SPHERE
+#ifndef EPIX2_CUBE
+#define EPIX2_CUBE
 
 #include "Point.h"
 #include "Object.h"
 
 namespace ePiX2 {
 
-  /* * * Sphere.h * * */
+  /* * * Cube.h * * */
 
-  class Sphere : public Shape {
+  class Cube : public Shape {
 
   public:
 
-    Sphere(const Point& ctr=Origin, double rad=1, int n1 = 16, int n2 = 8);
+    Cube(double s1, double s2, double s3) 
+      : side1(s1), side2(s2), side3(s3), solid(true) { }
+
+    Cube(double s) : side1(s), side2(s), side3(s), solid(true) { }
+
+    Cube(void) : side1(1), side2(1), side3(1), solid(true) { }
+
+    Cube (const Point& arg1, const Point& arg2);
+
+    void skeleton(bool T=true) { solid = !T; }
 
     bool hides(const Point vpt, const Point X);
 
@@ -53,13 +62,11 @@ namespace ePiX2 {
 
   private:
 
-    Point center;
-    double radius;
+    double side1, side2, side3;
 
-    int longitudes, latitudes;
-
-  }; // end of class Sphere
+    bool solid;
+  }; // end of class Cube
 
 } /* end of namespace */
 
-#endif /* EPIX2_SPHERE */
+#endif /* EPIX2_CUBE */

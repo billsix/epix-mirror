@@ -1,11 +1,11 @@
 /* 
  *  Output.h -- epix2:: raw output functions
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 29, 2005
+ * Last Change: August 02, 2005
  */
 
 /* 

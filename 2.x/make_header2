@@ -5,7 +5,8 @@ OUTPUT_FILE=epix2.h
 HEADERS="Enums.h Errors.h Constants.h Color.h Functions.h Pair.h Point.h \
          Edge.h Domain.h Mapping.h Screen.h Tile.h \
          Vector.h Basis.h Hiding.h Camera.h Object.h \
-         Segment.h Triangle.h Quad.h Sphere.h Disk.h Picture.h"
+         Segment.h Triangle.h Quad.h Sphere.h Disk.h \
+         Cube.h Picture.h"
 
 #HEADERS="Enums.h Errors.h Constants.h Pair.h Point.h Functions.h \
 #         Vector.h Segment.h Circle.h Picture.h"
@@ -31,8 +32,7 @@ namespace ePiX2 {
   class Point;
   class Tile;
   class Glyph;
-  class Outline;
-  class Region;
+  class Silhouette;
   class Picture;
 
 HEADER_HEADER

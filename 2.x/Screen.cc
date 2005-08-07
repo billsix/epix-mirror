@@ -1,11 +1,11 @@
 /* 
  * Screen.cc -- ePiX2::Screen class and classes for importing
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 31, 2005
+ * Last Change: August 02, 2005
  */
 
 /* 
@@ -212,8 +212,7 @@ namespace ePiX2 {
   void Screen::clear(void) 
   { 
     glyphs.clear(); 
-    outlines.clear(); 
-    regions.clear(); 
+    silhouettes.clear(); 
 
     tiles.clear(); 
   }
@@ -258,15 +257,15 @@ namespace ePiX2 {
 	      << v_min() << "," << v_max() << "]";
 
     print_line("\\setlength{\\unitlength}{1in}");
+    Color::print_pallet();
+
     print_line("\\begin{picture}");
 
     raw_print(Pair(Screen::the_page.h_size(),Screen::the_page.v_size()));
     raw_print(Screen::the_page.bl());
 
-    Color::print_pallet();
-
     // TO DO -- handle user-specified parameters; N.B. Magic number 0.6
-    print_line("\\psset{unit=1in,linewidth=0.6pt,linearc=0.2pt}");
+    print_line("\\psset{unit=1in,linewidth=0.6pt}");
 
     for_each(Screen::the_page.tiles.begin(), 
 	     Screen::the_page.tiles.end(), 

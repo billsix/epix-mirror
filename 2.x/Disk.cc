@@ -1,11 +1,11 @@
 /* 
  *  Disk.h -- epix2::Disk class
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: August 01, 2005
+ * Last Change: August 06, 2005
  */
 
 /* 
@@ -57,8 +57,9 @@ namespace ePiX2 {
     if (!solid || fabs(normal|(vpt-center)) < EPIX2_EPSILON)
       return false;
 
-    else // open disk
-      return (norm(normal.perp_hits(vpt,X) - center) < radius);
+    else // behind plane and line(vpt,x) intersects disk
+      return ((normal|(vpt-normal.tail()))*(normal|(X-normal.tail())) < 0 &&
+	      norm(normal.perp_hits(vpt,X) - center) <= radius);
   }
 
 
@@ -104,7 +105,7 @@ namespace ePiX2 {
     face.set_solid(solid);
     face.set_fill_color(get_fill_color());
 
-    fragments->insert(face);
+    fragments.push_back(face);
 
   } // end of Disk::shatter
 

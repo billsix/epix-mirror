@@ -1,11 +1,11 @@
 /* 
  * Tile.cc -- ePiX2::Tile and Affine_Map class functions
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 29, 2005
+ * Last Change: August 02, 2005
  */
 
 /* 
@@ -80,7 +80,7 @@ namespace ePiX2 {
   }
 
   // TO DO
-  void Glyph::print(void)
+  void Glyph::print(void) const
   {
     print_line("\\put");
 
@@ -89,50 +89,29 @@ namespace ePiX2 {
     std::cout << "{\\makebox(0,0)[c]{\\rule{2pt}{2pt}}}";
   }
 
-  void Outline::map_to(Screen& screen, const Affine_Map& map) 
+  void Silhouette::map_to(Screen& screen, const Affine_Map& map) 
   {
     // create copy of this
-    Outline* temp = new Outline;
+    Silhouette* temp = new Silhouette;
 
     std::list<Screen_Edge>::iterator p;
 
     for (p=border.begin(); p != border.end(); ++p)
       temp->add_edge(map(*p)); // adjust location
 
-    screen.outlines.push_back(*temp);
-    screen.add_tile_ptr(temp);
-  }
-
-
-  // draw visible edges
-  void Outline::print(void)
-  {
-    for_each(border.begin(), border.end(), 
-	     std::bind2nd(std::mem_fun_ref(&Screen_Edge::print), false));
-  }
-
-  void Region::map_to(Screen& screen, const Affine_Map& map)
-  {
-    // create copy of this
-    Region* temp = new Region;
-
-    std::list<Screen_Edge>::iterator p;
-
-    for (p=border.begin(); p != border.end(); ++p)
-      temp->add_edge(map(*p)); // adjust location
-
+    temp->set_solid(solid);
     temp->fill_color=fill_color;
     // TO DO: copy fill style
 
-    screen.regions.push_back(*temp);
+    screen.silhouettes.push_back(*temp);
     screen.add_tile_ptr(temp);
   }
 
-  void Region::print(void)
+  void Silhouette::print(void) const
   {
-    if (border.size() > 2)
+    if (solid && border.size() > 2)
       {
-	std::list<Screen_Edge>::iterator p;
+	std::list<Screen_Edge>::const_iterator p;
 
 	if (fillcolor_isnt(fill_color))
 	  std::cout << std::endl << "\\psset{fillcolor=" 
@@ -149,10 +128,10 @@ namespace ePiX2 {
 
 	    raw_print((*p).second);
 	  }
+      } // interior printed
 
-	for_each(border.begin(), border.end(), 
-		 std::bind2nd(std::mem_fun_ref(&Screen_Edge::print), false));
-      }
+    for_each(border.begin(), border.end(), 
+	     std::bind2nd(std::mem_fun_ref(&Screen_Edge::print), false));
   }
 
 } /* end of namespace */

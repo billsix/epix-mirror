@@ -1,4 +1,4 @@
-# ePiX2 files, August 01, 2005
+# ePiX2 files, August 06, 2005
 #
 Basis.cc
 Basis.h
@@ -7,6 +7,8 @@ Camera.h
 Color.cc
 Color.h
 Constants.h
+Cube.cc
+Cube.h
 Disk.cc
 Disk.h
 Domain.cc
@@ -23,7 +25,6 @@ Hiding.cc
 Hiding.h
 Label.cc
 Label.h
-Linestyle.h
 Makefile
 make_header2
 Mapping.cc
@@ -46,7 +47,6 @@ Segment.cc
 Segment.h
 Sphere.cc
 Sphere.h
-syntax.xp
 test.cc
 Tile.cc
 Tile.h

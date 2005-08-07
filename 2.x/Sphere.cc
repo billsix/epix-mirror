@@ -1,11 +1,11 @@
 /* 
  *  Sphere.h -- epix2::Sphere class
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 21, 2005
+ * Last Change: August 06, 2005
  */
 
 /* 
@@ -39,106 +39,123 @@
 
 #include <vector>
 
-#include "Point.h"
-#include "Picture.h"
+#include "Functions.h"
+#include "Edge.h"
 #include "Hiding.h"
+#include "Basis.h"
+#include "Object.h"
+#include "Visibility.h"
 #include "Quad.h"
+#include "Triangle.h"
 #include "Sphere.h"
 
 namespace ePiX2 {
 
-  Sphere::Sphere(const Point& ctr, double rad)
-    : center(ctr), radius(rad)
+  Sphere::Sphere(const Point& ctr, double rad, int n1, int n2)
+    : center(ctr), radius(rad), longitudes(n1), latitudes(n2)
   {
-    my_orientation=Basis(ctr, E_1(ctr), E_2(ctr), E_3(ctr));
+    // quasi-sane minimum values
+    longitudes = (int)max(3, abs(longitudes));
+    latitudes  = (int)max(2, abs(latitudes));
   }
 
-  Sphere::Sphere(const Point& ctr, double rad, const Basis& orient)
-    : center(ctr), radius(rad), my_orientation(orient) { }
-
-
-  Sphere& Sphere::operator+= (const Vector& dX)
+  bool Sphere::hides(const Point vpt, const Point X)
   {
-    center = center+dX;
-    my_orientation.move_to(center);
+    Vector dir_vpt = vpt - center;
+    Vector dir_X   =   X - center;
+    double dist_X   = norm(dir_X);
+    double dist_vpt = norm(dir_vpt);
 
-    return *this;
+    if (dist_vpt <= radius) // vpt inside
+      return (dist_X > radius);
+
+    else
+      return (dist_X < radius ||
+	      ( (dir_vpt|dir_X) < 0 &&
+		norm(dir_vpt.perp_hits(vpt,X) - center) <= radius));
   }
 
-  void Sphere::move_to(const Point& ctr) // place barycenter at ctr
+
+  void Sphere::shatter(void)
   {
-    center=ctr;
-    my_orientation.move_to(center);
-  }
+    if (the_scale < EPIX2_EPSILON)
+      return;
 
-  Sphere& Sphere::operator*= (const double c)  // scale
-  {
-    radius *= c;
-    return *this;
-  }
+    // else
+    closed_oriented=true;
+    Point vertices[longitudes+1][latitudes+1];
 
-  void Sphere::scale (const double c)
-  {
-    radius *= c;
-  }
+    double rad=radius*recip(the_scale);
 
-  void Sphere::rotate(const double angle, const Vector& axis)
-  {
-    my_orientation.rotate(angle, axis); // significant for shattering
-    center = my_orientation.here();
-  }
+    Vector E1=rad*the_orient.sea();
+    Vector E2=rad*the_orient.sky();
+    Vector E3=rad*the_orient.eye();
 
-  void Sphere::shatter(Picture& world, int num1, int num2) const 
-  {
-    int n1 = 3 < abs(num1) ? abs(num1) : 3; // longitudes
-    int n2 = 2 < abs(num2) ? abs(num2) : 2; // latitudes
-
-    Point vertices[n1+1][n2+1];
-
-    Vector E1=my_orientation.sea();
-    Vector E2=my_orientation.sky();
-    Vector E3=my_orientation.eye();
-
-    double th=0, phi=-M_PI_2, dt=2*M_PI/n1, dphi=M_PI/n2;
+    double th=0, phi=-M_PI_2, dt=2*M_PI/longitudes, dphi=M_PI/latitudes;
 
     // calculate vertices; N.B. boundary conditions
-    for (int j=0; j<=n2; ++j, phi += dphi)
+    for (int j=0; j<=latitudes; ++j)
       {
+	phi = -M_PI_2 + j*dphi;
 	th=0;
-	for (int i=0; i<=n1; ++i, th += dt)
-	  vertices[i][j] = center + 
-	    radius*(cos(phi)*(cos(th)*E1 + sin(th)*E2) + (sin(phi)*E3));
+	for (int i=0; i<=longitudes; ++i)
+	  {
+	    th = i*dt;
+	    vertices[i][j] = center + 
+	      (cos(phi)*(cos(th)*E1 + sin(th)*E2) + (sin(phi)*E3));
+	  }
       }
 
     // compute facets; convex -> no cutting
-    //    double tmp1, tmp2;
-    for (int j=0; j<n2; ++j, phi += dphi)
-      for (int i=0; i<n1; ++i, th += dt)
-	{
-	  Quad facet = Quad(vertices[i][j],     vertices[i+1][j],
-			    vertices[i+1][j+1], vertices[i][j+1]);
-	  facet.shatter(world);
-	}
-    //	  world.add_shard(facet);
+    Vector temp_N;
+    Point v00, v10, v11, v01;
 
+    for (int j=0; j<latitudes; ++j)
+      for (int i=0; i<longitudes; ++i)
+	{
+	  Shard face;
+
+	  v00 = vertices[i][j],     v10 = vertices[i+1][j];
+	  v11 = vertices[i+1][j+1], v01 = vertices[i][j+1];
+
+	  // N.B. Normal arbitrarily located at v00
+	  temp_N=(v10-v00)*(v01-v00);
+	  temp_N *= recip(norm(temp_N));
+	  face.set_normal(temp_N);
+
+	  Edge e0(v00, v10, get_line_color());
+	  Edge e1(v10, v11, get_line_color());
+	  Edge e2(v11, v01, get_line_color());
+	  Edge e3(v01, v00, get_line_color());
+
+	  if (j == 0) // at south pole
+	    {
+	      face.add_edge(e1);
+	      face.add_edge(e2);
+	      face.add_edge(e3);
+	    }
+
+	  else if (j == latitudes-1) // north pole
+	    {
+	      face.add_edge(e0);
+	      face.add_edge(e1);
+	      face.add_edge(e3);
+	    }
+
+	  else
+	    {
+	      face.add_edge(e0);
+	      face.add_edge(e1);
+	      face.add_edge(e2);
+	      face.add_edge(e3);
+	    }
+
+	  face.set_solid(true);
+	  face.set_line_color(get_line_color());
+	  face.set_fill_color(get_fill_color());
+
+	  fragments.push_back(face);
+	}
   } // end of Sphere::shatter
 
 } /* end of namespace */
-
-
-/*
-	{
-	  tmp1=(i+0.5)*dt, tmp2=(j+0.5)*dphi;
-	  Point temp = center + 
-	    radius*(cos(tmp2)*(cos(tmp1)*E1+sin(tmp1)*E2)+(sin(tmp2)*E3));
-
-	  if (((temp-center).move_to(temp)|world.camera.viewpt()-temp)>0)
-	    {
-	      Quad facet = Quad(vertices[i][j],     vertices[i+1][j],
-				vertices[i+1][j+1], vertices[i][j+1]);
-	      facet.shatter(world);
-	    }
-	  //	  world.add_shard(facet);
-	}
-
-*/

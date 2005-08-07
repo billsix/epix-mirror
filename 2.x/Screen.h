@@ -1,11 +1,11 @@
 /*** 
  *** Screen.h -- ePiX2::Screen class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 19, 2005
+ *** Last Change: August 02, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -110,8 +110,7 @@ namespace ePiX2 {
 
     // actual data; ordering stored privately in tiles
     std::list<Glyph> glyphs;
-    std::list<Outline> outlines;
-    std::list<Region> regions;
+    std::list<Silhouette> silhouettes;
     void add_tile_ptr(Tile*);
 
   private:

@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 29, 2005
+ * Last Change: August 06, 2005
  */
 
 /* 
@@ -44,11 +44,6 @@
 #include "Object.h"
 
 namespace ePiX2 {
-
-  Object::Object(void)
-  { 
-    fragments = new Layer;
-  }
 
   // translate
   Object& Object::operator+= (const Vector& dX)
@@ -185,6 +180,7 @@ namespace ePiX2 {
   Color Shape::get_back_color(void) { return style.back_color; }
 
 
+  /*
   // Clump operations
 
   Clump& Clump::operator+= (const Object obj) 
@@ -218,6 +214,7 @@ namespace ePiX2 {
 
     return value;
   }
+  */
 
 } // end of namespace
 

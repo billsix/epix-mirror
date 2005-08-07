@@ -1,11 +1,11 @@
 /*** 
  ***  Tile.h -- epix2::Tile class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 27, 2005
+ *** Last Change: August 02, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -35,8 +35,7 @@
  *** Affine_Map - mapping class for importing, etc.
  *** Tile    - The base for the screen elements
  *** Glyph   - Labels and Markers in the Screen
- *** Outline - Image of a Path or curve-like Object
- *** Region  - Image of a filled or surface-like Object
+ *** Silhouette - Screen Shape
  ***/
 
 
@@ -82,7 +81,7 @@ namespace ePiX2 {
 
     virtual void map_to(Screen&, const Affine_Map&) = 0;
 
-    virtual void print(void) = 0;
+    virtual void print(void) const = 0;
 
   }; // end of class Tile
 
@@ -97,7 +96,7 @@ namespace ePiX2 {
 
     void map_to(Screen& screen, const Affine_Map& map);
 
-    void print(void);
+    void print(void) const;
 
   private:
 
@@ -120,14 +119,16 @@ namespace ePiX2 {
   }; // end of class Glyph
 
 
-  // Outline represents curves in the Screen, and is the parent of Region
+  // Silhouettes represent curves and filled regions in the Screen;
   // Color is handled Edge by Edge
-  class Outline : public Tile {
+  class Silhouette : public Tile {
 
   public:
 
+    Silhouette(void) { }
+
     void map_to(Screen& screen, const Affine_Map& map);
-    void print(void);
+    void print(void) const;
 
     void add_edge(const Screen_Edge& E)
       {
@@ -138,30 +139,18 @@ namespace ePiX2 {
 
     std::list<Screen_Edge> border;
 
-  protected:
-
-    double line_width;
-
-  }; // end of class Outline
-
-  // Outline with filling
-  class Region : public Outline {
-
-  public:
-
-    void map_to(Screen& screen, const Affine_Map& map);
-    void print(void);
-
+    void set_solid(bool arg=true) { solid = arg; }
     void set_fill_color(const Color& col) { fill_color=col; }
     // void set_fill_style(Fill_Style);
 
-    private:
+  private:
 
+    bool solid;
+    double line_width;
     Color fill_color;
-
     // Fill_Style fill_style;
 
-  }; // end of class Region
+  }; // end of class Silhouette
 
 } /* end of namespace */
 

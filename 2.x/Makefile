@@ -23,22 +23,19 @@ SRCS=Pair.cc Functions.cc Color.cc Visibility.cc \
 	Edge.cc Screen.cc Tile.cc Domain.cc \
 	Vector.cc Mapping.cc Basis.cc Hiding.cc Camera.cc \
 	Output.cc Object.cc Picture.cc \
-	Triangle.cc Quad.cc Segment.cc Disk.cc 
-#	Sphere.cc
+	Triangle.cc Quad.cc Segment.cc Disk.cc Sphere.cc Cube.cc
 
 OBJS=Pair.o Functions.o Color.o Visibility.o \
 	Edge.o Screen.o Tile.o Domain.o \
 	Vector.o Mapping.o Basis.o Hiding.o Camera.o \
 	Output.o Object.o Picture.o \
-	Triangle.o Quad.o Segment.o Disk.o
-#	Sphere.o
+	Triangle.o Quad.o Segment.o Disk.o Sphere.o Cube.o
 
 
 HDRS=Errors.h Constants.h Pair.h Functions.h Color.h Point.h Visibility.h \
 	Edge.h Screen.h Tile.h Domain.h Vector.h Mapping.h Basis.h Hiding.h \
 	Camera.h Object.h Output.h Picture.h Output.h \
-	Triangle.h Quad.h Segment.h Disk.h 
-#	Sphere.h 
+	Triangle.h Quad.h Segment.h Disk.h Sphere.h Cube.h
 
 
 ## Targets ##
@@ -102,8 +99,11 @@ Triangle.o:	Triangle.cc Triangle.h Object.h
 Quad.o:	Quad.cc Quad.h Object.h
 	$(CXX) $(CFLAGS) Quad.cc
 
-#Sphere.o:	Sphere.cc Sphere.h Object.h
-#	$(CXX) $(CFLAGS) Sphere.cc
+Sphere.o:	Sphere.cc Sphere.h Object.h
+	$(CXX) $(CFLAGS) Sphere.cc
+
+Cube.o:	Cube.cc Cube.h Object.h
+	$(CXX) $(CFLAGS) Cube.cc
 
 Disk.o:	Disk.cc Disk.h Object.h
 	$(CXX) $(CFLAGS) Disk.cc

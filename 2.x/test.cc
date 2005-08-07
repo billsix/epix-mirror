@@ -5,10 +5,12 @@ using namespace ePiX2;
 //#define TETRAHEDRA    // two complementary regular tetrahedra
 //#define DISK_TEST     // stack of disks
 //#define CIRC_TEST     // bouquet of circles
-#define POLYGON_TEST  // a cube and octahedron
+//#define POLYGON_TEST  // a cube and octahedron
 //#define IMPLODE_FACES // use in conjunction with POLYGON_TEST
-//#define POLYNEW  // a cube and octahedron, new syntax
 //#define POLYGON2_TEST // 3 golden rectangles
+//#define SPHERE_TEST
+//#define CUBE_TEST     // 3 intersecting cubes
+#define BLOCK_TEST    // miscellaneous boxes
 
 #define FACE_COLOR
 #define EDGE_COLOR
@@ -41,6 +43,83 @@ int main() {
 #ifndef MULTI_IMAGE
   world.view_from(20, 10, 6);
 #endif
+
+#ifdef CUBE_TEST
+
+  Cube block0, block1, block2, block3;
+
+#ifdef FACE_COLOR
+  block1.red(0.8);
+  block2.rgb(0.9, 0.7, 0.5);
+  block3.rgb(0.5, 0.4, 0.3);
+#endif
+
+#ifdef EDGE_COLOR
+  block0.green0();
+  block1.red0(0.8);
+  block2.rgb0(0.9, 0.7, 0.5);
+  block3.rgb0(0.5, 0.4, 0.3);
+#endif
+
+  block0.skeleton();  
+  block1.rotate(45, E_1());
+  block2.rotate(45, E_2());
+  block3.rotate(45, E_3());
+
+  world << block1 << block2 << block3 << block0;
+
+#endif // CUBE_TEST
+
+
+#ifdef BLOCK_TEST
+
+  Cube block0(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
+  Cube block1(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
+  Cube block2(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
+  Cube block3(Point(-0.5,-1,-0.1), Point(0.5, 1, 0.1));
+
+#ifdef FACE_COLOR
+  block0.rgb(0.5, 0.4, 0.3);
+  block1.red(0.8);
+  block2.rgb(0.9, 0.7, 0.5);
+  block3.rgb(0.7, 0.6, 0.5);
+#endif
+
+#ifdef EDGE_COLOR
+  block0.red0(0.8);
+  block1.red0(0.8);
+  block2.yellow0();
+  block3.yellow0();
+#endif
+
+  block0.rotate(90, E_3());
+  block2.rotate(90, E_3());
+  block0.rotate(30, Vector(Origin, 1, 1, 1));
+  block1.rotate(60, Vector(Origin, -1, 1, 1));
+  block2.rotate(60, Vector(Origin, 1, -1, 1));
+  block3.rotate(60, Vector(Origin, 1, 1, -1));
+
+  block2 += 0.5*E_1();
+
+  world << block0 << block1 << block2 << block3;
+
+#endif // BLOCK_TEST
+
+
+#ifdef SPHERE_TEST
+
+  Sphere S1(Origin, sqrt(3), 16, 8);
+  Sphere S2(Point(1,1,1), 0.2, 6, 3);
+
+  S1.rotate(30, Vector(Origin, 1, 1, 1));
+
+  S1.red(0.6);
+  S2.red();
+  S1.yellow0();
+
+  world << S1 << S2;
+
+#endif // SPHERE_TEST
 
 
 #ifdef CIRC_TEST
@@ -75,132 +154,6 @@ int main() {
 
 #endif
 
-#ifdef POLYNEW
-  double cb=1, sz = 2.0;
-
-  Point v000(-cb,-cb,-cb), v100( cb,-cb,-cb);
-  Point v010(-cb, cb,-cb), v110( cb, cb,-cb);
-  Point v001(-cb,-cb, cb), v101( cb,-cb, cb);
-  Point v011(-cb, cb, cb), v111( cb, cb, cb);
-
-  Quad f1a(v000, v010, v011, v001);
-  Quad f1b(v111, v110, v100, v101);
-
-  Quad f2a(v000, v001, v101, v100);
-  Quad f2b(v111, v011, v010, v110);
-
-  Quad f3a(v000, v100, v110, v010);
-  Quad f3b(v111, v101, v001, v011);
-
-  Point v1p(sz,0,0), v1n(-sz,0,0);
-  Point v2p(0,sz,0), v2n(0,-sz,0);
-  Point v3p(0,0,sz), v3n(0,0,-sz);
-
-  Triangle face_ppp(v1p, v2p, v3p);
-  Triangle face_pnp(v1p, v3p, v2n);
-  Triangle face_nnp(v1n, v2n, v3p);
-  Triangle face_npp(v1n, v3p, v2p);
-
-  Triangle face_ppn(v1p, v3n, v2p);
-  Triangle face_pnn(v1p, v2n, v3n);
-  Triangle face_nnn(v1n, v3n, v2n);
-  Triangle face_npn(v1n, v2p, v3n);
-
-#ifdef FACE_COLOR
-  face_ppp.red(0.8);
-  face_pnp.red(0.8);
-  face_npp.red(0.8);
-  face_nnp.red(0.8);
-
-  face_ppn.red(0.8);
-  face_pnn.red(0.8);
-  face_npn.red(0.8);
-  face_nnn.red(0.8);
-
-
-  f1a.rgb(0.5,0.7,0.6);
-  f1b.rgb(0.5,0.7,0.6);
-
-  f2a.rgb(0.5,0.7,0.7);
-  f2b.rgb(0.5,0.7,0.7);
-
-  f3a.rgb(0.5,0.7,0.8);
-  f3b.rgb(0.5,0.7,0.8);
-
-
-#endif // FACE_COLOR
-
-#ifdef EDGE_COLOR
-
-  f1a.cyan0();
-  f1b.cyan0();
-
-  f2a.cyan0();
-  f2b.cyan0();
-
-  f3a.cyan0();
-  f3b.cyan0();
-
-
-  face_ppp.yellow0();
-  face_pnp.yellow0();
-  face_npp.yellow0();
-  face_nnp.yellow0();
-
-  face_ppn.yellow0();
-  face_pnn.yellow0();
-  face_npn.yellow0();
-  face_nnn.yellow0();
-#endif // EDGE_COLOR
-
-  world << f1a;
-  world << f1b;
-
-  world << f2a;
-  world << f2b;
-
-  world << f3a;
-  world << f3b;
-
-  world << face_ppp << face_pnp	<< face_npp << face_nnp
-	<< face_ppn << face_pnn	<< face_npn << face_nnn
-	<< f1a << f1b << f2a << f2b << f3a << f3b;
-
-#endif // POLYNEW
-
-
-#ifdef POLYGON2_TEST
-
-  double wd=1.0, ht=0.5*(1+sqrt(5));
-
-  Point pt1a(  0, wd, ht), pt1b(  0,-wd, ht);
-  Point pt1c(  0,-wd,-ht), pt1d(  0, wd,-ht);
-
-  Point pt2a( ht,  0, wd), pt2b(-ht,  0, wd);
-  Point pt2c(-ht,  0,-wd), pt2d( ht,  0,-wd);
-
-  Point pt3a( wd, ht,  0), pt3b(-wd, ht,  0);
-  Point pt3c(-wd,-ht,  0), pt3d( wd,-ht,  0);
-
-  Quad face1(pt1a, pt1b, pt1c, pt1d);
-  Quad face2(pt2a, pt2b, pt2c, pt2d);
-  Quad face3(pt3a, pt3b, pt3c, pt3d);
-
-#ifdef FACE_COLOR
-  face1.rgb(0.6,0.7,0.8);
-  face2.rgb(0.7,0.7,0.8);
-  face3.rgb(0.7,0.6,0.8);
-#endif
-
-#ifdef EDGE_COLOR
-  face1.green0(0.8);
-  face2.green0(0.8);
-  face3.green0(0.8);
-#endif
-
-  world << face1 << face2 << face3;
-
-#endif // POLYGON2_TEST
 
 #ifdef POLYGON_TEST
 
@@ -216,14 +169,15 @@ int main() {
   Point v001(-cb,-cb, cb), v101( cb,-cb, cb);
   Point v011(-cb, cb, cb), v111( cb, cb, cb);
 
-  Quad f1a(v000, v010, v011, v001);
-  Quad f1b(v111, v110, v100, v101);
+  // oriented by outward normals
+  Quad f1a(v000, v001, v011, v010);
+  Quad f1b(v111, v101, v100, v110);
 
-  Quad f2a(v000, v001, v101, v100);
-  Quad f2b(v111, v011, v010, v110);
+  Quad f2a(v000, v100, v101, v001);
+  Quad f2b(v111, v110, v010, v011);
 
-  Quad f3a(v000, v100, v110, v010);
-  Quad f3b(v111, v101, v001, v011);
+  Quad f3a(v000, v010, v110, v100);
+  Quad f3b(v111, v011, v001, v101);
 
   Point v1p(sz,0,0), v1n(-sz,0,0);
   Point v2p(0,sz,0), v2n(0,-sz,0);
@@ -306,6 +260,39 @@ int main() {
 #endif // POLYGON_TEST
 
 
+#ifdef POLYGON2_TEST
+
+  double wd=1.0, ht=0.5*(1+sqrt(5));
+
+  Point pt1a(  0, wd, ht), pt1b(  0,-wd, ht);
+  Point pt1c(  0,-wd,-ht), pt1d(  0, wd,-ht);
+
+  Point pt2a( ht,  0, wd), pt2b(-ht,  0, wd);
+  Point pt2c(-ht,  0,-wd), pt2d( ht,  0,-wd);
+
+  Point pt3a( wd, ht,  0), pt3b(-wd, ht,  0);
+  Point pt3c(-wd,-ht,  0), pt3d( wd,-ht,  0);
+
+  Quad face1(pt1a, pt1b, pt1c, pt1d);
+  Quad face2(pt2a, pt2b, pt2c, pt2d);
+  Quad face3(pt3a, pt3b, pt3c, pt3d);
+
+#ifdef FACE_COLOR
+  face1.rgb(0.6,0.7,0.8);
+  face2.rgb(0.7,0.7,0.8);
+  face3.rgb(0.7,0.6,0.8);
+#endif
+
+#ifdef EDGE_COLOR
+  face1.green0(0.8);
+  face2.green0(0.8);
+  face3.green0(0.8);
+#endif
+
+  world << face1 << face2 << face3;
+
+#endif // POLYGON2_TEST
+
 #ifdef DISK_TEST
 
   Point pt1(0,0,0.5), pt2(0,0,1), pt3(0,0,1.5);
@@ -325,7 +312,7 @@ int main() {
   world << disk0 << disk1 << disk2 << disk3;
 
 #ifndef MULTI_IMAGE
-  Disk disk4(pt1, 1.75, E_1(pt1), false);
+  Disk disk4(pt1, 1.75, E_1(pt1), false); // Circle
   Disk disk5(pt1, 1.5, E_1(pt1), false);
   Disk disk6(pt1, 1.25, E_1(pt1));
 #ifdef FACE_COLOR
@@ -418,7 +405,7 @@ int main() {
   face_nnn += Vector(Point(-sz/3,-sz/3,-sz/3),-disp,-disp,-disp);
 
 #ifdef FACE_COLOR
-  double my_r=0.7, my_g=0.3, my_b=0.9;
+  double my_r=1, my_g=0.9, my_b=0.7;
   face_ppp.rgb(my_r, my_g, my_b);
   face_pnp.rgb(my_r, my_g, my_b);
   face_nnp.rgb(my_r, my_g, my_b);

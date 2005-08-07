@@ -1,11 +1,11 @@
 /* 
  * Basis.cc -- ePiX2::Basis class and operations
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 31, 2005
+ * Last Change: August 06, 2005
  */
 
 /* 
@@ -122,7 +122,7 @@ namespace ePiX2 {
 	if (lin_dependent(tmp_axis, E_3(old_O)))
 	  old_coords=Basis(old_O, E_1(old_O), E_2(old_O), tmp_axis);
 	else
-	  old_coords=Basis(old_O, E_2(old_O), E_3(old_O), tmp_axis);
+	  old_coords=Basis(old_O, E_3(old_O)*tmp_axis, E_3(old_O), tmp_axis);
 
 	// rotate basis backward and use to compute coordinates
 	new_coords=old_coords;

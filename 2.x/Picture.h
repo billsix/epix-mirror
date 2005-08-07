@@ -1,11 +1,11 @@
 /*** 
  ***  Picture.h -- epix2::Picture class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 19, 2005
+ *** Last Change: August 03, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -76,8 +76,9 @@ namespace ePiX2 {
       void import(Picture& world, const Pair& arg1, const Pair& arg2);
 
       // map scenery to screen
-      void expose(epix2_shade_type shaded=SHADE_SOLID);
-      void x_ray(void); // draw edges only, with no hiding
+      void expose(epix2_shade_type shaded=SHADE_SOLID); // face-normal shading
+      void flash(void) { expose(SHADE_FLAT); }
+      void x_ray(void) { expose(SHADE_NONE); } // edges only, no hiding
 
       void print(void); // map screen to page
       void draw(Tile*); // draw directly in screen
@@ -122,7 +123,10 @@ namespace ePiX2 {
 
       Layer* shards; // binary space partition tree root
 
-      void merge(Layer*);
+      //      void merge(Layer*);
+
+      void remove_backfaces(Object*);
+      void set_shard_distance(Object*); // compute min/max dist to viewer
 
       void clear_shard_tree(void);
       void build_shard_tree(void);

@@ -6,11 +6,11 @@
  ***  tree. Then, depending on the location of the viewer, the tree
  ***  is traversed, and each node's data is projected to a Tile.
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 27, 2005
+ *** Last Change: August 06, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -90,8 +90,6 @@ namespace ePiX2 {
 
     friend class Layer;
     friend class Picture;
-    friend class by_minimum_distance;
-    friend class by_maximum_distance;
 
   public:
 
@@ -110,6 +108,8 @@ namespace ePiX2 {
     void set_fill_color(const Color& col) { fill_color=col; }
 
     Shard clip_by(const Vector& knife) const;
+
+    bool operator< (const Shard& arg);
 
   private:
 
@@ -131,23 +131,6 @@ namespace ePiX2 {
     // if solid, interior color/shading
 
   }; // end of class Shard
-
-  // for crude distance sorting
-  class by_minimum_distance {
-  public:
-    bool operator() (Shard& arg1, Shard& arg2)
-      {
-	return arg1.min_distance > arg2.min_distance;
-      }
-  };
-
-  class by_maximum_distance {
-  public:
-    bool operator() (Shard& arg1, Shard& arg2)
-      {
-	return arg1.max_distance > arg2.max_distance;
-      }
-  };
 
 
   class Layer {

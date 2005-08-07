@@ -1,8 +1,8 @@
 /* 
  *  Quad.h -- epix2::Quad class
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
  * Last Change: August 01, 2005
@@ -87,7 +87,7 @@ namespace ePiX2 {
     face.set_line_color(get_line_color());
     face.set_fill_color(get_fill_color());
 
-    fragments->insert(face);
+    fragments.push_back(face);
 
   } // end of Quad::shatter
 

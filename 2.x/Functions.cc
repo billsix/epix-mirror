@@ -1,11 +1,11 @@
 /* 
  * Functions.cc -- non-standard mathematical functions
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 13, 2005
+ * Last Change: August 02, 2005
  */
 
 /* 
@@ -92,7 +92,7 @@ namespace ePiX2 {
 
   /* identity map and coordinate projections */
 
-  template<class T> T identity(T) { return arg; }
+  template<class T> T identity(T arg) { return arg; }
 
   double proj1 (double x, double y) { return x; }
   double proj2 (double x, double y) { return y; }

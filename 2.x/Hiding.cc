@@ -1,11 +1,11 @@
 /* 
  * Hiding.cc -- ePiX2 classes (Shard, Layer) for hiding
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: August 01, 2005
+ * Last Change: August 06, 2005
  */
 
 /* 
@@ -48,6 +48,13 @@
 #include "Hiding.h"
 
 namespace ePiX2 {
+
+  bool Shard::operator< (const Shard& arg)
+  {
+    return ((min_distance < arg.min_distance - EPIX2_EPSILON) ||
+	    (fabs(min_distance-arg.min_distance) < EPIX2_EPSILON && 
+	     max_distance < arg.max_distance - EPIX2_EPSILON));
+  }
 
   Shard Shard::clip_by(const Vector& knife) const
   {

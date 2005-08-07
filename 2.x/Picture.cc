@@ -1,11 +1,11 @@
 /* 
  *  Picture.cc -- epix2::Picture class
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a program for creating high-quality 
+ * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: July 29, 2005
+ * Last Change: August 06, 2005
  */
 
 /* 
@@ -117,14 +117,6 @@ namespace ePiX2 {
     //    shards->label_draw(*this); TO DO
   }
 
-  // map edges to screen without hiding
-  void Picture::x_ray(void) 
-  { 
-    //    clear_shard_tree();
-    build_shard_tree(); // shatter everything and build tree
-    draw_tree(*shards, SHADE_NONE); 
-  }
-
 
   // map screen to page
   void Picture::print(void)
@@ -193,7 +185,7 @@ namespace ePiX2 {
   void Picture::tilt(const double th) { camera.rotate_sea(th); }
   void Picture::roll(const double th) { camera.rotate_eye(th); }
 
-
+  /*
   // merge tree front to back into shards
   void Picture::merge(Layer* tree) 
   {
@@ -222,76 +214,122 @@ namespace ePiX2 {
 	  merge(tree->front);
       }
   }
+  */
+
+  // shard mangling
+  void Picture::set_shard_distance(Object* obj)
+  {
+    std::list<Shard>::iterator frag_ptr;  // current shard
+    std::list<Edge>::const_iterator curr; // current edge
+
+    for (frag_ptr  = obj->fragments.begin(); 
+	 frag_ptr != obj->fragments.end(); ++frag_ptr)
+      {
+	Point curr_vertex;
+	double curr_dist;
+	double max_dist, min_dist; // initialize on first edge
+
+	for (curr  = (*frag_ptr).boundary.begin(); 
+	     curr != (*frag_ptr).boundary.end(); ++curr)
+	  {
+	    if (curr == (*frag_ptr).boundary.begin())
+	      {
+		curr_vertex = (*curr).first;
+		curr_dist = norm(curr_vertex - camera.viewpt());
+		max_dist=min_dist=curr_dist;
+	      }
+
+	    curr_vertex = (*curr).second;
+	    curr_dist = norm(curr_vertex - camera.viewpt());
+
+	    max_dist=max(curr_dist, max_dist);
+	    min_dist=min(curr_dist, min_dist);
+	  }
+
+	// all edges examined, set distances
+	(*frag_ptr).max_distance = max_dist;
+	(*frag_ptr).min_distance = min_dist;
+      } // all shards examined
+
+  } // end of set_shard_distance
+
+
+  void Picture::remove_backfaces(Object* obj)
+  {
+    if (obj->closed_oriented) // else do nothing
+      {
+	std::list<Shard>::iterator frag_ptr = obj->fragments.begin();
+	Vector temp_N;
+
+	while (frag_ptr != obj->fragments.end())
+	  {
+	    temp_N = (*frag_ptr).normal;
+
+	    if ((temp_N|(camera.viewpt()-temp_N.tail())) < EPIX2_EPSILON)
+	      frag_ptr = obj->fragments.erase(frag_ptr);
+
+	    else
+	      ++frag_ptr;
+	  }
+      }
+  } // end of remove_backfaces()
 
   // private functions to turn all our Objects into lists of Shards
   void Picture::build_shard_tree(void)
   {
+    std::list<Shard> all_fragments;
+
     std::list<Object*>::iterator obj;
 
-    for (obj=scenery.begin(); obj!=scenery.end(); ++obj)
-      (*obj)->shatter(); 
+    //    for (obj=scenery.begin(); obj!=scenery.end(); ++obj)
+    //      set_distance(*obj); // distance from viewpt to object
 
-    // do distance sorting, Object-level removal, back-face removal, et. al.
+    //    sort(scenery.begin(), scenery.end(), by_distance);
 
     for (obj=scenery.begin(); obj!=scenery.end(); ++obj)
-      merge((*obj)->fragments);
+      {
+	(*obj)->shatter();       // break *obj into shards
+	remove_backfaces(*obj);  // remove obvious invisibles
+	set_shard_distance(*obj);// compute min/max dist to viewer
+
+	all_fragments.merge((*obj)->fragments); // global temporary shard list
+      }
+
+    shards->insert(all_fragments);
   }
 
   // map a single Shard to the screen; TO DO -- make outline an unsolid region
   void Picture::map_to_tile(const Shard& frag, epix2_shade_type shaded)
   {
-    if (frag.solid && (shaded != SHADE_NONE)) // add region
+    Silhouette shadow;
+    std::list<Edge>::const_iterator curr;
+
+    for(curr=frag.boundary.begin(); curr!=frag.boundary.end(); ++curr)
+      shadow.add_edge(camera(*curr)); // Tile::add_edge
+
+    shadow.set_solid(frag.solid);
+
+    if (frag.solid && (shaded != SHADE_NONE)) // set fillcolor
       {
-	Region shadow;
-	std::list<Edge>::const_iterator curr;
+	// TO DO: Handle back coloring
+	Vector view_dir=camera.viewpt() - frag.normal.tail();
+	double c=(frag.normal|view_dir)/(norm(frag.normal)*norm(view_dir));
+	double dens=1;
 
-	for(curr=frag.boundary.begin(); curr!=frag.boundary.end(); ++curr)
-	  shadow.add_edge(camera(*curr)); // Tile::add_edge
-
+	// Magic formula: (3+cos^2(theta))/4 interpolates color 
+	// densities between 0.75 and 1, discards face orientation
 	if (shaded == SHADE_SOLID)
-	  {
-	    Vector view_dir=camera.viewpt() - frag.normal.tail();
-	    // Magic formula: (3+cos^2(theta))/4 interpolates color 
-	    // densities between 0.75 and 1, discards face orientation
-	    double c=(frag.normal|view_dir)/(norm(frag.normal)*norm(view_dir));
-	    shadow.set_fill_color(frag.fill_color*(0.25*(3+c*c)));
-	  }
+	  dens = 0.25*(3+c*c);
 
-	else // shaded == SHADE_FLAT
-	  shadow.set_fill_color(frag.fill_color);
-
-	screen.regions.push_back(shadow);
-
-	// get address of element just pushed
-	std::list<Region>::iterator last;
-	if (screen.regions.size() == 1)
-	  last = screen.regions.begin();
-	else
-	  last = --screen.regions.end();
-
-	screen.add_tile_ptr(&(*last));
+	shadow.set_fill_color(frag.fill_color*dens);
       }
 
-    else // add outline
-      {
-	Outline bdy;
-	std::list<Edge>::const_iterator curr;
+    screen.silhouettes.push_back(shadow);
 
-	for(curr=frag.boundary.begin(); curr!=frag.boundary.end(); ++curr)
-	  bdy.add_edge(camera(*curr));
+    // get address of element just pushed
+    std::list<Silhouette>::iterator last = --screen.silhouettes.end();
+    screen.add_tile_ptr(&(*last));
 
-	// color and style dictated edge by edge      
-	screen.outlines.push_back(bdy);
-
-	// get address of element just pushed
-	std::list<Outline>::iterator last;
-	if (screen.outlines.size() == 1)
-	  last = screen.outlines.begin();
-	else
-	  last = --screen.outlines.end();
-
-	screen.add_tile_ptr(&(*last));
-      }
   } // end of map_to_tile()
 
 
