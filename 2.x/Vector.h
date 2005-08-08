@@ -1,8 +1,8 @@
 /*** 
  ***  Vector.h -- epix2::Vector class and operators
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
  *** Last Change: August 01, 2005
@@ -193,6 +193,8 @@ namespace ePiX2 {
 	Vx3 -= c*arg.Vx3;
 	return *this;
       }
+
+    double height(const Point&) const;
 
     // intersection of perp with E
     Point perp_hits(const Point&, const Point&) const;

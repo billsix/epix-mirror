@@ -1,5 +1,5 @@
 /* 
- * Triangle.cc -- epix2::Triangle class
+ * Tetra.h -- epix2::Tetrahedron class
  *
  * This file is part of ePiX, a program for creating high-quality 
  * figures in LaTeX 
@@ -34,57 +34,67 @@
 
 /*
  *   This file provides:
- *     - The Triangle class (derived from Object) and operators
+ *     - The Tetrahedron class (derived from Object) and operators
  */
+
+#include <vector>
 
 #include "Functions.h"
 #include "Edge.h"
-#include "Hiding.h"
+#include "Point.h"
 #include "Basis.h"
 #include "Object.h"
-#include "Visibility.h"
+#include "Hiding.h"
 #include "Triangle.h"
+#include "Tetra.h"
 
 namespace ePiX2 {
 
-  bool Triangle::hides(const Point vpt, const Point X)
+  Tetrahedron::Tetrahedron(const Point& arg0, const Point& arg1,
+			   const Point& arg2, const Point& arg3)
+    : vtx0(arg0), vtx1(arg1), vtx2(arg2), vtx3(arg3)
   {
-    return ( (!on_same_side(vtx1, vtx2, vtx3, vpt, X)) &&
-	       on_same_side(vtx1, vtx2, vpt, X,  vtx3) &&
-               on_same_side(vtx2, vtx3, vpt, X,  vtx1) &&
-               on_same_side(vtx3, vtx1, vpt, X,  vtx2) );
+    if (((vtx3-vtx0)|((vtx1-vtx0)*(vtx2-vtx0))) < 0) // wrong orientation
+      {
+	vtx2=arg3;
+	vtx3=arg2;
+      }
   }
 
-  void Triangle::shatter(void)
+  Tetrahedron::Tetrahedron(double s)
   {
-    // compute transformed vertices
-    Point V1=the_orient.coords(vtx1, the_scale);
-    Point V2=the_orient.coords(vtx2, the_scale);
-    Point V3=the_orient.coords(vtx3, the_scale);
+    double ht=1.0/sqrt(8);
+    vtx0 = Point(0.5, 0,  ht);
+    vtx1 = Point(-0.5, 0, ht);
+    vtx2 = Point(0, 0.5, -ht);
+    vtx3 = Point(0,-0.5, -ht);
+  }
 
-    Edge e1(V1, V2, get_line_color());
-    Edge e2(V2, V3, get_line_color());
-    Edge e3(V3, V1, get_line_color());
 
-    Shard face;
+  void Tetrahedron::shatter(void)
+  {
+    closed_oriented=true;
 
-    face.add_edge(e1);
-    face.add_edge(e2);
-    face.add_edge(e3);
+    // vertices
 
-    // N.B. Normal arbitrarily located at V1
-    Vector N=(V2-V1)*(V3-V1);
-    N *= recip(norm(N)); // normalize, returning (0,0,0) if N=0
-    face.set_normal(N);
+    Triangle f1(vtx0, vtx2, vtx1);
+    Triangle f2(vtx0, vtx1, vtx3);
+    Triangle f3(vtx0, vtx3, vtx2);
+    Triangle f4(vtx1, vtx2, vtx3);
 
-    face.set_solid(solid);
-    face.set_line_color(get_line_color());
-    face.set_fill_color(get_fill_color());
+    (*this) << f1 << f2 << f3 << f4;
 
-    fragments.push_back(face);
+    std::list<Object*>::iterator faces;
 
-  } // end of Triangle::shatter
+    for (faces=parts.begin(); faces!=parts.end(); ++faces)
+      {
+	(*faces)->skeleton(!solid);
+	(*faces)->set_line_color(get_line_color());
+	(*faces)->set_fill_color(get_fill_color());
+      }
+
+    this->Object::shatter();
+
+  } // end of Tetrahedron::shatter
 
 } /* end of namespace */
-
-

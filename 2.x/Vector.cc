@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: August 01, 2005
+ * Last Change: August 08, 2005
  */
 
 /* 
@@ -34,6 +34,7 @@
 
 #include "Constants.h"
 #include "Errors.h"
+#include "Functions.h"
 #include "Edge.h"
 #include "Vector.h"
 
@@ -75,6 +76,13 @@ namespace ePiX2 {
     return (fabs((v1*v2)|v3) <= EPIX2_EPSILON*norm(v1)*norm(v2)*norm(v3));
   }
 
+
+  double Vector::height(const Point& arg) const
+  {
+    Vector N = (*this);
+    N *= recip(norm(N)); // unit, or 0
+    return N|(arg-N.tail());
+  }
 
   // intersection of perp with E
   Point Vector::perp_hits(const Point& q1, const Point& q2) const

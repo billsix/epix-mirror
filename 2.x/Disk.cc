@@ -68,8 +68,8 @@ namespace ePiX2 {
     const int N=80; // Magic number
 
     // compute normal in transformed coordinates
-    Point new_center=the_orient.coords(center);
-    Point new_N_tip=the_orient.coords(normal.head());
+    Point new_center=the_orient.coords(center, the_scale);
+    Point new_N_tip=the_orient.coords(normal.head(), the_scale);
 
     normal=new_N_tip - new_center; 
     normal *= recip(norm(normal));

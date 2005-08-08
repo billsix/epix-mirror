@@ -2,7 +2,6 @@
 using namespace ePiX2;
 
 //#define TRIANGLES     // an octahedron with retracted faces
-//#define TETRAHEDRA    // two complementary regular tetrahedra
 
 //#define POLYGON_TEST  // manual cube/octahedron, can be "imploded"
 //#define IMPLODE_FACES // use in conjunction with POLYGON_TEST
@@ -13,10 +12,13 @@ using namespace ePiX2;
 
 //#define SPHERE_TEST   // ugly...
 
-//#define CUBE3_TEST    // 3 intersecting cubes
-//#define CUBE5_TEST    // 5 intersecting cubes
+//#define TETRAHEDRA    // two complementary regular tetrahedra
+#define TETRAHEDRA5   // five tetrahedra
+
+//#define CUBE3_TEST    // three cubes
+//#define CUBE5_TEST    // five cubes with icosahedral symmetry
 //#define CUBE_OCTA     // polyhedral cube and octahedron
-#define OCTAHEDRA
+//#define OCTAHEDRA     // five octahedra
 
 #define FACE_COLOR
 #define EDGE_COLOR
@@ -382,32 +384,61 @@ int main() {
   Point v000(-1,-1,-1), v100( 1,-1,-1), v010(-1, 1,-1), v110( 1, 1,-1);
   Point v001(-1,-1, 1), v101( 1,-1, 1), v011(-1, 1, 1), v111( 1, 1, 1);
 
-  Triangle face1a(v000, v011, v101);
-  Triangle face1b(v000, v101, v110);
-  Triangle face1c(v000, v110, v011);
-  Triangle face1d(v011, v101, v110);
+  Tetrahedron T1(v000, v011, v101, v110);
+  Tetrahedron T2(v111, v100, v010, v001);
 
-  Triangle face2a(v111, v100, v010);
-  Triangle face2b(v111, v010, v001);
-  Triangle face2c(v111, v001, v100);
-  Triangle face2d(v100, v010, v001);
+  //  T1.skeleton();
+  //  T2.skeleton();
 
 #ifdef FACE_COLOR
-  face1a.red(0.6);
-  face1b.red(0.6);
-  face1c.red(0.6);
-  face1d.red(0.6);
-
-  face2a.green(0.7);
-  face2b.green(0.7);
-  face2c.green(0.7);
-  face2d.green(0.7);
+  T1.red(0.6);
+  T2.green(0.7);
 #endif
 
-  world << face1a << face1b << face1c << face1d 
-	<< face2a << face2b << face2c << face2d;
+#ifdef EDGE_COLOR
+  T1.green0(0.7);
+  T2.red0(0.6);
+#endif
+
+  world << T1 << T2;
 
 #endif // TETRAHEDRA
+
+
+#ifdef TETRAHEDRA5
+  Point v000(-1,-1,-1), v100( 1,-1,-1), v010(-1, 1,-1), v110( 1, 1,-1);
+  Point v001(-1,-1, 1), v101( 1,-1, 1), v011(-1, 1, 1), v111( 1, 1, 1);
+
+  Tetrahedron T0(v000, v011, v101, v110);
+  Tetrahedron T1(v000, v011, v101, v110);
+  Tetrahedron T2(v000, v011, v101, v110);
+  Tetrahedron T3(v000, v011, v101, v110);
+  Tetrahedron T4(v000, v011, v101, v110);
+
+  T0.skeleton(false);
+  T1.skeleton(false);
+  T2.skeleton(false);
+  T3.skeleton(false);
+  T4.skeleton(false);
+
+#ifdef FACE_COLOR
+  T0.red(0.6);
+  T1.rgb(0.6,0.3,0.3);
+  T2.rgb(0.6,0.3,0.3);
+  T3.rgb(0.6,0.3,0.3);
+  T4.rgb(0.6,0.3,0.3);
+#endif
+
+  Vector axis(Origin, 1, 0.5*(1+sqrt(5)), 0);
+
+  T1.rotate(72, axis);
+  T2.rotate(144, axis);
+  T3.rotate(216, axis);
+  T4.rotate(288, axis);
+
+  world << T0 << T1 << T2 << T3 << T4;
+
+#endif // TETRAHEDRA5
 
 
 #ifdef TRIANGLES

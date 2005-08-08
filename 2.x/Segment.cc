@@ -5,7 +5,7 @@
  * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: August 01, 2005
+ * Last Change: August 08, 2005
  */
 
 /* 
@@ -54,8 +54,8 @@ namespace ePiX2 {
   void Segment::shatter(void)
   {
     // compute transformed vertices
-    Point V0=the_orient.coords(vtx0);
-    Point V1=the_orient.coords(vtx1);
+    Point V0=the_orient.coords(vtx0, the_scale);
+    Point V1=the_orient.coords(vtx1, the_scale);
 
     Shard seg;
 

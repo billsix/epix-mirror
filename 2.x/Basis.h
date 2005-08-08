@@ -1,11 +1,11 @@
 /*** 
  ***  Basis.h -- epix2::Basis class
  ***
- *** This file is part of ePiX, a preprocessor for creating high-quality 
- *** line figures in LaTeX 
+ *** This file is part of ePiX, a program for creating high-quality 
+ *** figures in LaTeX 
  ***
  *** Version 2.0pre
- *** Last Change: July 31, 2005
+ *** Last Change: August 08, 2005
  ***
  *** 
  *** Copyright (C) 2001, 2002, 2003, 2004, 2005
@@ -74,7 +74,7 @@ namespace ePiX2 {
 
     Point here(void) const { return location; }
     // coordinates of arg with respect to us
-    Point coords(const Point arg) const;
+    Point coords(const Point arg, const double scale=1) const;
 
     void move_to(const Point& arg)
       {

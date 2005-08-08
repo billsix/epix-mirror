@@ -5,7 +5,7 @@
  * figures in LaTeX 
  *
  * Version 2.0pre
- * Last Change: August 06, 2005
+ * Last Change: August 08, 2005
  */
 
 /* 
@@ -188,11 +188,11 @@ namespace ePiX2 {
 
   } // end of Basis::reflect(Vector)
 
-  Point Basis::coords(const Point arg) const
+  Point Basis::coords(const Point arg, const double scale) const
   {
-    return Point(basis1|(arg-location),
-		 basis2|(arg-location),
-		 basis3|(arg-location));
+    return Point(scale*(basis1|(arg-location)),
+		 scale*(basis2|(arg-location)),
+		 scale*(basis3|(arg-location)));
   }
 
 } // end of namespace

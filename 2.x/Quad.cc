@@ -60,10 +60,10 @@ namespace ePiX2 {
   void Quad::shatter(void)
   {
     // compute transformed vertices
-    Point V0=the_orient.coords(vtx0);
-    Point V1=the_orient.coords(vtx1);
-    Point V2=the_orient.coords(vtx2);
-    Point V3=the_orient.coords(vtx3);
+    Point V0=the_orient.coords(vtx0, the_scale);
+    Point V1=the_orient.coords(vtx1, the_scale);
+    Point V2=the_orient.coords(vtx2, the_scale);
+    Point V3=the_orient.coords(vtx3, the_scale);
 
 
     Edge e0(V0, V1, get_line_color());

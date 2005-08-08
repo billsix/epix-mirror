@@ -24,21 +24,21 @@ SRCS=Pair.cc Functions.cc Color.cc Visibility.cc \
 	Vector.cc Mapping.cc Basis.cc Hiding.cc Camera.cc \
 	Output.cc Object.cc Picture.cc \
 	Triangle.cc Quad.cc Segment.cc Disk.cc Sphere.cc \
-	Cube.cc Octa.cc 
+	Tetra.cc Cube.cc Octa.cc 
 
 OBJS=Pair.o Functions.o Color.o Visibility.o \
 	Edge.o Screen.o Tile.o Domain.o \
 	Vector.o Mapping.o Basis.o Hiding.o Camera.o \
 	Output.o Object.o Picture.o \
 	Triangle.o Quad.o Segment.o Disk.o Sphere.o \
-	Cube.o Octa.o 
+	Tetra.o Cube.o Octa.o 
 
 
 HDRS=Errors.h Constants.h Pair.h Functions.h Color.h Point.h Visibility.h \
 	Edge.h Screen.h Tile.h Domain.h Vector.h Mapping.h Basis.h Hiding.h \
 	Camera.h Object.h Output.h Picture.h Output.h \
 	Triangle.h Quad.h Segment.h Disk.h Sphere.h \
-	Cube.h Octa.h 
+	Tetra.h Cube.h Octa.h 
 
 
 ## Targets ##
@@ -107,6 +107,9 @@ Disk.o:	Disk.cc Disk.h Object.h
 
 Sphere.o:	Sphere.cc Sphere.h Object.h Triangle.h Quad.h
 	$(CXX) $(CFLAGS) Sphere.cc
+
+Tetra.o:	Tetra.cc Tetra.h Object.h Triangle.h
+	$(CXX) $(CFLAGS) Tetra.cc
 
 Cube.o:	Cube.cc Cube.h Object.h Quad.h
 	$(CXX) $(CFLAGS) Cube.cc

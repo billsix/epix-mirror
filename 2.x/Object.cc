@@ -59,13 +59,13 @@ namespace ePiX2 {
 
   Object_Base& Object_Base::operator*= (const double c)
   {
-    the_scale *= recip(c); // will detect *=0 in shatter()
+    the_scale *= c;
     return *this;
   }
 
   void Object_Base::scale (const double c)
   {
-    the_scale *= recip(c);
+    the_scale *= c;
   }
 
   void Object_Base::rotate(const double angle, const Vector& axis)
