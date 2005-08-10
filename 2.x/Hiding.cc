@@ -102,9 +102,9 @@ namespace ePiX2 {
 
 		    if (cut_ends.size() == 2) // found second crossing
 		      {
-			Edge the_cut; // undrawn boundary component
+			Edge the_cut; // undrawn (? TO DO) boundary component
 			the_cut = Edge(cut_ends.at(1), cut_ends.at(0), 
-				       fill_color, true);
+				       fill_color, false);
 
 			clipped.add_edge(the_cut);
 		      }
@@ -119,7 +119,7 @@ namespace ePiX2 {
 		      {
 			Edge the_cut;
 			the_cut = Edge(cut_ends.at(0), cut_ends.at(1),
-				       fill_color, true);
+				       fill_color, false);
 
 			clipped.add_edge(the_cut);
 		      }

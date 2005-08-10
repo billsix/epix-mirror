@@ -139,4 +139,5 @@ test:	$(EPIX_LIB) $(EPIX_HDR) test.cc
 	./a.out > test.eepic && elaps test.eepic
 
 clean:
-	-$(RM) $(OBJS) $(EPIX_LIB) $(EPIX_HDR) a.out
+	-$(RM) $(OBJS) a.out
+#	$(EPIX_LIB) $(EPIX_HDR)

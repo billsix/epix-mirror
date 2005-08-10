@@ -91,12 +91,12 @@ namespace ePiX2 {
   }
 
   // Object operations
-
   Object::Object(void) 
   {
     the_orient=Basis();
     the_scale=1;
     // set default face and edge colors 
+    solid=true;
     white(); 
     black0(); 
   }

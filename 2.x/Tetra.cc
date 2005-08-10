@@ -63,11 +63,11 @@ namespace ePiX2 {
 
   Tetrahedron::Tetrahedron(double s)
   {
-    double ht=1.0/sqrt(8);
-    vtx0 = Point(0.5, 0,  ht);
-    vtx1 = Point(-0.5, 0, ht);
-    vtx2 = Point(0, 0.5, -ht);
-    vtx3 = Point(0,-0.5, -ht);
+    double ht=s/sqrt(8), sz=0.5*s;
+    vtx0 = Point( sz, 0,  ht);
+    vtx1 = Point(-sz, 0,  ht);
+    vtx2 = Point(0,  sz, -ht);
+    vtx3 = Point(0, -sz, -ht);
   }
 
 
@@ -76,13 +76,12 @@ namespace ePiX2 {
     closed_oriented=true;
 
     // vertices
+    Triangle f_1(vtx0, vtx2, vtx1);
+    Triangle f_2(vtx0, vtx1, vtx3);
+    Triangle f_3(vtx0, vtx3, vtx2);
+    Triangle f_4(vtx1, vtx2, vtx3);
 
-    Triangle f1(vtx0, vtx2, vtx1);
-    Triangle f2(vtx0, vtx1, vtx3);
-    Triangle f3(vtx0, vtx3, vtx2);
-    Triangle f4(vtx1, vtx2, vtx3);
-
-    (*this) << f1 << f2 << f3 << f4;
+    (*this) << f_1 << f_2 << f_3 << f_4;
 
     std::list<Object*>::iterator faces;
 

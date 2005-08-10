@@ -13,9 +13,9 @@ using namespace ePiX2;
 //#define SPHERE_TEST   // ugly...
 
 //#define TETRAHEDRA    // two complementary regular tetrahedra
-#define TETRAHEDRA5   // five tetrahedra
+//#define TETRAHEDRA5   // five tetrahedra
 
-//#define CUBE3_TEST    // three cubes
+#define CUBE3_TEST    // three cubes
 //#define CUBE5_TEST    // five cubes with icosahedral symmetry
 //#define CUBE_OCTA     // polyhedral cube and octahedron
 //#define OCTAHEDRA     // five octahedra
@@ -387,9 +387,6 @@ int main() {
   Tetrahedron T1(v000, v011, v101, v110);
   Tetrahedron T2(v111, v100, v010, v001);
 
-  //  T1.skeleton();
-  //  T2.skeleton();
-
 #ifdef FACE_COLOR
   T1.red(0.6);
   T2.green(0.7);
@@ -415,18 +412,12 @@ int main() {
   Tetrahedron T3(v000, v011, v101, v110);
   Tetrahedron T4(v000, v011, v101, v110);
 
-  T0.skeleton(false);
-  T1.skeleton(false);
-  T2.skeleton(false);
-  T3.skeleton(false);
-  T4.skeleton(false);
-
 #ifdef FACE_COLOR
-  T0.red(0.6);
-  T1.rgb(0.6,0.3,0.3);
-  T2.rgb(0.6,0.3,0.3);
-  T3.rgb(0.6,0.3,0.3);
-  T4.rgb(0.6,0.3,0.3);
+  T0.red(0.8);
+  T1.rgb(0.8,0.6,0.3);
+  T2.rgb(0.8,0.5,0.3);
+  T3.rgb(0.8,0.4,0.3);
+  T4.rgb(0.8,0.3,0.3);
 #endif
 
   Vector axis(Origin, 1, 0.5*(1+sqrt(5)), 0);

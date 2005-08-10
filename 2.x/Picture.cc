@@ -307,7 +307,11 @@ namespace ePiX2 {
     for(curr=frag.boundary.begin(); curr!=frag.boundary.end(); ++curr)
       shadow.add_edge(camera(*curr)); // Tile::add_edge
 
-    shadow.set_solid(frag.solid);
+    if (shaded == SHADE_NONE)
+      shadow.set_solid(false);
+
+    else
+      shadow.set_solid(frag.solid);
 
     if (frag.solid && (shaded != SHADE_NONE)) // set fillcolor
       {
