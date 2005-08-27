@@ -39,7 +39,7 @@
 #include "Pair.h"
 #include "Color.h"
 #include "Tile.h"
-#include "Picture.h"
+#include "World.h"
 #include "Screen.h"
 
 #include "Output.h"

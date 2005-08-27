@@ -90,7 +90,7 @@ namespace ePiX2 {
   class Shard {
 
     friend class Layer;
-    friend class Picture;
+    friend class World;
 
   public:
 
@@ -136,7 +136,7 @@ namespace ePiX2 {
 
   class Layer {
 
-    friend class Picture;
+    friend class World;
 
   public:
 

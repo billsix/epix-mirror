@@ -37,7 +37,7 @@ namespace ePiX2{
 int main() { 
 
   // declare a blank (3-D) "slate"
-  Picture world; 
+  World world; 
 
   // analogous to old "bounding_box"
   world.bounding_box(Pair(-2,-2), Pair(2,2));

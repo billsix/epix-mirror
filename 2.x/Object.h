@@ -63,7 +63,7 @@ namespace ePiX2 {
 
   class Object_Base   // Marker, Label, Object, Clump
     {
-      friend class Picture;
+      friend class World;
 
     public:
 

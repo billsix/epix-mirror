@@ -22,22 +22,22 @@ EPIX_LIB=libepix2.a
 SRCS=Pair.cc Functions.cc Color.cc Visibility.cc \
 	Edge.cc Screen.cc Tile.cc Domain.cc \
 	Vector.cc Mapping.cc Basis.cc Hiding.cc Camera.cc \
-	Output.cc Object.cc Picture.cc \
-	Triangle.cc Quad.cc Segment.cc Disk.cc Sphere.cc \
+	Output.cc Object.cc World.cc \
+	Polyhedra.cc Triangle.cc Quad.cc Segment.cc Disk.cc Sphere.cc \
 	Tetra.cc Cube.cc Octa.cc 
 
 OBJS=Pair.o Functions.o Color.o Visibility.o \
 	Edge.o Screen.o Tile.o Domain.o \
 	Vector.o Mapping.o Basis.o Hiding.o Camera.o \
-	Output.o Object.o Picture.o \
-	Triangle.o Quad.o Segment.o Disk.o Sphere.o \
+	Output.o Object.o World.o \
+	Polyhedra.o Triangle.o Quad.o Segment.o Disk.o Sphere.o \
 	Tetra.o Cube.o Octa.o 
 
 
 HDRS=Errors.h Constants.h Pair.h Functions.h Color.h Point.h Visibility.h \
 	Edge.h Screen.h Tile.h Domain.h Vector.h Mapping.h Basis.h Hiding.h \
-	Camera.h Object.h Output.h Picture.h Output.h \
-	Triangle.h Quad.h Segment.h Disk.h Sphere.h \
+	Camera.h Object.h Output.h World.h Output.h \
+	Polyhedra.h Triangle.h Quad.h Segment.h Disk.h Sphere.h \
 	Tetra.h Cube.h Octa.h 
 
 
@@ -96,6 +96,9 @@ Output.o:Output.cc Output.h Color.h
 Segment.o:	Segment.cc Segment.h Object.h
 	$(CXX) $(CFLAGS) Segment.cc
 
+Polyhedra.o:	Polyhedra.cc Polyhedra.h Object.h
+	$(CXX) $(CFLAGS) Polyhedra.cc
+
 Triangle.o:	Triangle.cc Triangle.h Object.h
 	$(CXX) $(CFLAGS) Triangle.cc
 
@@ -117,9 +120,9 @@ Cube.o:	Cube.cc Cube.h Object.h Quad.h
 Octa.o:	Octa.cc Octa.h Object.h Triangle.h
 	$(CXX) $(CFLAGS) Octa.cc
 
-Picture.o:	Picture.cc Picture.h \
+World.o:	World.cc World.h \
 	Pair.h Point.h Screen.h Camera.h Object.h Hiding.h Tile.h
-	$(CXX) $(CFLAGS) Picture.cc
+	$(CXX) $(CFLAGS) World.cc
 
 epix2.h:$(HDRS)
 	./make_header2
