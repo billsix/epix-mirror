@@ -2,6 +2,37 @@ ePiX -- CHANGELOG
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
+October 30, 2005 (v1.0.6)
+ * README(-changes) Put documentation under the GPL (Julian Gilbey)
+ * (New files: samples/extras/hyperboloid.xp, helicoid.flx)
+
+July 31, 2005 (v1.0.5)
+ * (make_flix) 
+  - Exit immediately if input file not found
+  - --no-defaults option
+
+May 09, 2005
+ * (doc/tutorial.tex) Generate (shaded) torus figure in one file
+ * (Makefile, helpfiles.sh) Always compile docs/samples if requested
+ * (samples/extras/tori.xp, doc/tori.xp) quad -> ePiX::quad
+
+May 07, 2005
+ * (make_{elaps,epix,flix,laps}) "Help" is verbose by default (Karl Berry)
+ * (make_laps) Accept extensions tex, dtx, ltx
+
+April 23, 2005
+ * (polyhedron.cc) Don Hatch's suggestions on Acos
+ * (geometry.cc) ePiX:acos -> Acos
+ * (functions.cc) Re-implement sinx()
+
+April 02, 2005
+ * (make_elaps) "-ps|--ps" option (create standalone PS file)
+
+March 14, 2005
+ * (make_epix)
+  - "--no-defaults" does not clear the include and lib paths
+  - "-cc|--compiler" option (set compiler)
+
 March 11-13, 2005 (v1.0.4)
  * (New files: polyhedron.{cc,h}) Manipulate, draw convex 1-skeleta
  * (plane.h) Functions to extract normal, determine separation of points

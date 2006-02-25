@@ -4,7 +4,7 @@
 #
 # Andrew D. Hwang <"laps -v" for email>
 #
-# January 03, 2005
+# July 31, 2005
 #
 
 ## Don't modify anything below unless you know what you're doing :) ##
@@ -111,6 +111,9 @@ function flix_get_fileroot {
     if [ "$FLIX_INFILE" = "" ]; 
 	then 
 	ePiX_die "You must specify an input file!" 
+    elif [ ! -f $FLIX_INFILE ];
+        then
+        ePiX_die "Input file \"$FLIX_INFILE\" not found"
     fi
 
 # Get fileroot and extension; first match wins
@@ -176,13 +179,7 @@ while [ "$1" != "${1#"-"}" ]; do
             ;;
 
         -h|--help)
-	    ePiX_basic_help $FLIX_DOT_EXT &&
-            if [ "$FLIX_VERBOSE" = "yes" ]; then 
-                flix_help
-            else
-                ePiX_terse_help
-            fi && 
-            exit 0
+	    ePiX_basic_help $FLIX_DOT_EXT && flix_help && exit 0
 	    ;;
 
         -v|--version)
@@ -203,6 +200,12 @@ while [ "$1" != "${1#"-"}" ]; do
         --frames)
             FLIX_FRAME_COUNT=$2
             shift 2
+            ;;
+
+        --no-defaults)
+            GXX_LIBS="-lm"
+            ELAPS_OPTS="$ELAPS_OPTS $1";
+            shift; continue
             ;;
 
         --only-eepic)
@@ -297,13 +300,16 @@ function flix_help
 {
 cat <<HELP >&1
     -vv, --verbose
-      Show output/error messages, or option list/license (before -h/-v)
+      Show output/error messages, or license (before -v)
 
     -d, --delay
       Set frame delay in 1/100 sec (default 8)
 
     --frames
       Set number of frames (default 24).
+
+    --no-defaults
+      Do not use default include/library directories
 
     --only-eepic
       Create only eepic files (default no); implies --save-eepic
@@ -408,7 +414,7 @@ function flix_make_movie()
 ## Script proper starts here ##
 
 if [ $# -eq 0 ]; then 
-    ePiX_basic_help $ELAPS_DOT_EXT && ePiX_terse_help && exit 0
+    ePiX_basic_help $FLIX_DOT_EXT && flix_help && exit 0
 
 else
     # Command line options

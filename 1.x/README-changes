@@ -1,14 +1,10 @@
 ePiX -- README-changes
 
-January 05, 2005
+October 30, 2005
 
 Starting with Version 1.0.3, ePiX (epix and elaps) can be used with
 multiple versions of the library, allowing "legacy" files to be
 compiled "natively". Please see the manual for details.
-
-As currently conceived, epix-2.x would overlap substantially with the
-Asymptote project. Development will continue on 1.x, and the scattered
-code for 2.x will probably be incorporated in 1.x
 
 As of Version 1.0.3, pre-compile configuration is handled in the text
 file "config", NOT by the Makefile. Variables mentioned below are
@@ -223,15 +219,14 @@ please write to the author for assistance.
 
 COPYLEFT and DISTRIBUTION
 
-ePiX is distributed under the terms of the GNU GPL. You are free to
-copy, modify and distribute this program freely as long as this
-copyleft notice remains intact IN ITS ENTIRETY. This program comes
-with ABSOLUTELY NO WARRANTY OF ANY KIND, INCLUDING ANY WARRANTY OF
-MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Lest this lack
-of guarantee sound dire, please note that it is the same guarantee
-granted by all common software, including expensive, proprietary
-software whose quality you have no way to verify directly, and whose
-license you tacitly accept merely by opening the package.
+ePiX and its documentation are distributed under the terms of the GNU
+GPL.  This program and its documentation come with ABSOLUTELY NO
+WARRANTY OF ANY KIND, INCLUDING ANY WARRANTY OF MERCHANTABILITY OR
+FITNESS FOR A PARTICULAR PURPOSE. Lest this lack of guarantee sound
+dire, please note that it is the same guarantee granted by all common
+software, including expensive, proprietary software whose quality you
+have no way to verify directly, and whose license you tacitly accept
+merely by opening the package.
 
 Feedback about this program (suggestions for features, etc.) is 
 welcome. If you find this program useful, please consider making a

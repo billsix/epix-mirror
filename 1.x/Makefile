@@ -189,13 +189,13 @@ functions.o:	functions.cc $(GLOBALS) functions.h
 	$(CXX) $(CFLAGS) functions.cc
 
 # documentation
-doc:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
+doc:	$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(FLIX) $(ELAPS) $(LAPS)
 	@./helpfiles.sh --doc
 
-samples:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
+samples:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(FLIX) $(ELAPS) $(LAPS)
 	@./helpfiles.sh --samples
 
-contrib-doc:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(LAPS) $(ELAPS) $(FLIX)
+contrib-doc:$(EPIX_LIB) $(EPIX_HDR) $(EPIX) $(FLIX) $(ELAPS) $(LAPS)
 	@./helpfiles.sh --contrib-doc
 
 test:	

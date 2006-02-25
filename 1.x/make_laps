@@ -4,7 +4,7 @@
 #
 # Andrew D. Hwang <"laps -v" for email>
 #
-# February 27, 2005
+# May 07, 2005
 #
 
 ## Don't modify anything below unless you know what you're doing :) ##
@@ -38,7 +38,6 @@ cat <<"EOF" >> $LAPS_WRAPPER
 PROG=$(basename $0)
 DVIPS_OPTS="-f"
 
-LAPS_FILEROOT=
 LAPS_FILE_LIST=""
 declare -i LAPS_FILE_COUNT
 
@@ -47,9 +46,9 @@ LAPS_PREFIX="la"
 LAPS_STDERR=/dev/null
 LAPS_PDF=
 
-LAPS_EXTENSIONS="tex" # or NULL
+LAPS_EXTENSIONS="tex dtx ltx" # or NULL
 LAPS_DOT_EXT=".${LAPS_EXTENSIONS// /|.}" # for usage message
-
+LAPS_DEFAULT_EXT="tex"
 
 function laps_parse_options {
 # Command-line options start with "-"
@@ -63,13 +62,7 @@ while [ "$1" != "${1#"-"}" ]; do
             ;;
 
         -h|--help)
-	    ePiX_basic_help $LAPS_DOT_EXT &&
-            if [ "$LAPS_VERBOSE" = "yes" ]; then 
-                laps_help
-            else
-                ePiX_terse_help
-            fi && 
-            exit 0
+	    ePiX_basic_help $LAPS_DOT_EXT && laps_help && exit 0
 	    ;;
 
         -v|--version)
@@ -134,9 +127,33 @@ LAPS_FILE_COUNT=$#
 
 function laps_compile ()
 {
-    ${LAPS_PREFIX}tex $1.tex 1> $LAPS_STDERR
-    dvips $DVIPS_OPTS -o $1.ps $1.dvi &> $LAPS_STDERR
-    if [ "$LAPS_PDF" = "yes" ]; then ps2pdf $1.ps &> $LAPS_STDERR; fi
+    LAPS_INFILE=$1
+    LAPS_INROOT=""
+    LAPS_EXT=""
+
+    # search extensions; first match wins
+    for EXT in $LAPS_EXTENSIONS; do
+        TMP_ROOT=${LAPS_INFILE%%".$EXT"}
+        if [ $LAPS_INFILE = $TMP_ROOT.$EXT ]; then
+            LAPS_INROOT=$TMP_ROOT && LAPS_EXT=$EXT && break;
+        fi
+    done
+
+    # No recognized extension provided, assume default
+    if [ "$LAPS_EXT" = "" ]; then
+        LAPS_INROOT=${LAPS_INFILE%%"."}
+        LAPS_EXT=$LAPS_DEFAULT_EXT
+    fi
+
+    if [ ! -f $LAPS_INROOT.$LAPS_EXT ]; then
+        ePiX_warn "\"$LAPS_INROOT.$LAPS_EXT\" not found, skipping"
+    else
+        ${LAPS_PREFIX}tex $LAPS_INROOT.$LAPS_EXT 1> $LAPS_STDERR
+        dvips $DVIPS_OPTS -o $LAPS_INROOT.ps $LAPS_INROOT.dvi &> $LAPS_STDERR
+        if [ "$LAPS_PDF" = "yes" ]; then 
+            ps2pdf $LAPS_INROOT.ps &> $LAPS_STDERR; 
+        fi
+    fi
 }
 
 
@@ -144,7 +161,7 @@ function laps_help ()
 {
 cat <<"HELP" >&1
     -vv, --verbose
-      Show output/error messages, or option list/license (before -h/-v)
+      Show output/error messages, or license (before -v)
 
     --pdf(la)tex
       Use pdf(la)tex instead of latex.
@@ -171,21 +188,14 @@ HELP
 ### main ###
 
 if [ $# -eq 0 ]; then
-        ePiX_basic_help $LAPS_DOT_EXT && ePiX_terse_help && exit 0
+        ePiX_basic_help $LAPS_DOT_EXT && laps_help && exit 0
 else
     laps_parse_options $@
     if [ $LAPS_FILE_COUNT -eq 0 ]; then
         ePiX_die "You must specify an input file!"
     else
         for FILE in $LAPS_FILE_LIST; do
-            LAPS_FILEROOT=${FILE%%".tex"}
-
-            if [ ! -f ${LAPS_FILEROOT}.tex ]; then
-                ePiX_warn "\"$LAPS_FILEROOT.tex\" not found"; continue
-
-            else
-                laps_compile $LAPS_FILEROOT
-            fi
+            laps_compile $FILE
         done
     fi
 

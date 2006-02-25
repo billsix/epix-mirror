@@ -1,6 +1,6 @@
 ePiX -- README
 
-Last Change: January 06, 2005
+Last Change: October 30, 2005
 
 Please consult the following files as appropriate:
 
@@ -15,12 +15,12 @@ ePiX (pronounced like "epic" with a soft "k", cf. "TeX"), a collection
 of batch-oriented utilities for *nix, creates mathematically accurate
 line figures, plots, and movies using easy-to-learn syntax. LaTeX and
 dvips comprise the typographical rendering engine, while ImageMagick
-is used to create bitmapped images and animations.  The user interface
-resembles that of LaTeX: You prepare a short scene description in a
-text editor, then "compile" the input file into a picture. Default
-output formats are eepic (a plain text enhancement to the LaTeX
-picture environment), eps, pdf, png, and mng. GNU bash and a C++
-compiler are *required* for ordinary use.
+is used (if desired) to create bitmapped images and animations.  The
+user interface resembles that of LaTeX: You prepare a short scene
+description in a text editor, then "compile" the input file into a
+picture. Default output formats are eepic (a plain text enhancement to
+the LaTeX picture environment), eps, pdf, png, and mng. GNU bash and a
+C++ compiler are *required* for ordinary use.
 
 ePiX is tested on the following platforms:
 
@@ -133,15 +133,14 @@ from the address you wish to remove, and complete the three-way handshake.
 
 COPYLEFT and DISTRIBUTION
 
-ePiX is distributed under the terms of the GNU GPL. You are free to
-copy, modify and distribute this program freely as long as this
-copyleft notice remains intact IN ITS ENTIRETY. This program comes
-with ABSOLUTELY NO WARRANTY OF ANY KIND, INCLUDING ANY WARRANTY OF
-MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Lest this lack
-of guarantee sound dire, please note that it is the same guarantee
-granted by all common software, including expensive, proprietary
-software whose quality you have no way to verify directly, and whose
-license you tacitly accept merely by opening the package.
+ePiX and its documentation are distributed under the terms of the GNU
+GPL.  This program and its documentation come with ABSOLUTELY NO
+WARRANTY OF ANY KIND, INCLUDING ANY WARRANTY OF MERCHANTABILITY OR
+FITNESS FOR A PARTICULAR PURPOSE. Lest this lack of guarantee sound
+dire, please note that it is the same guarantee granted by all common
+software, including expensive, proprietary software whose quality you
+have no way to verify directly, and whose license you tacitly accept
+merely by opening the package.
 
 Feedback about this program (suggestions for features, etc.) is 
 welcome. If you find this program useful, please consider making a

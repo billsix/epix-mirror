@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 27, 2004
+ * Version 1.0.5
+ * Last Change: April 23, 2005
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -86,10 +86,10 @@ namespace ePiX {
   // sin(x)/x
   double sinx (double x)
   {
-    if (x != 0)
-      return ePiX::sin(x)/angle(x);
+    if (1. + x*x == 1.) // from Don Hatch
+      return 1.;
     else
-      return 1;
+      return Sin(x)/angle(x);
   }
 
   // signum, x/|x|, defined to be 0 at 0

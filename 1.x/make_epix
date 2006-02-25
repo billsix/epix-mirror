@@ -4,7 +4,7 @@
 #
 # Andrew D. Hwang <"epix -v" for email>
 #
-# January 04, 2005
+# May 07, 2005
 #
 
 ## Don't modify anything below unless you know what you're doing :) ##
@@ -84,7 +84,7 @@ function epix_help()
 {
 cat <<"HELP" >&1
     -vv, --verbose
-      Show error messages, or option list/license (before -h/-v)
+      Show error messages, or license (before -v)
 
     -o, --output
       Specify output file (ONLY for use with a single input file)
@@ -170,17 +170,11 @@ while [ "$1" != "${1#"-"}" ]; do
         ;;
 
     -h|--help)
-	ePiX_basic_help $EPIX_DOT_EXT &&
-        if [ "$EPIX_VERBOSE" = "yes" ]; then 
-            epix_help
-        else
-            ePiX_terse_help
-        fi && 
-        exit 0
+	ePiX_basic_help $EPIX_DOT_EXT && epix_help && exit 0
 	;;
 
     -v|--version)
-	ePiX_version &&
+	ePiX_version && 
         if [ "$EPIX_VERBOSE" = "yes" ]; then 
             ePiX_license
         else
@@ -326,8 +320,7 @@ rm -Rf $EPIX_TEMPDIR
 ## Script proper starts here ##
 
 if [ $# -eq 0 ]; then 
-    ePiX_basic_help $EPIX_DOT_EXT
-    epix_help
+    ePiX_basic_help $EPIX_DOT_EXT && epix_help && exit 0
 
 else
     # Command line options

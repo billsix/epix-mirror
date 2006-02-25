@@ -4,7 +4,7 @@
 #
 # Andrew D. Hwang <"elaps -v" for email>
 #
-# February 27, 2005
+# May 07, 2005
 #
 
 ## Don't modify anything below unless you know what you're doing :) ##
@@ -73,6 +73,7 @@ ELAPS_INROOT=""
 ELAPS_OUTROOT=""
 
 ELAPS_PDF="no"    # Create PDF file?
+ELAPS_PS="no"     # Create PS file instead of EPS?
 
 ELAPS_STDERR=/dev/null # Pipe stderr here
 ELAPS_VERBOSE="no"
@@ -83,7 +84,7 @@ function elaps_help()
 {
 cat <<"HELP" >&1
     -vv, --verbose
-      Show output/error messages, or option list/license (before -h/-v)
+      Show output/error messages, or license (before -v)
 
     -P<printer>
       dvips printer options, e.g. "-Pamz", may be given on the command 
@@ -95,6 +96,9 @@ cat <<"HELP" >&1
 
     -pdf, --pdf
       Create PDF file instead of EPS
+
+    -ps, --ps
+      Create standalone PostScript file (overrides --pdf)
 
     -o|--output
       Specify output file (ONLY for use with a single input file)
@@ -141,13 +145,7 @@ function elaps_process_files ()
             ;;
 
         -h|--help)
-	    ePiX_basic_help $ELAPS_DOT_EXT &&
-            if [ "$ELAPS_VERBOSE" = "yes" ]; then 
-                elaps_help
-            else
-                ePiX_terse_help
-            fi && 
-            exit 0
+	    ePiX_basic_help $ELAPS_DOT_EXT && elaps_help && exit 0
 	    ;;
 
         -v|--version)
@@ -184,6 +182,12 @@ function elaps_process_files ()
         -pdf|--pdf)
             ELAPS_PDF="yes"
             echo "$PROG: Creating PDF file" > $ELAPS_STDERR
+            shift;
+            ;;
+
+        -ps|--ps)
+            ELAPS_PS="yes"
+            echo "$PROG: Creating PS file" > $ELAPS_STDERR
             shift;
             ;;
 
@@ -310,33 +314,39 @@ function elaps_process_files ()
 
         fi
 
-        elaps_make_latex $ELAPS_TEMP_LATEX $ELAPS_SIZE $ELAPS_PKGS $ELAPS_TEMP_EEPIC
+        elaps_make_latex $ELAPS_TEMP_LATEX $ELAPS_SIZE $ELAPS_PKGS \
+            $ELAPS_TEMP_EEPIC
 
         # Create $ELAPS_TEMP_PS
         latex $ELAPS_TEMP_LATEX 1>$ELAPS_STDERR
         dvips $DVIPS_OPTS -o $ELAPS_TEMP_PS $ELAPS_TEMP_DVI &>$ELAPS_STDERR
 
-        # Create eps file,
-        $PS2EPS $ELAPS_TEMP_PS 1> $ELAPS_STDERR
+        if [ "$ELAPS_PS" = "yes" ]; then
+            # fix title
+            sed "s/$PROG-$PID/$ELAPS_INROOT/g" \
+                $ELAPS_TEMP_PS > $ELAPS_OUTROOT.ps
+        else
+            # Create eps file,
+            $PS2EPS $ELAPS_TEMP_PS 1> $ELAPS_STDERR
 
+            # fix title,
+            sed "s/$PROG-$PID/$ELAPS_INROOT/g" \
+                $ELAPS_TEMP_EPSI > $ELAPS_OUTROOT.eps &&
+            rm $ELAPS_TEMP_EPSI
 
-        # fix title,
-        sed "s/$PROG-$PID/$ELAPS_INROOT/g" $ELAPS_TEMP_EPSI > $ELAPS_OUTROOT.eps
-
-        # create pdf if requested,
-        if [ "$ELAPS_PDF" = "yes" ]; then
-            # avoid ghostscript rotation bug
-            grep -v "^%%Orientation:" $ELAPS_OUTROOT.eps | \
-                epstopdf --filter --outfile=$ELAPS_OUTROOT.pdf
-            rm $ELAPS_OUTROOT.eps # clean up eps
+            # create pdf if requested,
+            if [ "$ELAPS_PDF" = "yes" ]; then
+                # avoid ghostscript rotation bug
+                grep -v "^%%Orientation:" $ELAPS_OUTROOT.eps | \
+                    epstopdf --filter --outfile=$ELAPS_OUTROOT.pdf
+                rm $ELAPS_OUTROOT.eps # clean up eps
+            fi
         fi
 
         # and clean up
-        rm  $ELAPS_TEMP_LATEX $ELAPS_TEMP_DVI $ELAPS_TEMP_PS $ELAPS_TEMP_EPSI \
-        $PROG-$PID.aux $PROG-$PID.log
+        rm  $ELAPS_TEMP_LATEX $ELAPS_TEMP_DVI $ELAPS_TEMP_PS \
+            $ELAPS_TEMP_EEPIC $PROG-$PID.aux $PROG-$PID.log
 
-        # clean up
-        rm $ELAPS_TEMP_EEPIC
         ELAPS_OUTROOT=""
 
     done # for ELAPS_INFILE in $INFILE_LIST
@@ -346,7 +356,7 @@ function elaps_process_files ()
 ## Script proper starts here ##
 
 if [ $# -eq 0 ]; then 
-    ePiX_basic_help $ELAPS_DOT_EXT && ePiX_terse_help && exit 0
+    ePiX_basic_help $ELAPS_DOT_EXT && elaps_help && exit 0
 
 else
     # Command line options
