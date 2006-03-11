@@ -45,7 +45,10 @@ Options:
       Show version and exit
 
     -vv, --verbose
-      Show error messages, or license (before -v)
+      Show error messages
+
+    --gpl
+      Show license
 
     -o, --output
       Specify output file (ONLY for use with a single input file)
@@ -134,12 +137,18 @@ while [ "$1" != "${1#"-"}" ]; do
 	ePiX_usage $EPIX_DOT_EXT && epix_help && exit 0
 	;;
 
+    --gpl)
+        ePiX_version
+        ePiX_license
+        exit 0
+        ;;
+
     -v|--version)
 	ePiX_version && 
         if [ "$EPIX_VERBOSE" = "yes" ]; then 
             ePiX_license
         else
-            echo "$PROG --verbose -v\" for license" 
+            echo "\"$PROG --gpl\" for license" 
         fi && 
         exit 0
 	;;

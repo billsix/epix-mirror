@@ -50,6 +50,59 @@ HDR_PATH=$INSTALL_DIR/include
 LIB_PATH=$INSTALL_DIR/lib
 
 
+
+function flix_help 
+{
+cat <<HELP >&1
+Options:
+    -h, --help
+      Show this message and exit
+
+    -v, --version
+      Show version and exit
+
+    -vv, --verbose
+      Show output/error messages
+
+    --gpl
+      Show license
+
+    -d, --delay
+      Set frame delay in 1/100 sec (default 8)
+
+    --frames
+      Set number of frames (default 24).
+
+    --no-defaults
+      Do not use default include/library directories
+
+    --only-eepic
+      Create only eepic files (default no); implies --save-eepic
+
+    --only-png
+      Create only png files (default no); implies --save-png
+
+    -o, --output
+      Specify output file explicitly (extension optional)
+
+    --save-eepic
+      Save eepic files (default no)
+
+    --save-png
+      Save png files (default no)
+
+    -t, --tmax
+      Set maximum time on animation interval (default 1.0).
+
+    -I*, -L*, -l*, -W*, -V, -i*, -u, -x
+      Passed to g++ (q.v.)
+
+    Other options are passed to elaps (q.v.)
+
+HELP
+} # End of flix_help
+
+
 function flix_pad_init()
 {
     let TMP_CT=$((FLIX_FRAME_COUNT/10))
@@ -138,12 +191,18 @@ while [ "$1" != "${1#"-"}" ]; do
 	    ePiX_usage $FLIX_DOT_EXT && flix_help && exit 0
 	    ;;
 
+        --gpl)
+            ePiX_version
+            ePiX_license
+            exit 0
+	    ;;
+
         -v|--version)
             ePiX_version &&
             if [ "$ELAPS_VERBOSE" = "yes" ]; then 
                 ePiX_license
             else
-                echo "$PROG --verbose -v\" for license" 
+                echo "$PROG --gpl\" for license" 
             fi && 
             exit 0
 	    ;;
@@ -250,55 +309,6 @@ if [ "$1" != "" ]; then
 fi
 
 } # End of flix_parse_options
-
-
-function flix_help 
-{
-cat <<HELP >&1
-Options:
-    -h, --help
-      Show this message and exit
-
-    -v, --version
-      Show version and exit
-
-    -vv, --verbose
-      Show output/error messages, or license (before -v)
-
-    -d, --delay
-      Set frame delay in 1/100 sec (default 8)
-
-    --frames
-      Set number of frames (default 24).
-
-    --no-defaults
-      Do not use default include/library directories
-
-    --only-eepic
-      Create only eepic files (default no); implies --save-eepic
-
-    --only-png
-      Create only png files (default no); implies --save-png
-
-    -o, --output
-      Specify output file explicitly (extension optional)
-
-    --save-eepic
-      Save eepic files (default no)
-
-    --save-png
-      Save png files (default no)
-
-    -t, --tmax
-      Set maximum time on animation interval (default 1.0).
-
-    -I*, -L*, -l*, -W*, -V, -i*, -u, -x
-      Passed to g++ (q.v.)
-
-    Other options are passed to elaps (q.v.)
-
-HELP
-} # End of flix_help
 
 
 # compile infile outfile.exe

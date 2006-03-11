@@ -25,6 +25,12 @@ while [ "$1" != "${1#"-"}" ]; do
 	    ePiX_usage $LAPS_DOT_EXT && laps_help && exit 0
 	    ;;
 
+        --gpl)
+            ePiX_version
+            ePiX_license
+            exit 0
+	    ;;
+
         -n|--no-config) # do not use ~/.dvipsrc
             export DVIPSRC=/dev/null
             shift;
@@ -68,7 +74,7 @@ while [ "$1" != "${1#"-"}" ]; do
             if [ "$LAPS_VERBOSE" = "yes" ]; then 
                 ePiX_license
             else
-                echo "$PROG --verbose -v\" for license" 
+                echo "\"$PROG --gpl\" for license" 
             fi && 
             exit 0
 	    ;;
@@ -160,11 +166,14 @@ Options:
     -h, --help
       Show this message and exit
 
+    --gpl
+      Show license
+
     -v, --version
       Show version and exit
 
     -vv, --verbose
-      Scroll output/error messages, or show license (before -v)
+      Scroll output/error messages
 
     -n, --no-config
       Ignore $(HOME)/.dvipsrc

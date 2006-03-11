@@ -2,7 +2,7 @@ ePiX -- ChangeLog
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
-March 04-10, 2006 (v1.0.7)
+March 04-11, 2006 (v1.0.7)
  * Package uses autoconf
   - "config" file obsolete (removed)
   - New files: AUTHORS, NEWS, configure.in
@@ -25,6 +25,8 @@ March 04-10, 2006 (v1.0.7)
  * (make_{elaps,epix,flix,header,laps}) 
   - Scripts built by Makefile
   - Portions kept in files named, e.g., make_epix_in and epix_hdr
+  - "--gpl" option for license ("-vv -v" still works)
+  - Missing " in usage message fixed
  * (All sources and headers)
   - Move lengthy inlined functions to cc
   - Functions declared const when appropriate

@@ -51,7 +51,10 @@ Options:
       Show version and exit
 
     -vv, --verbose
-      Scroll output/error messages, or show license (before -v)
+      Scroll output/error messages
+
+    --gpl
+      Show license
 
     -n, --no-config
       Ignore $(HOME)/.dvipsrc
@@ -110,6 +113,12 @@ function elaps_get_options ()
 
         -h|--help)
 	    ePiX_usage $ELAPS_DOT_EXT && elaps_help && exit 0
+	    ;;
+
+        --gpl)
+            ePiX_version
+            ePiX_license
+            exit 0
 	    ;;
 
         -n|--no-config) # do not use ~/.dvipsrc
@@ -174,7 +183,7 @@ function elaps_get_options ()
             if [ "$ELAPS_VERBOSE" = "yes" ]; then
                 ePiX_license
             else
-                echo "$PROG --verbose -v\" for license"
+                echo "\"$PROG --gpl\" for license"
             fi
             exit 0
 	    ;;
