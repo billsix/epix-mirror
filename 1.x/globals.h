@@ -4,7 +4,7 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version EPIX_VERSION_NUMBER
+ * Version 1.0.7
  * Last Change: January 07, 2005
  */
 
@@ -58,7 +58,7 @@
 
 #ifdef EPIX_COMPILE_OUTPUT
 namespace ePiX {
-  std::string epix_version="EPIX_VERSION_NUMBER"; 
+  std::string epix_version="1.0.7"; 
 }
 #endif
 

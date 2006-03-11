@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.2
- * Last Change: December 31, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -32,16 +32,20 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include<sstream>
+
 #include "globals.h"
-#include "Label.h"
 #include "cropping.h"
 #include "output.h"
+#include "Label.h"
 
 namespace ePiX {
 
   // Constructor for function-specified labels
   Label::Label(P basepoint, double f(P), epix_label_posn alignment, 
-	bool mask, P offset)
+	       bool mask, P offset)
+    : the_basepoint(basepoint), the_label_type(TEXT), 
+      the_alignment(alignment), masked(mask), the_offset(offset)
   {
     // Generate label text as function of location
     std::string label_string;
@@ -49,12 +53,7 @@ namespace ePiX {
     label_contents << "$" << f(basepoint) << "$";
     label_string = label_contents.str();
 
-    the_basepoint = basepoint;
-    the_label_text = label_string;
-    the_label_type = TEXT;
-    the_alignment = alignment;
-    masked = mask;
-    the_offset = offset;
+    the_label_text=label_string;
   }
 
   void Label::draw()

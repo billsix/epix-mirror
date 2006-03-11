@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc13
- * Last Change: July 11, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -39,7 +39,7 @@
 namespace ePiX {
 
   // cross product
-  P& P::operator *= (const P v)
+  P& P::operator *= (const P& v)
 	{
 	  P temp = *this;
 	  
@@ -51,59 +51,59 @@ namespace ePiX {
 	}
 
   // vector space operations
-  P operator- (const P u) 
+  P operator- (const P& u) 
   { 
     P temp = u;
     return temp *= -1;
   }
 
-  P operator+ (const P u, const P v) 
+  P operator+ (const P& u, const P& v) 
   { 
     P temp = u;
     return temp += v;
   }
 
-  P operator- (const P u, const P v) 
+  P operator- (const P& u, const P& v) 
   { 
     P temp = u;
     return temp -= v;
   }
 
   // scalar multiplication
-  P operator* (const double c, const P v) 
+  P operator* (const double c, const P& v) 
   { 
     P temp = v;
     return temp *= c;
   }
 
   // cross product
-  P operator* (const P u, const P v) 
+  P operator* (const P& u, const P& v) 
   { 
     P temp = u;
     return temp *= v;
   }
 
-  P J(const P arg) 
+  P J(const P& arg) 
   { 
     P temp = -arg;
     return temp *= E_3; 
   }
 
   // dot product
-  double operator | (const P u, const P v) 
+  double operator | (const P& u, const P& v) 
     { 
       return u.x1()*v.x1() + u.x2()*v.x2() + u.x3()*v.x3(); 
     }
 
   // componentwise product (a,b,c)&(x,y,z)=(ax,by,cz)
-  P operator& (const P u, const P v) 
+  P operator& (const P& u, const P& v) 
   { 
     P temp = u;
     return temp &= v;
   }
 
   // orthogonalization: u%v is component of u perp to v
-  P& P::operator%= (const P v)
+  P& P::operator%= (const P& v)
     { 
       double c = (*this|v)/(v|v);
       X1 -= c*v.X1;
@@ -113,19 +113,19 @@ namespace ePiX {
       return *this;
     }
 
-  P operator% (const P u, const P v) 
+  P operator% (const P& u, const P& v) 
   { 
     P temp = u;
     return temp %= v;
   }
 
   // (in)equality
-  bool operator == (const P u, const P v)
+  bool operator == (const P& u, const P& v)
     { 
       return (norm(u-v) < EPIX_EPSILON); 
     }
 
-  bool operator != (const P u, const P v)
+  bool operator != (const P& u, const P& v)
     { 
       return !(u==v); 
     }

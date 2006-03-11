@@ -1,6 +1,6 @@
 # Copyright 1999-2004 Gentoo Foundation
 # Distributed under the terms of the GNU General Public License v2
-# $Header: /sources/epix/epix/1.x/epix.ebuild,v 1.1 2005/04/02 15:51:29 adhere Exp $
+# $Header: /sources/epix/epix/1.x/epix.ebuild,v 1.2 2006/03/11 02:20:15 adhere Exp $
 
 inherit toolchain-funcs flag-o-matic
 

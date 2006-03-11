@@ -5,8 +5,8 @@
 ;; Author: Jay Belanger
 ;; Maintainer: Jay Belanger <belanger@truman.edu>
 
-;; $Revision: 1.1 $
-;; $Date: 2004/08/26 14:18:07 $
+;; $Revision: 1.2 $
+;; $Date: 2006/03/11 02:20:15 $
 ;; Keywords: epix
 
 ;; This program is free software; you can redistribute it and/or

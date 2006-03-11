@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -91,58 +91,20 @@ namespace ePiX {
 
   public:
     //constructors
-    frame(void) { frame1 = E_1; frame2 = E_2; frame3 = E_3; }
+    frame(void) : frame1(E_1), frame2(E_2), frame3(E_3) { }
 
     // Gram-Schmidt
     frame(P arg1, P arg2, P arg3);
 
     // frame elements
-    P sea() { return frame1; }
-    P sky() { return frame2; }
-    P eye() { return frame3; }
+    P sea() const { return frame1; }
+    P sky() const { return frame2; }
+    P eye() const { return frame3; }
 
     // rotations about frame elements
-    frame rotate_frame1(double angle)
-      {
-	P temp2 = frame2;
-	P temp3 = frame3;
-
-	frame2 = 
-	  (ePiX::cos(angle)*(temp2)) - (ePiX::sin(angle)*(temp3));
-	frame3 = 
-	  (ePiX::sin(angle)*(temp2)) + (ePiX::cos(angle)*(temp3));
-
-	return *this;
-      }
-
-
-    frame rotate_frame2(double angle)
-      {
-	P temp3 = frame3;
-	P temp1 = frame1;
-
-	frame3 = 
-	  (ePiX::cos(angle)*(temp3)) - (ePiX::sin(angle)*(temp1));
-
-	frame1 = 
-	  (ePiX::sin(angle)*(temp3)) + (ePiX::cos(angle)*(temp1));
-
-	return *this;
-      }
-
-    frame rotate_frame3(double angle)
-      {
-	P temp1 = frame1;
-	P temp2 = frame2;
-
-	frame1 = 
-	  (ePiX::cos(angle)*(temp1)) - (ePiX::sin(angle)*(temp2));
-
-	frame2 = 
-	  (ePiX::sin(angle)*(temp1)) + (ePiX::cos(angle)*(temp2));
-
-	return *this;
-      }
+    frame& rot1(double angle);
+    frame& rot2(double angle);
+    frame& rot3(double angle);
 
   }; // end of class frame
 
@@ -154,53 +116,28 @@ namespace ePiX {
 
 
   class epix_camera {
-  private:
-    P viewpt;
-    P target;
-    frame  orient;
-    double distance;
-    pair (*screen_projection)(P);
-
   public:
-
     // defaults to orthog projection on (x,y) plane from pos z-axis
-    epix_camera(void)
-      { 
-	viewpt = P(0,0,EPIX_INFTY);
-	target = P(0,0,0);
-	distance = EPIX_INFTY;
-	orient = frame();
+    epix_camera(void);
 
-	screen_projection = shadow;
-      }
-
-    P get_viewpt(void) { return viewpt; }
-    P get_target(void) { return target; }
-    double get_range(void) { return distance; }
+    P get_viewpt(void) const { return viewpt; }
+    P get_target(void) const { return target; }
+    double get_range(void) const { return distance; }
 
     // get frame vectors
-    P sea(void) { return orient.sea(); }
-    P sky(void) { return orient.sky(); }
-    P eye(void) { return orient.eye(); }
+    P sea(void) const { return orient.sea(); }
+    P sky(void) const { return orient.sky(); }
+    P eye(void) const { return orient.eye(); }
 
     // adjust position, orientation, and target
     // pitch: rotate camera up/down
-    void rotate_sea(double angle)
-      { 
-	orient = orient.rotate_frame1(angle); 
-	viewpt = target + distance*orient.eye();
-      }
+    void rotate_sea(double angle);
 
     // yaw: rotate camera left/right
-    void rotate_sky(double angle)
-      { 
-	orient = orient.rotate_frame2(angle); 
-      	viewpt = target + distance*orient.eye();
-      }
+    void rotate_sky(double angle);
 
     // roll: rotate camera about viewing axis
-    void rotate_eye(double angle)
-      { orient = orient.rotate_frame3(angle); } // target unchanged
+    void rotate_eye(double angle);
 
     // fix target, move viewpt radially along eye()
     void range(double d);
@@ -219,7 +156,14 @@ namespace ePiX {
     void lens(pair proj(P)) { screen_projection = proj; }
 
     // project a point to the screen ("shoot a photo")
-    pair operator() (const P arg) { return screen_projection(arg); }
+    pair operator() (const P arg) const { return screen_projection(arg); }
+
+  private:
+    P viewpt;
+    P target;
+    frame  orient;
+    double distance;
+    pair (*screen_projection)(P);
 
   }; // end of class epix_camera 
 

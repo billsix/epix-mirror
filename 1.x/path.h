@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 16, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -56,27 +56,11 @@ namespace ePiX {
 
   class vertex {
 
-  private:
-    P location;
-    bool onscreen;
-    bool in_world;
-
   public:
     vertex(const double a1=0, const double a2=0, const double a3=0)
-      {
-	location   = P(a1,a2,a3);
+      : location(a1,a2,a3), onscreen(true), in_world(true) { }
 
-	onscreen = true;
-	in_world = true;
-      }
-
-    vertex(const P arg)
-      {
-	location   = arg;
-
-	onscreen = true;
-	in_world = true;
-      }
+    vertex(const P arg) : location(arg), onscreen(true), in_world(true) { }
 
     P here(void) const      { return location; }
     bool is_onscreen(void) const { return onscreen; }
@@ -85,30 +69,23 @@ namespace ePiX {
     void set_crop(const bool arg) { onscreen = !arg; }
     void set_clip(const bool arg) { in_world = !arg; }
 
+  private:
+    P location;
+    bool onscreen;
+    bool in_world;
+
   }; //end of class vertex
 
 
   class path {
-  private:
-    std::vector<vertex> vertices;
-
-    bool closed;
-    bool filled;
-
   public:
 
     path(const std::vector<vertex>& data, bool loop)
-      {
-	vertices = data;
-	closed = loop;
-	filled = epix::fill_paths;
-      }
+      : vertices(data), closed(loop), filled(epix::fill_paths) { }
 
-    path(int num_pts)
+    path(int num_pts) : closed(false), filled(epix::fill_paths)
       {
 	vertices = std::vector<vertex> (num_pts);
-	closed = false;
-	filled = epix::fill_paths;
       }
 
     // line constructors
@@ -117,15 +94,15 @@ namespace ePiX {
 
     // finite-data paths (ellipse, spline)
     path(const P center, const P axis1, const P axis2, 
-	      const double t_min, const double t_max,
-	      int num_pts=EPIX_NUM_PTS);
+	 const double t_min, const double t_max,
+	 int num_pts=EPIX_NUM_PTS);
 
     path(const P p1, const P p2, const P p3, 
-	      int num_pts=EPIX_NUM_PTS);
+	 int num_pts=EPIX_NUM_PTS);
 
     path(const P p1, const P p2, 
-	      const P p3, const P p4, 
-	      int num_pts=EPIX_NUM_PTS);
+	 const P p3, const P p4, 
+	 int num_pts=EPIX_NUM_PTS);
 
 
     path(P f(double), double t_min, double t_max, int num_pts=EPIX_NUM_PTS);
@@ -159,37 +136,35 @@ namespace ePiX {
 
     void draw(sphere, bool); // spherical plotting (front/back), in sphere.cc
 
+  private:
+    std::vector<vertex> vertices;
+
+    bool closed;
+    bool filled;
+
   }; // end of class path
 
 
   class path_pt {
-
-  private:
-    P location;
-    bool start; // start/end of path segment
-    bool end;
-
   public:
     path_pt(const P arg, bool is_start, bool is_end)
-      {
-	location   = arg;
-
-	start = is_start;
-	end = is_end;
-      }
+      : location(arg), start(is_start), end(is_end) { }
 
     path_pt(const vertex arg, bool is_start, bool is_end)
+      : start(is_start), end(is_end)
       {
 	location   = arg.here();
-
-	start = is_start;
-	end = is_end;
       }
     void unset(void) { start = end = false; }
 
     P here(void) const   { return location; }
     bool is_start(void) const { return start; }
     bool is_end(void) const   { return end; }
+
+  private:
+    P location;
+    bool start; // start/end of path segment
+    bool end;
 
   }; //end of class path_pt
 

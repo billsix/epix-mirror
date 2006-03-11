@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 27, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -42,26 +42,13 @@
 namespace ePiX {
 
   class crop_mask {
-  private:
-    double x1_min, x1_max, x1_sz;
-    double x2_min, x2_max, x2_sz;
-
   public:
     static crop_mask Bounding_Box;
     static crop_mask Crop_Box;
     static crop_mask Picture;
     static pair Offset;
 
-    crop_mask(const pair arg1=pair(1,1), const pair arg2=pair(0,0))
-      {
-	x1_min = min(arg1.x1(), arg2.x1());
-	x1_max = max(arg1.x1(), arg2.x1());
-	x1_sz  = x1_max - x1_min;
-
-	x2_min = min(arg1.x2(), arg2.x2());
-	x2_max = max(arg1.x2(), arg2.x2());
-	x2_sz  = x2_max - x2_min;
-      }
+    crop_mask(const pair arg1=pair(1,1), const pair arg2=pair(0,0));
 
     double x_sz(void) const { return x1_sz; }
     double y_sz(void) const { return x2_sz; }
@@ -71,34 +58,25 @@ namespace ePiX {
     //    pair size(void) const { return pair(x1_sz,  x2_sz); }
 
     // translate by pair
-    crop_mask operator+= (const pair arg)
-      {
-	x1_min += arg.x1();
-	x1_max += arg.x1();
+    crop_mask& operator+= (const pair arg);
 
-	x2_min += arg.x2();
-	x2_max += arg.x2();
-
-	return *this;
-      }
-
-    bool is_onscreen(const P arg) const;
+    bool is_onscreen(const P& arg) const;
 
     // Given two points (one projecting to the crop_mask, one not),
     // return the point on the segment that projects to the border.
-    P seek_crop(const P, const P) const;
-    friend P seek_path_end(const P in, const P out);
+    P seek_crop(const P&, const P&) const;
+    friend P seek_path_end(const P& in, const P& out);
 
     // functions in global scope for compatibility
-    friend void bounding_box(const P, const P);
+    friend void bounding_box(const P&, const P&);
 
-    friend void crop_box(const P, const P);
+    friend void crop_box(const P&, const P&);
     friend void crop_box(void); // (re)set crop box to bounding box
 
     friend void picture(const double, const double);
-    friend void picture(const P);
+    friend void picture(const P&);
 
-    friend void offset(const P arg) { crop_mask::Offset = pair(arg); }
+    friend void offset(const P& arg) { crop_mask::Offset = pair(arg); }
     friend void offset(const double hoff, const double voff) 
       { crop_mask::Offset = pair(hoff, voff); }
 
@@ -107,6 +85,10 @@ namespace ePiX {
 
     friend double h_offset(void) { return crop_mask::Offset.x1(); }
     friend double v_offset(void) { return crop_mask::Offset.x2(); }
+
+  private:
+    double x1_min, x1_max, x1_sz;
+    double x2_min, x2_max, x2_sz;
 
   }; // end of class crop_mask
 
@@ -120,50 +102,50 @@ namespace ePiX {
     static enclosure Clip_Box;
 
   public:
-    enclosure(const P arg1, const P arg2);
+    enclosure(const P& arg1, const P& arg2);
     //    bool is_cropped(const P arg);
 
     // functions in global scope for compatibility
-    friend void clip_box(const P arg1, const P arg2);
+    friend void clip_box(const P& arg1, const P& arg2);
 
-    bool is_clipped1(const P arg) const
+    bool is_clipped1(const P& arg) const
       {
 	double x1 = arg.x1();
 	return !( (x1_min <= x1) && (x1 <= x1_max) );
       }
 
-    bool is_clipped2(const P arg) const
+    bool is_clipped2(const P& arg) const
       {
 	double x2 = arg.x2();
 	return !( (x2_min <= x2) && (x2 <= x2_max) );
       }
 
-    bool is_clipped3(const P arg) const 
+    bool is_clipped3(const P& arg) const 
       {
 	double x3 = arg.x3();
 	return !( (x3_min <= x3) && (x3 <= x3_max) );
       }
 
-    bool is_inside(const P arg) const
+    bool is_inside(const P& arg) const
       {
 	return !(is_clipped1(arg) || is_clipped2(arg) || is_clipped3(arg));
       }
 
     // Given two points, one in the enclosure, the other not, return the
     // point on the boundary.
-    P seek_clip(const P in, const P out) const;
-    friend P seek_path_end(const P in, const P out);
+    P seek_clip(const P& in, const P& out) const;
+    friend P seek_path_end(const P& in, const P& out);
 
-    friend bool is_in_bounds(const P arg)
+    friend bool is_in_bounds(const P& arg)
       {
 	return enclosure::Clip_Box.is_inside(arg);
       }
 
-    friend void clip_to(const P arg) 
+    friend void clip_to(const P& arg) 
       { 
 	enclosure::Clip_Box = enclosure(P(0,0,0), arg); 
       }
-    friend void clip_box(const P arg) 
+    friend void clip_box(const P& arg) 
       { 
 	enclosure::Clip_Box = enclosure(arg, -arg); 
       }
@@ -178,7 +160,7 @@ namespace ePiX {
 
   }; // end of class enclosure
 
-  inline bool is_visible(const P arg)
+  inline bool is_visible(const P& arg)
     {
       bool visible = true;
       if (epix::clipping && !is_in_bounds(arg))

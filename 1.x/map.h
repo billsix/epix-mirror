@@ -3,13 +3,13 @@
  *
  * Andrew D. Hwang            <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *
- * Version 0.8.11rc13
- * Last Change: July 13, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  *
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -66,12 +66,9 @@ namespace ePiX {
     P (*Y)(P);
 
   public:
-    path_map(P f(double), P F(P) = id)
-      {
-	y = f;
-	Y = F;
-      }
-    P operator() (const P arg) { return Y(y(arg.x1())); }
+    path_map(P f(double), P F(P) = id) : y(f), Y(F) { }
+
+    P operator() (const P& arg) const { return Y(y(arg.x1())); }
 
   }; // end of class path_map
 
@@ -82,12 +79,8 @@ namespace ePiX {
     P (*Y)(P);
 
   public:
-    surface_map(P f(double, double), P F(P) = id)
-      {
-	y = f;
-	Y = F;
-      }
-    P operator() (const P arg) { return Y(y(arg.x1(), arg.x2())); }
+    surface_map(P f(double, double), P F(P) = id) : y(f), Y(F) { }
+    P operator() (const P& arg) const { return Y(y(arg.x1(), arg.x2())); }
 
   }; // end of class surface_map
 
@@ -98,12 +91,11 @@ namespace ePiX {
     P (*Y)(P);
 
   public:
-    space_map(P f(double, double, double), P F(P) = id)
+    space_map(P f(double, double, double), P F(P) = id) : y(f), Y(F) { }
+    P operator() (const P& arg) const
       {
-	y = f;
-	Y = F;
+	return Y(y(arg.x1(), arg.x2(), arg.x3()));
       }
-    P operator() (const P arg) { return Y(y(arg.x1(), arg.x2(), arg.x3())); }
 
   }; // end of class space_map
 
@@ -118,22 +110,12 @@ namespace ePiX {
 
   public:
     column_1var(double f1(double), double f2(double), double f3(double) = zero,
-		P F(P) = id)
-      {
-	y1 = f1;
-	y2 = f2;
-	y3 = f3;
-	Y  = F;
-      }
+		P F(P) = id) : y1(f1), y2(f2), y3(f3), Y(F) { }
+
     // parameterized path from f:R -> R
     column_1var(double f(double), P F(P) = id)
-      {
-	y1 = id;
-	y2 = f;
-	y3 = zero;
-	Y  = F;
-      }
-    P operator() (const P arg) 
+      : y1(id), y2(f), y3(zero), Y(F) { }
+    P operator() (const P& arg) 
       { 
 	double t = arg.x1();
 	return Y(P(y1(t), y2(t), y3(t))); 
@@ -152,32 +134,17 @@ namespace ePiX {
     column_2var(double f1(double, double), 
 		double f2(double, double), 
 		double f3(double, double),
-		P F(P) = id)
-      {
-	y1 = f1;
-	y2 = f2;
-	y3 = f3;
-	Y  = F;
-      }
+		P F(P) = id) : y1(f1), y2(f2), y3(f3), Y(F) { }
+
     // omitted third component defaults to zero
     column_2var(double f1(double, double), 
 		double f2(double, double), 
-		P F(P) = id)
-      {
-	y1 = f1;
-	y2 = f2;
-	y3 = zero;
-	Y  = F;
-      }
+		P F(P) = id) : y1(f1), y2(f2), y3(zero), Y(F) { }
+
     // parameterized surface from f:R x R -> R
     column_2var(double f(double, double), P F(P) = id)
-      {
-	y1 = proj1;
-	y2 = proj2;
-	y3 = f;
-	Y  = F;
-      }
-    P operator() (const P arg) 
+      : y1(proj1), y2(proj2), y3(f), Y(F) { }
+    P operator() (const P& arg) 
       { 
 	double u = arg.x1();
 	double v = arg.x2();

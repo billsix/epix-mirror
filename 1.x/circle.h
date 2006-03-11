@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -60,29 +60,12 @@ namespace ePiX {
 
   class circle 
     {
-    private:
-      P ctr;
-      double rad;
-      P perp_to; // *unit* normal, even if rad = 0
-
     public:
       // defaults to unit circle in (x1,x2,0) plane
-      circle(P arg1=P(0,0,0), double arg2=1, P arg3=E_3) 
-	{
-	  double temp=norm(arg3);
-	  if (temp < EPIX_EPSILON)
-	    throw constructor_error(MALFORMED);
+      circle(const P& arg1=P(0,0,0), const double arg2=1, const P& arg3=E_3);
 
-	  else
-	    {
-	      ctr = arg1;
-	      rad = arg2; 
-	      perp_to = (1/temp)*arg3;
-	    }
-	}
-
-      circle(P ctr, P pt); // center, and point, normal = E_3
-      circle(P pt1, P pt2, P pt3); // three points
+      circle(const P& ctr, const P& pt); // center, and point, normal = E_3
+      circle(const P& pt1, const P& pt2, const P& pt3); // three points
 
       P center() const { return ctr; }
       double radius() const { return rad; }
@@ -92,7 +75,6 @@ namespace ePiX {
       circle& operator += (const P& arg)
 	{
 	  ctr += arg;
-
 	  return *this;
 	}
 
@@ -100,12 +82,16 @@ namespace ePiX {
       circle& operator *= (const double& arg)
 	{
 	  rad *= arg;
-
 	  return *this;
 	}
 
       // circle
       void draw();
+
+    private:
+      P ctr;
+      double rad;
+      P perp_to; // *unit* normal, even if rad = 0
 
     }; /* end of circle class */
 

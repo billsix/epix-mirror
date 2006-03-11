@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.2
- * Last Change: December 31, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -58,38 +58,38 @@ namespace ePiX {
    * a white box that masks whatever is underneath and earlier in the file.
    */
   // location given as a <P>
-  void label(P base, P offset, std::string label_text);
-  void label(P base, std::string label_text);
-  void label(P base, P offset, std::string label_text,
+  void label(const P& base, const P& offset, std::string label_text);
+  void label(const P& base, std::string label_text);
+  void label(const P& base, const P& offset, std::string label_text,
 	     epix_label_posn);
 
-  void masklabel(P base, P offset, std::string label_text);
-  void masklabel(P base, std::string label_text);
-  void masklabel(P base, P offset, std::string label_text,
+  void masklabel(const P& base, const P& offset, std::string label_text);
+  void masklabel(const P& base, std::string label_text);
+  void masklabel(const P& base, const P& offset, std::string label_text,
 		 epix_label_posn);
 
   // Empty and filled LaTeX circles of diameter get_dotsize() true pt
-  void circ(P posn, P offset=P(0,0), std::string label_text="",
+  void circ(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none); // filled white circ
-  void ring(P posn, P offset=P(0,0), std::string label_text="",
+  void ring(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none); // unfilled circ 
 
-  void spot(P posn, P offset=P(0,0), std::string label_text="",
+  void spot(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
-  void dot(P posn, P offset=P(0,0), std::string label_text="",
+  void dot(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
-  void ddot(P posn, P offset=P(0,0), std::string label_text="",
-	    epix_label_posn align=none);
-
-  void box(P posn, P offset=P(0,0), std::string label_text="",
-	    epix_label_posn align=none);
-  void bbox(P posn, P offset=P(0,0), std::string label_text="",
+  void ddot(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
 
-  void arrow(P tail, P head, P offset, std::string label_text,
+  void box(const P& posn, const P& offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none);
+  void bbox(const P& posn, const P& offset=P(0,0), std::string label_text="",
+	    epix_label_posn align=none);
+
+  void arrow(const P& tail, const P& head, const P& offset, std::string label_text,
 	     epix_label_posn align, double scale=1);
 
-  void marker (P, epix_mark_type);
+  void marker (const P&, epix_mark_type);
 
   // Axes and coordinate grids.
 
@@ -99,15 +99,15 @@ namespace ePiX {
    * not map lines to lines). Generally num_pts should be a multiple of n.
    * h/v_axis are identical except for style of tick marks.
    */
-  void h_axis_tick(P location);
-  void v_axis_tick(P location);
+  void h_axis_tick(const P& location);
+  void v_axis_tick(const P& location);
 
-  //  void h_axis(P tail, P head, int n);
-  //  void v_axis(P tail, P head, int n);
+  //  void h_axis(const P& tail, const P& head, int n);
+  //  void v_axis(const P& tail, const P& head, int n);
 
   // n+1 = #ticks, num_pts = #segments used to draw
-  void h_axis(P tail, P head, int n, int num_pts=1);
-  void v_axis(P tail, P head, int n, int num_pts=1);
+  void h_axis(const P& tail, const P& head, int n, int num_pts=1);
+  void v_axis(const P& tail, const P& head, int n, int num_pts=1);
 
   // These versions may be used with gcc 2.96 and later
   inline void h_axis(int n=x_size) { h_axis(P(x_min,0), P(x_max,0), n); }
@@ -125,44 +125,44 @@ namespace ePiX {
    *    Cartesian coordinates, and offsets labels in true pt.
    */
 
-  void h_axis_labels(P tail, P head, int n, P offset);
-  void v_axis_labels(P tail, P head, int n, P offset);
+  void h_axis_labels(const P& tail, const P& head, int n, const P& offset);
+  void v_axis_labels(const P& tail, const P& head, int n, const P& offset);
 
-  void h_axis_masklabels(P tail, P head, int n, P offset);
-  void v_axis_masklabels(P tail, P head, int n, P offset);
+  void h_axis_masklabels(const P& tail, const P& head, int n, const P& offset);
+  void v_axis_masklabels(const P& tail, const P& head, int n, const P& offset);
 
   // Axis labels with LaTeX-style alignment option
 
-  void h_axis_labels(P tail, P head, int n, 
-		     P offset, epix_label_posn POSN);
-  void v_axis_labels(P tail, P head, int n, 
-		     P offset, epix_label_posn POSN);
+  void h_axis_labels(const P& tail, const P& head, int n, 
+		     const P& offset, epix_label_posn POSN);
+  void v_axis_labels(const P& tail, const P& head, int n, 
+		     const P& offset, epix_label_posn POSN);
 
-  void h_axis_masklabels(P tail, P head, int n, 
-			 P offset, epix_label_posn POSN);
-  void v_axis_masklabels(P tail, P head, int n, 
-			 P offset, epix_label_posn POSN);
+  void h_axis_masklabels(const P& tail, const P& head, int n, 
+			 const P& offset, epix_label_posn POSN);
+  void v_axis_masklabels(const P& tail, const P& head, int n, 
+			 const P& offset, epix_label_posn POSN);
 
   // Axis labels with default endpoints
-  inline void h_axis_labels(int n, P offset)
+  inline void h_axis_labels(int n, const P& offset)
     { h_axis_labels(P(x_min,0), P(x_max,0), n, offset); }
-  inline void h_axis_masklabels(int n, P offset)
+  inline void h_axis_masklabels(int n, const P& offset)
     { h_axis_masklabels(P(x_min,0), P(x_max,0), n, offset); }
 
-  inline void h_axis_labels(int n, P offset, epix_label_posn POSN)
+  inline void h_axis_labels(int n, const P& offset, epix_label_posn POSN)
     { h_axis_labels(P(x_min,0), P(x_max,0), n, offset, POSN); }
-  inline void h_axis_masklabels(int n, P offset, epix_label_posn POSN)
+  inline void h_axis_masklabels(int n, const P& offset, epix_label_posn POSN)
     { h_axis_masklabels(P(x_min,0), P(x_max,0), n, offset, POSN); }
 
 
-  inline void v_axis_labels(int n, P offset)
+  inline void v_axis_labels(int n, const P& offset)
     { v_axis_labels(P(0,y_min), P(0,y_max), n, offset); }
-  inline void v_axis_masklabels(int n, P offset)
+  inline void v_axis_masklabels(int n, const P& offset)
     { v_axis_masklabels(P(0,y_min), P(0,y_max), n, offset); }
 
-  inline void v_axis_labels(int n, P offset, epix_label_posn POSN)
+  inline void v_axis_labels(int n, const P& offset, epix_label_posn POSN)
     { v_axis_labels(P(0,y_min), P(0,y_max), n, offset, POSN); }
-  inline void v_axis_masklabels(int n, P offset, epix_label_posn POSN)
+  inline void v_axis_masklabels(int n, const P& offset, epix_label_posn POSN)
     { v_axis_masklabels(P(0,y_min), P(0,y_max), n, offset, POSN); }
 
 } /* end of namespace */

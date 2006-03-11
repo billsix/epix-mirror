@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2003
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -65,6 +65,40 @@ namespace ePiX {
   }
 
 
+  frame& frame::rot1(double angle)
+  {
+    P temp2 = frame2;
+    P temp3 = frame3;
+
+    frame2 = (ePiX::cos(angle)*(temp2)) - (ePiX::sin(angle)*(temp3));
+    frame3 = (ePiX::sin(angle)*(temp2)) + (ePiX::cos(angle)*(temp3));
+
+    return *this;
+  }
+
+
+  frame& frame::rot2(double angle)
+  {
+    P temp3 = frame3;
+    P temp1 = frame1;
+
+    frame3 = (ePiX::cos(angle)*(temp3)) - (ePiX::sin(angle)*(temp1));
+    frame1 = (ePiX::sin(angle)*(temp3)) + (ePiX::cos(angle)*(temp1));
+
+    return *this;
+  }
+
+  frame& frame::rot3(double angle)
+  {
+    P temp1 = frame1;
+    P temp2 = frame2;
+
+    frame1 = (ePiX::cos(angle)*(temp1)) - (ePiX::sin(angle)*(temp2));
+    frame2 = (ePiX::sin(angle)*(temp1)) + (ePiX::cos(angle)*(temp2));
+
+    return *this;
+  }
+
   extern epix_camera camera;
 
   // screen projection mappings ("lenses")
@@ -117,6 +151,33 @@ namespace ePiX {
 
     // stereographic projection from target antipode
     return (d/(d-u3))*pair(u1, u2);
+  }
+
+  // camera functions
+  epix_camera::epix_camera(void)
+    : viewpt(P(0,0,EPIX_INFTY)), target(P(0,0,0)), distance(EPIX_INFTY)
+  { 
+    orient = frame();
+    screen_projection = shadow;
+  }
+
+  void epix_camera::rotate_sea(double angle)
+  { 
+    orient.rot1(angle); 
+    viewpt = target + distance*orient.eye();
+  }
+
+  // yaw: rotate camera left/right
+  void epix_camera::rotate_sky(double angle)
+  { 
+    orient.rot2(angle); 
+    viewpt = target + distance*orient.eye();
+  }
+
+  // roll: rotate camera about viewing axis
+  void epix_camera::rotate_eye(double angle)
+  { 
+    orient.rot3(angle); // target unchanged
   }
 
 

@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.2
- * Last Change: December 31, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -57,46 +57,46 @@ namespace ePiX {
 
   // label -- put basepoint-aligned string constant <label_text> 
   // at Cartesian position <base> translated by <offset> true points.
-  void label(P base, P offset, std::string lbl)
+  void label(const P& base, const P& offset, std::string lbl)
   {
     Label(base, lbl, TEXT, none, false, offset).draw();
   }
-  void masklabel(P base, P offset, std::string lbl)
+  void masklabel(const P& base, const P& offset, std::string lbl)
   {
     Label(base, lbl, TEXT, none, true, offset).draw();
   }
 
-  void label(P base, P offset, 
+  void label(const P& base, const P& offset, 
 	     std::string lbl, epix_label_posn POSN)
   {
     Label(base, lbl, TEXT, POSN, false, offset).draw();
   }
-  void masklabel(P base, P offset, 
+  void masklabel(const P& base, const P& offset, 
 		 std::string lbl, epix_label_posn POSN)
   {
     Label(base, lbl, TEXT, POSN, true, offset).draw();
   }
 
   // centered labels
-  void label(P base, std::string lbl)
+  void label(const P& base, std::string lbl)
   {
     Label(base, lbl, TEXT, c).draw();
   }
 
   void
-  masklabel(P base, std::string lbl)
+  masklabel(const P& base, std::string lbl)
   {
     Label(base, lbl, TEXT, c, true).draw();
   }
 
   // Marker aliases
-  void marker(P arg, epix_mark_type TYPE)
+  void marker(const P& arg, epix_mark_type TYPE)
   {
     Label(arg, "", TYPE, c).draw();
   }
 
   // Markers with labels
-  void circ(P posn, P offset, std::string label_text,
+  void circ(const P& posn, const P& offset, std::string label_text,
 	    epix_label_posn align)
   {
     if (label_text != "")
@@ -104,7 +104,7 @@ namespace ePiX {
     Label(posn, "", CIRC, c).draw();
   }
 
-  void ring(P posn, P offset, std::string label_text,
+  void ring(const P& posn, const P& offset, std::string label_text,
 	    epix_label_posn align)
   {
     if (label_text != "")
@@ -112,7 +112,7 @@ namespace ePiX {
     Label(posn, "", RING, c).draw();
   }
 
-  void spot(P posn, P offset, std::string label_text,
+  void spot(const P& posn, const P& offset, std::string label_text,
 	    epix_label_posn align)
   {
     if (label_text != "")
@@ -120,7 +120,7 @@ namespace ePiX {
     Label(posn, "", SPOT, c).draw();
   }
 
-  void dot(P posn, P offset, std::string label_text,
+  void dot(const P& posn, const P& offset, std::string label_text,
 	   epix_label_posn align)
   {
     if (label_text != "")
@@ -128,7 +128,7 @@ namespace ePiX {
     Label(posn, "", DOT, c).draw();
   }
 
-  void ddot(P posn, P offset, std::string label_text,
+  void ddot(const P& posn, const P& offset, std::string label_text,
 	    epix_label_posn align)
   {
     if (label_text != "")
@@ -136,7 +136,7 @@ namespace ePiX {
     Label(posn, "", DDOT, c).draw();
   }
 
-  void box(P posn, P offset, std::string label_text,
+  void box(const P& posn, const P& offset, std::string label_text,
 	   epix_label_posn align)
   {
     if (label_text != "")
@@ -144,7 +144,7 @@ namespace ePiX {
     Label(posn, "", BOX, c).draw();
   }
 
-  void bbox(P posn, P offset, std::string label_text,
+  void bbox(const P& posn, const P& offset, std::string label_text,
 	    epix_label_posn align)
   {
     if (label_text != "")
@@ -153,7 +153,7 @@ namespace ePiX {
   }
 
   // arrow with label
-  void arrow(P tail, P head, P offset, std::string label_text,
+  void arrow(const P& tail, const P& head, const P& offset, std::string label_text,
 	     epix_label_posn align, double scale)
   {
     arrow(tail, head, scale);
@@ -161,18 +161,18 @@ namespace ePiX {
   }
 
   // Axis ticks (h_tick = tall, thin rectangle, for a *horizontal* axis)
-  void h_axis_tick(P arg) 
+  void h_axis_tick(const P& arg) 
   { 
     Label(arg, "", H_TICK, c).draw();
   }
-  void v_axis_tick(P arg) 
+  void v_axis_tick(const P& arg) 
   { 
     Label(arg, "", V_TICK, c).draw();
   }
 
   // Coordinate axes
   static void 
-  draw_axis(P tail, P head, int n, int num_pts, epix_tick_type TICK)
+  draw_axis(const P& tail, const P& head, int n, int num_pts, epix_tick_type TICK)
   {
     line(tail, head, 0, num_pts);
 
@@ -194,11 +194,11 @@ namespace ePiX {
   }
 
   // Suitable for curved axes
-  void h_axis(P tail, P head, int n, int num_pts)
+  void h_axis(const P& tail, const P& head, int n, int num_pts)
   {
     draw_axis(tail, head, n, num_pts, H_AXIS);
   }
-  void v_axis(P tail, P head, int n, int num_pts)
+  void v_axis(const P& tail, const P& head, int n, int num_pts)
   {
     draw_axis(tail, head, n, num_pts, V_AXIS);
   }
@@ -215,11 +215,11 @@ namespace ePiX {
    */
 
   static void
-  draw_axis_labels(P tail, P head, int n, P offset, 
+  draw_axis_labels(const P& tail, const P& head, int n, const P& offset, 
 		   epix_tick_type TICK, bool mask)
   {
     bool neg_flag;
-    double label;
+    double label=0;
     P current = tail;
     P step = (1.0/n)*(head - tail);
 
@@ -283,19 +283,19 @@ namespace ePiX {
     end_stanza();
   }
 
-  void h_axis_labels(P tail, P head, int n, P offset)
+  void h_axis_labels(const P& tail, const P& head, int n, const P& offset)
   {
     draw_axis_labels(tail, head, n, offset, H_AXIS, false);
   }
-  void v_axis_labels(P tail, P head, int n, P offset)
+  void v_axis_labels(const P& tail, const P& head, int n, const P& offset)
   {
     draw_axis_labels(tail, head, n, offset, V_AXIS, false);
   }
-  void h_axis_masklabels(P tail, P head, int n, P offset)
+  void h_axis_masklabels(const P& tail, const P& head, int n, const P& offset)
   {
     draw_axis_labels(tail, head, n, offset, H_AXIS, true);
   }
-  void v_axis_masklabels(P tail, P head, int n, P offset)
+  void v_axis_masklabels(const P& tail, const P& head, int n, const P& offset)
   {
     draw_axis_labels(tail, head, n, offset, V_AXIS, true);
   }
@@ -304,7 +304,7 @@ namespace ePiX {
   static double coord2(P arg) { return arg.x2(); }
   // axis labels with alignment option
   static void
-  draw_axis_labels(P tail, P head, int n, P offset, 
+  draw_axis_labels(const P& tail, const P& head, int n, const P& offset, 
 		   epix_tick_type TICK, bool mask, epix_label_posn POSN)
   {
     //    double label;
@@ -321,22 +321,22 @@ namespace ePiX {
       }
   }
 
-  void h_axis_labels(P tail, P head, int n, P offset, 
+  void h_axis_labels(const P& tail, const P& head, int n, const P& offset, 
 		     epix_label_posn POSN)
   {
     draw_axis_labels(tail, head, n, offset, H_AXIS, false, POSN);
   }
-  void v_axis_labels(P tail, P head, int n, P offset, 
+  void v_axis_labels(const P& tail, const P& head, int n, const P& offset, 
 		     epix_label_posn POSN)
   {
     draw_axis_labels(tail, head, n, offset, V_AXIS, false, POSN);
   }
-  void h_axis_masklabels(P tail, P head, int n, P offset, 
+  void h_axis_masklabels(const P& tail, const P& head, int n, const P& offset, 
 			 epix_label_posn POSN)
   {
     draw_axis_labels(tail, head, n, offset, H_AXIS, true, POSN);
   }
-  void v_axis_masklabels(P tail, P head, int n, P offset, 
+  void v_axis_masklabels(const P& tail, const P& head, int n, const P& offset, 
 			 epix_label_posn POSN)
   {
     draw_axis_labels(tail, head, n, offset, V_AXIS, true, POSN);

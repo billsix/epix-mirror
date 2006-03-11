@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.1
- * Last Change: December 26, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -52,6 +52,11 @@
 namespace ePiX {
 
   extern epix_camera camera;
+
+  sphere::sphere(const P& p1, const P& p2) : ctr(p1)
+  { 
+    rad = norm(p2-p1); 
+  }
 
   // defined in output.cc
   void dash_seg(const P& arg0, const P& arg1, const P& arg2);
@@ -122,6 +127,11 @@ namespace ePiX {
       }
   } // end of sphere::draw()
 
+  // not a member
+  sphere poles(const P& p1, const P& p2) 
+  { 
+    return sphere(midpoint(p1,p2), p2); 
+  }
 
   // Visibility test for plotting on unit sphere; assumes arg is on S
   bool visible_on_sphere(const P& arg, bool front, const sphere& S)

@@ -4,13 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.3
- * Last Change: January 05, 2005
- *
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -59,13 +58,13 @@ namespace ePiX {
   // Simple geometric objects
 
   // Lines take a stretch factor, roughly in percent
-  void line(const P tail, const P head, const double expand)
+  void line(const P& tail, const P& head, const double expand)
   {
     path data = path(tail, head, expand);
     data.draw();
   }
 
-  void line(const P tail, const P head, const double expand,
+  void line(const P& tail, const P& head, const double expand,
 	    int num_pts)
   {
     path data = path(tail, head, expand, num_pts);
@@ -73,7 +72,7 @@ namespace ePiX {
   }
 
   // Line(p1, p2) -- draw uncropped portion of long line through p1, p2
-  void Line(P arg1, P arg2) //, const int num_pts)
+  void Line(const P& arg1, const P& arg2) //, const int num_pts)
   {
     pair screen_dir = camera(arg2)-camera(arg1);
     if (norm(screen_dir) < EPIX_EPSILON)
@@ -147,14 +146,14 @@ namespace ePiX {
 
   // point-slope form
   void
-  Line(P tail, double slope)
+  Line(const P& tail, double slope)
   {
     Line(tail, tail+P(1, slope, 0));
   }
 
 
 
-  void triangle(const P arg1, const P arg2, const P arg3)
+  void triangle(const P& arg1, const P& arg2, const P& arg3)
   {
     if (epix::path_style() == SOLID)
       {
@@ -170,8 +169,8 @@ namespace ePiX {
       }
   }
 
-  void quad(const P arg1, const P arg2, 
-	    const P arg3, const P arg4)
+  void quad(const P& arg1, const P& arg2, 
+	    const P& arg3, const P& arg4)
   {
     if (epix::path_style() == SOLID)
       {
@@ -194,7 +193,7 @@ namespace ePiX {
   // must lie is a plane parallel to a coordinate plane, but not on a 
   // line parallel to a coordinate axis.
 
-  void rect(const P arg1, const P arg2, bool solid)
+  void rect(const P& arg1, const P& arg2, bool solid)
   {
     P diagonal = arg2 - arg1;
     P jump;
@@ -226,19 +225,35 @@ namespace ePiX {
   } // end rect
 
 
-  void swatch(const P arg1, const P arg2)
+  void swatch(const P& arg1, const P& arg2)
   {
     rect(arg1, arg2, true);
   }
 
+  void dart(const P& tail, const P& head)
+  { 
+    arrow(tail, head, 0.5); 
+  }
 
-  void ellipse(const P center, const P axis1, const P axis2,  
+  void aarrow(const P& tail, const P& head, double scale)
+    {
+      P midpt = 0.5*(tail+head);
+      arrow(midpt, tail, scale);
+      arrow(midpt, head, scale);
+    }
+
+  void ellipse(const P& center, const P& axis1, const P& axis2,  
 	       const double t_min, const double t_max, int num_pts)
   {
     path data=path(center, axis1, axis2, t_min, t_max, num_pts);
     data.draw();
   }  
 
+  void ellipse_arc(const P& center, const P& axis1, const P& axis2,
+		   const double t_min, const double t_max)
+  {
+    ellipse(center, axis1, axis2, t_min, t_max);
+  }
 
 
   // Arrows joining two specified <P>s. An arrow consists of a head
@@ -289,7 +304,7 @@ namespace ePiX {
   // nothing else. This division of labor  allows the pieces to be used in
   // other functions, e.g., plots of tangent vectors to a parametrized curve.
 
-  void arrow(const P tail, const P head, double scale)
+  void arrow(const P& tail, const P& head, double scale)
   {
     // may assume head-tail is not the zero vector in object/screen
     double ratio = epix::get_arrow_ratio();
@@ -351,28 +366,33 @@ namespace ePiX {
 
 
   // Standard half-ellipse functions
-  void ellipse_left (const P center, const P radius)
+  void ellipse_left (const P& center, const P& radius)
   {
     ellipse(center, radius.x1()*E_1, radius.x2()*E_2, 
 	    -0.5*epix_pi, 0.5*epix_pi);
   }
 
-  void ellipse_right (const P center, const P radius)
+  void ellipse_right (const P& center, const P& radius)
   {
     ellipse(center, radius.x1()*E_1, radius.x2()*E_2, 
 	    0.5*epix_pi, 1.5*epix_pi);
   }
 
-  void ellipse_top (const P center, const P radius)
+  void ellipse_top (const P& center, const P& radius)
   {
     ellipse(center, radius.x1()*E_1, radius.x2()*E_2, 0, epix_pi);
   }
 
-  void ellipse_bottom (const P center, const P radius)
+  void ellipse_bottom (const P& center, const P& radius)
   {
     ellipse(center, radius.x1()*E_1, radius.x2()*E_2, -epix_pi, 0);
   }
 
+  void arc(const P& center, const double r, 
+	   const double start,  const double finish)
+  { 
+    ellipse(center, r*E_1, r*E_2, start, finish); 
+  }
 
   // circular arcs parallel to (x,y)-plane
 
@@ -382,7 +402,7 @@ namespace ePiX {
     return scale*epix::get_arrow_width()*epix::get_arrow_ratio()/arc_scale(r);
   }
 
-  void arc_arrow(const P center, const double r, 
+  void arc_arrow(const P& center, const double r, 
 		 const double start, const double finish, const double scale)
   {
     bool fill_state=epix::fill_paths;
@@ -402,7 +422,7 @@ namespace ePiX {
 
 
   // quadratic spline
-  void spline(const P p1, const P p2, const P p3, int num_pts)
+  void spline(const P& p1, const P& p2, const P& p3, int num_pts)
   {
     path data(p1, p2, p3, num_pts);
     data.draw();
@@ -429,7 +449,7 @@ namespace ePiX {
     arrow(head-ht*object_unit, head, scale);
   }
 
-  void arrow(const P p1, const P p2, const P p3, double scale)
+  void arrow(const P& p1, const P& p2, const P& p3, double scale)
   {
     path data(p1, p2, p3, EPIX_NUM_PTS);
     data.draw();
@@ -439,14 +459,14 @@ namespace ePiX {
   }
 
   // cubic spline
-  void spline(const P p1, const P p2, 
-	      const P p3, const P p4, int num_pts)
+  void spline(const P& p1, const P& p2, 
+	      const P& p3, const P& p4, int num_pts)
   {
     path data(p1, p2, p3, p4, num_pts);
     data.draw();
   }
 
-  void arrow(const P p1, const P p2, const P p3, const P p4, double scale)
+  void arrow(const P& p1, const P& p2, const P& p3, const P& p4, double scale)
   {
     path data(p1, p2, p3, p4, EPIX_NUM_PTS);
     data.draw();
@@ -485,7 +505,7 @@ namespace ePiX {
 
 
   // n1 x n2 Cartesian grid, where coarse = (n1, n2)
-  void grid(const P arg1, const P arg2, mesh coarse, mesh fine)
+  void grid(const P& arg1, const P& arg2, mesh coarse, mesh fine)
   {
     P diagonal = arg2 - arg1;
     P jump1, jump2; // sides of grid
@@ -536,13 +556,18 @@ namespace ePiX {
   }
 
   // Grids that fill bounding_box with default camera
-  void grid(const P arg1, const P arg2, int n1, int n2)
+  void grid(const P& arg1, const P& arg2, int n1, int n2)
   {
     mesh temp(n1,n2);
     if (!epix::cropping && ! epix::clipping)
       grid(arg1, arg2, temp, mesh(1,1));
     else
       grid(arg1, arg2, temp, temp);
+  }
+
+  void grid(int n1, int n2)
+  {
+    grid(P(x_min, y_min), P(x_max, y_max), n1, n2);
   }
 
 

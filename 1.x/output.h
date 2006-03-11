@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.2
- * Last Change: December 31, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -116,15 +116,7 @@ namespace ePiX {
   inline void epix_makebox(void)  { cout << "\\makebox(0,0)"; }
   inline void epix_whiten(void)   { cout << "\\whiten"; }
 
-  inline void start_path(void)
-    {
-      newl();
-      if (epix::using_pstricks)
-	cout << "\\psline";
-
-      else
-	cout << "\\path";
-    }
+  void start_path(void);
   inline void end_path(void) {}
 
   // string-valued functions for path::draw()
@@ -185,20 +177,8 @@ namespace ePiX {
     }
   */
 
-  inline void epix_circle(const double r_pt) // radius in pt
-    {
-      lbrace();
-      cout << "\\circle";
-      epix_grouping(t2p(r_pt)); // convert radius to picture units
-      rbrace();
-    }
-  inline void epix_disk(const double r_pt)
-    {
-      lbrace();
-      cout << "\\circle*";
-      epix_grouping(t2p(r_pt));
-      rbrace();
-    }
+  void epix_circle(const double r_pt); // radius in pt
+  void epix_disk(const double r_pt);
 
   inline void epix_newline(void)            { cout << "\n%%"; }
   inline void epix_newline(std::string msg) { cout << "\n%% " << msg; }
@@ -214,7 +194,7 @@ namespace ePiX {
   // Unified comment/warning/error functions
   inline void epix_warning(std::string msg)
   {
-    std::clog << "ePiX WARNING: " << msg << "\n"; // buffered output
+    std::cerr << "ePiX WARNING: " << msg << "\n";
   } 
 
   inline void epix_error(std::string msg)

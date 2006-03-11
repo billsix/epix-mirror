@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc16
- * Last Change: August 24, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -70,13 +70,13 @@ namespace ePiX {
       double x3(void) const { return X3; }
 
      // increment operators
-      P& operator += (const P arg)
+      P& operator += (const P& arg)
 	{
 	  X1 += arg.X1; X2 += arg.X2; X3 += arg.X3;
 	  return (*this);
 	}
 
-      P& operator -= (const P arg)
+      P& operator -= (const P& arg)
 	{
 	  X1 -= arg.X1; X2 -= arg.X2; X3 -= arg.X3;  
 	  return (*this);
@@ -89,10 +89,10 @@ namespace ePiX {
 	}
 
       // cross product
-      P& operator *= (const P v);
+      P& operator *= (const P& v);
 
       // componentwise product
-      P& operator &= (const P v)
+      P& operator &= (const P& v)
 	{
 	  X1 *= v.X1;
 	  X2 *= v.X2;
@@ -102,7 +102,7 @@ namespace ePiX {
 	}
 
       // orthogonalization u %= v: vector of the form u-k*v, perp to v
-      P& operator %= (const P v);
+      P& operator %= (const P& v);
 
     }; // end of class P
 
@@ -113,33 +113,33 @@ namespace ePiX {
   const P E_3 = P(0,0,1);
 
   // vector space operations
-  P operator- (const P u);  // unary negation
-  P operator+ (const P u, const P v);
-  P operator- (const P u, const P v);
+  P operator- (const P& u);  // unary negation
+  P operator+ (const P& u, const P& v);
+  P operator- (const P& u, const P& v);
   // scalar multiplication
-  P operator* (const double c, const P v);
+  P operator* (const double c, const P& v);
 
-  inline P midpoint(const P u, const P v, const double t=0.5)
+  inline P midpoint(const P& u, const P& v, const double t=0.5)
     {
       return u + t*(v-u);
     }
 
   // cross product
-  P operator* (const P u, const P v);
-  P J(const P arg); // quarter turn about E_3-axis
+  P operator* (const P& u, const P& v);
+  P J(const P& arg); // quarter turn about E_3-axis
 
   // dot product
-  double operator | (const P u, const P v);
-  inline double norm(const P u) { return sqrt(u|u); }
+  double operator | (const P& u, const P& v);
+  inline double norm(const P& u) { return sqrt(u|u); }
 
   // componentwise product (a,b,c)&(x,y,z)=(ax,by,cz)
-  P operator& (const P u, const P v);
+  P operator& (const P& u, const P& v);
   // orthogonalization
-  P operator% (const P u, const P v);
+  P operator% (const P& u, const P& v);
 
   // (in)equality
-  bool operator == (const P u, const P v);
-  bool operator != (const P u, const P v);
+  bool operator == (const P& u, const P& v);
+  bool operator != (const P& u, const P& v);
 
 } /* end of namespace */
 

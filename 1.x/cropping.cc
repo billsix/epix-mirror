@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc14
- * Last Change: July 27, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -32,9 +32,10 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include "cropping.h"
+#include "functions.h"
 #include "camera.h"
 #include "output.h"
+#include "cropping.h"
 
 namespace ePiX {
 
@@ -51,8 +52,30 @@ namespace ePiX {
 	      P( EPIX_INFTY, EPIX_INFTY, EPIX_INFTY));
 
 
+  crop_mask::crop_mask(const pair arg1, const pair arg2)
+  {
+    x1_min = min(arg1.x1(), arg2.x1());
+    x1_max = max(arg1.x1(), arg2.x1());
+    x1_sz  = x1_max - x1_min;
+
+    x2_min = min(arg1.x2(), arg2.x2());
+    x2_max = max(arg1.x2(), arg2.x2());
+    x2_sz  = x2_max - x2_min;
+  }
+
+  crop_mask& crop_mask::operator+= (const pair arg)
+  {
+    x1_min += arg.x1();
+    x1_max += arg.x1();
+
+    x2_min += arg.x2();
+    x2_max += arg.x2();
+
+    return *this;
+  }
+
   // not defined in header b/c of camera dependence
-  bool crop_mask::is_onscreen(const P arg) const
+  bool crop_mask::is_onscreen(const P& arg) const
   {
     pair temp = camera(arg);
     double x = temp.x1(), y = temp.x2();
@@ -61,7 +84,7 @@ namespace ePiX {
   }
 
   // functions in global scope for compatibility
-  void bounding_box(const P arg1, const P arg2)
+  void bounding_box(const P& arg1, const P& arg2)
   {
     crop_mask::Bounding_Box = crop_mask(pair(arg1), pair(arg2));
     if (crop_mask::Bounding_Box.x1_sz == 0)
@@ -74,7 +97,7 @@ namespace ePiX {
     crop_mask::Crop_Box = crop_mask(pair(arg1), pair(arg2));
   }
 
-  void crop_box(const P arg1, const P arg2)
+  void crop_box(const P& arg1, const P& arg2)
   {
     crop_mask::Crop_Box = crop_mask(pair(arg1), pair(arg2));
   }
@@ -95,7 +118,7 @@ namespace ePiX {
     crop_mask::Picture = crop_mask(pair(0,0), pair(horiz, vert));
   }
 
-  void picture(const P arg)
+  void picture(const P& arg)
   {
     crop_mask::Picture = crop_mask(pair(0,0), pair(arg));
     if (crop_mask::Picture.x1_sz == 0)
@@ -108,7 +131,7 @@ namespace ePiX {
 
   // Find t in [0,1] so that t*in + (1-t)*out is on the Crop_Box boundary
   // by checking four cases. Assume "in" is in the Crop_Box and out isn't.
-  P crop_mask::seek_crop(const P in, const P out) const
+  P crop_mask::seek_crop(const P& in, const P& out) const
   {
     // find t such that (1-t)*in + t*out projects to boundary
     double t_min = 0;
@@ -130,7 +153,7 @@ namespace ePiX {
     return (1-mid)*in + mid*out;
   } // end of seek_crop
 
-  enclosure::enclosure(const P arg1, const P arg2)
+  enclosure::enclosure(const P& arg1, const P& arg2)
   {
     x1_min = min(arg1.x1(), arg2.x1());
     x1_max = max(arg1.x1(), arg2.x1());
@@ -142,7 +165,7 @@ namespace ePiX {
     x3_max = max(arg1.x3(), arg2.x3());
   }
 
-  void clip_box(const P arg1, const P arg2)
+  void clip_box(const P& arg1, const P& arg2)
   {
     enclosure::Clip_Box = enclosure(arg1, arg2);
   }
@@ -150,7 +173,7 @@ namespace ePiX {
 
   // Find t in [0,1] so that t*in + (1-t)*out is on the Clip_Box boundary
   // by checking six cases. Assume "in" is in the Clip_Box and out isn't.
-  P enclosure::seek_clip(const P in, const P out) const
+  P enclosure::seek_clip(const P& in, const P& out) const
   {
     double t=1;
 
@@ -196,7 +219,7 @@ namespace ePiX {
   // Find endpoint of path segment by testing both clipping and cropping;
   // algorithm works because only two convex criteria determine whether
   // a point is invisible. Assume out is either clipped or cropped
-  P seek_path_end(const P in, const P out)
+  P seek_path_end(const P& in, const P& out)
   {
     crop_mask& cropper = crop_mask::Crop_Box;
     enclosure& clipper = enclosure::Clip_Box;

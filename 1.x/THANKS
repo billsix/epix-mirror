@@ -10,6 +10,8 @@ Tim Morgan		tpic
 Piet van Oostrum	updates and maintenance of eepic
 Sunil Podar 		the epic style
 Richard M. Stallman	the GNU project
+Herbert Voss            PSTricks
+Timothy Van Zandt
 
 ----------------------------------------------------------------------
 
@@ -18,7 +20,7 @@ Special thanks to:	For:
 Jay Belanger		the emacs mode
 Robin Blume-Kohout	design help
 Guido Gonzato		creating and maintaining the RPM
-Svend Daugaard Pedersen	the contrib package
+Svend Daugaard Pedersen	extended coordinate systems and plotting capability
 Andrew Sterian		Pyepix and its Windows package
 
 
@@ -26,6 +28,9 @@ Andrew Sterian		Pyepix and its Windows package
 
                         Fink
 Steve Bellenot
+
+                        Debian
+Julian Gilbey
 
                         FreeBSD
 Tsuguru Kato
@@ -83,4 +88,3 @@ Torbjorn Vik
 Wenguang Wang
 Gabe Weaver
 Mariusz Wodzicki
-

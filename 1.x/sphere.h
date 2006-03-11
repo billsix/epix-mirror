@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -64,17 +64,8 @@ namespace ePiX {
       double rad;
 
     public:
-      sphere(P p1=P(0,0,0), double r=1) 
-	{ 
-	  ctr = p1; 
-	  rad = r; 
-	}
-
-      sphere(P p1, P p2) 
-	{ 
-	  ctr = p1; 
-	  rad = norm(p2-p1); 
-	}
+      sphere(const P& p1=P(0,0,0), double r=1) : ctr(p1), rad(r) { }
+      sphere(const P& p1, const P& p2);
 
       P center() const { return ctr; }
       double radius() const { return rad; }
@@ -124,10 +115,8 @@ namespace ePiX {
 
 
   // alternative constructor: specify pair of antipodal points
-  inline sphere poles(P p1, P p2) 
-    { 
-      return sphere(midpoint(p1,p2), p2); 
-    }
+  sphere poles(const P& p1, const P& p2);
+
 
   // utility function for hidden line removal (hidden<0 reverses value)
   bool visible_on_sphere(const P& arg, bool front = true, 

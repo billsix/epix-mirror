@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.5
- * Last Change: April 23, 2005
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -36,6 +36,7 @@
 #include <cmath>
 
 #include "globals.h"
+#include "output.h"
 #include "functions.h"
 
 namespace ePiX {
@@ -65,6 +66,27 @@ namespace ePiX {
    temp += 0.5; // shift back
    epix::labelangle = 360*temp; // (-180, 180]
  }
+
+  P cyl(double r, double t, double z) 
+  {
+    return P(r*ePiX::cos(t), r*ePiX::sin(t), z);
+  }
+
+  P sph(double r, double t, double phi) 
+  {
+    return P(r*(Cos(t))*(Cos(phi)), r*(Sin(t))*(Cos(phi)), r*(Sin(phi)));
+  }
+
+  P cylindrical(P arg)
+  {
+    return cyl(arg.x1(), arg.x2(), arg.x3());
+  }
+
+  P spherical(P arg)
+  {
+    return sph(arg.x1(), arg.x2(), arg.x3());
+  }
+
 
   // Force double to [0,1]
   double clip_to_unit(double t)
@@ -215,4 +237,31 @@ namespace ePiX {
     return guess;
   }
 
+  double newton (double f(double), double start)
+  {
+    return newton(f, zero, start);
+  }
+
+  // Member functions
+  P D::operator() (const P& arg) const
+  {
+    double t=arg.x1();
+    return P(t, deriv(f, t, dt), 0);
+  }
+
+  double D::eval(const double t)
+  {
+    return deriv(f, t, dt);
+  }
+
+  // one-sided derivatives
+  double D::right(const double t)
+  {
+    return  (2.0/dt)*(f(t+0.5*dt) - f(t));
+  }
+
+  double D::left(const double t)
+  {
+    return (2.0/dt)*(f(t) - f(t-0.5*dt));
+  }
 } /* end of namespace */

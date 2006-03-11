@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -52,8 +52,6 @@
 #ifndef EPIX_LABEL
 #define EPIX_LABEL
 
-// #include<iostream>
-#include<sstream>
 #include "globals.h"
 #include "triples.h"
 
@@ -76,23 +74,18 @@ namespace ePiX {
 	    epix_label_posn alignment=none, 
 	    bool mask=false,
 	    P offset=P(0,0))
-	{
-	  the_basepoint = basepoint;
-	  the_label_text = label_text;
-	  the_label_type = label_type;
-	  the_alignment = alignment;
-	  masked = mask;
-	  the_offset = offset;
-	}
+	: the_basepoint(basepoint), the_label_text(label_text),
+	the_label_type(label_type), the_alignment(alignment),
+	masked(mask), the_offset(offset) { }
 
       Label(P basepoint, double f(P),
 	    epix_label_posn alignment=none, 
 	    bool mask=false,
 	    P offset=P(0,0));
 
-      Label move_to(P arg) { the_basepoint = arg; return *this; }
-      Label offset(P arg) { the_offset = arg; return *this; }
-      Label align(epix_label_posn arg) { the_alignment=arg; return *this; }
+      Label& move_to(P arg) { the_basepoint = arg; return *this; }
+      Label& offset(P arg) { the_offset = arg; return *this; }
+      Label& align(epix_label_posn arg) { the_alignment=arg; return *this; }
 
       void draw();
 

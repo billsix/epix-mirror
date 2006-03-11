@@ -1,5 +1,24 @@
 ePiX -- README-porting
 
+March 10, 2006
+
+As of Version 1.0.7, ePiX uses autoconf and automake.
+
+  ./configure [options]
+  make all
+  make install
+
+
+The shell scripts are built by the top-level Makefile from pristine
+files named, e.g., make_epix_in and epix_hdr.
+
+The configuration scripts helpfiles.sh, newbash.sh, pre-install.sh,
+and post-uninst.sh are obsolete and have been removed.
+
+Install paths are as indicated below, but the variable EPIX_ROOTDIR is
+obsolete, replaced by the standard, "prefix".
+
+
 January 12, 2005
 
 In Version 1.0.3, the build process and install paths have changed.

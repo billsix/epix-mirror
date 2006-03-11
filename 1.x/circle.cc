@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2004
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -48,6 +48,61 @@
 
 namespace ePiX {
 
+  circle::circle(const P& arg1, const double arg2, const P& arg3) 
+  {
+    double temp=norm(arg3);
+    if (temp < EPIX_EPSILON)
+      throw constructor_error(MALFORMED);
+
+    else
+      {
+	ctr = arg1;
+	rad = arg2; 
+	perp_to = (1/temp)*arg3;
+      }
+  }
+
+  // point-and-center constructor -- parallel to (x1,x2,0)-plane
+  circle::circle(const P& center, const P& point) 
+  { 
+    if (fabs(E_3|(point-center)) > EPIX_EPSILON)
+      throw constructor_error(MALFORMED);
+    else
+      {
+	ctr = center;
+	rad = norm(point-center);
+	perp_to = E_3;
+      }
+  }
+  // three-point circle constructor
+  circle::circle(const P& pt1, const P& pt2, const P& pt3)
+  {
+    P D21=pt2-pt1, D31=pt3-pt1, D32=pt3-pt2;
+
+    if (norm(D21) < EPIX_EPSILON ||
+	norm(D31) < EPIX_EPSILON ||
+	norm(D32) < EPIX_EPSILON)
+      throw constructor_error(MULTIPLICITY);
+
+    else if (norm(D21*D31) < EPIX_EPSILON)
+      throw constructor_error(COLLINEAR_PTS);
+
+    else
+      {
+	P temp = D21*D31;
+	perp_to = (1.0/norm(temp))*temp;
+
+	P q2 = midpoint(pt1, pt2);
+	P dir2 = perp_to*(q2-pt1);
+
+	P q3 = midpoint(pt1, pt3);
+	P dir3 = perp_to*(q3-pt1);
+
+	ctr = segment(q2, q2+dir2)*segment(q3, q3+dir3);
+	rad = norm(ctr - pt1);
+      }
+  }
+ 
   void circle::draw()
   {
     double r = this->rad;
@@ -70,45 +125,7 @@ namespace ePiX {
   }
   */
 
-  // point-and-center constructor -- parallel to (x1,x2,0)-plane
-  circle::circle(P center, P point) 
-  { 
-    if (fabs(E_3|(point-center)) > EPIX_EPSILON)
-      throw constructor_error(MALFORMED);
-    else
-      {
-	ctr = center;
-	rad = norm(point-center);
-	perp_to = E_3;
-      }
-  }
-  // three-point circle constructor
-  circle::circle(P pt1, P pt2, P pt3)
-  {
-    if (norm(pt2-pt1) < EPIX_EPSILON ||
-	norm(pt3-pt1) < EPIX_EPSILON ||
-	norm(pt3-pt2) < EPIX_EPSILON)
-      throw constructor_error(MULTIPLICITY);
 
-    else if (norm((pt2 - pt1)*(pt3 - pt1)) < EPIX_EPSILON)
-      throw constructor_error(COLLINEAR_PTS);
-
-    else
-      {
-	P temp = (pt2 - pt1)*(pt3 - pt1);
-	perp_to = (1.0/norm(temp))*temp;
-
-	P q2 = midpoint(pt1, pt2);
-	P dir2 = perp_to*(q2-pt1);
-
-	P q3 = midpoint(pt1, pt3);
-	P dir3 = perp_to*(q3-pt1);
-
-	ctr = segment(q2, q2+dir2)*segment(q3, q3+dir3);
-	rad = norm(ctr - pt1);
-      }
-  }
- 
   segment& operator * (const segment& arg_seg, const circle& arg_circle)
   {
     P dir = arg_seg.end2() - arg_seg.end1();

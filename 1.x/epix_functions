@@ -12,28 +12,19 @@ function ePiX_warn {
 }
 
 
-function ePiX_basic_help()
+function ePiX_usage()
 {
 cat <<HELP >&1
 Usage: $PROG [options] <file(s)>[$1]
 
-Options:
-    -h, --help
-      Show this message and exit
-
-    -v, --version
-      Show version and exit
-
 HELP
-} # End of ePiX_basic_help
+} # End of ePiX_usage
 
 
 function ePiX_terse_help()
 {
 cat <<TERSE >&1
-  For options specific to $PROG, do
-
-    $PROG --verbose -h
+  $PROG -h:  Print option list
 
 TERSE
 } # End of ePiX_terse_help
@@ -45,9 +36,9 @@ function ePiX_version
     SPAMMY="${SPAMMY}$(echo ubylpebff|$my_decode).$(echo rqh|$my_decode)>"
 
 cat <<VERSION >&1
-$PROG is part of ePiX, Version EPIX_VERSION_NUMBER
+$PROG is part of ePiX, Version 1.0.7
 
-Copyright (C) 2001, 2002, 2003, 2004, 2005
+Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
 Andrew D. Hwang  $SPAMMY
 Department of Mathematics and Computer Science
 College of the Holy Cross

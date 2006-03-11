@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.4
- * Last Change: March 13, 2005
+ * Version 1.0.5
+ * Last Change: April 23, 2005
  */
 
 /* 
@@ -64,20 +64,18 @@ namespace ePiX {
     {
       P loc=location-origin;
       loc *= 1/norm(loc);
+
       P ref=pos_x-origin;
       ref *= 1/norm(ref);
-      if (norm(loc-ref) < EPIX_EPSILON)
-	angle=0;
-      else if (norm(loc+ref) < EPIX_EPSILON)
-	angle=M_PI/ePiX::angle(1);
-      else
-	{
-	  double temp=Acos(loc|ref);
-	  if (((ref*loc)|normal) < 0) // wrong orientation
-	    temp *= -1;
 
-	  angle=temp; // between -pi and pi
-	}
+      if ((loc|ref) < 0.)
+	angle = M_PI/ePiX::angle(1) - 2*Asin(0.5*norm(loc+ref));
+      else
+	angle = 2*Asin(0.5*norm(loc-ref));
+
+      if (((ref*loc)|normal) < 0) // wrong orientation
+	angle *= -1;
+
     }
   }; // end of class cpv
 

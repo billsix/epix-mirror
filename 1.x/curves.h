@@ -4,13 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 1.0.3
- * Last Change: January 05, 2005
- *
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -47,78 +46,66 @@ namespace ePiX {
   extern double x_min, y_min, x_max, y_max;
 
   // lines can be "stretched" by double parameter
-  void line(const P tail, const P head, const double expand=0); 
-  void line(const P tail, const P head, const double expand,
+  void line(const P& tail, const P& head, const double expand=0); 
+  void line(const P& tail, const P& head, const double expand,
 	    int num_pts);
 
   // "Visible" portion of the line through p1, p2
-  void Line(const P tail, const P head);
+  void Line(const P& tail, const P& head);
 
   // point-slope form
-  void Line(const P, const double);
+  void Line(const P&, const double);
 
-  void triangle(const P, const P, const P);
-  void quad(const P, const P, const P, const P);
+  void triangle(const P&, const P&, const P&);
+  void quad(const P&, const P&, const P&, const P&);
 
-  void draw_rect(const P, const P); // opposite corners
-  void rect(const P, const P, bool solid=epix::fill_paths);
+  void draw_rect(const P&, const P&); // opposite corners
+  void rect(const P&, const P&, bool solid=epix::fill_paths);
   // filled rectangle; deprecated
-  void swatch(const P, const P);
+  void swatch(const P&, const P&);
 
   // arrows
-  void arrow(const P tail, const P head, double scale=1);
-  inline void dart(const P tail, const P head)
-  { 
-    arrow(tail, head, 0.5); 
-  }
+  void arrow(const P& tail, const P& head, double scale=1);
+  void dart(const P& tail, const P& head);
+
   // double-tipped
-  inline void aarrow(const P tail, const P head, double scale=1)
-    {
-      P midpt = 0.5*(tail+head);
-      arrow(midpt, tail, scale);
-      arrow(midpt, head, scale);
-    }
+  inline void aarrow(const P& tail, const P& head, double scale=1);
 
   // Algebraic curves (elliptical and circular arcs, splines)
-  void ellipse(const P center, const P axis1, const P axis2,  
+  void ellipse(const P& center, const P& axis1, const P& axis2,  
 	       const double t_min=0, 
 	       const double t_max=epix::full_turn(),
 	       int num_pts=EPIX_NUM_PTS);
 
   // for backward compatibility
-  inline void ellipse_arc(const P center, 
-			  const P axis1, const P axis2,
-			  const double t_min, const double t_max)
-    {
-      ellipse(center, axis1, axis2, t_min, t_max);
-    }
+  void ellipse_arc(const P& center, const P& axis1, const P& axis2,
+		   const double t_min, const double t_max);
 
   // old style "center and polyradius"
-  inline void ellipse (const P center, const P radius)
+  inline void ellipse (const P& center, const P& radius)
     { ellipse(center, radius.x1()*E_1, radius.x2()*E_2); }
   // Standard half-ellipse functions
-  void ellipse_left (const P, const P);
-  void ellipse_right (const P, const P);
-  void ellipse_top (const P, const P);
-  void ellipse_bottom (const P, const P);
+  void ellipse_left (const P&, const P&);
+  void ellipse_right (const P&, const P&);
+  void ellipse_top (const P&, const P&);
+  void ellipse_bottom (const P&, const P&);
 
   // Circular arcs parallel to (x,y)-plane
-  inline void arc(const P center, const double r, 
-		  const double start,  const double finish)
-  { ellipse(center, r*E_1, r*E_2, start, finish); }
+  void arc(const P& center, const double r, 
+	   const double start,  const double finish);
 
-  void arc_arrow (const P center, const double r, 
+  void arc_arrow (const P& center, const double r, 
 		  const double start, const double finish, 
 		  const double scale=1);
 
 
   // Quadratic and cubic splines/spline arrows
-  void spline (const P p1, const P p2, const P p3, int num_pts=EPIX_NUM_PTS);
-  void arrow(const P p1, const P p2, const P p3, double scale=1);
+  void spline(const P& p1, const P& p2, const P& p3, int num_pts=EPIX_NUM_PTS);
+  void arrow(const P& p1, const P& p2, const P& p3, double scale=1);
 
-  void spline (const P p1, const P p2, const P p3, const P p4,
+  void spline (const P& p1, const P& p2, const P& p3, const P& p4,
 	       int num_pts=EPIX_NUM_PTS);
-  void arrow(const P p1, const P p2, const P p3, const P p4, double scale=1);
+  void arrow(const P&, const P&, const P&, const P&, double scale=1);
 
 
   // A "mesh" is an ordered pair of positive integers, and is used to
@@ -132,15 +119,11 @@ namespace ePiX {
   // of the corresponding entry of coarse, of course. :)
 
   // Cartesian grid of specified size, mesh, and resolution
-  void grid(P arg1, P arg2, mesh coarse, mesh fine);
+  void grid(const P& arg1, const P& arg2, mesh coarse, mesh fine);
 
   // coarse = fine = (n1,n2)
-  void grid(P arg1, P arg2, int n1=1, int n2=1);
-
-  inline void grid(int n1=1, int n2=1)
-    {
-      grid(P(x_min, y_min), P(x_max, y_max), n1, n2);
-    }
+  void grid(const P& arg1, const P& arg2, int n1=1, int n2=1);
+  void grid(int n1=1, int n2=1);
 
   // polar grid of specified radius, mesh (rings and sectors), and resolution
   void draw_polar_grid(double r, mesh coarse, mesh fine);

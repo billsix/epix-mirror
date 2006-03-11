@@ -4,13 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.0
- * Last Change: September 04, 2004
- *
+ * Version 1.0.7
+ * Last Change: March 06, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -80,30 +79,12 @@ namespace ePiX {
   template<class T1, class T2>T2 proj2(T1 arg1, T2 arg2) { return arg2; }
 
   // P constructors
-  inline P xyz(double x, double y, double z=0) 
-    {
-      return P(x, y, z);
-    }
+  P xyz(double x, double y, double z=0);
+  P cyl(double r, double t, double z);
+  P sph(double r, double t, double phi);
 
-  inline P cyl(double r, double t, double z) 
-    {
-      return P(r*ePiX::cos(t), r*ePiX::sin(t), z);
-    }
-
-  inline P sph(double r, double t, double phi) 
-    {
-      return P(r*(Cos(t))*(Cos(phi)), r*(Sin(t))*(Cos(phi)), r*(Sin(phi)));
-    }
-
-  inline P cylindrical(P arg)
-    {
-      return cyl(arg.x1(), arg.x2(), arg.x3());
-    }
-
-  inline P spherical(P arg)
-    {
-      return sph(arg.x1(), arg.x2(), arg.x3());
-    }
+  P cylindrical(P arg);
+  P spherical(P arg);
 
   inline P polar(double r, double t) { return cyl(r, t, 0); }
   inline P cis(double t) { return cyl(1, t, 0); }
@@ -146,31 +127,17 @@ namespace ePiX {
     double dt;
 
   public:
-    D(double func(double), const double eps=EPIX_EPSILON) 
-      { f = func; dt = eps; }
+    D(double func(double), const double eps=EPIX_EPSILON)
+      : f(func), dt(eps) { }
 
-    P operator() (const P arg) // for plotting
-      { 
-	double t=arg.x1();
-	return P(t, deriv(f, t, dt), 0);
-      }
+    P operator() (const P& arg) const; // for plotting
 
     // numerical values
-    double eval(const double t)
-      {
-	return deriv(f, t, dt);
-      }
+    double eval(const double t);
 
     // one-sided derivatives
-    double right(const double t)
-      {
-	return  (2.0/dt)*(f(t+0.5*dt) - f(t));
-      }
-
-    double left(const double t)
-      {
-	return (2.0/dt)*(f(t) - f(t-0.5*dt));
-      }
+    double right(const double t);
+    double left(const double t);
 
   }; // end of class D
 
@@ -191,10 +158,7 @@ namespace ePiX {
   }; // end of class I
 
   double newton (double f(double), double g(double), double start);
-  inline double newton (double f(double), double start)
-    {
-      return newton(f, zero, start);
-    }
+  double newton (double f(double), double start);
 
 } /* end of namespace */
 
