@@ -1,0 +1,155 @@
+/* -*-ePiX-*- */
+/* tori.xp -- May 09, 2005 */
+// compile tutorial torus meshes at once
+#include "epix.h"
+using namespace ePiX;
+
+// mesh size
+const int N1=16;
+const int N2=36;
+const double du=2.0/N1, dv=2.0/N2;
+
+// location of light, for shading
+const P LIGHT=P(5,-4,4);
+const P VIEWPT=P(4, 3, 4);
+
+const double EPS=0;
+
+// torus inradius (outradius=2+r_0)
+const double r_0=1.0;
+
+// clip box sizes
+double MAX1=3.5;
+double MAX2=2;
+double MIN3=-1.5;
+double MAX3=1.5;
+
+class mesh_quad
+{
+private:
+  P pt1;
+  P pt2;
+  P pt3;
+  P pt4;
+  
+  double distance;
+
+public:
+  mesh_quad() 
+  {
+    pt1=P();
+    pt2=P();
+    pt3=P();
+    pt4=P();
+    distance=camera.get_range();
+  }
+
+  mesh_quad(P f(double u, double v), double u0, double v0)
+  {
+    pt1=f(u0+EPS,v0+EPS);
+    pt2=f(u0+du-EPS,v0+EPS);
+    pt3=f(u0+du-EPS,v0+dv-EPS);
+    pt4=f(u0+EPS,v0+dv-EPS);
+    
+    P center = 0.25*(pt1 + (pt2 + (pt3 + pt4)));
+    P temp = camera.get_viewpt();
+
+    distance = norm(center-temp);
+  }
+
+  double how_far() const { return distance; }
+
+  void draw() 
+  { 
+    P normal = (pt2 - pt1)*(pt4 - pt1);
+    normal *= 1/norm(normal);
+
+    //    double dens  = 0.125+0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
+    double dens  = 0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
+
+    gray(dens); 
+    ePiX::quad(pt1, pt2, pt3, pt4); 
+  }
+
+};
+
+class ByDistance {
+public:
+  bool operator() (const mesh_quad& arg1, const mesh_quad& arg2)
+  {
+    return arg1.how_far() > arg2.how_far(); 
+  }
+};
+
+// torus
+P F(double u, double v)
+{
+  return polar(2.25+r_0*Cos(M_PI*u), M_PI*v) + P(0,0,r_0*Sin(M_PI*u));
+}
+
+int main() 
+{
+  unitlength("1in");
+  bounding_box(P(-3,-3), P(3,3));
+  picture(P(1,1));
+
+  std::vector<mesh_quad> mesh(N1*N2);
+
+  for (int i=0; i<N1; ++i)
+    for (int j=0; j<N2; ++j)
+      mesh.at(N2*i+j) = mesh_quad(F, -1+du*i, -1+dv*j);
+
+  begin(); // unclipped, uncropped
+
+  viewpoint(VIEWPT);
+  camera.range(10);
+
+  sort(mesh.begin(), mesh.end(), ByDistance());
+
+  fill();
+
+  for (int i=0; i<N1*N2; ++i)
+    mesh.at(i).draw();
+
+  end();
+
+  std::cout << "\\hspace*{0.75in}";
+
+  begin(); // clipped
+
+  viewpoint(VIEWPT);
+  camera.range(10);
+
+  clip_box(P(-MAX1, -MAX2, MIN3), P(MAX1, MAX2, MAX3));
+
+  clip();
+  grid(P(-MAX1, -MAX2, MIN3), P(-MAX1,  MAX2, MAX3));
+  grid(P(-MAX1, -MAX2, MIN3), P( MAX1, -MAX2, MAX3));
+
+  for (int i=0; i<N1*N2; ++i)
+    mesh.at(i).draw();
+
+  grid(P(-MAX1,  MAX2, MIN3), P( MAX1,  MAX2, MAX3));
+  grid(P( MAX1, -MAX2, MIN3), P( MAX1,  MAX2, MAX3));
+
+  end();
+
+  clip(false);
+
+  std::cout << "\\hspace*{0.75in}";
+
+  begin(); // cropped
+
+  crop();
+  viewpoint(P(0,0,100));
+  grid(1,1);
+
+  viewpoint(VIEWPT);
+  camera.range(10);
+
+  for (int i=0; i<N1*N2; ++i)
+    mesh.at(i).draw();
+
+  end();
+}
+
