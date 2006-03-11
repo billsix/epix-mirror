@@ -23,19 +23,19 @@ int main()
   fill();
   gray(0.6);
   rect(legend+3*dy, legend+dx+2.5*dy);
-  histogram("binom.dat", 4, 1, 0, 10, 10);
+  histogram("binom.dat", 4, 1, 10, 0, 10);
 
   gray(0.4);
   rect(legend+2*dy, legend+dx+1.5*dy);
-  histogram("binom.dat", 4, 2, 0, 40, 40);
+  histogram("binom.dat", 4, 2, 40, 0, 40);
 
   gray(0);
   rect(legend, legend+dx-0.5*dy);
-  histogram("binom.dat", 4, 4, 30, 70, 40);
+  histogram("binom.dat", 4, 4, 40, 30, 70);
 
   gray(0.2);
   rect(legend+1*dy, legend+dx+0.5*dy);
-  histogram("binom.dat", 4, 3, 10, 50, 40);
+  histogram("binom.dat", 4, 3, 40, 10, 50);
 
   fill(false);
 

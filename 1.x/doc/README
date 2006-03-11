@@ -1,20 +1,20 @@
-ePiX Tutorial  
+ePiX Manual
 
-Version 0.8.x
-June 30, 2002
+March 05, 2006
 
-To compile the ePiX tutorial, do "latex tutorial.tex", or (if ePiX
-is installed) "laps tutorial" to get PostScript.
+ePiX comes packaged four ways:
 
-If the .eepic files are missing or damaged and ePiX is installed, do
+1. epix-XXX_src.tar.bz2 (sources only). Since you're reading this
+   file, you must have installed another version. :)
 
-for i in *.xp ; do epix $i ; done
+2. epix-XXX_complete.tar.bz2 (sources and uncompiled manuals). To
+   build the documentation, do "make doc" from the source directory.
 
+3. epix-XXX_withpdf.tar.bz2 (sources and compiled manuals). The manual
+   is a PDF file in the source directory. You can build another copy
+   by running "make doc" from there.
 
-Copyright 2001, 2002, 2003 Andrew D. Hwang <ahwang@mathcs.holycross.edu>
-This document may be copied and distributed in any medium, so
-long as this copyright notice remains IN ITS ENTIRETY.
+4. epix-XXX_manuals.tar.bz2 (compiled samples and manuals only).
 
-This document comes with ABSOLUTELY NO WARRANTY WHATSOEVER,
-INCLUDING BUT NOT LIMITED TO ANY WARRANTY OF MERCHANTABILITY or
-FITNESS FOR A PARTICULAR PURPOSE.
+The "make doc" target builds compressed PostScript and PDF files, as
+well as a compressed tar file of the LaTeX and ePiX source files.

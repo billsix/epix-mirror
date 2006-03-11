@@ -49,7 +49,7 @@ public:
     double dens  = 0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
 
     gray(dens); 
-    quad(pt1, pt2, pt3, pt4); 
+    ePiX::quad(pt1, pt2, pt3, pt4); 
   }
 
 };
