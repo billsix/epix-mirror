@@ -1,0 +1,208 @@
+PROG=$(basename $0)
+DVIPS_OPTS="-f"
+
+LAPS_FILE_LIST=""
+declare -i LAPS_FILE_COUNT
+
+LAPS_VERBOSE="no"
+PS2PDF="ps2pdf"
+LATEX="latex"
+LAPS_STDERR=/dev/null
+LAPS_PDF=
+
+LATEX_INTERACT="batchmode"
+
+LAPS_EXTENSIONS="tex dtx ltx" # or NULL
+LAPS_DOT_EXT=".${LAPS_EXTENSIONS// /|.}" # for usage message
+LAPS_DEFAULT_EXT="tex"
+
+function laps_parse_options {
+# Command-line options start with "-"
+while [ "$1" != "${1#"-"}" ]; do
+    case "$1" in
+ 
+        -h|--help)
+	    ePiX_usage $LAPS_DOT_EXT && laps_help && exit 0
+	    ;;
+
+        -n|--no-config) # do not use ~/.dvipsrc
+            export DVIPSRC=/dev/null
+            shift;
+            ;;
+
+        -pdf|--pdf)
+            LATEX=${LATEX##"pdf"};
+            LAPS_PDF="yes";
+            shift;
+            ;;
+
+        --pdflatex)
+            LATEX="pdflatex";
+            LAPS_PDF="";
+            shift;
+            ;;
+
+        --pdftex)
+            LATEX="pdftex";
+            LAPS_PDF="";
+            shift;
+            ;;
+
+        -ps|--ps|--pslatex)
+            LATEX="pslatex";
+            shift;
+            ;;
+
+        -P*)
+            DVIPS_OPTS="$1 $DVIPS_OPTS";
+            shift;
+            ;;
+
+        -t|--tex)
+            LATEX="tex";
+            shift;
+            ;;
+
+        -v|--version)
+            ePiX_version &&
+            if [ "$LAPS_VERBOSE" = "yes" ]; then 
+                ePiX_license
+            else
+                echo "$PROG --verbose -v\" for license" 
+            fi && 
+            exit 0
+	    ;;
+
+        -vv|--verbose)
+            LAPS_VERBOSE="yes"
+            LAPS_STDERR=/dev/stderr
+            LATEX_INTERACT="scrollmode"
+            shift;
+            ;;
+
+        *)
+            ePiX_warn "Ignoring unknown option \"$1\"";
+            shift;
+            ;;
+    esac
+done
+
+LAPS_FILE_LIST=$@
+LAPS_FILE_COUNT=$#
+} # End of laps_parse_options
+
+
+function laps_compile ()
+{
+    LAPS_INFILE=$1
+    LAPS_INROOT=""
+    LAPS_EXT=""
+
+    # search extensions; first match wins
+    for EXT in $LAPS_EXTENSIONS; do
+        TMP_ROOT=${LAPS_INFILE%".$EXT"}
+        if [ $LAPS_INFILE = $TMP_ROOT.$EXT ]; then
+            LAPS_INROOT=$TMP_ROOT && LAPS_EXT=$EXT && break;
+        fi
+    done
+
+    # No recognized extension provided, assume default
+    if [ "$LAPS_EXT" = "" ]; then
+        LAPS_INROOT=${LAPS_INFILE%"."}
+        LAPS_EXT=$LAPS_DEFAULT_EXT
+    fi
+
+    if [ ! -f $LAPS_INROOT.$LAPS_EXT ]; then
+        ePiX_warn "\"$LAPS_INROOT.$LAPS_EXT\" not found"
+        return
+    fi
+
+    TMP_CMD="$LATEX -interaction=$LATEX_INTERACT $LAPS_INROOT.$LAPS_EXT"
+
+    # aux file out of date
+    if [ $LAPS_INROOT.$LAPS_EXT -nt $LAPS_INROOT.aux ]; then
+        echo "$PROG: aux file out of date" > $LAPS_STDERR
+        $TMP_CMD 1> $LAPS_STDERR
+    fi
+
+    $TMP_CMD 1> $LAPS_STDERR
+    if [ ! -f $LAPS_INROOT.dvi ]; then
+        ePiX_warn "\"$TMP_CMD\" failed"
+        return
+    fi
+
+    if [ "$LATEX" = "latex" -o "$LATEX" = "tex" ]; then
+        TMP_CMD="dvips $DVIPS_OPTS -o $LAPS_INROOT.ps $LAPS_INROOT.dvi"
+
+        $TMP_CMD &> $LAPS_STDERR
+        if [ ! -f $LAPS_INROOT.ps ]; then
+            ePiX_warn "$TMP_CMD failed"
+            return
+        fi
+    fi
+
+    if [ "$LAPS_PDF" = "yes" ]; then
+        TMP_CMD="$PS2PDF $LAPS_INROOT.ps"
+
+        $TMP_CMD &> $LAPS_STDERR
+        if [ ! -f $LAPS_INROOT.pdf ]; then
+            ePiX_warn "$TMP_CMD failed"
+            return
+        fi
+    fi
+}
+
+
+function laps_help ()
+{
+cat <<"HELP" >&1
+Options:
+    -h, --help
+      Show this message and exit
+
+    -v, --version
+      Show version and exit
+
+    -vv, --verbose
+      Scroll output/error messages, or show license (before -v)
+
+    -n, --no-config
+      Ignore $(HOME)/.dvipsrc
+
+    --pdf
+      Post-process ps file with ps2pdf
+
+    --pdf(la)tex
+      Use pdf(la)tex instead of latex.
+
+    -ps, --ps, --pslatex
+      Use pslatex instead of latex.
+
+    -P<printer>
+      dvips printer options, e.g. "-Pamz", may be given on the command 
+      line. They are also read from ~/.dvipsrc if this file exists.
+
+    -t, --tex
+      Use tex instead of latex
+
+HELP
+} # End of laps_help
+
+### main ###
+
+if [ $# -eq 0 ]; then
+    ePiX_usage $LAPS_DOT_EXT
+    ePiX_terse_help
+    exit 0
+fi
+
+laps_parse_options $@
+if [ $LAPS_FILE_COUNT -eq 0 ]; then
+    ePiX_die "No input file specified"
+else
+    for FILE in $LAPS_FILE_LIST; do
+        laps_compile $FILE
+    done
+fi
+
+exit 0

@@ -1,0 +1,23 @@
+ePiX NEWS -- history of user-visible changes.  March, 2006
+
+Copyright (C) 2006 Andrew D. Hwang
+
+Please see COPYING for copying conditions and README-changes for
+changes prior to Version 1.0.7.
+
+Version 1.0.7
+
+  ePiX now uses autoconf:
+
+    ./configure
+    make all
+    make install
+
+
+  The build command, which is equivalent to "make doc samples",
+  accepts the following targets (among many others):
+
+    make doc         -- manual
+    make samples     -- sample document
+    make contrib     -- contrib library
+    make contrib-doc -- contrib manual
