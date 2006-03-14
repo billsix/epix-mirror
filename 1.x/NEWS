@@ -9,12 +9,28 @@ Version 1.0.7
 
   ePiX now uses autoconf:
 
-    ./configure
+    ./configure [options]
     make all
     make install
 
 
-  The build command, which is equivalent to "make doc samples",
+* The configure command accepts the following ePiX-specific options:
+
+    --with-bash=<path to bash>
+
+      Specify the path to bash for the shell scripts. (Defaults to the
+      full path to bash found in the PATH environment variable, or to
+      /bin/bash if bash isn't found.)
+
+    --with-runtime=<runtime compiler>
+
+      Specify the compiler for epix and flix. (Defaults to the full
+      path to g++ found in PATH, or to "g++".)
+
+  Running "./configure --help" prints all available options.
+
+
+* The build command, which is equivalent to "make doc samples",
   accepts the following targets (among many others):
 
     make doc         -- manual
