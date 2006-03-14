@@ -85,7 +85,7 @@ libepix_a_LIBADD = camera.o circle.o cropping.o curves.o 	dataplot.o domain.o fu
 CXX = @CXX@
 RUNTIME_COMPILER = @RUNTIME_COMPILER@
 
-BASH = @BASH@
+BASH_PATH = @BASH_PATH@
 
 # docs, samples
 EPIX_MANUAL = epix-${VERSION}_manual
@@ -473,7 +473,8 @@ libepix.a:	libepix-${VERSION}.a
 elaps: ${srcdir}/make_elaps_in ${srcdir}/elaps_hdr ${srcdir}/epix_functions
 #	-${RM} -f elaps
 	@echo "Creating shell script elaps"
-	@echo "#! ${BASH}" > elaps && cat ${srcdir}/elaps_hdr >> elaps && \
+	@echo "#! ${BASH_PATH}" > elaps && \
+	cat ${srcdir}/elaps_hdr >> elaps && \
 	echo "EPIX_BIN=${bindir}/epix" >> elaps && \
 	cat ${srcdir}/epix_functions ${srcdir}/make_elaps_in >> elaps
 	chmod ugo+x elaps
@@ -481,7 +482,8 @@ elaps: ${srcdir}/make_elaps_in ${srcdir}/elaps_hdr ${srcdir}/epix_functions
 epix: ${srcdir}/make_epix_in ${srcdir}/epix_hdr ${srcdir}/epix_functions
 #	-${RM} -f epix
 	@echo "Creating shell script epix"
-	@echo "#! ${BASH}" > epix && cat ${srcdir}/epix_hdr >> epix && \
+	@echo "#! ${BASH_PATH}" > epix && \
+	cat ${srcdir}/epix_hdr >> epix && \
 	echo "INSTALL_DIR=${prefix}" >> epix && \
 	echo "COMPILER=${RUNTIME_COMPILER}" >> epix && \
 	cat ${srcdir}/epix_functions ${srcdir}/make_epix_in >> epix
@@ -490,7 +492,8 @@ epix: ${srcdir}/make_epix_in ${srcdir}/epix_hdr ${srcdir}/epix_functions
 flix: ${srcdir}/make_flix_in ${srcdir}/flix_hdr ${srcdir}/epix_functions
 #	-${RM} -f flix
 	@echo "Creating shell script flix"
-	@echo "#! ${BASH}" > flix && cat ${srcdir}/flix_hdr >> flix && \
+	@echo "#! ${BASH_PATH}" > flix && \
+	cat ${srcdir}/flix_hdr >> flix && \
 	echo "INSTALL_DIR=${prefix}" >> flix && \
 	echo "COMPILER=${RUNTIME_COMPILER}" >> flix && \
 	cat ${srcdir}/epix_functions ${srcdir}/make_flix_in >> flix
@@ -499,7 +502,8 @@ flix: ${srcdir}/make_flix_in ${srcdir}/flix_hdr ${srcdir}/epix_functions
 laps: ${srcdir}/make_laps_in ${srcdir}/laps_hdr ${srcdir}/epix_functions
 #	-${RM} -f laps
 	@echo "Creating shell script laps"
-	@echo "#! ${BASH}" > laps && cat ${srcdir}/laps_hdr >> laps && \
+	@echo "#! ${BASH_PATH}" > laps && \
+	cat ${srcdir}/laps_hdr >> laps && \
 	cat ${srcdir}/epix_functions ${srcdir}/make_laps_in >> laps
 	chmod ugo+x laps
 

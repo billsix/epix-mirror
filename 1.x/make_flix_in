@@ -392,9 +392,9 @@ if [ $# -eq 0 ]; then
 else
     # Command line options
     flix_parse_options $@
-#    : ${FLIX_OUTFILE=FLIX_FILEROOT} # supposedly sh-safe, but doesn't work
+#    : ${FLIX_OUTFILE=$FLIX_FILEROOT}  ## sh-safe, but doesn't work
 #    FLIX_FRAME=${FLIX_OUTFILE}-frame
-     FLIX_FRAME=${FLIX_OUTFILE:-$FLIX_FILEROOT}-frame
+FLIX_FRAME=${FLIX_OUTFILE:-$FLIX_FILEROOT}-frame
      flix_pad_init
 
     # Append options from config files, if any
@@ -430,9 +430,9 @@ fi
 FLIX_INTEMP=$FLIX_TEMPDIR/flix-$PID.cc # temporary input file
 ln -s $(pwd)/$FLIX_INFILE $FLIX_INTEMP
 
-#: ${FLIX_OUTFILE=FLIX_FILEROOT}
-#FLIX_MOVIE=${FLIX_OUTROOT}.mng
-FLIX_MOVIE=${FLIX_OUTROOT:-$FLIX_FILEROOT}.mng
+#: ${FLIX_OUTFILE=$FLIX_FILEROOT} # doesn't work...??
+#FLIX_MOVIE=${FLIX_OUTFILE}.mng
+FLIX_MOVIE=${FLIX_OUTFILE:-$FLIX_FILEROOT}.mng
 
 flix_compile $FLIX_INTEMP $FLIX_EXE
 

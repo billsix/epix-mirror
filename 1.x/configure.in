@@ -13,11 +13,13 @@ AC_SUBST(CXXFLAGS, -Wall -O2)
 
 AC_CHECK_PROG(CXX, g++, g++)
 
-dnl Needed by shell scripts
-AC_PATH_PROG(BASH, bash, /bin/bash)
+dnl For all shell scripts
+AC_PATH_PROG(BASH_PATH, bash, /bin/bash)
+AC_ARG_WITH(bash, [  --with-bash=<bash>      The path to bash], BASH_PATH=$withval)
 
 dnl For epix and flix
 AC_CHECK_PROG(RUNTIME_COMPILER, g++, g++)
+AC_ARG_WITH(runtime, [  --with-runtime=<g++>    The runtime compiler], RUNTIME_COMPILER=$withval)
 
 dnl Checks for libraries.
 

@@ -10,6 +10,9 @@ March 04-11, 2006 (v1.0.7)
   - New boilerplate files: config.{guess,sub}, aclocal.m4, install-sh,
     missing, mkinstalldirs
   - INSTALL, manual (formerly tutorial) updated
+  - ./configure accepts options
+    --with-bash=<bash>
+    --with-runtime=<runtime compiler>
  * Package uses automake 
   - Makefile -> Makefile.am in top-level directory, samples, contrib,
     doc, and doc/contrib

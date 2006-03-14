@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: March 06, 2006
+ * Last Change: March 14, 2006
  */
 
 /* 
@@ -66,6 +66,11 @@ namespace ePiX {
    temp += 0.5; // shift back
    epix::labelangle = 360*temp; // (-180, 180]
  }
+
+  P xyz(double x, double y, double z) 
+  {
+    return P(x, y, z);
+  }
 
   P cyl(double r, double t, double z) 
   {
