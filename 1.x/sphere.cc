@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: March 06, 2006
+ * Last Change: May 09, 2006
  */
 
 /* 
@@ -360,7 +360,7 @@ namespace ePiX {
   void draw_latitude(double lat, double lngtd_min, double lngtd_max,
 		     bool hidden, sphere S, frame coords)
   {
-    P center = S.center() + (Sin(lat)*coords.eye());
+    P center = S.center() + (S.radius()*Sin(lat)*coords.eye());
     double radius = S.radius()*Cos(lat);
 
     path temp(center, radius*coords.sea(), radius*coords.sky(),

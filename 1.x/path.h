@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: March 06, 2006
+ * Last Change: May 14, 2006
  */
 
 /* 
@@ -109,11 +109,6 @@ namespace ePiX {
     path(double f(double), double t_min, double t_max, 
 	 int num_pts=EPIX_NUM_PTS);
 
-    // polygon/polyline with variable number of vertices
-    friend path polygon(int num_pts ...);
-    friend path polyline(int num_pts ...);
-
-
     // concatenate path segments
     path& operator+= (const path& vertices);
     // concatenate, reversing second sequence
@@ -143,6 +138,10 @@ namespace ePiX {
     bool filled;
 
   }; // end of class path
+
+  // polygon/polyline with variable number of vertices
+  path polygon(int num_pts ...);
+  path polyline(int num_pts ...);
 
 
   class path_pt {

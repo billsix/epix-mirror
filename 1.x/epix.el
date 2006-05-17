@@ -5,8 +5,8 @@
 ;; Author: Jay Belanger
 ;; Maintainer: Jay Belanger <belanger@truman.edu>
 
-;; $Revision: 1.2 $
-;; $Date: 2006/03/11 02:20:15 $
+;; $Revision: 1.3 $
+;; $Date: 2006/05/17 03:19:34 $
 ;; Keywords: epix
 
 ;; This program is free software; you can redistribute it and/or
@@ -693,7 +693,6 @@ which can point in the direction 2 pi k/N.  Each integer after N in seed
 will specify the direction of the next segment.
 fractal will recursively replace each segment in seed by a copy of the
 original, up to a depth of D, and draw it from P(a,b) to P(c,d)."
-  (interactive)
   (setq font-lock-defaults
         '((c++-font-lock-keywords 
            c++-font-lock-keywords-1
@@ -911,7 +910,6 @@ which can point in the direction 2 pi k/N.  Each integer after N in seed
 will specify the direction of the next segment.
 fractal will recursively replace each segment in seed by a copy of the
 original, up to a depth of D, and draw it from P(a,b) to P(c,d)."
-  (interactive)
   (setq font-lock-defaults
         '((c++-font-lock-keywords 
            c++-font-lock-keywords-1

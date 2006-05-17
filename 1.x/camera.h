@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: March 06, 2006
+ * Last Change: May 14, 2006
  */
 
 /* 
@@ -110,10 +110,9 @@ namespace ePiX {
 
 
   // screen projection mappings ("lenses")
-  pair shadow(P arg);
-  pair fisheye(P arg);
-  pair bubble(P arg);
-
+  pair shadow(const P& arg);
+  pair fisheye(const P& arg);
+  pair bubble(const P& arg);
 
   class epix_camera {
   public:
@@ -145,29 +144,33 @@ namespace ePiX {
     void focus(double d);
 
     // fix target, set viewpt arbitrarily
-    void at(P arg);
-    friend void viewpoint(P arg);
-    friend void viewpoint(double a1, double a2, double a3);
+    void at(const P& arg);
 
     // fix viewpt, set target arbitrarily
-    void look_at(P arg);
+    void look_at(const P& arg);
 
     // set projection mapping
-    void lens(pair proj(P)) { screen_projection = proj; }
+    void lens(pair proj(const P&)) { screen_projection = proj; }
 
     // project a point to the screen ("shoot a photo")
-    pair operator() (const P arg) const { return screen_projection(arg); }
+    pair operator() (const P& arg) const { return screen_projection(arg); }
 
   private:
     P viewpt;
     P target;
     frame  orient;
     double distance;
-    pair (*screen_projection)(P);
+    pair (*screen_projection)(const P&);
 
   }; // end of class epix_camera 
 
   extern epix_camera camera;
+
+  inline void viewpoint(const P& arg) { ePiX::camera.at(arg); }
+  inline void viewpoint(double a1, double a2, double a3)
+    {
+      ePiX::camera.at(P(a1,a2,a3));
+    }
 
 } /* end of namespace */
 

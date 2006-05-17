@@ -22,6 +22,11 @@ latex, and ps2epsi.) Please consult your system documentation for
 information on installing these components. The POST-INSTALL file has
 potentially helpful information, as well.
 
+It has been noticed by a number of people that g++ 4.0 does not
+compile this package correctly.  You are advised to use g++ 3.4.  You
+may need to specify something like CXX=g++-3.4 --with-runtime=g++-3.4
+to ./configure if your machine has multiple versions of g++ on it.
+
 ePiX comprises a header file (epix.h), a compiled library (libepix.a),
 and four shell scripts (epix, elaps, flix, and laps) that automate
 file processing by running auxiliary programs.  The shell scripts must
@@ -108,30 +113,6 @@ Password: <your root password>
   If you are installing somewhere in your HOME directory, just type
 
 % make install
-
-
-(3b)   *** This step can be skipped by most people. ***
-
-  Installing multiple versions on the same machine:
-
-  More than one version of ePiX can be installed on a machine, allowing
-  you to compile old source files. To install a version older than 1.0.3
-  (in the example below, version 0.8.9 is installed in the user's home
-  directory), download and build the source code as usual; please visit
-
-    http://savannah.nongnu.org/cgi-bin/viewcvs/epix/epix/archive/
-
-  for source tarballs. Next, MANUALLY install the header and library,
-
-% install -m 644 epix.h ~/include/epix-0.8.9.h
-% install -m 644 libepix.a ~/lib/libepix-0.8.9.a
-
-  The version number must be specified in the target names, and old
-  shell scripts must NOT be installed. To use version 0.8.9, the
-  source file must #include "epix-0.8.9.h", and be compiled with the
-  epix flag "--no-defaults":
-
-% epix --no-defaults -I ~/include -L ~/lib -lepix-0.8.9 file.c
 
 
 (4) Post-Install:

@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: March 06, 2006
+ * Last Change: May 14, 2006
  */
 
 /* 
@@ -40,6 +40,40 @@
 #include "path.h"
 
 namespace ePiX {
+
+  // pre-declare friends for gcc-4.1
+  // friends of crop_mask
+  P seek_path_end(const P& in, const P& out);
+  void bounding_box(const P&, const P&);
+  void crop_box(const P&, const P&);
+  void crop_box(void); // (re)set crop box to bounding box
+
+  void picture(const double, const double);
+  void picture(const P&);
+  void offset(const P& arg);
+  void offset(const double hoff, const double voff);
+
+  double h_size(void);
+  double v_size(void);
+  double h_offset(void);
+  double v_offset(void);
+
+  // friends of enclosure
+  void clip_box(const P& arg1, const P& arg2);
+  P seek_path_end(const P& in, const P& out);
+  bool is_in_bounds(const P& arg);
+  void clip_to(const P& arg);
+  void clip_box(const P& arg); 
+
+  double clip1_min(void);
+  double clip2_min(void);
+  double clip3_min(void);
+
+  double clip1_max(void);
+  double clip2_max(void);
+  double clip3_max(void);
+  // end of friends
+
 
   class crop_mask {
   public:

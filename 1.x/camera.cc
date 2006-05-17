@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: March 06, 2006
+ * Last Change: May 14, 2006
  */
 
 /* 
@@ -105,7 +105,7 @@ namespace ePiX {
 
   // Point projection to sea-sky plane from point at given "distance"
   // from "target" along "eye" axis
-  pair shadow(P arg)
+  pair shadow(const P& arg)
   {
     P arg_vector = arg - camera.get_target();
 	
@@ -120,7 +120,7 @@ namespace ePiX {
     return pair(u1/(1-dist*u3), u2/(1-dist*u3));
   }
 
-  pair fisheye(P arg) 
+  pair fisheye(const P& arg) 
   {
     // vector from camera to arg, based at camera
     P arg_vector = arg - camera.get_viewpt();
@@ -135,7 +135,7 @@ namespace ePiX {
     return pair(u1, u2);
   }
 
-  pair bubble(P arg) 
+  pair bubble(const P& arg) 
   {
     // vector from camera to arg, based at camera
     P arg_vector = arg - camera.get_viewpt();
@@ -202,7 +202,7 @@ namespace ePiX {
   }
 
   // fix target, set viewpt arbitrarily
-  void epix_camera::at(P arg) 
+  void epix_camera::at(const P& arg) 
   {
     viewpt = arg;
     P temp = arg - get_target();
@@ -228,10 +228,7 @@ namespace ePiX {
     distance = d;
   }
 
-  void viewpoint(P arg) { camera.at(arg); }
-  void viewpoint(double a1, double a2, double a3) { camera.at(P(a1,a2,a3)); }
-
-  void epix_camera::look_at(P arg) 
+  void epix_camera::look_at(const P& arg) 
   {
     camera.target = arg;
     P temp = camera.viewpt - arg;

@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc11
- * Last Change: June 26, 2004
+ * Version 1.0.7
+ * Last Change: April 15, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -34,10 +34,6 @@
 
 #ifndef EPIX_PAIRS
 #define EPIX_PAIRS
-
-// #include <cstdlib>
-// #include <cstdio>
-// #include <cmath>
 
 #include "functions.h"
 #include "triples.h"
@@ -98,7 +94,7 @@ namespace ePiX {
 	}
       pair& operator /= (const pair arg)
 	{
-	  double denom = hypot(arg.X1, arg.X2);
+	  double denom = (arg.X1)*(arg.X1)+(arg.X2)*(arg.X2);
 
 	  double temp = X1;
 	  X1 = (temp * arg.X1 + X2 * arg.X2)/denom;

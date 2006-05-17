@@ -1,5 +1,5 @@
 Name:      epix
-Version:   1.0.0
+Version:   1.0.7
 Release:   1
 Summary:   Utility for generating LaTeX figures.
 License:   GPL
@@ -35,8 +35,8 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-,root,root)
-%doc BUGS CHANGELOG COPYING POST-INSTALL README README-changes
-%doc THANKS VERSION contrib/doc/ doc/ samples/
+%doc BUGS ChangeLog COPYING INSTALL NEWS POST-INSTALL README README-changes
+%doc README-porting THANKS VERSION contrib/doc/ doc/ samples/
 %{_bindir}/*
 %{_prefix}/man/man1/*
 %{_libdir}/*

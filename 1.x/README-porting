@@ -1,8 +1,10 @@
 ePiX -- README-porting
 
-March 10, 2006
+May 16, 2006
 
-As of Version 1.0.7, ePiX uses autoconf and automake.
+As of Version 1.0.7, ePiX uses autoconf and automake, and installs
+libraries, headers, scripts, and (especially) documentation in
+standard locations. (Thanks to Julian Gilbey!)
 
   ./configure [options]
   make all
@@ -10,7 +12,7 @@ As of Version 1.0.7, ePiX uses autoconf and automake.
 
 
 The shell scripts are built by the top-level Makefile from pristine
-files named, e.g., make_epix_in and epix_hdr.
+files named, e.g., epix.in.
 
 The configuration scripts helpfiles.sh, newbash.sh, pre-install.sh,
 and post-uninst.sh are obsolete and have been removed.

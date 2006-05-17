@@ -1,0 +1,35 @@
+#!/bin/bash
+#
+HEADER_FILE="epix.h"
+
+HEADERS="globals.h triples.h functions.h domain.h map.h pairs.h camera.h \
+     cropping.h path.h segment.h circle.h sphere.h plane.h polyhedron.h \
+     lengths.h output.h Label.h objects.h curves.h plots.h \
+     dataplot.h geometry.h"
+
+# (N.B. Spaces in 2nd line are properly adjusted :)
+cat <<HEADER_HEADER > $HEADER_FILE
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\\
+ *  $HEADER_FILE -- Automatically created on $(date)  *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#include <iostream>
+#include <vector>
+#include <sstream>
+#include <cmath>
+#include <cstdio>
+#include <cstdarg>
+
+#ifndef EPIX_H
+#define EPIX_H
+
+HEADER_HEADER
+
+cat $HEADERS | grep -v "\#if" | grep -v "\#include" \
+    | grep -v "\#define EPIX_" | grep -v "endif" \
+    | grep -v "std::string epix_version" >> $HEADER_FILE
+
+echo >> $HEADER_FILE
+echo "#endif /* EPIX_H */" >> $HEADER_FILE
+
+exit 0;

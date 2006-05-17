@@ -17,10 +17,11 @@ Timothy Van Zandt
 
 Special thanks to:	For:
 
-Jay Belanger		the emacs mode
-Robin Blume-Kohout	design help
-Guido Gonzato		creating and maintaining the RPM
-Svend Daugaard Pedersen	extended coordinate systems and plotting capability
+Jay Belanger		The emacs mode
+Robin Blume-Kohout	Design help
+Julian Gilbey		Getting ePiX to work with autoconf/automake
+Guido Gonzato		Creating and maintaining the RPM
+Svend Daugaard Pedersen	Extended coordinate systems and plotting capability
 Andrew Sterian		Pyepix and its Windows package
 
 
@@ -29,11 +30,15 @@ Andrew Sterian		Pyepix and its Windows package
                         Fink
 Steve Bellenot
 
+
                         Debian
 Julian Gilbey
 
+
                         FreeBSD
 Tsuguru Kato
+
+
                         Gentoo
 Danny van Dyk
 Olivier Fisette

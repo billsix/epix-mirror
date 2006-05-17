@@ -2,8 +2,48 @@ ePiX -- ChangeLog
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
-March 04-11, 2006 (v1.0.7)
- * Package uses autoconf
+May 16, 2006 (v1.0.7)
+ * (Shell scripts) Backward-compatibility messages for "-vv" option,
+   miscellaneous bugfixes from recent changes
+
+May 14, 2006
+ * (camera.{cc,h})
+  - Friend functions viewpoint() inlined outside camera class
+  - Declare at(), look_at(), lens functions to take const P&
+ * (path.h) polygon(), polyline() declared outside path class
+ * (cropping.h, globals.h) Pre-declare friend functions
+
+May 09, 2006
+ * (sphere.cc) Latitude radius bug
+ * (pairs.h) Complex division bug
+ * (epix.in) Don't cd to temporary directory when compiling
+
+April 08, 2006
+ * (samples/extras/riemann.flx) Fixed command line parsing
+ * (elaps.in, laps.in) -i (interactive) option runs latex in scrollmode
+ * (flix.in) Can process multiple input files
+ * (All scripts) Print success/failure summary after processing
+   multiple files
+
+April 01, 2006
+ * (Shell scripts) If an option requires an argument (e.g. -I), check
+   for argument and exit if not found
+
+March 26, 2006
+ * (Shell scripts) Option change: "-V" for version, "-v" for verbose
+  - Verbose option echoes filename(s) and prints "success" or "failure"
+  - All output/error messages piped to log file
+  - filename parsing factored out to epix-lib.sh
+  - Obsolete function ePiX_terse_help removed
+  - Options -V, --version, --gpl all print license
+ * (epix.in)
+  - Use subdirectory of cwd, not mktemp
+  - Obsolete loop at start of epix_compile_files removed
+ * (flix.in)
+  - flix_get_fileroot returns but doesn't die if input file isn't found
+
+March 04-19, 2006
+ * Package uses autoconf (Julian Gilbey and ADH)
   - "config" file obsolete (removed)
   - New files: AUTHORS, NEWS, configure.in
   - CHANGELOG -> ChangeLog
@@ -13,14 +53,15 @@ March 04-11, 2006 (v1.0.7)
   - ./configure accepts options
     --with-bash=<bash>
     --with-runtime=<runtime compiler>
+    --with-contrib
+ * doc/contrib has moved to contrib/doc
  * Package uses automake 
   - Makefile -> Makefile.am in top-level directory, samples, contrib,
-    doc, and doc/contrib
- * Top-level Makefile re-written:
-  - Build documentation, (un)install 
+    doc, and contrib/doc
+ * All Makefiles re-written:
   - helpfiles.sh, pre-install.sh, post-uninst.sh obsolete (removed)
   - Use compiler flag -O2 uniformly
- * Subdirectory Makefiles re-written
+ * Subdirectory Makefile.ams re-written
   - Compiled documentation placed in top-level directory at build
  * samples/sample.sh replaced with samples/sample.tex in package
  * (make_epix)
@@ -35,6 +76,10 @@ March 04-11, 2006 (v1.0.7)
   - Functions declared const when appropriate
   - Function arguments made const& when possible
   - Initialize in constructors instead of copying
+ * epix, flix read config files *before* looking at command line options
+ * The include and library files are no longer versioned.  That was
+   somewhat confusing!
+ * contrib/epix_ext.h no longer says "using namespace ePiX_contrib" globally
 
 February 26, 2006
  * (epix_functions) epix_basic_help() -> epix_usage()

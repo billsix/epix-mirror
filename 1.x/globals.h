@@ -5,11 +5,11 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: January 07, 2005
+ * Last Change: May 14, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -58,7 +58,7 @@
 
 #ifdef EPIX_COMPILE_OUTPUT
 namespace ePiX {
-  std::string epix_version="1.0.7"; 
+  std::string epix_version="EPIX_VERSION_NUMBER"; 
 }
 #endif
 
@@ -81,6 +81,41 @@ namespace ePiX {
       return var;
     }
 
+  // pre-declare friends for gcc-4.1
+  void dash_fill(double t=0.5);
+  void dash_length(double len=12);
+  void dot_sep(double len=12);
+  void dot_size(double diam=3);
+  void gray(double depth=0.3);
+
+  void radians(void);
+  void degrees(void);
+  void revolutions(void);
+  double angle(const double t);
+
+  void label_angle(double t); // defined in functions.cc
+
+  void solid(void);
+  void dashed(double t=0);
+  void dotted(double t=0);
+
+  void clip(bool arg = true);
+  void crop(bool arg = true);
+  void fill(bool arg = true);
+  void use_pstricks(bool arg = true);
+
+  void font_size(std::string arg="normalsize");
+  void font_face(std::string arg="default");
+
+  void begin(void); // write figure header; defined in output.cc
+
+  void arrow_width(double w=3);
+  void arrow_ratio(double r=5.5);
+  void arrow_camber(double arg=0);
+  void arrow_fill(double dens=0);
+  // end of friend pre-declarations
+
+
   // global "style" constants
   class epix {
   public:
@@ -95,13 +130,13 @@ namespace ePiX {
     static std::string fontface; // valid LaTeX font face
 
     // functions for setting style parameters
-    friend void dash_fill(double t=0.5)    { dashfill = snip_to(t,0.05,0.95); }
-    friend void dash_length(double len=12) { separation = snip_to(len,2,200); }
+    friend void dash_fill(double t)    { dashfill = snip_to(t,0.05,0.95); }
+    friend void dash_length(double len) { separation = snip_to(len,2,200); }
 
-    friend void dot_sep(double len=12)     { separation = snip_to(len,2,200); }
-    friend void dot_size(double diam=3)    { dotsize = snip_to(diam,0.5,256); }
+    friend void dot_sep(double len)     { separation = snip_to(len,2,200); }
+    friend void dot_size(double diam)    { dotsize = snip_to(diam,0.5,256); }
 
-    friend void gray(double depth=0.3) { gray_depth = snip_to(depth, 0, 1); }
+    friend void gray(double depth) { gray_depth = snip_to(depth, 0, 1); }
 
     friend void radians(void)         { angle_units = 1.0; }
     friend void degrees(void)         { angle_units = M_PI/180; }
@@ -115,34 +150,34 @@ namespace ePiX {
 
     // set state variable
     friend void solid(void)  { PATH_STYLE = SOLID; }
-    friend void dashed(double t=0) 
+    friend void dashed(double t) 
       { 
 	PATH_STYLE = DASHED; 
 	if ( t != 0) dash_fill(t); // by default, leave
       }
-    friend void dotted(double t=0) 
+    friend void dotted(double t) 
       { 
 	PATH_STYLE = DOTTED; 
 	if (t != 0) dot_size(t);
       }
 
-    friend void clip(bool arg = true)   { clipping = arg; }
-    friend void crop(bool arg = true)   { cropping = arg; }
-    friend void fill(bool arg = true)   { fill_paths = arg; }
-    friend void use_pstricks(bool arg = true)   { using_pstricks = arg; }
+    friend void clip(bool arg)   { clipping = arg; }
+    friend void crop(bool arg)   { cropping = arg; }
+    friend void fill(bool arg)   { fill_paths = arg; }
+    friend void use_pstricks(bool arg)   { using_pstricks = arg; }
 
     // set font size and face
-    friend void font_size(std::string arg="normalsize") { fontsize = arg; }
-    friend void font_face(std::string arg="default")    { fontface = arg; }
+    friend void font_size(std::string arg) { fontsize = arg; }
+    friend void font_face(std::string arg)    { fontface = arg; }
 
     friend void begin(void); // defined in output.cc
 
     // set arrowhead parameters
-    friend void arrow_width(double w=3) { arrowwidth=fabs(0.5*w); }
-    friend void arrow_ratio(double r=5.5) { arrowratio=fabs(r); }
-    friend void arrow_camber(double arg=0)
+    friend void arrow_width(double w) { arrowwidth=fabs(0.5*w); }
+    friend void arrow_ratio(double r) { arrowratio=fabs(r); }
+    friend void arrow_camber(double arg)
       { arrowcamber=snip_to(arg,0,1); }
-    friend void arrow_fill(double dens=0) { arrowfill=snip_to(dens,0,1);}
+    friend void arrow_fill(double dens) { arrowfill=snip_to(dens,0,1);}
     static double get_arrow_width(void)  { return arrowwidth; }
     static double get_arrow_ratio(void)  { return arrowratio; }
     static double get_arrow_camber(void) { return arrowcamber; }
