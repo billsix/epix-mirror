@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.7
- * Last Change: April 15, 2006
+ * Last Change: May 17, 2006
  */
 
 /* 
@@ -42,99 +42,46 @@ namespace ePiX {
 
   class pair 
     {
-    private:
-      double X1;
-      double X2;
-
     public:
-      pair(const double arg1=0, const double arg2=0) : X1(arg1), X2(arg2) {}
+      pair(const double arg1=0, const double arg2=0) : X1(arg1), X2(arg2) { }
+      pair(const P& arg); // take first two coordinates
 
       double x1(void) const { return X1; }
       double x2(void) const { return X2; }
 
-      pair(const P arg) 
-	{ 
-	  X1 = arg.x1();
-	  X2 = arg.x2(); 
-	}
-
       // unary increment operators
-      pair& operator += (const pair arg)
-	{
-	  X1 += arg.X1;
-	  X2 += arg.X2;
-  
-	  return (*this);
-	}
-
-      pair& operator -= (const pair arg)
-	{
-	  X1 -= arg.X1;
-	  X2 -= arg.X2;
-  
-	  return (*this);
-	}
-
-      pair& operator *= (const double c)
-	{
-	  X1 *= c;
-	  X2 *= c;
-  
-	  return (*this);
-	}
+      pair& operator += (const pair& arg);
+      pair& operator -= (const pair& arg);
+      pair& operator *= (const double c);
 
       // complex multiplication and division
-      pair& operator *= (const pair arg)
-	{
-	  double temp = X1;
-	  X1 = temp * arg.X1 - X2 * arg.X2;
-	  X2 = temp * arg.X2 + X2 * arg.X1;
-  
-	  return (*this);
-	}
-      pair& operator /= (const pair arg)
-	{
-	  double denom = (arg.X1)*(arg.X1)+(arg.X2)*(arg.X2);
+      pair& operator *= (const pair& arg);
+      pair& operator /= (const pair& arg);
+      bool operator== (const pair& u) const;
+      bool operator!= (const pair& u) const;
 
-	  double temp = X1;
-	  X1 = (temp * arg.X1 + X2 * arg.X2)/denom;
-	  X2 = (X2 * arg.X1 - temp * arg.X2)/denom;
-  
-	  return (*this);
-	}
-
-      bool operator== (const pair u)
-	{
-	  return ( (X1 == u.X1) && (X2 == u.X2) );
-	}
+    private:
+      double X1;
+      double X2;
 
     }; // end of class pair
   
-  inline pair& operator- (pair u)
-    {
-      return u *= -1;
-    }
-
-  inline pair operator+ (pair u, const pair v) { return u += v; }
-  inline pair operator- (pair u, const pair v) { return u -= v; }
+  pair operator- (pair u);
+  pair operator+ (pair u, const pair& v);
+  pair operator- (pair u, const pair& v);
+  pair operator* (const double c, pair u);
 
   // complex arithmetic
-  inline pair& J(pair p) { return p *= pair(0,1); }
-  inline pair& operator* (pair u, const pair v) { return u *= v; }
-  inline pair& operator/ (pair u, const pair v) { return u /= v; }
+  pair J(pair p);
+  pair operator* (pair u, const pair& v);
+  pair operator/ (pair u, const pair& v);
 
   // dot product
-  inline double operator| (const pair u, const pair v)
-  {
-    return u.x1()*v.x1() + u.x2()*v.x2();
-  }
-  inline double norm (const pair u) { return sqrt(u|u); }
+  double operator| (const pair& u, const pair& v);
+  double norm (const pair& u);
 
   // componentwise product (a,b)&(x,y)=(ax,by)
-  inline pair operator& (const pair u, const pair v)
-  {
-    return pair(u.x1()*v.x1(), u.x2()*v.x2());
-  }
+  pair operator& (const pair& u, const pair& v);
 
 } // end of namespace
 

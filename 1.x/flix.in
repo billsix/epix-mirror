@@ -52,7 +52,7 @@ FLIX_1ST_FRAME=       # filename, to test success of compile
 trap '[ -n "$EPIX_TEMPDIR" ] && rm -rf "$EPIX_TEMPDIR"' 0 1 2 3 7 10 13 15
 
 # options for external programs
-declare ELAPS_OPTS
+declare -a ELAPS_OPTS
 
 # compiler variables
 declare GXX_INCLUDES
@@ -130,7 +130,7 @@ while [ "$1" != "${1#-}" ]; do
     case "$1" in
 
         -v|--verbose)
-            if [ -z $2 ]; then 
+            if [ -z "$2" ]; then 
                 echo "Please use -V for version"
                 exit 0
             fi
@@ -140,10 +140,8 @@ while [ "$1" != "${1#-}" ]; do
             ;;
 
         -vv)
-            echo "Deprecated option -vv; please use -v for verbose output"
-            EPIX_STDOUT=/dev/stdout
-            FLIX_PROGRESS="no"
-            shift; continue
+            echo "Discontinued option -vv; please use -v for verbose output"
+            exit 0
             ;;
 
         -h|--help)
@@ -179,7 +177,7 @@ while [ "$1" != "${1#-}" ]; do
             GXX_POSTLIBS=
 	    HDR_PATH=
 	    LIB_PATH=
-            ELAPS_OPTS="$ELAPS_OPTS $1";
+            ELAPS_OPTS=("${ELAPS_OPTS[@]}" "$1")
             shift; continue
             ;;
 
@@ -280,10 +278,10 @@ while [ "$1" != "${1#-}" ]; do
         *)  # Pass other options to elaps
         if [ $# -lt 2 ]; then ePiX_die "Missing argument to \"$1\" option"; fi
             if [ "$2" != "${2#-}" ]; then
-                ELAPS_OPTS="$ELAPS_OPTS $1";
+                ELAPS_OPTS=("${ELAPS_OPTS[@]}" "$1")
                 shift 1; continue
             else
-                ELAPS_OPTS="$ELAPS_OPTS $1 $2";
+                ELAPS_OPTS=("${ELAPS_OPTS[@]}" "$1" "$2")
                 shift 2; continue
             fi
             ;;
@@ -298,7 +296,7 @@ FLIX_FILE_LIST=("$@")
 # compile infile outfile.exe
 function flix_compile_files()
 {
-    if [ -z $1 ]; then
+    if [ -z "$1" ]; then
         ePiX_die "No input file specified"
     fi
 
@@ -323,7 +321,7 @@ function flix_compile_files()
 
         # Temporary binary
         { TEMP_BIN="$EPIX_INROOT" && touch "${EPIX_TEMPDIR}/$TEMP_BIN" ; } ||
-        { ePiX_fail "Couldn't create \"${EPIX_TEMPDIR}/$TEMP_BIN\"" && \
+        { ePiX_fail "No write permission in \"${EPIX_TEMPDIR}\"?!" && \
           continue ; }
 
         TEMPFILES=("{TEMPFILES[@]}" "${EPIX_TEMPDIR}/$TEMP_BIN")
@@ -348,7 +346,7 @@ function flix_compile_files()
 
         # Write animation frames
         if [ ! -x "${EPIX_TEMPDIR}/$TEMP_BIN" ]; then
-            ePiX_fail "Couldn't create \"${EPIX_TEMPDIR}/$TEMP_BIN\""
+            ePiX_fail "Couldn't compile executable \"${EPIX_TEMPDIR}/$TEMP_BIN\""
             continue
         fi
 
@@ -468,7 +466,7 @@ function flix_png()
     if [ "$FLIX_ONLY_EEPIC" = "no" ]; then # create eps
         TEMPFILES=("{TEMPFILES[@]}" "$TMP_NAME".eps)
 
-        TMP_CMD=(elaps $ELAPS_OPTS -o "$TMP_NAME".eps "$TMP_NAME".eepic)
+        TMP_CMD=(elaps "${ELAPS_OPTS[@]}" -o "$TMP_NAME".eps "$TMP_NAME".eepic)
         ePiX_command "${TMP_CMD[@]}"
 
         TMP_CMD=(convert "$TMP_NAME".eps "$TMP_NAME".png)

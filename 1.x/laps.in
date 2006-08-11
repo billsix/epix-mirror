@@ -10,8 +10,7 @@
 
 . "@pkglibdir@/epix-lib.sh"
 
-DVIPS_OPTS="-f"
-
+declare -a DVIPS_OPTS
 declare -a LAPS_FILE_LIST
 declare -i LAPS_FILE_COUNT
 
@@ -81,45 +80,50 @@ while [ "$1" != "${1#-}" ]; do
         -i|-int|--interactive)
             EPIX_STDOUT=/dev/stdout
             LATEX_INTERACT="scrollmode"
-            shift;
+            shift
             ;;
 
         -n|--no-config) # do not use ~/.dvipsrc
             export DVIPSRC=/dev/null
-            shift;
+            shift
             ;;
 
         -pdf|--pdf)
-            LATEX="${LATEX##pdf}";
-            LAPS_PDF="yes";
-            shift;
+            LATEX="${LATEX##pdf}"
+            LAPS_PDF="yes"
+            shift
             ;;
 
         --pdflatex)
-            LATEX="pdflatex";
-            LAPS_PDF="";
-            shift;
+            LATEX="pdflatex"
+            LAPS_PDF=""
+            shift
             ;;
 
         --pdftex)
-            LATEX="pdftex";
-            LAPS_PDF="";
-            shift;
+            LATEX="pdftex"
+            LAPS_PDF=""
+            shift
             ;;
 
         -ps|--ps|--pslatex)
-            LATEX="pslatex";
-            shift;
+            LATEX="pslatex"
+            shift
+            ;;
+
+        -P)
+            DVIPS_OPTS=("${DVIPS_OPTS[@]}" "-P$2")
+            shift 2
             ;;
 
         -P*)
-            DVIPS_OPTS="$1 $DVIPS_OPTS";
-            shift;
+            DVIPS_OPTS=("${DVIPS_OPTS[@]}" "$1")
+            shift
             ;;
 
         -t|--tex)
-            LATEX="tex";
-            shift;
+            LATEX="tex"
+            shift
             ;;
 
         -V|--version|--gpl)
@@ -129,23 +133,22 @@ while [ "$1" != "${1#-}" ]; do
 	    ;;
 
         -v|--verbose)
-            if [ -z $2 ]; then 
+            if [ -z "$2" ]; then 
                 echo "Please use -V for version"
                 exit 0
             fi
             EPIX_STDOUT=/dev/stdout
-            shift;
+            shift
             ;;
 
         -vv)
-            echo "Deprecated option -vv; please use -v for verbose output"
-            EPIX_STDOUT=/dev/stdout
-            shift;
+            echo "Discontinued option -vv; please use -v for verbose output"
+            exit 0
             ;;
 
         *)
-            ePiX_warn "Ignoring unknown option \"$1\"";
-            shift;
+            ePiX_warn "Ignoring unknown option \"$1\""
+            shift
             ;;
     esac
 done
@@ -156,7 +159,7 @@ LAPS_FILE_LIST=("$@")
 
 function laps_compile_files()
 {
-    if [ -z $1 ]; then ePiX_die "No input file specified"; fi
+    if [ -z "$1" ]; then ePiX_die "No input file specified"; fi
 
     # file counts
     local processed=0
@@ -194,7 +197,7 @@ function laps_compile_files()
         fi
 
         if [ "$LATEX" = "latex" -o "$LATEX" = "tex" ]; then
-            TMP_CMD=(dvips $DVIPS_OPTS -o "$EPIX_INROOT.ps" "$EPIX_INROOT.dvi")
+            TMP_CMD=(dvips "${DVIPS_OPTS[@]}" -f -o "$EPIX_INROOT.ps" "$EPIX_INROOT.dvi")
 
             ePiX_dvips "${TMP_CMD[@]}"
 

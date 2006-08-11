@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: May 14, 2006
+ * Version 1.0.9
+ * Last Change: June 14, 2006
  */
 
 /* 
@@ -83,7 +83,7 @@ namespace ePiX {
     path(const std::vector<vertex>& data, bool loop)
       : vertices(data), closed(loop), filled(epix::fill_paths) { }
 
-    path(int num_pts) : closed(false), filled(epix::fill_paths)
+    path(int num_pts=0) : closed(false), filled(epix::fill_paths)
       {
 	vertices = std::vector<vertex> (num_pts);
       }
@@ -109,6 +109,10 @@ namespace ePiX {
     path(double f(double), double t_min, double t_max, 
 	 int num_pts=EPIX_NUM_PTS);
 
+    // append a point
+    path& pt(const double, const double, const double=0);
+    path& pt(const P&);
+
     // concatenate path segments
     path& operator+= (const path& vertices);
     // concatenate, reversing second sequence
@@ -117,8 +121,10 @@ namespace ePiX {
     bool is_closed(void) const { return closed; }
     bool is_filled(void) const { return filled; }
 
-    void close(const bool arg=true) { closed = arg; }
-    void set_fill(const bool arg=true) { filled = arg; }
+    // set attributes
+    path& close(const bool arg=true);
+    path& fill(const bool arg=true);
+    path& set_fill(const bool arg=true); // deprecated
 
     void set_crop_all(const bool arg);
     void set_clip_all(const bool arg);

@@ -23,14 +23,14 @@ ELAPS_EXTENSIONS="eepic xp flx cc c C cpp" # or NULL
 ELAPS_DOT_EXT=".${ELAPS_EXTENSIONS// /|.}" # for usage message
 
 # default options
-DVIPS_OPTS="-f"
 ELAPS_PKGS="latexsym,amsmath,rotating,epic,eepic,pstcol"
 ELAPS_SIZE=12 # figure compiled in [12pt]{article}
 
 ELAPS_PDF="no"    # Create PDF file?
 ELAPS_PS="no"     # Create PS file instead of EPS?
 
-EPIX_OPTS=""
+declare -a EPIX_OPTS
+declare -a DVIPS_OPTS
 
 LATEX_INTERACT="batchmode"
 
@@ -136,12 +136,12 @@ function elaps_parse_options ()
         -i|-int|--interactive)
             EPIX_STDOUT=/dev/stdout
             LATEX_INTERACT="scrollmode"
-            shift;
+            shift
             ;;
 
         -n|--no-config) # do not use ~/.dvipsrc
             export DVIPSRC=/dev/null
-            shift;
+            shift
             ;;
 
         -o|--output)
@@ -156,39 +156,44 @@ function elaps_parse_options ()
                 EPIX_OUTROOT="$2"
             fi
             ELAPS_USER_OUT="yes"
-            shift 2;
+            shift 2
+            ;;
+
+        -P)
+            DVIPS_OPTS=("${DVIPS_OPTS[@]}" "-P$2")
+            shift 2
             ;;
 
         -P*)
-            DVIPS_OPTS="$DVIPS_OPTS $1";
-            shift;
+            DVIPS_OPTS=("${DVIPS_OPTS[@]}" "$1")
+            shift
             ;;
 
         -pdf|--pdf)
             ELAPS_PDF="yes"
-            shift;
+            shift
             ;;
 
         -ps|--ps)
             ELAPS_PS="yes"
             ELAPS_PDF="no" # redundant; enforced by logic later
-            shift;
+            shift
             ;;
 
         -p|--pkg)
             if [ "$2" != "${2#-}" ]; then
                 elaps_warn "\"$1\" cannot be followed by \"$2\"; skipping"
-                shift 1;
+                shift 1
             else
                 ELAPS_PKGS="$ELAPS_PKGS,$2"
                 echo "$PROG: Using LaTeX package \"$2\"" > "$EPIX_STDERR"
-                shift 2;
+                shift 2
             fi
             ;;
 
         -p*)
             ELAPS_PKGS="$ELAPS_PKGS,${1#-p}"
-            shift;
+            shift
             ;;
 
         # Deliberately undocumented
@@ -199,7 +204,7 @@ function elaps_parse_options ()
 
         --size)
             ELAPS_SIZE="$2"
-            shift 2;
+            shift 2
             ;;
 
         -V|--version|--gpl)
@@ -209,35 +214,34 @@ function elaps_parse_options ()
 	    ;;
 
         -v|--verbose)
-            if [ -z $2 ]; then 
+            if [ -z "$2" ]; then 
                 echo "Please use -V for version"
                 exit 0
             fi
             EPIX_STDOUT=/dev/stdout
-            shift;
+            shift
             ;;
 
         -vv)
-            echo "Deprecated option -vv; please use -v for verbose output"
-            EPIX_STDOUT=/dev/stdout
-            shift;
+            echo "Discontinued option -vv; please use -v for verbose output"
+            exit 0
             ;;
 
 
         # pass other options to epix
         -i*|-u|-x|-I|-L|-l|-W)
-	    EPIX_OPTS="$EPIX_OPTS $1 $2";
-            shift 2;
+	    EPIX_OPTS=("${EPIX_OPTS[@]}" "$1" "$2")
+            shift 2
             ;;
 
         -b) 
             ePiX_warn "Skipping option \"$1 $2\""
-            shift 2;
+            shift 2
             ;;
 
         *)
-            EPIX_OPTS="$EPIX_OPTS $1";
-            shift;
+            EPIX_OPTS=("${EPIX_OPTS[@]}" "$1")
+            shift
             ;;
         esac
     done
@@ -256,7 +260,7 @@ function elaps_parse_options ()
 
 function elaps_process_files() 
 {
-    if [ -z $1 ]; then
+    if [ -z "$1" ]; then
         ePiX_die "No input file specified"
     fi
 
@@ -281,7 +285,7 @@ function elaps_process_files()
 
         # Create eepic file if necessary
         if [ "$EPIX_SUFFIX" != "eepic" ]; then
-            TMP_CMD=(@bindir@/epix $EPIX_OPTS -o "$ELAPS_TEMP_EEPIC" "$EPIX_INFILE")
+            TMP_CMD=(@bindir@/epix "${EPIX_OPTS[@]}" -o "$ELAPS_TEMP_EEPIC" "$EPIX_INFILE")
 
             ePiX_command "${TMP_CMD[@]}"
 
@@ -309,7 +313,7 @@ function elaps_process_files()
             continue
         fi
 
-        TMP_CMD=(dvips $DVIPS_OPTS -o "$ELAPS_TEMP_PS" "$ELAPS_TEMP_DVI")
+        TMP_CMD=(dvips "${DVIPS_OPTS[@]}" -f -o "$ELAPS_TEMP_PS" "$ELAPS_TEMP_DVI")
 
         ePiX_dvips "${TMP_CMD[@]}"
 

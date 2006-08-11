@@ -1,6 +1,6 @@
 ePiX -- INSTALL
 
-Last Change: March 08, 2006
+Last Change: June 02, 2006
 
 This file contains detailed installation instructions for ePiX-1.x
 
@@ -8,24 +8,22 @@ Lines starting with a "%" denote commands typed at a shell prompt.
 Lines starting with a "#" denote commands run as root.
 Don't type the prompt characters "%" or "#". :)
 
+"${prefix}" stands for the complete path to the install directory,
+e.g. "/usr/local" or "/home/hwang/epix".
+
 
 The following software must be installed on your system in order for
 you to use ePiX:
 
   * The GNU shell, bash
-  * A C++ compiler and development libraries, preferably g++
+  * A C++ compiler and development libraries, preferably g++ (> 3.1)
   * GhostScript, ImageMagick, and teTeX
   * GNU binutils, textutils, and fileutils (ar, sed, grep, ln, rm...)
 
-(For the curious, the specific programs are: convert, dvips, g++,
-latex, and ps2epsi.) Please consult your system documentation for
-information on installing these components. The POST-INSTALL file has
-potentially helpful information, as well.
+Please consult your system documentation for information on installing
+these components. The POST-INSTALL file contains potentially helpful
+information, as well.
 
-It has been noticed by a number of people that g++ 4.0 does not
-compile this package correctly.  You are advised to use g++ 3.4.  You
-may need to specify something like CXX=g++-3.4 --with-runtime=g++-3.4
-to ./configure if your machine has multiple versions of g++ on it.
 
 ePiX comprises a header file (epix.h), a compiled library (libepix.a),
 and four shell scripts (epix, elaps, flix, and laps) that automate
@@ -42,39 +40,66 @@ be in your PATH.
 
 (3) Build:
 
-% make [all contrib]
+% make
 % make install
 
 
 --- Step-by-step Instructions ---
 
-(1) Tarballs are available gzip or bzip2 compressed. GNU/Linux comes with
-  bzip2 utilities, while some Unices may not. To unpack the tarball, use
-  the appropriate version number, package name (src or complete), and
-  tar options (z for .gz, j for .bz2, v to see filenames unpacked):
+(1) Unpack
 
-% tar -zxf epix-x.y.z_complete.tar.gz
+  Tarballs are available gzip or bzip2 compressed. To unpack, use the
+  appropriate version number and tar options (z for .gz, j for .bz2, v
+  to see filenames unpacked):
 
-% tar -jxf epix-x.y.z_complete.tar.bz2
+% tar -zxf epix-x.y.z.tar.gz
+
+  or
+
+% tar -jxf epix-x.y.z.tar.bz2
 
   If your "tar" doesn't understand decompression, do
 
-% gunzip -c epix-x.y.z_complete.tar.gz | tar -xf -
+% gunzip -c epix-x.y.z.tar.gz | tar -xf -
 
-% bzcat epix-x.y.z_complete.tar.bz2 | tar -xf -
+  or
+
+% bzcat epix-x.y.z.tar.bz2 | tar -xf -
+
 
   Change to the source directory:
 
 % cd epix-x.y.z
 
 
-(2) Run ./configure to change, e.g., the installation directory. (By
-    default, ePiX installs in /usr/local.) To install in your home
-    directory, for example, do
+(2) Configure the package:
 
-  ./configure --prefix=${HOME}
+  As of Version 1.0.7, ePiX uses GNU autoconf. The build commands now
+  match the familiar "./configure; make; make install". To customize
+  the build, you needn't edit a config file, but instead will provide
+  options (if needed) to the configure script. Most users can run one
+  of the commands
 
-  ./configure --help  lists available options.
+% ./configure
+
+  or
+
+% ./configure --with-contrib
+
+  (The latter configures epix to build S. D. Pedersen's enhancements
+  for coordinate systems and the accompanying documentation. If you
+  don't know what these are, you may safely run the first command.
+  Otherwise, please read the NEWS file for important changes to the
+  behavior of the contrib package.)
+
+  To change the installation directory from the default (/usr/local)
+  to your home directory, do
+
+% ./configure --prefix=${HOME}
+
+  To list all options, do
+
+% ./configure --help
 
 
 (3) Compile and install:
@@ -87,14 +112,17 @@ be in your PATH.
   * Four shell scripts
   * The manual and sample document
 
-  To build S. D. Pedersen's enhancements for coordinate systems and
-  the accompanying documentation, do
+  If you configured the contrib package, a separate library and header
+  will be built, and installed in parallel with the "core" library and
+  header.
 
-% make contrib doc-contrib
+  Be sure you are using GNU make. If the build fails immediately with
+  an error about unexpected characters in the Makefile, speak to your
+  system administrator about availability of GNU make, or try running
+  the command "gmake".
 
-  A couple dozen figures must be compiled for each make command,
-  depending which package you have downloaded, so the process may take
-  a few minutes. If there are no errors, you're ready to install.
+
+  If there are no build errors, you're ready to install.
 
   You must have write permission in the install directory you selected
   in step (2). If you have been logged on as yourself until now (a Very
@@ -130,24 +158,43 @@ Password: <your root password>
   
 % make clean
 
-  to clean the source tree of compiled files, and
-
-% make clean-all
-
-  to remove (in addition) documentation, and samples. Note that each
-  command removes the top-level Makefile. Run ./configure to re-create
-  the Makefile if necessary.
+  to clean the source tree of compiled files. This command removes the
+  top-level Makefile. Run ./configure to re-create the Makefile if
+  necessary.
 
 
 (5) Uninstalling:
 
-  To remove all versions of ePiX from your system, go to the directory
+  To remove a version of ePiX from your system, go to the directory
   where the sources were unpacked, log on as root if necessary, and do:
 
-# make uninstall-all
+# make uninstall
 
-  ePiX also provides a "make uninstall" target, which removes only the
-  version corresponding to the source directory. 
+  If you ran "make clean" at some point, you need to ./configure the
+  source package *the same way as it was originally built* before you
+  do "make uninstall".
+
+
+  To uninstall multiple versions, it suffices to remove the following
+  files and directories manually:
+
+[] Shell scripts
+  ${prefix}/bin/{elaps,epix,flix,laps}
+
+[] Static libraries
+  ${prefix}/lib/libepix.a   (Symbolic link)
+  ${prefix}/lib/libepix-*.a (Versions prior to 1.0.6)
+  ${prefix}/lib/epix/*      (Versions after 1.0.7)
+
+[] Header files
+  ${prefix}/include/epix*.h
+
+[] Configuration files
+  ${prefix}/share/epix/*     (Versions prior to 1.0.6)
+  ${prefix}/share/doc/epix/* (Versions after 1.0.7)
+
+[] Manuals and samples
+  ${prefix}/share/doc/epix/*
 
 
 --- Contact Information ---

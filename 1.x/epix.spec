@@ -1,5 +1,5 @@
 Name:      epix
-Version:   1.0.7
+Version:   EPIX_VERSION_NUMBER
 Release:   1
 Summary:   Utility for generating LaTeX figures.
 License:   GPL
@@ -10,7 +10,7 @@ BuildRoot: %{_tmppath}/%{name}-%{version}-buildroot
 Source:    http://math.holycross.edu/~ahwang/epix/epix_complete.tar.gz
 
 %description
-ePiX, a collection of batch-oriented utilities for *nix, creates
+ePiX, a collection of command line utilities for *nix, creates
 mathematically accurate line figures, plots, and movies using
 easy-to-learn syntax. LaTeX and dvips comprise the typographical
 rendering engine, while ImageMagick is used to create bitmapped

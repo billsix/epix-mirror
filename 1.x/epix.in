@@ -150,7 +150,7 @@ while [ "$1" != "${1#-}" ]; do
         ;;
 
     -v|--verbose)
-        if [ -z $2 ]; then 
+        if [ -z "$2" ]; then 
             echo "Please use -V for version"
             exit 0
         fi
@@ -160,10 +160,8 @@ while [ "$1" != "${1#-}" ]; do
         ;;
 
     -vv)
-        echo "Deprecated option -vv; please use -v for verbose output"
-        EPIX_STDOUT=/dev/stdout
-        EPIX_STDERR=/dev/stderr
-        shift; continue
+        echo "Discontinued option -vv; please use -v for verbose output"
+        exit 0
         ;;
 
 
@@ -209,7 +207,7 @@ EPIX_FILE_LIST=("$@")
 # Compile specified files to eepic
 function epix_compile_files {
 
-    if [ -z $1 ]; then
+    if [ -z "$1" ]; then
         ePiX_die "No input file specified"
     fi
 

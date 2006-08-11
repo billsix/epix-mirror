@@ -1,4 +1,4 @@
-# Version EPIX_VERSION_NUMBER
+# Version EPIX_VERSION_NUMBER 
 AUTHORS
 BUGS
 ChangeLog
@@ -12,6 +12,7 @@ README
 README-changes
 README-porting
 THANKS
+TODO
 VERSION
 aclocal.m4
 bash_completions
@@ -65,6 +66,7 @@ objects.cc
 objects.h
 output.cc
 output.h
+pairs.cc
 pairs.h
 path.h
 path.cc
@@ -78,5 +80,7 @@ segment.cc
 segment.h
 sphere.cc
 sphere.h
+surface.cc
+surface.h
 triples.cc
 triples.h

@@ -7,7 +7,7 @@ libraries, headers, scripts, and (especially) documentation in
 standard locations. (Thanks to Julian Gilbey!)
 
   ./configure [options]
-  make all
+  make
   make install
 
 

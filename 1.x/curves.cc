@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.9
+ * Last Change: July 28, 2006
  */
 
 /* 
@@ -157,8 +157,8 @@ namespace ePiX {
   {
     if (epix::path_style() == SOLID)
       {
-	path data = polygon(3, &arg1, &arg2, &arg3);
-	data.set_fill(epix::fill_paths);
+	path data;
+	data.pt(arg1).pt(arg2).pt(arg3).close().fill(epix::fill_paths);
 	data.draw();
       }
     else // dashed/dotted -- not filled
@@ -174,8 +174,8 @@ namespace ePiX {
   {
     if (epix::path_style() == SOLID)
       {
-        path data = polygon(4, &arg1, &arg2, &arg3, &arg4);
-        data.set_fill(epix::fill_paths);
+        path data;
+	data.pt(arg1).pt(arg2).pt(arg3).pt(arg4).close().fill(epix::fill_paths);
         data.draw();
       }
     else // dashed/dotted
@@ -356,7 +356,9 @@ namespace ePiX {
     if (dens != 0)
       std::cout << "\n\\special{sh " << dens << "}%";
 
-    polygon(4, &base, &tip1, &tip3, &tip2).draw();
+    path my_tip;
+    my_tip.pt(base).pt(tip1).pt(tip3).pt(tip2).draw();
+    // polygon(4, &base, &tip1, &tip3, &tip2).draw();
     // restore path style
     if (TEMP == DASHED)
       dashed();

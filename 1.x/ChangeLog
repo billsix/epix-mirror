@@ -2,9 +2,52 @@ ePiX -- ChangeLog
 
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
-May 16, 2006 (v1.0.7)
- * (Shell scripts) Backward-compatibility messages for "-vv" option,
-   miscellaneous bugfixes from recent changes
+
+July 13, 2006 (v1.0.9)
+ * (README, manual.tex) Update mailing list information
+
+June 14, 2006
+ * (path.{h,cc})
+  - Misc cleanup, redeclarations
+  - Default path() constructor
+  - Add pt() functions for building a path point-by-point
+ * (curves.cc) Remove polygon in triangle/quad implementation
+ * (samples/extras)
+  - Update README
+  - Add lighting.{flx,h} (color-shaded surface sample files)
+  - Rewrite {butterfly,helicoid,hyperboloid,tori}.xp so data, sorting
+    classes don't conflict with surface plot functions
+
+June 09, 2006
+ * (samples/{clipping,pole}.xp) Rewrite using shaded surface plots
+
+June 06, 2006 (v1.0.8)
+ * New Makefiles from autoconf 2.60 (Julian Gilbey)
+
+June 02, 2006
+ * (INSTALL, POST-INSTALL) Update instructions
+ * (pkg script) Only two versions (epix-x.y.z[_withpdf].tar.bz2)
+
+May 24, 2006
+ * (contrib/epix_ext.h) Define virtual destructors for classes
+   containing virtual functions
+
+May 22, 2006 (v1.0.7)
+ * (files) Add TODO (needed by "make dist" et. al.)
+
+May 19, 2006
+ * (New module: surface.{cc,h}) Shaded surface plotting
+
+May 17, 2006
+ * New file: pairs.cc
+  - Factor out inlined functions, clean up call and return syntax
+  - Scalar multiplication operator (fixes bug with "bubble" lens)
+  - Reimplement equality operator, add inequality operator
+
+May 16, 2006
+ * (Shell scripts) 
+  - Disable "-vv" option
+  - Miscellaneous bugfixes from recent changes
 
 May 14, 2006
  * (camera.{cc,h})

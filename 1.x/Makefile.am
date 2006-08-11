@@ -11,8 +11,6 @@ SUBDIRS = . samples doc $(MAYBE_DIRS)
 
 # Now stuff for this directory specifically
 
-docdir = $(datadir)/doc/epix
-
 bin_SCRIPTS = epix elaps flix laps
 
 pkglib_LIBRARIES = libepix.a
@@ -21,8 +19,8 @@ include_HEADERS = epix.h
 
 libepix_a_CXXSOURCES = camera.cc circle.cc cropping.cc curves.cc \
 	dataplot.cc domain.cc functions.cc geometry.cc Label.cc lengths.cc \
-	objects.cc output.cc path.cc plane.cc plots.cc polyhedron.cc \
-	segment.cc sphere.cc triples.cc
+	objects.cc output.cc pairs.cc path.cc plane.cc plots.cc polyhedron.cc \
+	segment.cc sphere.cc surface.cc triples.cc
 # header groups for build deps
 H_GLOBALS = globals.h triples.h functions.h map.h pairs.h
 H_OUTPUTS = camera.h cropping.h lengths.h output.h

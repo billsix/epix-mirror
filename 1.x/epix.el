@@ -5,8 +5,8 @@
 ;; Author: Jay Belanger
 ;; Maintainer: Jay Belanger <belanger@truman.edu>
 
-;; $Revision: 1.3 $
-;; $Date: 2006/05/17 03:19:34 $
+;; $Revision: 1.4 $
+;; $Date: 2006/08/11 19:57:01 $
 ;; Keywords: epix
 
 ;; This program is free software; you can redistribute it and/or
@@ -87,7 +87,7 @@
 ;;       #include \"epix.h\"
 ;;       using namespace ePiX;
 ;;
-;;       int main() 
+;;       int main()
 ;;       {
 ;;         bounding_box(P(,),P(,));
 ;;         unitlength(\"\");
@@ -148,7 +148,7 @@
 "#include \"epix.h\"
 using namespace ePiX;
 
-int main() 
+int main()
 {
 bounding_box(P(,),P(,));
 unitlength(\"\");

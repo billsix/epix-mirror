@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.0
- * Last Change: September 04, 2004
+ * Version 1.0.9
+ * Last Change: June 14, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -76,12 +76,12 @@ namespace ePiX {
 	std::vector<vertex> data(num_pts+1);
   
 	// starting location
-	P pt = tail - (0.5*c)*dir;
+	P start = tail - (0.5*c)*dir;
 
 	dir *= ((1+c)/num_pts);
 
-	for (unsigned int i=0; i < data.size(); ++i, pt += dir)
-	  data.at(i) = vertex(pt);
+	for (unsigned int i=0; i < data.size(); ++i, start += dir)
+	  data.at(i) = vertex(start);
 
 	vertices = data;
 	closed = false;
@@ -99,12 +99,12 @@ namespace ePiX {
 
     // direction and starting location
     P dir = head - tail;
-    P pt = tail - (0.5*c)*dir;
+    P start = tail - (0.5*c)*dir;
 
     dir *= ((1+c)/num_pts);
 
-    for (unsigned int i=0; i < data.size(); ++i, pt += dir)
-      data.at(i) = vertex(pt);
+    for (unsigned int i=0; i < data.size(); ++i, start += dir)
+      data.at(i) = vertex(start);
 
     vertices = data;
     closed = false;
@@ -143,13 +143,13 @@ namespace ePiX {
 
 
   // Splines
-  static inline P
+  static P
   spl_pt(const P p1, const P p2, const P p3, double t)
   {
     return t*t*p1 + 2*t*(1-t)*p2 + (1-t)*(1-t)*p3;
   }
 
-  static inline P
+  static P
   spl_pt(const P p1, const P p2, const P p3, const P p4, 
 	 double t)
   {
@@ -220,6 +220,61 @@ namespace ePiX {
   }
 
 
+  // append a point
+  path& path::pt(const double x, const double y, const double z)
+  {
+    vertices.push_back(vertex(P(x, y, z)));
+    return *this;
+  }
+
+  path& path::pt(const P& loc)
+  {
+    vertices.push_back(vertex(loc));
+    return *this;
+  }
+
+
+  // concatenate
+  path& path::operator+= (const path& data)
+  {
+    unsigned int my_size = vertices.size();
+    vertices.resize(my_size + data.vertices.size());
+
+    for(unsigned int i=0; i < data.vertices.size(); ++i)
+      vertices.at(my_size+i) = data.vertices.at(i);
+
+    return *this;
+  }
+
+  path& path::operator-= (const path& data)
+  {
+    unsigned int my_size = vertices.size();
+    vertices.resize(my_size+data.vertices.size());
+
+    for(unsigned int i=0; i < data.vertices.size(); ++i)
+      vertices.at(my_size + data.vertices.size()-1-i) = data.vertices.at(i);
+
+    return *this;
+  }
+
+  path& path::close(const bool arg)
+  {
+    closed = arg;
+    return *this;
+  }
+  path& path::fill(const bool arg)
+  {
+    filled = arg;
+    return *this;
+  }
+  path& path::set_fill(const bool arg) // legacy name
+  {
+    filled = arg;
+    return *this;
+  }
+
+
+  // global functions
   // polygon/polyline
   path polygon(int num_pts, ...)
   {
@@ -249,30 +304,6 @@ namespace ePiX {
     va_end(ap);
 
     return path(data, false); // closed
-  }
-
-
-  // concatenate
-  path& path::operator+= (const path& data)
-  {
-    unsigned int my_size = vertices.size();
-    vertices.resize(my_size + data.vertices.size());
-
-    for(unsigned int i=0; i < data.vertices.size(); ++i)
-      vertices.at(my_size+i) = data.vertices.at(i);
-
-    return *this;
-  }
-
-  path& path::operator-= (const path& data)
-  {
-    unsigned int my_size = vertices.size();
-    vertices.resize(my_size+data.vertices.size());
-
-    for(unsigned int i=0; i < data.vertices.size(); ++i)
-      vertices.at(my_size + data.vertices.size()-1-i) = data.vertices.at(i);
-
-    return *this;
   }
 } /* end of namespace */
 
