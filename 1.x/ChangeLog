@@ -3,6 +3,36 @@ ePiX -- ChangeLog
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
 
+September 25, 2006 (v1.0.15)
+* (samples/{clipping,pole}.xp) Remove unneeded "Light"
+
+September 23, 2006 (v1.0.14)
+* (pkg script, doc/Makefile.am) Keep manual file tori.eepic
+
+September 8, 2006 (v1.0.13)
+* (surface.{cc,h}) Surface plotting works with domains (fine mesh used
+  to draw mesh elements; for proper behavior, fine must be a multiple
+  of coarse)
+
+August 29, 2009 (v1.0.12)
+* "make clean" removes stale latex files (Julian Gilbey)
+
+August 23, 2006 (v1.0.11)
+* Version not updated in configure
+
+August 20, 2006 (v1.0.10)
+* (elaps.in)
+  - Default LATEX_INTERACT=batchmode -> scrollmode
+  - Interactive LATEX_INTERACT=scrollmode -> errorstopmode
+  - Add spacers ("---") between stanzas in output, log file
+* (epix-lib.sh)
+  - ePiX_command wraps argument in a single command
+  - ePiX_dvips function removed
+  - New variables SYSTEM_STD{ERR,OUT}, SYSTEM_DEVNULL
+* (All *.in files)
+  - ePiX_dvips -> ePiX_command
+  - Use SYSTEM_ variables instead of hard-coded /dev/...
+
 July 13, 2006 (v1.0.9)
  * (README, manual.tex) Update mailing list information
 

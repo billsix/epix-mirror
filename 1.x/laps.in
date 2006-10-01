@@ -78,13 +78,13 @@ while [ "$1" != "${1#-}" ]; do
 	    ;;
 
         -i|-int|--interactive)
-            EPIX_STDOUT=/dev/stdout
+            EPIX_STDOUT="$SYSTEM_STDOUT"
             LATEX_INTERACT="scrollmode"
             shift
             ;;
 
         -n|--no-config) # do not use ~/.dvipsrc
-            export DVIPSRC=/dev/null
+            export DVIPSRC="$SYSTEM_DEVNULL"
             shift
             ;;
 
@@ -137,7 +137,7 @@ while [ "$1" != "${1#-}" ]; do
                 echo "Please use -V for version"
                 exit 0
             fi
-            EPIX_STDOUT=/dev/stdout
+            EPIX_STDOUT="$SYSTEM_STDOUT"
             shift
             ;;
 
@@ -185,7 +185,7 @@ function laps_compile_files()
         if [ "$EPIX_INROOT.$EPIX_SUFFIX" -nt "$EPIX_INROOT.aux" ]; then
             ePiX_msg "aux file out of date"
 
-            ePiX_dvips "${TMP_CMD[@]}"
+            ePiX_command "${TMP_CMD[@]}"
         fi
 
         ePiX_command "${TMP_CMD[@]}"
@@ -199,7 +199,7 @@ function laps_compile_files()
         if [ "$LATEX" = "latex" -o "$LATEX" = "tex" ]; then
             TMP_CMD=(dvips "${DVIPS_OPTS[@]}" -f -o "$EPIX_INROOT.ps" "$EPIX_INROOT.dvi")
 
-            ePiX_dvips "${TMP_CMD[@]}"
+            ePiX_command "${TMP_CMD[@]}"
 
             if [ "$EPIX_INROOT.dvi" -nt "$EPIX_INROOT.ps" ]; then
                 ePiX_warn "${TMP_CMD[*]} failed"

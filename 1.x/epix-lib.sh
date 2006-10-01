@@ -14,8 +14,13 @@ EPIX_TEMPDIR=${PROG}-${EPIX_PID}
 EPIX_LOGFILE=${PROG}.log
 if [ -f "${EPIX_LOGFILE}" ]; then rm -f "${EPIX_LOGFILE}"; fi
 
-EPIX_STDOUT=/dev/null
-EPIX_STDERR=/dev/stderr
+# These may need to be modified
+declare -r SYSTEM_STDOUT=/dev/stdout
+declare -r SYSTEM_STDERR=/dev/stderr
+declare -r SYSTEM_DEVNULL=/dev/null
+
+EPIX_STDOUT=$SYSTEM_DEVNULL
+EPIX_STDERR=$SYSTEM_STDERR
 
 declare EPIX_NOTFOUND
 
@@ -45,11 +50,6 @@ function ePiX_die {
 # Echo command to stderr/stdout and logfile, then run command
 #
 function ePiX_command {
-    ePiX_msg "$@"
-    "$@" 2>&1 | tee -a "$EPIX_LOGFILE" > "$EPIX_STDOUT"
-}
-
-function ePiX_dvips {
     ePiX_msg "$@"
     ("$@" 2>&1) | tee -a "$EPIX_LOGFILE" > "$EPIX_STDOUT"
 }

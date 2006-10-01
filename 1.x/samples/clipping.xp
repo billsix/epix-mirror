@@ -1,11 +1,10 @@
 /* -*-ePiX-*- */
 /* 
- * ePiX surface demo image, May 12, 2004 
+ * ePiX surface demo image, June 08, 2006
  *
- * This file uses several types of hackery: pstricks (for color-filled
- * arrowheads), manual layering of lines, labels, and shaded quadrilaterals
- * (for hidden-surface removal), and re-drawing polygons at narrow width
- * (to simulate transparency).
+ * This file illustrates the use of pstricks (for color-filled
+ * arrowheads), manual layering of figure elements (for hidden-surface
+ * removal), and simulated transparency.
  */
 #include "epix.h"
 using namespace ePiX;
@@ -14,66 +13,34 @@ using namespace ePiX;
 // camera location (in spherical coordinates); must be in first orthant
 const P VIEWPT=sph(4, M_PI/6, M_PI/6);
 
-const P LIGHT=-E_1-E_2-2*E_3; // location of light, for shading
-
+// colors
 void color_coord(void)  { rgb(0.7, 0.9, 0.5); }
 void color_axis(void)   { rgb(0.8, 0.2, 0.9); } 
-void color_xslice(void) {  red(); }
-void color_yslice(void) {   blue(); }
+void color_xslice(void) { red(); }
+void color_yslice(void) { blue(); }
 void ps_axis_color(void)
 { 
   std::cout << "\n\\newrgbcolor{axis_color}{0.8 0.2 0.9}%"; 
 }
 
-const int MESH=8; // number of coordinate grid squares
+const int MESH(12); // number of coordinate grid squares
 
 // location of tangency point
-const double x_0=0.625;
-const double y_0=0.5;
+const double x_0=7.0/MESH;
+const double y_0=6.0/MESH;
 
 const double z_0=0.25; // height of top of slicing planes
 
-// function to be graphed
-double f(double x, double y) { return 0.75*y*(y*y-3*x*x); }
-
-// Auxiliary internal parameters
-const int N=2*MESH; // number of surface mesh subdivisions
 const int MAX=1; // maximum coordinate
 
+// function to be graphed
+P f(double x, double y) { return P(x, y, 0.75*y*(y*y-3*x*x)); }
+
 // constant y slice of the graph of f
-inline P Df_x(double t) { return P(t+x_0, y_0, f(t+x_0, y_0)); }
+P Df_x(double t) { return f(t+x_0, y_0); }
 
 // constant x slice of the graph of f
-inline P Df_y(double t) { return P(x_0, t+y_0, f(x_0, t+y_0)); }
-
-// shading density function and helpers
-const double EPS=0.001; // for approximating derivatives
-double g(int i) { return MAX*i*1.0/N; } // int -> grid coordinate
-
-// 0.5*(1-cos^2(t)), t=angle from camera to surface normal
-double density(int i, int j)
-{
-  // compute unit surface normal
-  double f_x = 0.5*(f(g(i)+EPS, g(j)) - f(g(i)-EPS, g(j)))/EPS;
-  double f_y = 0.5*(f(g(i), g(j)+EPS) - f(g(i), g(j)-EPS))/EPS;
-
-  P normal = P(-f_x, -f_y, 1);
-  normal *= 1/sqrt(normal|normal);
-
-  // convert cos^2 to a gray density
-  //  return  0.5*(1-pow(normal|VIEWPT, 2)/(VIEWPT|VIEWPT));
-  return  0.625*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
-}
-
-// mesh location -> draw surface element
-inline void draw_mesh_quad(int i, int j)
-{
-  gray(density(i,j));
-  ePiX::quad(P(g(i),   g(j),   f(g(i),   g(j))), 
-       P(g(i+1), g(j),   f(g(i+1), g(j))),
-       P(g(i+1), g(j+1), f(g(i+1), g(j+1))), 
-       P(g(i),   g(j+1), f(g(i),   g(j+1))));
-}
+P Df_y(double t) { return f(x_0, t+y_0); }
 
 
 int main() 
@@ -89,6 +56,10 @@ int main()
 
   clip_box(P(-2, -2, -1), P(2, 2, 0.75));
 
+  // front and back halves
+  domain R1(P(-1,-1), P(0, 1), mesh(MESH, 2*MESH), mesh(MESH, 2*MESH));
+  domain R2(P( 0,-1), P(1, 1), mesh(MESH, 2*MESH), mesh(MESH, 2*MESH));
+
   // coordinate grids
   color_coord();
   grid(P(-MAX,-MAX,-MAX), P(-MAX, MAX, MAX), MESH, MESH);
@@ -96,21 +67,13 @@ int main()
   grid(P(-MAX,-MAX,-MAX), P( MAX, MAX,-MAX), MESH, MESH);
 
   color_axis();
-  /*
-  grid(P(-MAX,-MAX,-MAX), P( MAX, MAX,-MAX), 4, 4);
-  h_axis_labels(P(-MAX, MAX,-MAX), P(MAX, MAX,-MAX), 2*MAX, P( 2,-2), br);
-  */
 
   label(P(0,0.25+MAX,0), P(4,0), "$y$", r);
   label(P(0,0,0.25+MAX), P(0,4), "$z$", t);
 
-  // back 1/2 of surface (x<0), drawn back-to-front
   clip();
   fill();
-  for (int i=-N; i < 0; ++i)
-    for (int j=-N; j < N; ++j)
-      draw_mesh_quad(i,j);
-
+  surface(f, R1);
   fill(false);
   clip(false);
 
@@ -127,7 +90,7 @@ int main()
   // vertices of slicing planes
   P pt1(x_0, 0, z_0), pt2(x_0, 0, -MAX), pt3(x_0, MAX, -MAX);
   P pt4(0, y_0, z_0), pt5(0, y_0, -MAX), pt6(MAX, y_0, -MAX);
-  P pt7(x_0, 0, 0), pt8(x_0, MAX, z_0), pt9(0, y_0, f(0,y_0));
+  P pt7(x_0, 0, 0), pt8(x_0, MAX, z_0), pt9=f(0,y_0);
   P pt10(MAX, y_0, z_0);
 
   // lower outlines of slicing planes (partially hidden by surface)
@@ -140,10 +103,7 @@ int main()
   clip();
   fill();
   // front 1/2 of surface (x>0)
-  for (int i=0; i < N; ++i)
-    for (int j=-N; j < N; ++j)
-      draw_mesh_quad(i,j);
-
+  surface(f, R2);
   fill(false);
   clip(false);
 
@@ -157,32 +117,34 @@ int main()
   color_axis();
   label(P(0.25+MAX,0,0), P(-2,-2), "$x$", bl);
 
+  font_size("scriptsize");
   // slices of the graph and labels
-  pen(1.5);
+  pen(1);
   color_yslice();
   plot(Df_x, -x_0, MAX-x_0, 20);
   label(Df_x(MAX-x_0), P(-4,0), 
-	"\\scriptsize $\\displaystyle\\frac{\\partial f}{\\partial x}$: $y$ constant", l);
+	"$\\displaystyle\\frac{\\partial f}{\\partial x}$: $y$ constant", l);
 
   clip();
   color_xslice();
   plot(Df_y, -y_0, MAX-y_0, 20);
   clip(false);
   label(Df_y(MAX-y_0), P(4,0), 
-	"\\scriptsize $\\displaystyle\\frac{\\partial f}{\\partial y}$: $x$ constant", br);
+	"$\\displaystyle\\frac{\\partial f}{\\partial y}$: $x$ constant", br);
 
   // overall label
   black();
   label(P(-MAX, 0, MAX), P(2,2), 
-	"\\scriptsize $z=\\displaystyle\\frac{1}{2}(y^3-3x^2y)$", tr);
+	"$z=\\displaystyle\\frac{1}{2}(y^3-3x^2y)$", tr);
 
   // fake transparency: redraw slicing planes thinly
-  clip();
+  //  clip();
   pen(0.15);
   color_xslice();
-  polyline(3, &pt1, &pt2, &pt3).draw();
+  rect(P(x_0, 0, -MAX), P(x_0, 1, z_0));
+
   color_yslice();
-  polyline(3, &pt4, &pt5, &pt6).draw();
+  rect(P(0, y_0, -MAX), P(1, y_0, z_0));
 
   // upper outlines of slicing planes (not hidden by surface) 
   bold();

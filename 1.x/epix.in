@@ -144,8 +144,8 @@ while [ "$1" != "${1#-}" ]; do
 
     # Deliberately undocumented
     -q|--quiet)
-        EPIX_STDOUT=/dev/null
-        EPIX_STDERR=/dev/null
+        EPIX_STDOUT="$SYSTEM_DEVNULL"
+        EPIX_STDERR="$SYSTEM_DEVNULL"
         shift; continue
         ;;
 
@@ -154,8 +154,8 @@ while [ "$1" != "${1#-}" ]; do
             echo "Please use -V for version"
             exit 0
         fi
-        EPIX_STDOUT=/dev/stdout
-        EPIX_STDERR=/dev/stderr
+        EPIX_STDOUT="$SYSTEM_STDOUT"
+        EPIX_STDERR="$SYSTEM_STDERR"
         shift; continue
         ;;
 

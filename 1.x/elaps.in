@@ -32,7 +32,7 @@ ELAPS_PS="no"     # Create PS file instead of EPS?
 declare -a EPIX_OPTS
 declare -a DVIPS_OPTS
 
-LATEX_INTERACT="batchmode"
+LATEX_INTERACT="scrollmode"
 
 # auxiliary programs
 PS2EPS="ps2epsi"
@@ -69,6 +69,9 @@ Options:
 
     -v, --verbose
       Show success/failure messages
+
+    -i, --interactive
+      Run LaTeX interactively (implies verbose)
 
     -n, --no-config
       Ignore $(HOME)/.dvipsrc
@@ -133,14 +136,14 @@ function elaps_parse_options ()
 	    exit 0
 	    ;;
 
-        -i|-int|--interactive)
-            EPIX_STDOUT=/dev/stdout
-            LATEX_INTERACT="scrollmode"
+        -i|--interactive)
+            EPIX_STDOUT="$SYSTEM_STDOUT"
+            LATEX_INTERACT="errorstopmode"
             shift
             ;;
 
         -n|--no-config) # do not use ~/.dvipsrc
-            export DVIPSRC=/dev/null
+            export DVIPSRC="$SYSTEM_DEVNULL"
             shift
             ;;
 
@@ -196,9 +199,11 @@ function elaps_parse_options ()
             shift
             ;;
 
-        # Deliberately undocumented
+        # Deliberately undocumented; run silently, no log file
         -q|--quiet)
-            EPIX_STDERR=/dev/null
+            EPIX_STDOUT="$SYSTEM_DEVNULL"
+            EPIX_STDERR="$SYSTEM_DEVNULL"
+            LATEX_INTERACT="batchmode"
             shift; continue
             ;;
 
@@ -218,7 +223,7 @@ function elaps_parse_options ()
                 echo "Please use -V for version"
                 exit 0
             fi
-            EPIX_STDOUT=/dev/stdout
+            EPIX_STDOUT="$SYSTEM_STDOUT"
             shift
             ;;
 
@@ -288,8 +293,9 @@ function elaps_process_files()
             TMP_CMD=(@bindir@/epix "${EPIX_OPTS[@]}" -o "$ELAPS_TEMP_EEPIC" "$EPIX_INFILE")
 
             ePiX_command "${TMP_CMD[@]}"
+	    echo "---" | tee -a "$EPIX_LOGFILE" > "$EPIX_STDOUT"
 
-            if [ "$EPIX_INFILE" -nt "$ELAPS_TEMP_EEPIC" ]; then
+          if [ "$EPIX_INFILE" -nt "$ELAPS_TEMP_EEPIC" ]; then
                 ePiX_warn "\"${TMP_CMD[*]}\" failed"
                 let failure=failure+1
                 continue
@@ -305,22 +311,26 @@ function elaps_process_files()
         # Create $ELAPS_TEMP_PS; elaps always uses latex
         TMP_CMD=(latex -interaction=$LATEX_INTERACT "$ELAPS_TEMP_LATEX")
 
-        ePiX_dvips "${TMP_CMD[@]}"
+        ePiX_command "${TMP_CMD[@]}"
 
         if [ "$ELAPS_TEMP_LATEX" -nt "$ELAPS_TEMP_DVI" ]; then
             ePiX_warn "\"${TMP_CMD[*]}\" failed"
             let failure=failure+1
             continue
+	else
+	    echo "---" | tee -a "$EPIX_LOGFILE" > "$EPIX_STDOUT"
         fi
 
         TMP_CMD=(dvips "${DVIPS_OPTS[@]}" -f -o "$ELAPS_TEMP_PS" "$ELAPS_TEMP_DVI")
 
-        ePiX_dvips "${TMP_CMD[@]}"
+        ePiX_command "${TMP_CMD[@]}"
 
         if [ "$ELAPS_TEMP_DVI" -nt "$ELAPS_TEMP_PS" ]; then
             ePiX_warn "\"${TMP_CMD[*]}\" failed"
             let failure=failure+1
             continue
+	else
+	    echo "---" | tee -a "$EPIX_LOGFILE" > "$EPIX_STDOUT"
         fi
 
         if [ "$ELAPS_PS" = "yes" ]; then
