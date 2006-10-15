@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.5
- * Last Change: April 23, 2005
+ * Version 1.0.15
+ * Last Change: October 09, 2005
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -36,36 +36,37 @@
 #include <cstdarg>
 
 #include "triples.h"
-#include "camera.h"
+
 #include "cropping.h"
 #include "plane.h"
 #include "segment.h"
-#include "polyhedron.h"
 #include "path.h"
+#include "polyhedron.h"
 
 namespace ePiX {
 
-  extern epix_camera camera;
-
   // convex polygon vertex -- not intended for general use
   class cpv {
-  private:
-    P location;
-    double angle;
-
   public:
-    cpv(const P arg) : location(arg), angle(0) {}
+    cpv(const P& arg)
+      : location(arg), angle(0) { }
 
-    P posn(void) const { return location; }
-    double get_angle(void) const { return angle; }
+    P posn(void) const
+    {
+      return location;
+    }
+    double get_angle(void) const
+    {
+      return angle;
+    }
 
     // set angle with respect to origin, reference point, normal vector
-    void set_angle(P origin, P pos_x, P normal)
+    void set_angle(const P& origin, const P& pos_x, const P& normal)
     {
-      P loc=location-origin;
+      P loc(location-origin);
       loc *= 1/norm(loc);
 
-      P ref=pos_x-origin;
+      P ref(pos_x-origin);
       ref *= 1/norm(ref);
 
       if ((loc|ref) < 0.)
@@ -77,6 +78,10 @@ namespace ePiX {
 	angle *= -1;
 
     }
+
+  private:
+    P location;
+    double angle;
   }; // end of class cpv
 
   class by_angle {
@@ -87,47 +92,43 @@ namespace ePiX {
     }
   };
 
-  one_skel::one_skel(void)
-  {
-    std::vector<segment> edges;
-  }
+  one_skel::one_skel() { }
 
   one_skel::one_skel(unsigned int num_edges ...) // list of edges
   {
-    std::vector<segment> edges;
-    edges.reserve(num_edges);
+    std::vector<segment> tmp_edges;
 
     // get edges
     va_list ap;
     va_start(ap, num_edges);
 
     for (unsigned int i=0; i < num_edges; ++i)
-      this->add_edge(*va_arg(ap, segment*));
+      tmp_edges.push_back(*va_arg(ap, segment*));
 
     va_end(ap);
+
+    swap(edges, tmp_edges);
   }
 
   void one_skel::transform(P Phi(P))
   {
-    segment curr;
     for (unsigned int i=0; i < edges.size(); ++i)
       {
-	curr=edges.at(i);
-	edges.at(i)=join(Phi(curr.end1()), Phi(curr.end2()));
+	segment curr(edges.at(i));
+	edges.at(i)=segment(Phi(curr.end1()), Phi(curr.end2()));
       }
   }
 
   void one_skel::section(const plane& knife)
   {
     std::vector<cpv> corners;
-    segment curr;
 
     // find/count points where we hit an edge
     unsigned int count=0;
 
     for (unsigned int i=0; i < edges.size(); ++i)
       {
-	curr=this->edges.at(i);
+	segment curr(edges.at(i));
 
 	if (knife.separates(curr.end1(), curr.end2()))
 	  {
@@ -140,10 +141,10 @@ namespace ePiX {
     if (count > 2)
       {
 	// kludge to build an origin to measure angles
-	P tmp_ctr = (1.0/3)*(corners.at(0).posn() +
-			     corners.at(1).posn() + corners.at(2).posn());
+	P tmp_ctr((1.0/3)*(corners.at(0).posn() +
+			   corners.at(1).posn() + corners.at(2).posn()));
 
-	cpv pos_x = corners.at(0);
+	cpv pos_x(corners.at(0));
 
 	for (unsigned int i=1; i < count; ++i)
 	  corners.at(i).set_angle(tmp_ctr, pos_x.posn(), knife.normal());

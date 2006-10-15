@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -41,70 +41,105 @@
 
 namespace ePiX {
 
+  Label::Label(const P& basepoint, 
+	       const std::string& label_text, 
+	       epix_mark_type label_type,
+	       epix_label_posn alignment, 
+	       bool mask, const P& offset)
+    : the_basepoint(basepoint),
+      the_label_text(label_text),
+      the_label_type(label_type),
+      the_alignment(alignment),
+      masked(mask),
+      the_offset(offset) { }
+
+
   // Constructor for function-specified labels
-  Label::Label(P basepoint, double f(P), epix_label_posn alignment, 
-	       bool mask, P offset)
-    : the_basepoint(basepoint), the_label_type(TEXT), 
-      the_alignment(alignment), masked(mask), the_offset(offset)
+  Label::Label(const P& basepoint, double f(P), epix_label_posn alignment, 
+	       bool mask, const P& offset)
+    : the_basepoint(basepoint),
+      the_label_type(TEXT), 
+      the_alignment(alignment),
+      masked(mask),
+      the_offset(offset)
   {
     // Generate label text as function of location
-    std::string label_string;
     std::stringstream label_contents;
     label_contents << "$" << f(basepoint) << "$";
-    label_string = label_contents.str();
 
-    the_label_text=label_string;
+    the_label_text = label_contents.str();
   }
 
-  void Label::draw()
+
+  Label& Label::move_to(const P& arg)
   {
-    if (is_visible(the_basepoint))
+    the_basepoint = arg;
+    return *this;
+  }
+
+  Label& Label::offset(const P& arg)
+  {
+    the_offset = arg;
+    return *this;
+  }
+
+  Label& Label::align(epix_label_posn arg)
+  {
+    the_alignment=arg;
+    return *this;
+  }
+
+
+  void Label::draw() const
+  {
+    if (!is_visible(the_basepoint))
+      return;
+
+    // else
+    newl();
+    if (the_label_type == CIRC) 
+      epix_whiten();
+
+    epix_put();
+    print(the_basepoint, the_offset);
+
+    if (the_alignment != none || the_alignment == c)
       {
-	newl();
-	if (the_label_type == CIRC) 
-	  epix_whiten();
+	lbrace();
+	epix_makebox();
+	print_alignment(the_alignment);
+      }
 
-	epix_put();
-	print(the_basepoint, the_offset);
+    if (the_label_type == TEXT && 
+	(fabs(epix::get_labelangle()) > EPIX_EPSILON))
+      {
+	lbrace();
+	epix_rotatebox();
+      }
 
-	if (the_alignment != none || the_alignment == c)
-	  {
-	    lbrace();
-	    epix_makebox();
-	    print_alignment(the_alignment);
-	  }
+    if (masked)
+      {
+	lbrace();
+	epix_colorbox();
+      }
 
-	if (the_label_type == TEXT && 
-	    (fabs(epix::get_labelangle()) > EPIX_EPSILON))
-	  {
-	    lbrace();
-	    epix_rotatebox();
-	  }
+    if (the_label_type == TEXT)
+      epix_label_text(the_label_text);
 
-	if (masked)
-	  {
-	    lbrace();
-	    epix_colorbox();
-	  }
+    else
+      print_marker(the_label_type);
 
-	if (the_label_type == TEXT)
-	  epix_label_text(the_label_text);
+    if (masked)
+      rbrace();
 
-	else
-	  print_marker(the_label_type);
+    if (the_label_type == TEXT && 
+	(fabs(epix::get_labelangle()) > EPIX_EPSILON))
+      {
+	rbrace();
+      }
 
-	if (masked)
-	  rbrace();
-
-	if (the_label_type == TEXT && 
-	    (fabs(epix::get_labelangle()) > EPIX_EPSILON))
-	  {
-	    rbrace();
-	  }
-
-	if (the_alignment != none || the_alignment == c)
-	  rbrace();
-      } // end of is_visible
+    if (the_alignment != none || the_alignment == c)
+      rbrace();
   } // end of Label::draw()
 
 } /* end of namespace */

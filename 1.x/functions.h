@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.16
+ * Last Change: October 14, 2006
  */
 
 /* 
@@ -35,12 +35,11 @@
 #ifndef EPIX_FUNCTIONS
 #define EPIX_FUNCTIONS
 
-#include <cmath>
-
 #include "globals.h"
-#include "triples.h"
 
 namespace ePiX {
+
+  class P;
 
   // ePiX:: trig functions are sensitive to angle units
   double cos(double);
@@ -58,17 +57,17 @@ namespace ePiX {
   double atan(double);
 
   // more sanely-named aliases
-  inline double Cos(double t) { return ePiX::cos(t); }
-  inline double Sin(double t) { return ePiX::sin(t); }
-  inline double Tan(double t) { return ePiX::tan(t); }
+  double Cos(double t);
+  double Sin(double t);
+  double Tan(double t);
 
-  inline double Sec(double t) { return ePiX::sec(t); }
-  inline double Csc(double t) { return ePiX::csc(t); }
-  inline double Cot(double t) { return ePiX::cot(t); }
+  double Sec(double t);
+  double Csc(double t);
+  double Cot(double t);
 
-  inline double Acos(double t)  { return ePiX::acos(t); }
-  inline double Asin(double t)  { return ePiX::asin(t); }
-  inline double Atan(double t)  { return ePiX::atan(t); }
+  double Acos(double t);
+  double Asin(double t);
+  double Atan(double t);
 
   // identity and zero functions, coordinate projections
   template<class T>T id(T arg) { return arg; }
@@ -86,9 +85,8 @@ namespace ePiX {
   P cylindrical(P arg);
   P spherical(P arg);
 
-  inline P polar(double r, double t) { return cyl(r, t, 0); }
-  inline P cis(double t) { return cyl(1, t, 0); }
-
+  P polar(double r, double t);
+  P cis(double t);
 
   double clip_to_unit(double t);
   // utility functions with discontinuities removed
@@ -101,10 +99,20 @@ namespace ePiX {
 
   int gcd (int, int);
 
+  // Scattered calls compare (e.g.) int to float
+  // template<class T>T min(T a, T b) { return a < b ? a : b; }
+  // template<class T>T max(T a, T b) { return b < a ? a : b; }
+
+  double min(const double, const double);
+  double max(const double, const double);
+
+  double snip_to(double var, const double arg1, const double arg2);
+
   double inf (double f(double), double, double);
   double sup (double f(double), double, double);
 
 
+  /*
   // constant functions
   class Const {
   private:
@@ -114,6 +122,7 @@ namespace ePiX {
     Const(double val=0) { value = val; }
     double operator() (double t) { return value; }
   }; // end of class Const
+  */
 
   // derivative and integral operators for functions of one variable
   template<class T> T deriv(T f(double), double t, double dt=EPIX_EPSILON)
@@ -121,45 +130,47 @@ namespace ePiX {
     return (1.0/dt)*(f(t+0.5*dt) - f(t-0.5*dt));
   }
 
-  class D {
+  // derivative class
+  class Deriv {
   private:
     double (*f)(double);
     double dt;
 
   public:
-    D(double func(double), const double eps=EPIX_EPSILON)
-      : f(func), dt(eps) { }
+    Deriv(double func(double), const double eps=EPIX_EPSILON);
 
-    P operator() (const P& arg) const; // for plotting
+    P operator() (const P&) const; // for plotting
 
     // numerical values
-    double eval(const double t);
+    double eval(const double t) const;
 
     // one-sided derivatives
-    double right(const double t);
-    double left(const double t);
+    double right(const double t) const;
+    double left(const double t) const;
+  }; // end of class Deriv
 
-  }; // end of class D
 
-
-  class I {
+  // definite integral class
+  class Integral {
   private:
     double (*f)(double);
     double x0; // lower limit
 
   public:
-    I(double func(double), double a=0)
-      { f = func; x0 = a; }
+    Integral(double func(double), double a=0);
 
-    P operator() (const P arg);
+    P operator() (const P&) const;
 
-    double eval(const double t);
-
+    double eval(const double) const;
   }; // end of class I
+
+  // compatibility aliases
+  typedef Deriv D;
+  typedef Integral I;
 
   double newton (double f(double), double g(double), double start);
   double newton (double f(double), double start);
 
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_FUNCTIONS */

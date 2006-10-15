@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.4
- * Last Change: March 5, 2005
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -31,13 +31,6 @@
  * along with ePiX; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-/*
- *   This file provides:
- *
- */
-
-
 #ifndef EPIX_DATAPLOT
 #define EPIX_DATAPLOT
 
@@ -61,11 +54,7 @@ namespace ePiX {
 	    unsigned int col1=1, unsigned int col2=2, unsigned int col3=0,
 	    P f(double, double, double) = xyz);
 
-  inline void data_plot(const char* filename, epix_mark_type TYPE)
-    {
-      epix_warning("data_plot deprecated; please use plot");
-      plot(filename, TYPE, 2, 1, 2, 0);
-    }
+  void data_plot(const char* filename, epix_mark_type TYPE);
 
   // functions for data analysis
   double avg(FILEDATA data, unsigned int col1);
@@ -85,7 +74,6 @@ namespace ePiX {
 		 int subdivs=(int)x_size, 
 		 double low=x_min, double high=x_max, double v_scale=1);
 
-} /* end of namespace */ 
-
+} // end of namespace
 
 #endif /* EPIX_DATAPLOT */

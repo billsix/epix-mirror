@@ -1,11 +1,11 @@
 /* 
- * camera.h -- Vectors and operations
+ * camera.h -- the ePiX camera class
  *
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: May 14, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -33,11 +33,6 @@
  */
 
 /*
- * In geometry, a "frame" is a right-handed orthonormal basis, that is,
- * an ordered set of three mututally perpendicular unit vectors, oriented
- * according to the right-hand rule. A frame has nothing to do with
- * picture frames.
- *
  * ePiX uses a camera metaphor to view points in R^3. The camera consists
  * of:
  *   - a frame ({sea, sky, eye}, with the intuitive meanings:)
@@ -55,10 +50,6 @@
  *
  *
  * This file provides:
- *   - the frame class, and routines for rotating a frame about the axes
- *     determined by its elements. (Note that there are no methods for
- *     rotating about fixed coordinate axes, and that rotations in R^3 do
- *     not generally commute.
  *
  *   - the camera class and routines:
  *       void rotate_sea(double); // change camera orientation
@@ -70,44 +61,16 @@
  *       void lens(pair (*screen_projection(P))); // set projection mapping
  *
  *       pair shoot(P arg); // project a point to the screen ("take a photo")
- *
  */
 
 #ifndef EPIX_CAMERA
 #define EPIX_CAMERA
 
-#include "functions.h"
 #include "pairs.h"
 #include "triples.h"
+#include "frame.h"
 
 namespace ePiX {
-
-  class frame {
-  private:
-    // orthonormal triple
-    P frame1;
-    P frame2;
-    P frame3;
-
-  public:
-    //constructors
-    frame(void) : frame1(E_1), frame2(E_2), frame3(E_3) { }
-
-    // Gram-Schmidt
-    frame(P arg1, P arg2, P arg3);
-
-    // frame elements
-    P sea() const { return frame1; }
-    P sky() const { return frame2; }
-    P eye() const { return frame3; }
-
-    // rotations about frame elements
-    frame& rot1(double angle);
-    frame& rot2(double angle);
-    frame& rot3(double angle);
-
-  }; // end of class frame
-
 
   // screen projection mappings ("lenses")
   pair shadow(const P& arg);
@@ -117,43 +80,45 @@ namespace ePiX {
   class epix_camera {
   public:
     // defaults to orthog projection on (x,y) plane from pos z-axis
-    epix_camera(void);
+    epix_camera();
 
-    P get_viewpt(void) const { return viewpt; }
-    P get_target(void) const { return target; }
-    double get_range(void) const { return distance; }
+    P get_viewpt() const;
+    P get_target() const;
+    double get_range() const;
 
     // get frame vectors
-    P sea(void) const { return orient.sea(); }
-    P sky(void) const { return orient.sky(); }
-    P eye(void) const { return orient.eye(); }
+    P sea() const;
+    P sky() const;
+    P eye() const;
 
     // adjust position, orientation, and target
     // pitch: rotate camera up/down
-    void rotate_sea(double angle);
+    epix_camera& rotate_sea(double angle);
 
     // yaw: rotate camera left/right
-    void rotate_sky(double angle);
+    epix_camera& rotate_sky(double angle);
 
     // roll: rotate camera about viewing axis
-    void rotate_eye(double angle);
+    epix_camera& rotate_eye(double angle);
 
     // fix target, move viewpt radially along eye()
-    void range(double d);
+    epix_camera& range(double d);
     // fix viewpt, move target radially along eye()
-    void focus(double d);
+    epix_camera& focus(double d);
 
     // fix target, set viewpt arbitrarily
-    void at(const P& arg);
+    epix_camera& at(const P& arg);
+    epix_camera& at(const double, const double, const double);
 
     // fix viewpt, set target arbitrarily
-    void look_at(const P& arg);
+    epix_camera& look_at(const P& arg);
+    epix_camera& look_at(const double, const double, const double);
 
     // set projection mapping
-    void lens(pair proj(const P&)) { screen_projection = proj; }
+    epix_camera& lens(pair proj(const P&));
 
     // project a point to the screen ("shoot a photo")
-    pair operator() (const P& arg) const { return screen_projection(arg); }
+    pair operator() (const P&) const;
 
   private:
     P viewpt;
@@ -166,12 +131,10 @@ namespace ePiX {
 
   extern epix_camera camera;
 
-  inline void viewpoint(const P& arg) { ePiX::camera.at(arg); }
-  inline void viewpoint(double a1, double a2, double a3)
-    {
-      ePiX::camera.at(P(a1,a2,a3));
-    }
+  // set global camera's location
+  void viewpoint(const P&);
+  void viewpoint(double a1, double a2, double a3);
 
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_CAMERA */

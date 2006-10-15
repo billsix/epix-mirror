@@ -3,8 +3,8 @@
  *
  * Andrew D. Hwang            <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.16
+ * Last Change: October 14, 2006
  *
  */
 
@@ -68,7 +68,10 @@ namespace ePiX {
   public:
     path_map(P f(double), P F(P) = id) : y(f), Y(F) { }
 
-    P operator() (const P& arg) const { return Y(y(arg.x1())); }
+    P operator() (const P& arg) const
+      {
+	return Y(y(arg.x1()));
+      }
 
   }; // end of class path_map
 
@@ -80,7 +83,10 @@ namespace ePiX {
 
   public:
     surface_map(P f(double, double), P F(P) = id) : y(f), Y(F) { }
-    P operator() (const P& arg) const { return Y(y(arg.x1(), arg.x2())); }
+    P operator() (const P& arg) const
+      {
+	return Y(y(arg.x1(), arg.x2()));
+      }
 
   }; // end of class surface_map
 
@@ -115,7 +121,7 @@ namespace ePiX {
     // parameterized path from f:R -> R
     column_1var(double f(double), P F(P) = id)
       : y1(id), y2(f), y3(zero), Y(F) { }
-    P operator() (const P& arg) 
+    P operator() (const P& arg) const
       { 
 	double t = arg.x1();
 	return Y(P(y1(t), y2(t), y3(t))); 
@@ -144,14 +150,13 @@ namespace ePiX {
     // parameterized surface from f:R x R -> R
     column_2var(double f(double, double), P F(P) = id)
       : y1(proj1), y2(proj2), y3(f), Y(F) { }
-    P operator() (const P& arg) 
-      { 
-	double u = arg.x1();
-	double v = arg.x2();
+    P operator() (const P& arg) const
+      {
+	double u(arg.x1());
+	double v(arg.x2());
 	return Y(P(y1(u, v), y2(u, v), y3(u, v))); 
       }
   }; // end of class column_2var
-
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_MAP */

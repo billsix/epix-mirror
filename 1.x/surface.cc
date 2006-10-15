@@ -32,8 +32,13 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "globals.h"
-#include "camera.h"
+#include "errors.h"
+
 #include "triples.h"
+#include "frame.h"
+
+#include "camera.h"
+
 #include "domain.h"
 #include "curves.h"
 #include "output.h"

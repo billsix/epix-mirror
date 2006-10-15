@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 05, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -83,7 +83,7 @@ namespace ePiX {
 
     // 1-dim'l domain
     domain(double t_min, double t_max, int num_pts)
-      : corner1(t_min), corner2(t_max), coarse(num_pts), fine(num_pts) {}
+      : corner1(t_min), corner2(t_max), coarse(num_pts), fine(num_pts) { }
 
     // big and small steps
     double step1(void) const;
@@ -95,9 +95,9 @@ namespace ePiX {
     double dx3(void) const;
 
     // resizing attempts to preserve real resolution
-    domain& resize1(double a1, double b1);
-    domain& resize2(double a2, double b2);
-    domain& resize3(double a3, double b3);
+    domain resize1(double a1, double b1) const;
+    domain resize2(double a2, double b2) const;
+    domain resize3(double a3, double b3) const;
 
     // coordinate slices
     domain slice1(double a1) const;

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 1.0.13
- * Last Change: September 8, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /*
@@ -32,10 +32,14 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 #include "triples.h"
-#include "domain.h"
+#include "frame.h"
+
+#include "path.h"
 
 namespace ePiX 
 {
+  class domain;
+
   class facet {
   public:
     // create quasi-planar region bounded by path segments in f(R)

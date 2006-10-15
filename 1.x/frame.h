@@ -1,11 +1,11 @@
 /* 
- * Label.h -- ePiX::Label class
+ * frame.h -- Orthonormal basis
  *
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
  * Version 1.0.15
- * Last Change: October 09, 2006
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -33,59 +33,50 @@
  */
 
 /*
- *   This file provides:
+ * In geometry, a "frame" is a right-handed orthonormal basis, that is,
+ * an ordered set of three mututally perpendicular unit vectors, oriented
+ * according to the right-hand rule. A frame has nothing to do with
+ * picture frames.
  *
- *   The Label class
- *     - location
- *     - offset
- *     - alignment option
- *     - type
- *     - text field
  *
- *     Label(posn, f(posn)) // numerical label at specified location
- *     move_to(P) // change basepoint
- *     offset(P)  // change offset
- *     align(epix_label_posn) // change alignment
+ * This file provides:
+ *   - the frame class, and routines for rotating a frame about the axes
+ *     determined by its elements. (Note that there are no methods for
+ *     rotating about fixed coordinate axes, and that rotations in R^3 do
+ *     not generally commute.
  */
 
+#ifndef EPIX_FRAME
+#define EPIX_FRAME
 
-#ifndef EPIX_LABEL
-#define EPIX_LABEL
-
-#include "globals.h"
 #include "triples.h"
 
 namespace ePiX {
 
-  class Label {
+  class frame {
   public:
-    Label(const P& basepoint, 
-	  const std::string& label_text, 
-	  epix_mark_type label_type=TEXT,
-	  epix_label_posn alignment=none, 
-	  bool mask=false,
-	  const P& offset=P(0,0));
+    // standard basis
+    frame();
 
-    Label(const P& basepoint, double f(P),
-	  epix_label_posn alignment=none, 
-	  bool mask=false,
-	  const P& offset=P(0,0));
+    // Gram-Schmidt
+    frame(P arg1, P arg2, P arg3); // need args by value
 
-    Label& move_to(const P& arg);
-    Label& offset(const P& arg);
-    Label& align(epix_label_posn arg);
+    // frame elements
+    P sea() const;
+    P sky() const;
+    P eye() const;
 
-    void draw() const;
+    // rotations about frame elements
+    frame& rot1(const double angle);
+    frame& rot2(const double angle);
+    frame& rot3(const double angle);
 
   private:
-    P the_basepoint;
-    std::string the_label_text;
-    epix_mark_type the_label_type;
-    epix_label_posn the_alignment;
-    bool masked;
-    P the_offset;
-  }; // end of Label class
+    P m_e1; // sea
+    P m_e2; // sky
+    P m_e3; // eye
+  }; // end of class frame
 
 } // end of namespace
 
-#endif /* EPIX_LABEL */
+#endif /* EPIX_FRAME */

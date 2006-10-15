@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -31,104 +31,177 @@
  * along with ePiX; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
-
-
 #include "globals.h"
+#include "errors.h"
 #include "triples.h"
 
 namespace ePiX {
 
+  P::P(double arg1, double arg2, double arg3)
+    : m_X1(arg1), m_X2(arg2), m_X3(arg3) { }
+
+  double P::x1(void) const
+  {
+    return m_X1;
+  }
+  double P::x2(void) const
+  {
+    return m_X2;
+  }
+  double P::x3(void) const
+  {
+    return m_X3;
+  }
+
+  // increment operators
+  P& P::operator += (const P& arg)
+  {
+    m_X1 += arg.m_X1;
+    m_X2 += arg.m_X2;
+    m_X3 += arg.m_X3;
+
+    return *this;
+  }
+
+  P& P::operator -= (const P& arg)
+  {
+    m_X1 -= arg.m_X1;
+    m_X2 -= arg.m_X2;
+    m_X3 -= arg.m_X3;  
+
+    return *this;
+  }
+
+  // scalar multipication
+  P& P::operator *= (const double c)
+  {
+    m_X1 *= c;
+    m_X2 *= c;
+    m_X3 *= c;
+
+    return *this;
+  }
+
   // cross product
   P& P::operator *= (const P& v)
-	{
-	  P temp = *this;
+  {
+    P temp(*this);
 	  
-	  X1 = (temp.X2 * v.X3 - temp.X3 * v.X2);
-	  X2 = (temp.X3 * v.X1 - temp.X1 * v.X3);
-	  X3 = (temp.X1 * v.X2 - temp.X2 * v.X1);
+    m_X1 = (temp.m_X2 * v.m_X3 - temp.m_X3 * v.m_X2);
+    m_X2 = (temp.m_X3 * v.m_X1 - temp.m_X1 * v.m_X3);
+    m_X3 = (temp.m_X1 * v.m_X2 - temp.m_X2 * v.m_X1);
 
-	  return *this;
-	}
+    return *this;
+  }
+
+  // componentwise product
+  P& P::operator &= (const P& v)
+  {
+    m_X1 *= v.m_X1;
+    m_X2 *= v.m_X2;
+    m_X3 *= v.m_X3;
+
+    return *this;
+  }
+
+  // orthogonalization: u %= v is the vector of the form u-k*v perp to v
+  P& P::operator%= (const P& v)
+  { 
+    double denom(v.m_X1*v.m_X1 + v.m_X2*v.m_X2 + v.m_X3*v.m_X3);
+    if (denom < EPIX_EPSILON)
+      {
+	epix_warning("Orthogonalizing by zero vector, no action");
+	return *this;
+      }
+
+    // else c=(u|v)/(v|v)
+    double c((m_X1*v.m_X1 + m_X2*v.m_X2 + m_X3*v.m_X3)/denom);
+
+    m_X1 -= c*v.m_X1;
+    m_X2 -= c*v.m_X2;
+    m_X3 -= c*v.m_X3;
+
+    return *this;
+  }
+  // end of class functions
 
   // vector space operations
   P operator- (const P& u) 
   { 
-    P temp = u;
+    P temp(u);
     return temp *= -1;
   }
 
   P operator+ (const P& u, const P& v) 
   { 
-    P temp = u;
+    P temp(u);
     return temp += v;
   }
 
   P operator- (const P& u, const P& v) 
   { 
-    P temp = u;
+    P temp(u);
     return temp -= v;
   }
 
   // scalar multiplication
   P operator* (const double c, const P& v) 
   { 
-    P temp = v;
+    P temp(v);
     return temp *= c;
+  }
+
+  P midpoint(const P& u, const P& v, const double t)
+  {
+    return u + t*(v-u);
   }
 
   // cross product
   P operator* (const P& u, const P& v) 
   { 
-    P temp = u;
+    P temp(u);
     return temp *= v;
   }
 
   P J(const P& arg) 
-  { 
-    P temp = -arg;
+  {
+    // E_3 * arg
+    P temp(-arg);
     return temp *= E_3; 
   }
 
   // dot product
   double operator | (const P& u, const P& v) 
-    { 
-      return u.x1()*v.x1() + u.x2()*v.x2() + u.x3()*v.x3(); 
-    }
+  { 
+    return u.x1()*v.x1() + u.x2()*v.x2() + u.x3()*v.x3(); 
+  }
+
+  double norm(const P& u)
+  {
+    return sqrt(u|u);
+  }
 
   // componentwise product (a,b,c)&(x,y,z)=(ax,by,cz)
   P operator& (const P& u, const P& v) 
   { 
-    P temp = u;
+    P temp(u);
     return temp &= v;
   }
 
-  // orthogonalization: u%v is component of u perp to v
-  P& P::operator%= (const P& v)
-    { 
-      double c = (*this|v)/(v|v);
-      X1 -= c*v.X1;
-      X2 -= c*v.X2;
-      X3 -= c*v.X3;
-
-      return *this;
-    }
-
   P operator% (const P& u, const P& v) 
   { 
-    P temp = u;
+    P temp(u);
     return temp %= v;
   }
 
   // (in)equality
   bool operator == (const P& u, const P& v)
-    { 
-      return (norm(u-v) < EPIX_EPSILON); 
-    }
+  { 
+    return (norm(u-v) < EPIX_EPSILON); 
+  }
 
   bool operator != (const P& u, const P& v)
-    { 
-      return !(u==v); 
-    }
-
-} /* end of namespace */
-
+  { 
+    return !(u==v); 
+  }
+} // end of namespace

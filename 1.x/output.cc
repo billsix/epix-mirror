@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -45,62 +45,24 @@
 // #include <stdexcept>
 
 #include "globals.h"
+#include "errors.h"
+
 #include "triples.h"
 #include "pairs.h"
 
 #include "camera.h"
 #include "lengths.h"
-#include "path.h"
+// #include "path.h"
 
 #include "output.h"
 #include "objects.h"
 
-#include "segment.h"
-#include "circle.h"
-#include "plane.h"
-#include "sphere.h"
-
 namespace ePiX {
 
-  extern std::string epix_version;
+  using std::cout;
+
+  extern const std::string epix_version;
   epix_camera camera;
-
-  // define global variables (for backward compatibility, not in epix::)
-  double x_min, x_max, x_size, y_min, y_max, y_size;
-  double tix=0;
-
-  double pic_size;
-  char *pic_unit;
-
-  // define static variables
-  double epix::dashfill=0.5;
-  double epix::separation=12;
-  double epix::gray_depth=0.3;
-  double epix::dotsize=3.0;
-
-  double epix::angle_units=1.0;
-  double epix::labelangle=0;
-
-  bool epix::clipping=false;
-  bool epix::cropping=false;
-  bool epix::fill_paths=false;
-
-  bool epix::using_pstricks=false;
-  std::string epix::fillcolor="white";
-
-  std::string epix::fontsize="normalsize";
-  std::string epix::fontface="default";
-
-  double epix::arrowwidth=1.5;
-  double epix::arrowratio=5.5;
-  double epix::arrowcamber=0.0;
-  double epix::arrowfill=0.0;
-
-    //     epix_output_type epix::OUTPUT_TYPE;
-    //     std::string epix::font;
-  epix_path_style epix::PATH_STYLE=SOLID;
-
-  int epix::begin_count=0; // number of times begin() has been called
 
   void unitlength(const char *units)
   {
@@ -109,7 +71,7 @@ namespace ePiX {
 
   // Sectioning Functions
 
-  void begin(void)
+  void begin()
   {
     camera=epix_camera();
 
@@ -163,36 +125,32 @@ namespace ePiX {
   }
 
 
-  void print(const P location)
+  void raw_print(const pair& arg)
   {
-    pair out = truncate(c2p(camera(location)));
-    raw_print(out);
+    cout << "(" << arg.x1() << "," << arg.x2() << ")";
   }
 
-  void print(std::ostringstream& s, const P location)
+  void print(const P& location)
   {
-    pair out = truncate(c2p(camera(location)));
-    s << '(' << out.x1() << ',' << out.x2() << ')';
+    raw_print(truncate(c2p(camera(location))));
   }
 
-  void print(const pair location)
+  void print(const pair& location)
   {
-    pair out = truncate(c2p(camera(P(location.x1(), location.x2(), 0))));
-    raw_print(out);
+    raw_print(truncate(c2p(camera(P(location.x1(), location.x2(), 0)))));
   }
 
   // print command for label locations
-  void print(const P location, const P offset)
+  void print(const P& location, const P& offset)
   {
-    pair temp = pair(offset.x1(), offset.x2());
-    pair loc = truncate(c2p(camera(location)) + t2p(temp));
-    raw_print(loc);
+    raw_print(truncate(c2p(camera(location)) +
+		       t2p(pair(offset.x1(), offset.x2()))));
   }
+
   // print command for spatial displacements
-  void print_vector(const P direction)
+  void print_vector(const P& direction)
   {
-    pair out = truncate(c2s(camera(direction)));
-    raw_print(out);
+    raw_print(truncate(c2s(camera(direction))));
   }
 
   // print label elements
@@ -328,7 +286,91 @@ namespace ePiX {
   } // end of print_marker
 
 
-  void start_path(void)
+  // Functions that write small pieces of a LaTeX \picture environment.
+  // Aside from delimiters (braces and dollar), each command preserves
+  // the LaTeX grouping level.
+  void lbrace()
+  {
+    cout << '{';
+  }
+  void rbrace()
+  {
+    cout << '}';
+  }
+  void dollar()
+  {
+    cout << '$';
+  }
+  void newl()
+  {
+    cout << std::endl;
+  }
+
+  void epix_grouping(const double arg)
+  {
+    std::cout << "{" << arg << "}";
+  }
+  void epix_grouping(const std::string& arg)
+  {
+    std::cout << "{" << arg << "}";
+  }
+  // same, in math mode
+  void epix_math_grouping(const double arg)
+  {
+    std::cout << "{$" << arg << "$}";
+  }
+  void epix_math_grouping(const std::string& arg)
+  {
+    std::cout << "{$" << arg << "$}";
+  }
+
+
+  // common \LaTeX commands
+
+  // label txt, with font information
+  void epix_label_text(const std::string& arg)
+  {
+    cout << '{';
+    if ( epix::fontsize != "normalsize" )
+      {
+	cout << '\\' << epix::fontsize << " ";
+      }
+
+    if ( epix::fontface != "default" )
+      cout << "\\text" << epix::fontface << '{';
+
+    cout << arg;
+
+    if ( epix::fontface != "default" )
+      cout << '}';
+
+    cout << '}'; 
+  }
+
+  void epix_neg()
+  {
+    cout << "\\phantom{-}";
+  }
+
+  void epix_put()
+  {
+    cout << "\\put";
+  }
+  void epix_multiput()
+  {
+    cout << "\\multiput";
+  }
+  void epix_makebox()
+  {
+    cout << "\\makebox(0,0)";
+  }
+  void epix_whiten()
+  {
+    cout << "\\whiten";
+  }
+
+
+  void start_path()
   {
     newl();
     if (epix::using_pstricks)
@@ -337,6 +379,67 @@ namespace ePiX {
     else
       cout << "\\path";
   }
+
+  void end_path() { }
+
+
+  // string-valued functions for path::draw()
+  std::string start_path_string()
+  {
+    if (epix::using_pstricks)
+      return "\n\\psline";
+
+    else
+      return "\n\\path";
+  }
+  std::string end_path_string() 
+  {
+    return "";
+  }
+
+  void psset(const std::string& arg) 
+  {
+    if (epix::using_pstricks)
+      cout << "\n\\psset{" << arg << "}";
+  }
+
+  void fill_color(const std::string& color) 
+  {
+    if (epix::using_pstricks)
+      {
+	epix::fillcolor=color; 
+	cout << "\n\\psset{fillcolor=" << epix::fillcolor << "}";
+      }
+  }
+
+  void epix_rotatebox()
+  {
+    cout << "\\rotatebox";
+    epix_grouping(epix::get_labelangle());
+  }
+
+  void epix_colorbox()
+  {
+    cout << "\\colorbox";
+    if (epix::using_pstricks)
+      epix_grouping(epix::fillcolor);
+    else
+      epix_grouping("white");
+  }
+
+  void epix_rule(const double x, const double y)
+  {
+    cout << "\\rule{" << x << "pt}{" << y << "pt}";
+  }
+
+  /*
+  void epix_rule(const double x,  const double y,
+                 const double dx, const double dy)
+  {
+    cout << "{\\kern " << dx << "pt \\rule[" << dy << "pt]{"
+         << x << "pt}{" << y << "pt}}";
+  }
+  */
 
   // small (un)filled circle
   void epix_circle(const double r_pt) // radius in pt
@@ -356,35 +459,23 @@ namespace ePiX {
   }
 
 
-  // Path style declarations
-  void pen(std::string p) // valid LaTeX length, e.g. "0.01in"
+  void epix_newline()
   {
-    cout << "\n\\allinethickness{" << p << "}%";
+    cout << "\n%%";
+  }
+  void epix_newline(const std::string& msg)
+  {
+    cout << "\n%% " << msg;
   }
 
-  void pen(double w) // true points
+  void end_stanza()
   {
-    cout << "\n\\allinethickness{" << w << "pt}%";
+    epix_newline("---");
   }
 
-  void dash_start(const P& arg1, const P& arg2)
+  void end()
   {
-    P temp =  (0.5*epix::get_dashfill())*(arg2-arg1);
-    start_path();
-    print(arg1);
-    print(arg1 + temp);
-  }
-
-  void dash_seg(const P& arg0, const P& arg1, const P& arg2)
-  {
-    double fill=0.5*epix::get_dashfill();
-    P temp0 =  fill*(arg0-arg1);
-    P temp1 =  fill*(arg2-arg1);
-
-    start_path();
-    print(arg1 + temp0);
-    print(arg1);
-    print(arg1 + temp1);
+    cout << "\n\\end{picture}\n";
   }
 
   void line_break(int i, int num_pts)
@@ -397,259 +488,26 @@ namespace ePiX {
       cout << "  \n";
   }
 
-  // Variable color handling, requires "pstcol" package
 
-  // Red-Blue-Green
-  void rgb(double r, double g, double b)
+  // Misc Styles and output formatting
+  // Path style declarations
+  void pen(const std::string& p) // valid LaTeX length, e.g. "0.01in"
   {
-    r = clip_to_unit(r);
-    g = clip_to_unit(g);
-    b = clip_to_unit(b);
-    fprintf (stdout, "\n\\color[rgb]{%.2f,%.2f,%.2f}", r, g, b);
+    cout << "\n\\allinethickness{" << p << "}%";
   }
 
-  // Cyan-Magenta-Yellow-Black
-  void
-  cmyk(double c, double m, double y, double k)
+  void pen(double w) // true points
   {
-    c = clip_to_unit(c);
-    m = clip_to_unit(m);
-    y = clip_to_unit(y);
-    k = clip_to_unit(k);
-    fprintf (stdout, "\n\\color[cmyk]{%.2f,%.2f,%.2f,%.2f}", c, m, y, k);
+    cout << "\n\\allinethickness{" << w << "pt}%";
   }
 
-
-  // path (un)cropping, (un)clipping, and printing
-  void path::set_crop_all(const bool arg)
+  // Output styles
+  void bold()
   {
-    for (unsigned int i=0; i < vertices.size(); ++i)
-      vertices.at(i).set_crop(arg);
+    cout << "\n\\thicklines";
   }
-
-  void path::set_clip_all(const bool arg)
+  void plain()
   {
-    for (unsigned int i=0; i < vertices.size(); ++i)
-      vertices.at(i).set_clip(arg);
+    cout << "\n\\thinlines";
   }
-
-
-  void path::crop_to(const crop_mask& screen, const bool arg)
-  {
-    vertex curr;
-    for (unsigned int i=0; i < vertices.size(); ++i)
-      {
-	curr = vertices.at(i);
-	// if arg=true and curr is in screen, or arg=false and curr not in
-	vertices.at(i).set_crop( (screen.is_onscreen(curr.here()) != arg) );
-      }
-  } // end of crop_to(screen)
-
-
-  void path::clip_to(const enclosure& world, const bool arg)
-  {
-    vertex curr;
-    for (unsigned int i=0; i < vertices.size(); ++i)
-      {
-	curr = vertices.at(i);
-	vertices.at(i).set_clip( (world.is_inside(curr.here()) != arg) );
-      }
-  } // end of clip_to(world)
-
-
-  // Algorithm to draw path:
-  // 1. Close path, crop, and clip vector of vertices if necessary
-  // 2. Find starts and ends of path segments by examining visibility of
-  //    current and previous points and whether or not we're already in
-  //    a path segment. End result is a linked list of vertices with ends
-  //    of path segments marked.
-  // 3. Check list to see if list is non-empty. If not, check for filling,
-  //    and print data points to output.
-  //
-  void path::draw(void)
-  {
-    if(closed)
-      vertices.push_back(vertices.at(0));
-
-    // mark vertices for removal
-    if (epix::cropping)
-      this->crop_to(crop_mask::Crop_Box);
-
-    if (epix::clipping)
-      this->clip_to(enclosure::Clip_Box);
-
-    vertex prev, curr; //, next;
-    P temp_path_end;
-
-    bool prev_visible, curr_visible; //, next_visible;
-
-    bool started = false; // in "draw" mode when we examined curr?
-    epix_path_style STYLE = epix::path_style();
-
-    std::list<path_pt> segments;
-
-    // cull vertices, mark as start/end of path segments
-    for (unsigned int i=0; i < vertices.size(); ++i)
-      {
-	// get prev, curr, next
-	curr = vertices.at(i);
-	curr_visible = (curr.is_onscreen() && curr.is_in_world());
-
-	if (0 < i)
-	  {
-	    prev = vertices.at(i-1);
-	    prev_visible = (prev.is_onscreen() && prev.is_in_world());
-	  }
-	else prev = curr;
-
-	/*
-	if (i < vertices.size() - 1)
-	  {
-	    next = vertices.at(i+1);
-	    next_visible = (next.is_onscreen() && next.is_in_world());
-	  }
-	else next = curr;
-	*/
-
-	// four cases: "started" is (un)set and curr is (in)visible
-	if (curr_visible)
-	  {
-	    if (started)
-	      {
-		if (i < vertices.size() - 1)
-		  segments.push_back(path_pt(curr, false, false));
-		else
-		  segments.push_back(path_pt(curr, false, true));
-	      }
-	    else // start path segment
-	      {
-		temp_path_end = seek_path_end(curr.here(), prev.here());
-		segments.push_back(path_pt(temp_path_end, true, false));
-		if (curr.here() != prev.here())
-		  segments.push_back(path_pt(curr, false, false));
-		started = true;
-	      }
-	  } // end of curr_visible; started = true in all cases
-
-	else
-	  {
-	    if (started) // end path
-	      {
-		temp_path_end = seek_path_end(prev.here(), curr.here());
-		segments.push_back(path_pt(temp_path_end, false, true));
-		started = false;
-	      }
-	  } // if !started, do nothing
-
-      } // end of for loop to cull vertices
-
-    std::list<path_pt>::iterator p = ++segments.begin();
-    std::list<path_pt>::iterator q, q2;
-
-    if (p == segments.end())
-      return; // empty path
-
-    if (this->filled) // remove start/end flags except global first/last
-      while (p++ != segments.end())
-	p->unset();
-
-    // Write fill \special if necessary; pstricks handles its own filling
-    if (this->filled && SOLID == STYLE && !epix::using_pstricks)
-      cout << "\n\\special{sh " << epix::get_gray() << "}%";
-
-    // print path
-    switch (STYLE) 
-      {
-      case DOTTED:
-
-	for (p = segments.begin(); p != segments.end(); ++p)
-	  {
-	    newl();
-	    box((p->here()));
-	  }
-	break;
-
-
-      case DASHED:
-
-	for (p = segments.begin(); p != segments.end(); ++p)
-	  {
-	    q = q2 = p;
-	    {
-	      if (p->is_start())
-		{
-		  dash_start(q2->here(), (++q)->here());
-		}
-	      else if (p->is_end())
-		{
-		  dash_start(q2->here(), (--q)->here());
-		}
-	      else
-		{
-		  dash_seg((--q2)->here(), p->here(), (++q)->here());
-		}
-	    }
-	  }
-	break;
-
-      case SOLID: // fall through
-      default:
-
-	std::ostringstream outbuf;
-
-	int temp_size;             // number of characters in current point
-	int pt_count=0;            // points printed so far in path segment
-	int curr_line_count=0;    // characters so far in this line
-
-	for (p = segments.begin(); p != segments.end(); ++p)
-	  {
-	    std::ostringstream temp;         // empty buffer for point
-	    print (temp, p->here());         // examine point
-	    temp_size = temp.str().length(); // get length as a string
-	    
-	    if (p->is_start())
-	      {
-		outbuf << start_path_string();
-		print (outbuf, p->here());
-		curr_line_count=5+temp_size; // off by 2 if using_pstricks
-	      }
-
-	    else
-	      {
-		// reached maximum line length?
-		if ((curr_line_count >= EPIX_FILE_WIDTH) || 
-		    (curr_line_count + temp_size > EPIX_FILE_WIDTH + 5))
-		  {
-		    outbuf << "\n  ";
-		    curr_line_count = 2; // reset number of characters
-		  }
-
-		outbuf << temp.str(); // "routine" outcome
-		++pt_count;
-		curr_line_count += temp_size;
-
-		// break path segment to avoid TeX memory overflow?
-		if (0 == (pt_count%EPIX_PATH_LENGTH) && (pt_count > 0)
-		    && !(this->filled)) // don't break filled paths
-		  {
-		    outbuf << start_path_string() << temp.str();
-		    pt_count = 1;      // reset count and number of characters
-		    curr_line_count = 5 + temp_size; 
-		  }
-	      } // not start of path
-
-	    if (p->is_end())
-	      {
-		outbuf << end_path_string();
-	      }
-
-	  } // end of for loop; outbuf contains formatted output
-	std::cout << outbuf.str();
-
-	break;
-
-      } // end of switch(STYLE)
-
-  } // end of path::draw()
-
-} /* end of namespace */
+} // end of namespace

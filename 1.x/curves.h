@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -39,7 +39,6 @@
 #include "triples.h"
 #include "domain.h"
 #include "cropping.h"
-#include "pairs.h"
 
 namespace ePiX {
 
@@ -69,7 +68,7 @@ namespace ePiX {
   void dart(const P& tail, const P& head);
 
   // double-tipped
-  inline void aarrow(const P& tail, const P& head, double scale=1);
+  void aarrow(const P& tail, const P& head, double scale=1);
 
   // Algebraic curves (elliptical and circular arcs, splines)
   void ellipse(const P& center, const P& axis1, const P& axis2,  
@@ -82,8 +81,8 @@ namespace ePiX {
 		   const double t_min, const double t_max);
 
   // old style "center and polyradius"
-  inline void ellipse (const P& center, const P& radius)
-    { ellipse(center, radius.x1()*E_1, radius.x2()*E_2); }
+  void ellipse (const P& center, const P& radius);
+
   // Standard half-ellipse functions
   void ellipse_left (const P&, const P&);
   void ellipse_right (const P&, const P&);
@@ -144,8 +143,8 @@ namespace ePiX {
   // const int pre_seed[] = {6, 4, 0, 1, -1, 0};
   // pre_seed[0] = spokes, pre_seed[1] = seed_length;
 
-  void fractal (triple p, triple q, int depth, const int *pre_seed);
+  void fractal (const P& p, const P& q, const int depth, const int *pre_seed);
 
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_CURVES */

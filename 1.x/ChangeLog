@@ -3,7 +3,98 @@ ePiX -- ChangeLog
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
 
-September 25, 2006 (v1.0.15)
+October 14, 2006 (v1.0.16)
+* (functions.{cc,h})
+  - Remove Const class
+  - Rename "D" and "I" -> "Deriv" and "Integral" (update manual)
+* (map.h) Declare evaluation operators const
+* (New file plot_algorithms.h) Plotting templates
+  Actual plotting is done by template functions hidden from the user
+* (plots.{cc,h})
+  - Move templates to plot_algorithms.h
+  - Move inlines to cc
+  - Remove adaptive plotting
+* (make_header) Remove map.h
+
+October 10, 2006 (v1.0.15)
+* (camera.{cc,h})
+  - Factor out frame class
+  - Move inlined code to cc
+  - Add "at" and "look_at" functions taking three doubles
+  - Attribute-setting functions return epix_camera&, not void
+* (cropping.{cc,h})
+  - Move inlines to cc
+  - Cleanup
+* (dataplot.{cc,h}) Misc cleanup
+* (functions.{cc,h})
+  - Move inlines to cc (including D and I class functions)
+  - Remove "static inline" from declaration of "integrand"
+  - Misc cleanup
+* (output.{cc,h})
+  - Move inlines to cc
+  - Move globals variables to globals.cc
+  - Factor out color functions
+  - Misc cleanup
+* (New files colors.{cc,h})
+  - Inlines to cc
+* (New file errors.h)
+  - Some inclusions of "output.h" require only errors.h
+* (New files frame.{cc,h})
+  - Separate frame code
+  - Move inlined functions to cc
+  - Misc cleanup
+* (New file: globals.cc)
+  - Move globals.h inlines to cc
+  - Move globals variables from output.cc
+* (files, Makefile.am, make_header)
+  - Add colors.{cc,h}, frame.{cc,h}, errors.h, globals.cc
+
+October 09, 2006
+* (circle.{cc,h})
+  - Move inlined code to cc
+  - Remove operator+(P, circle)
+  - Fix dangling references
+  - Misc cleanup
+* (curves.{cc,h})
+  - aarrow de-inlined
+  - cleanup
+* (domain.{cc,h})
+  - Misc cleanup
+  - "resize" returns value, not reference
+* (geometry.{cc,h})
+  - Move inlined code to cc
+  - Change P to const P&
+  - Remove static functions from header
+  - Misc cleanup
+* (Label.{cc,h})
+  - Move inlined code to cc
+  - Misc cleanup
+* output.cc
+  - Misc cleanup, move path:: functions to path.cc
+* (path.{cc,h})
+  - Move inlined code to cc
+  - Change P to const P& in several functions
+  - Move member functions and auxiliaries from output.cc to path.cc
+  - Misc cleanup
+* (plane.{cc,h})
+  - Move inlined code to cc
+  - Declare classes instead of including header files in plane.h
+  - Misc cleanup
+* (sphere.{cc,h})
+  - Move inlined code to cc
+  - Remove operator+(P, sphere)
+  - Move path::draw to path.cc
+  - Misc cleanup
+* (segment.{cc,h})
+  - Move inlined code to cc
+  - Remove "join" constructor, operator+(P, segment)
+  - Fix dangling references
+  - Misc cleanup
+* (triples.{cc,h})
+  - Move inlined code to cc
+  - Misc. cleanup
+	
+September 25, 2006
 * (samples/{clipping,pole}.xp) Remove unneeded "Light"
 
 September 23, 2006 (v1.0.14)

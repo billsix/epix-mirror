@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 05, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -43,18 +43,15 @@
 namespace ePiX {
 
   mesh::mesh(int n1, int n2, int n3)
-  {
-    mesh1 = (int)max(1, fabs(n1));
-    mesh2 = (int)max(1, fabs(n2));
-    mesh3 = (int)max(1, fabs(n3));
-  }
-
+    : mesh1((int)max(1, fabs(n1))),
+      mesh2((int)max(1, fabs(n2))),
+      mesh3((int)max(1, fabs(n3))) { }
 
   domain::domain(P arg1, P arg2, mesh c, mesh f) 
     : corner1(arg1), corner2(arg2)
   {
-    int c1=c.n1(), c2=c.n2(), c3=c.n3();
-    int f1=f.n1(), f2=f.n2(), f3=f.n3();
+    int c1(c.n1()), c2(c.n2()), c3(c.n3());
+    int f1(f.n1()), f2(f.n2()), f3(f.n3());
 
     if (corner1.x1() == corner2.x1()) { c1 = f1 = 1; }
     if (corner1.x2() == corner2.x2()) { c2 = f2 = 1; }
@@ -65,13 +62,13 @@ namespace ePiX {
   }
 
 
-  double domain::step1(void) const 
-  { 
+  double domain::step1(void) const
+  {
     return (corner2.x1() - corner1.x1())/coarse.n1();
   }
 
   double domain::step2(void) const
-  { 
+  {
     return (corner2.x2() - corner1.x2())/coarse.n2();
   }
 
@@ -97,68 +94,58 @@ namespace ePiX {
 
 
   // resizing attempts to preserve real resolution
-  domain& domain::resize1(double a1, double b1)
+  domain domain::resize1(double a1, double b1) const
   {
-    double ratio = (b1-a1)/(corner2.x1()-corner1.x1());
-    corner1 = P(a1,  corner1.x2(), corner1.x3());
-    corner2 = P(b1,  corner2.x2(), corner2.x3());
+    P new_corner1(a1, corner1.x2(), corner1.x3());
+    P new_corner2(b1, corner2.x2(), corner2.x3());
+
+    double ratio((b1-a1)/(corner2.x1()-corner1.x1()));
+    mesh new_c((int)floor(ratio*coarse.n1()), coarse.n2(),  coarse.n3());
+    mesh new_f((int)floor(ratio*fine.n1()),   fine.n2(),    fine.n3());
 
     if (step1() == 0)
       {
-	coarse  = mesh(1, coarse.n2(),  coarse.n3());
-	fine    = mesh(1,   fine.n2(),    fine.n3());
+	new_c = mesh(1, coarse.n2(),  coarse.n3());
+	new_f = mesh(1,   fine.n2(),    fine.n3());
       }
-    else
-      {
-	int c = (int)floor(ratio*coarse.n1());
-	int f = (int)floor(ratio*fine.n1());
 
-	coarse  = mesh(c, coarse.n2(),  coarse.n3());
-	fine    = mesh(f,   fine.n2(),    fine.n3());
-      }
-    return *this;
+    return domain(new_corner1, new_corner2, new_c, new_f);
   }
 
-  domain& domain::resize2(double a2, double b2)
+  domain domain::resize2(double a2, double b2) const
   {
-    double ratio = (b2-a2)/(corner2.x2()-corner1.x2());
-    corner1 = P(corner1.x1(),  a2, corner1.x3());
-    corner2 = P(corner2.x1(),  b2, corner2.x3());
+    P new_corner1(corner1.x1(),  a2, corner1.x3());
+    P new_corner2(corner2.x1(),  b2, corner2.x3());
+
+    double ratio((b2-a2)/(corner2.x2()-corner1.x2()));
+    mesh new_c(coarse.n1(), (int)floor(ratio*coarse.n2()),  coarse.n3());
+    mesh new_f(  fine.n1(), (int)floor(ratio*fine.n2()),    fine.n3());
+
     if (step2() == 0)
       {
-	coarse = mesh(coarse.n1(), 1,  coarse.n3());
-	fine   = mesh(  fine.n1(), 1,    fine.n3());
+	new_c = mesh(coarse.n1(), 1,  coarse.n3());
+	new_f = mesh(  fine.n1(), 1,    fine.n3());
       }
-    else
-      {
-	int c = (int)floor(ratio*coarse.n2());
-	int f = (int)floor(ratio*fine.n2());
 
-	coarse = mesh(coarse.n1(), c,  coarse.n3());
-	fine   = mesh(  fine.n1(), f,    fine.n3());
-      }
-    return *this;
+    return domain(new_corner1, new_corner2, new_c, new_f);
   }
 
-  domain& domain::resize3(double a3, double b3)
+  domain domain::resize3(double a3, double b3) const
   {
-    double ratio = (b3-a3)/(corner2.x3()-corner1.x3());
-    corner1 = P(corner1.x1(),  corner1.x2(), a3);
-    corner2 = P(corner2.x1(),  corner2.x2(), b3);
+    P new_corner1(corner1.x1(),  corner1.x2(), a3);
+    P new_corner2(corner2.x1(),  corner2.x2(), b3);
+
+    double ratio((b3-a3)/(corner2.x3()-corner1.x3()));
+    mesh new_c(coarse.n1(), coarse.n2(), (int)floor(ratio*coarse.n3()));
+    mesh new_f(  fine.n1(),   fine.n2(), (int)floor(ratio*fine.n3()));
+
     if (step3() == 0)
       {
-	coarse = mesh(coarse.n1(), coarse.n2(),  1);
-	fine   = mesh(  fine.n1(),   fine.n2(),  1);
+	new_c = mesh(coarse.n1(), coarse.n2(),  1);
+	new_f = mesh(  fine.n1(),   fine.n2(),  1);
       }
-    else
-      {
-	int c = (int)floor(ratio*coarse.n3());
-	int f = (int)floor(ratio*fine.n3());
 
-	coarse = mesh(coarse.n1(), coarse.n2(),  c);
-	fine   = mesh(  fine.n1(),   fine.n2(),  f);
-      }
-    return *this;
+    return domain(new_corner1, new_corner2, new_c, new_f);
   }
 
 

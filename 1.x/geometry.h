@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc9
- * Last Change: June 23, 2004
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -35,60 +35,38 @@
 #ifndef EPIX_GEOMETRY
 #define EPIX_GEOMETRY
 
-#include "triples.h"
-#include "sphere.h"
-#include "functions.h"
-
 namespace ePiX {
-
-  // Flag for type of projection to the sphere
-  enum sphere_proj_type {RADIAL, STEREO_N, STEREO_S};
-
-  // recommended for internal use only
-  void draw_sphereplot(double f1(double), double f2(double), double f3(double),
-		       double t_min, double t_max, int num_pts, bool hidden, 
-		       sphere_proj_type TYPE, const sphere& S);
-
-  void draw_sphereplot(P Phi(double), double t_min, double t_max, 
-		       int num_pts, bool hidden, sphere_proj_type TYPE,
-		       const sphere& S);
+  class P;
+  class sphere;
 
   // stereographic projection; path first projected vertically
-  inline void frontplot_N(double f1(double), double f2(double),
-			  double t_min, double t_max, int num_pts, 
-			  const sphere& S = sphere())
-  { draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, true, STEREO_N, S); }
+  void frontplot_N(double f1(double), double f2(double),
+		   double t_min, double t_max, int num_pts, 
+		   const sphere& S = sphere());
 
-  inline void backplot_N(double f1(double), double f2(double),
-			 double t_min, double t_max, int num_pts,
-			 const sphere& S = sphere())
-  { draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, false, STEREO_N, S); }
+  void backplot_N(double f1(double), double f2(double),
+		  double t_min, double t_max, int num_pts,
+		  const sphere& S = sphere());
 
-  inline void frontplot_S(double f1(double), double f2(double),
-			  double t_min, double t_max, int num_pts, 
-			  const sphere& S = sphere())
-  { draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, true, STEREO_S, S); }
+  void frontplot_S(double f1(double), double f2(double),
+		   double t_min, double t_max, int num_pts, 
+		   const sphere& S = sphere());
 
-  inline void backplot_S(double f1(double), double f2(double),
-			 double t_min, double t_max, int num_pts, 
-			 const sphere& S = sphere())
-  { draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, false, STEREO_S, S); }
-
+  void backplot_S(double f1(double), double f2(double),
+		  double t_min, double t_max, int num_pts, 
+		  const sphere& S = sphere());
 
   // Radial projection from center
-  inline void frontplot_R(P phi(double), double t_min, double t_max, 
-			  int num_pts, const sphere& S = sphere())
-  { draw_sphereplot(phi, t_min, t_max, num_pts, true, RADIAL, S); }
+  void frontplot_R(P phi(double), double t_min, double t_max, 
+		   int num_pts, const sphere& S = sphere());
 
-  inline void backplot_R(P phi(double), double t_min, double t_max, 
-			 int num_pts, const sphere& S = sphere())
-  { draw_sphereplot(phi, t_min, t_max, num_pts, false, RADIAL, S); }
-
+  void backplot_R(P phi(double), double t_min, double t_max, 
+		  int num_pts, const sphere& S = sphere());
 
   // Hyperbolic lines
-  void hyperbolic_line (P, P);
-  void disk_line (P, P);
+  void hyperbolic_line (const P&, const P&);
+  void disk_line (const P&, const P&);
 
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_GEOMETRY */

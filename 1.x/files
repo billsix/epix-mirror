@@ -20,6 +20,8 @@ camera.cc
 camera.h
 circle.cc
 circle.h
+colors.cc
+colors.h
 config.guess
 config.sub
 configure
@@ -43,13 +45,17 @@ epix.el
 epix.in
 epix.spec
 epix-lib.sh
+errors.h
 files
 flix.1
 flix.in
+frame.cc
+frame.h
 functions.cc
 functions.h
 geometry.cc
 geometry.h
+globals.cc
 globals.h
 install-sh
 Label.cc
@@ -74,6 +80,7 @@ plane.cc
 plane.h
 polyhedron.cc
 polyhedron.h
+plot_algorithms.h
 plots.cc
 plots.h
 segment.cc

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.6
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -44,7 +44,6 @@
  *   - plane*sphere (circle of intersection)
  *
  */
-
 #ifndef EPIX_PLANE
 #define EPIX_PLANE
 
@@ -52,66 +51,49 @@
 
 #include "globals.h"
 #include "triples.h"
-#include "functions.h"
-#include "sphere.h"
-#include "circle.h"
 
 namespace ePiX {
 
-  class plane
-    {
-    public:
-      plane(const P& point=P(0,0,0), const P& normal=E_3);
+  class circle;
+  class segment;
+  class sphere;
 
-      plane(const P& p1, const P& p2, const P& p3);
+  class plane {
+  public:
+    plane(const P& point=P(0,0,0), const P& normal=E_3);
+    plane(const P&, const P&, const P&);
 
-      P normal() const { return N; }
+    P normal() const;
+    plane& reverse();
+    plane& operator+= (const P&);
 
-      plane& reverse(void) 
-	{ 
-	  N *= -1;
-	  return *this;
-	}
+    // normal component of arg
+    double height(const P&) const;
+    bool contains(const P&) const;
 
-      plane& operator += (const P& arg)
-        {
-          pt += arg;
-          return *this;
-        }
+    // pts separated by us, or we contain at least one point
+    bool separates(const P&, const P&) const;
+    bool parallel_to (const plane&) const;
+    bool operator== (const plane&) const;
 
-      // normal component of arg
-      double height(const P& arg) const;
-      bool contains(const P& arg) const;
+    // return circle of intersection
+    circle operator* (const sphere&) const;
+    // draw Line
+    void  operator* (const plane&) const;
 
-      // pts separated by us, or we contain at least one point
-      bool separates(const P arg1, const P arg2) const;
-      bool parallel_to (const plane& arg) const;
-      bool operator== (const plane& arg) const;
+    // draw lines of intersection of *this with clip box faces
+    void draw() const;
 
-      // return circle of intersection
-      circle operator* (const sphere& S) const;
-      // draw Line
-      void  operator* (const plane P1) const;
+  private:
+    P m_pt;
+    P m_perp; // UNIT normal
+  }; // end of plane class
 
-      // draw lines of intersection of *this with clip box faces
-      void draw() const;
+  circle operator* (const sphere&, const plane&);
 
-    private:
-      P pt;
-      P N; // UNIT normal
+  P operator* (const plane&, const segment&);
+  P operator* (const segment&, const plane&);
 
-  }; /* end of plane class */
-
-  inline circle operator* (const sphere& S, const plane& P) { return P*S; }
-
-  inline void draw(plane arg) { arg.draw(); }
-
-  P operator* (const plane knife, const segment seg);
-  inline P operator* (const segment seg, const plane knife)
-    {
-      return knife*seg;
-    }
-
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_PLANE */

@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.5
- * Last Change: April 23, 2005
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -36,45 +36,44 @@
 #include <vector>
 
 #include "globals.h"
-#include "triples.h"
-#include "pairs.h"
+#include "errors.h"
 
-#include "functions.h"
+#include "triples.h"
+
 #include "path.h"
 
 #include "sphere.h"
 
-#include "output.h"
-// #include "camera.h"
 #include "curves.h"
-// #include "plots.h"
+
 #include "geometry.h"
 
 namespace ePiX {
 
-  extern epix_camera camera;
+  // Flag for type of projection to the sphere
+  enum sphere_proj_type {RADIAL, STEREO_N, STEREO_S};
 
   // Spherical geometry
-  static P proj_to_sphere(P arg, const sphere& S, sphere_proj_type TYPE)
+  P proj_to_sphere(const P& arg, const sphere& S, sphere_proj_type TYPE)
   {
-    P O = S.center();
-    double rad = S.radius();
-    P loc = arg - O; // location relative to O
+    P O(S.center());
+    double rad(S.radius());
+    P loc(arg - O); // location relative to O
 
     if (TYPE == RADIAL)
       return O + (rad/norm(loc))*loc;
 
     else if (TYPE == STEREO_N)
       {
-	P temp = loc%E_3;
-	double rho = (temp|temp);
+	P temp(loc%E_3);
+	double rho(temp|temp);
 	return O + (rad/(rho+1))*P(2*temp.x1(), 2*temp.x2(), rho-1);
       }
 
     else if (TYPE == STEREO_S)
       {
-	P temp = loc%E_3;
-	double rho = (temp|temp);
+	P temp(loc%E_3);
+	double rho(temp|temp);
 	return O + (rad/(rho+1))*P(2*temp.x1(), 2*temp.x2(), 1-rho);
       }
 
@@ -87,15 +86,11 @@ namespace ePiX {
 		       sphere_proj_type TYPE, const sphere& S)
   {
     std::vector<vertex> data(num_pts+1);
-    double t=t_min;
-    const double dt = (t_max - t_min)/num_pts;
-    P curr;
+    double t(t_min);
+    const double dt((t_max - t_min)/num_pts);
 
     for (int i=0; i <= num_pts; ++i, t += dt)
-      {
-	curr = P(f1(t), f2(t), f3(t));	
-	data.at(i) = vertex(proj_to_sphere(curr, S, TYPE));
-      }
+      data.at(i) = vertex(proj_to_sphere(P(f1(t), f2(t), f3(t)), S, TYPE));
 
   path temp(data, false);
   temp.draw(S, hidden);
@@ -106,8 +101,8 @@ namespace ePiX {
 		       const sphere& S)
   {
     std::vector<vertex> data(num_pts+1);
-    double t=t_min;
-    const double dt = (t_max - t_min)/num_pts;
+    double t(t_min);
+    const double dt((t_max - t_min)/num_pts);
 
     for (int i=0; i <= num_pts; ++i, t += dt)
       data.at(i) = vertex(proj_to_sphere(Phi(t), S, TYPE));
@@ -117,19 +112,61 @@ namespace ePiX {
   } // end of draw_sphereplot
 
 
+  void frontplot_N(double f1(double), double f2(double),
+		   double t_min, double t_max, int num_pts, 
+		   const sphere& S)
+  {
+    draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, true, STEREO_N, S);
+  }
+
+  void backplot_N(double f1(double), double f2(double),
+		  double t_min, double t_max, int num_pts,
+		  const sphere& S)
+  {
+    draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, false, STEREO_N, S);
+  }
+
+  void frontplot_S(double f1(double), double f2(double),
+		   double t_min, double t_max, int num_pts, 
+		   const sphere& S)
+  {
+    draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, true, STEREO_S, S);
+  }
+
+  void backplot_S(double f1(double), double f2(double),
+		  double t_min, double t_max, int num_pts, 
+		  const sphere& S)
+  {
+    draw_sphereplot(f1, f2, zero, t_min, t_max, num_pts, false, STEREO_S, S);
+  }
+
+
+  // Radial projection from center
+  void frontplot_R(P phi(double), double t_min, double t_max, 
+		   int num_pts, const sphere& S)
+  {
+    draw_sphereplot(phi, t_min, t_max, num_pts, true, RADIAL, S);
+  }
+
+  void backplot_R(P phi(double), double t_min, double t_max, 
+		  int num_pts, const sphere& S)
+  {
+    draw_sphereplot(phi, t_min, t_max, num_pts, false, RADIAL, S);
+  }
+
+
   // Hyperbolic lines in upper half space
   // For compatibility with 2-D geometry, the boundary is the (x1,x3)-plane
 
-  void hyperbolic_line(P tail, P head)
+  void hyperbolic_line(const P& tail, const P& head)
   {
     if ( (tail.x2() < 0) || (head.x2() < 0) )
       epix_warning("Endpoint not in upper half-space");
 
-    P sh_tail = tail%E_2; // shadow of tail
-    P sh_head = head%E_2;
-    double ht_tail = tail|E_2;
-    double ht_head = head|E_2;
-    double dist = norm(sh_head - sh_tail); // dist btw projections to boundary
+    P sh_tail(tail%E_2); // shadow of tail
+    P sh_head(head%E_2);
+    double ht_tail(tail|E_2), ht_head(head|E_2);
+    double dist(norm(sh_head - sh_tail)); // dist btw projections to boundary
 
     if (dist < EPIX_EPSILON)
       line(tail, head);
@@ -137,15 +174,15 @@ namespace ePiX {
     else
       {
 	// use similar triangles to find center; get basis; draw arc
-	double diff = (ht_head*ht_head - ht_tail*ht_tail)/dist;
-	double frac = 0.5*(diff + dist);
-	P center = (1-frac/dist)*sh_tail + (frac/dist)*sh_head;
-	P e1 = tail - center;
-	double rad = norm(e1);
+	double diff((ht_head - ht_tail)*(ht_head + ht_tail)/dist);
+	double frac(0.5*(diff + dist));
+	P center((1-frac/dist)*sh_tail + (frac/dist)*sh_head);
+	P e1(tail - center);
+	double rad(norm(e1));
 
-	P e2 = E_2%e1;
+	P e2(E_2%e1);
 	e2 *= rad/norm(e2);
-	double theta = Acos( ((head-center)|e1)/(rad*rad) );
+	double theta(Acos(((head-center)|e1)/(rad*rad)));
 
 	ellipse(center, e1, e2, 0, theta);
       }
@@ -172,34 +209,30 @@ namespace ePiX {
   // circle. The number of points to draw is determined both by the true
   // distance between the endpoints and by how close they are to the circle.
 
-  static P poincare_klein(P pt)
+  P poincare_klein(P pt)
   {
-    double denom=1+(pt|pt);
-    pt *= (2.0/denom);
-    return pt;
+    return (2.0/(1+(pt|pt)))*pt;
   }
 
-  static P klein_poincare(P pt)
+  P klein_poincare(P pt)
   {
-    double denom=1+sqrt(1-(pt|pt));
-    pt *= (1.0/denom);
-    return pt;
+    return (1.0/(1+sqrt(1-(pt|pt))))*pt;
   }
 
-  static P p_line(const P& tail, const P& head, double t)
+  P p_line(const P& tail, const P& head, double t)
   {
-    double s = 0.5*(1+std::cos(M_PI*t)); // s in [0,1]
+    double s(0.5*(1+std::cos(M_PI*t))); // s in [0,1]
 
-    P current = (s*poincare_klein(tail)) + ((1-s)*poincare_klein(head));
+    P current((s*poincare_klein(tail)) + ((1-s)*poincare_klein(head)));
     return klein_poincare(current);
   }
 
-  void disk_line(P tail, P head)
+  void disk_line(const P& tail, const P& head)
   {
-    const int N = EPIX_NUM_PTS;
+    const int N(EPIX_NUM_PTS);
     std::vector<vertex> data(N+1);
 
-    double t=0;
+    double t(0);
 
     for (int i=0; i <= N; ++i, t += 1.0/N)
       data.at(i) = vertex(p_line(tail, head, t));

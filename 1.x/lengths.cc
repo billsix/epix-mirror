@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.0
- * Last Change: September 04, 2004
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -33,7 +33,6 @@
  */
 
 /*
- *
  * There are three types of coordinates/length in ePiX:
  *   (1) Cartesian (the user interface)
  *   (2) LaTeX picture coordinates (unitlength, the output)
@@ -60,13 +59,14 @@
  * the following LaTeX dimensions: bp, cm, in, mm, pc, pt, and sp
  */
 
-#include <iostream>
-
 #include "globals.h"
+#include "errors.h"
+
 #include "pairs.h"
 #include "cropping.h"
-#include "lengths.h"
 #include "output.h"
+
+#include "lengths.h"
 
 namespace ePiX {
 
@@ -82,42 +82,33 @@ namespace ePiX {
 
   pair truncate (pair p)
   {
-    double temp1 = truncate(p.x1());
-    double temp2 = truncate(p.x2());
-
-    return pair(temp1, temp2);
+    return pair(truncate(p.x1()), truncate(p.x2()));
   }
 
   // affine scalings for positions
   // Cartesian to picture
   pair c2p(pair X)
   {
-    pair scale = pair(h_size()/x_size, v_size()/y_size);
-    pair origin = crop_mask::Bounding_Box.bl();
-
-    return scale & (X - origin);
+    return pair(h_size()/x_size, v_size()/y_size) &
+      (X - crop_mask::Bounding_Box.bl());
   }
   // picture to Cartesian
   pair p2c(pair H)
   {
-    pair unscale = pair(x_size/h_size(), y_size/v_size());
-    pair origin = crop_mask::Bounding_Box.bl();
-
-    return origin + (unscale & H);
+    return crop_mask::Bounding_Box.bl() + 
+      (pair(x_size/h_size(), y_size/v_size()) & H);
   }
 
   // affine scalings for displacements
   // Cartesian to picture
   pair c2s(pair X)
   {
-    pair scale = pair(h_size()/x_size, v_size()/y_size);
-    return scale & X;
+    return pair(h_size()/x_size, v_size()/y_size) & X;
   }
 
   pair s2c(pair H)
   {
-    pair unscale = pair(x_size/h_size(), y_size/v_size());
-    return unscale & H;
+    return pair(x_size/h_size(), y_size/v_size()) & H;
   }
 
   // picture units to true pt
@@ -193,7 +184,7 @@ namespace ePiX {
   // Approx. number of true pts per angular unit at distance r
   double arc_scale(double r)
   {
-    pair temp = c2s(pair(r,r));
+    pair temp(c2s(pair(r,r)));
     return angle(0.5)*p2t(temp.x1() + temp.x2());
   }
 

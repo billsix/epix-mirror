@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.4
- * Last Change: March 5, 2005
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -33,13 +33,15 @@
  */
 
 #include <iostream>
-#include <math.h>
+// #include <math.h>
 #include <fstream>
 #include <sstream>
 #include <vector>
 #include <stdexcept>
 
 #include "globals.h"
+#include "errors.h"
+
 #include "functions.h"
 #include "triples.h"
 #include "path.h"
@@ -162,8 +164,15 @@ namespace ePiX {
     end_stanza();
   }
 
-  // (col1|col2)
-  static double dot_product(FILEDATA data,unsigned int col1, unsigned int col2)
+
+  void data_plot(const char* filename, epix_mark_type TYPE)
+  {
+    epix_warning("data_plot deprecated; please use plot");
+    plot(filename, TYPE, 2, 1, 2, 0);
+  }
+
+  // (col1|col2) -- local function
+  double dot_product(FILEDATA data,unsigned int col1, unsigned int col2)
   {
     double sum=0;
 
@@ -195,28 +204,22 @@ namespace ePiX {
   // variance
   double var(FILEDATA data, unsigned int col1)
   {
-    double mean = avg(data, col1);
-    int N = data.at(0).size();
+    double mean(avg(data, col1));
 
-    return dot_product(data, col1, col1) - mean*mean*N;
+    return dot_product(data, col1, col1) - mean*mean*data.at(0).size();
   }
 
   // covariance
   double covar(FILEDATA data, unsigned int col1, unsigned int col2)
   {
-    int N = data.at(0).size();
-
-    return dot_product(data, col1, col2) - N*avg(data, col1)*avg(data, col2);
+    return dot_product(data, col1, col2) - 
+      (data.at(0).size())*avg(data, col1)*avg(data, col2);
   }
 
   void regression(FILEDATA data, unsigned int col1, unsigned int col2)
   {
-    P mean = P(avg(data, col1), avg(data, col2));
-    double m = covar(data, col1, col2)/var(data, col1);
-
-    P dir = P(1, m);
-
-    Line(mean, mean+dir);
+    Line(P(avg(data, col1), avg(data, col2)),
+	 covar(data, col1, col2)/var(data, col1));
   }
 
 
@@ -225,16 +228,16 @@ namespace ePiX {
 		 int subdivs, double low, double high, double v_scale)
   {
     std::vector<unsigned int> data_count(subdivs+2);
-    double step=(high-low)/subdivs; // length of subintervals
+    double step((high-low)/subdivs); // length of subintervals
 
-    unsigned int num_entries = data_columns.at(0).size();
+    unsigned int num_entries(data_columns.at(0).size());
     double curr, temp;
 
     std::vector<vertex> data(num_entries);
 
     // count data points in each bin
     for (unsigned int i=0; i < num_entries; ++i)
-      try 
+      try
 	{
 	  curr = data_columns.at(column-1).at(i);
 	  if (curr < low)
@@ -278,5 +281,4 @@ namespace ePiX {
     histogram(data_columns, column, subdivs, low, high, v_scale);
     end_stanza();
   }
-
-} /* end of namespace */
+} // end of namespace

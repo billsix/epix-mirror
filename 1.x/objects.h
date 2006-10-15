@@ -1,11 +1,11 @@
 /* 
- * objects.h -- Simple picture objects: axes, grids, markers, polygons
+ * objects.h -- ePiX axes, grids, markers, and labels
  *
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -32,11 +32,21 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+/*
+ * label -- put string constant <label_text> at Cartesian position <base>
+ * translated by (offset.x1, offset.x2) true points (i.e., 3rd component
+ * of <offset> is discarded).
+ *
+ * Accepts an optional LaTeX-style positioning argument.
+ * If no offset is specified, the label is centered at the given Cartesian
+ * location.
+ * masklabel requires the "color" package, and places the text in 
+ * a white box that masks whatever is underneath and earlier in the file.
+ */
 #ifndef EPIX_OBJECTS
 #define EPIX_OBJECTS
 
-#include <cstdarg>
-#include <sstream>
+#include <string>
 
 #include "globals.h"
 #include "triples.h"
@@ -44,20 +54,6 @@
 
 namespace ePiX {
 
-  // Picture objects
-
-  /*
-   * label -- put string constant <label_text> at Cartesian position <base>
-   * translated by (offset.x1, offset.x2) true points (i.e., 3rd component
-   * of <offset> is discarded).
-   *
-   * Accepts an optional LaTeX-style positioning argument.
-   * If no offset is specified, the label is centered at the given Cartesian
-   * location.
-   * masklabel requires the "color" package, and places the text in 
-   * a white box that masks whatever is underneath and earlier in the file.
-   */
-  // location given as a <P>
   void label(const P& base, const P& offset, std::string label_text);
   void label(const P& base, std::string label_text);
   void label(const P& base, const P& offset, std::string label_text,
@@ -71,59 +67,57 @@ namespace ePiX {
   // Empty and filled LaTeX circles of diameter get_dotsize() true pt
   void circ(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none); // filled white circ
+
   void ring(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none); // unfilled circ 
 
   void spot(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
+
   void dot(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
+
   void ddot(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
 
   void box(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
+
   void bbox(const P& posn, const P& offset=P(0,0), std::string label_text="",
 	    epix_label_posn align=none);
 
-  void arrow(const P& tail, const P& head, const P& offset, std::string label_text,
+  void arrow(const P& tail, const P& head, const P& offset,
+	     std::string label_text,
 	     epix_label_posn align, double scale=1);
 
   void marker (const P&, epix_mark_type);
 
   // Axes and coordinate grids.
 
-  /* 
-   * Coordinate axes, specified by initial and final points, number of
-   * tick marks, and (optionally) number of points (for cameras that do
-   * not map lines to lines). Generally num_pts should be a multiple of n.
-   * h/v_axis are identical except for style of tick marks.
-   */
+  // Coordinate axes, specified by initial and final points, number of
+  // tick marks, and (optionally) number of points (for cameras that do
+  // not map lines to lines). Generally num_pts should be a multiple of n.
+  // h/v_axis are identical except for style of tick marks.
+
   void h_axis_tick(const P& location);
   void v_axis_tick(const P& location);
-
-  //  void h_axis(const P& tail, const P& head, int n);
-  //  void v_axis(const P& tail, const P& head, int n);
 
   // n+1 = #ticks, num_pts = #segments used to draw
   void h_axis(const P& tail, const P& head, int n, int num_pts=1);
   void v_axis(const P& tail, const P& head, int n, int num_pts=1);
 
-  // These versions may be used with gcc 2.96 and later
-  inline void h_axis(int n=x_size) { h_axis(P(x_min,0), P(x_max,0), n); }
-  inline void v_axis(int n=y_size) { v_axis(P(0,y_min), P(0,y_max), n); }
+  // Endpoints (x_min,0), x_max,0), etc.
+  void h_axis(int n=x_size);
+  void v_axis(int n=y_size);
 
   // n+1 = #ticks, num_pts = #segments used to draw
-  inline void h_axis(int n, int num_pts) 
-    { h_axis(P(x_min,0), P(x_max,0), n, num_pts); }
-  inline void v_axis(int n, int num_pts) 
-    { v_axis(P(0,y_min), P(0,y_max), n, num_pts); }
+  void h_axis(int n, int num_pts);
+  void v_axis(int n, int num_pts);
 
-  /*
-   * h_axis_labels: Draws n+1 equally-spaced axis labels between 
-   *    <tail> and <head>. Automatically generates label values from
-   *    Cartesian coordinates, and offsets labels in true pt.
-   */
+
+  // h_axis_labels: Draws n+1 equally-spaced axis labels between 
+  //   <tail> and <head>. Automatically generates label values from
+  //   Cartesian coordinates, and offsets labels in true pt.
 
   void h_axis_labels(const P& tail, const P& head, int n, const P& offset);
   void v_axis_labels(const P& tail, const P& head, int n, const P& offset);
@@ -144,27 +138,18 @@ namespace ePiX {
 			 const P& offset, epix_label_posn POSN);
 
   // Axis labels with default endpoints
-  inline void h_axis_labels(int n, const P& offset)
-    { h_axis_labels(P(x_min,0), P(x_max,0), n, offset); }
-  inline void h_axis_masklabels(int n, const P& offset)
-    { h_axis_masklabels(P(x_min,0), P(x_max,0), n, offset); }
+  void h_axis_labels(int n, const P& offset);
+  void h_axis_masklabels(int n, const P& offset);
 
-  inline void h_axis_labels(int n, const P& offset, epix_label_posn POSN)
-    { h_axis_labels(P(x_min,0), P(x_max,0), n, offset, POSN); }
-  inline void h_axis_masklabels(int n, const P& offset, epix_label_posn POSN)
-    { h_axis_masklabels(P(x_min,0), P(x_max,0), n, offset, POSN); }
+  void h_axis_labels(int n, const P& offset, epix_label_posn POSN);
+  void h_axis_masklabels(int n, const P& offset, epix_label_posn POSN);
 
+  void v_axis_labels(int n, const P& offset);
+  void v_axis_masklabels(int n, const P& offset);
 
-  inline void v_axis_labels(int n, const P& offset)
-    { v_axis_labels(P(0,y_min), P(0,y_max), n, offset); }
-  inline void v_axis_masklabels(int n, const P& offset)
-    { v_axis_masklabels(P(0,y_min), P(0,y_max), n, offset); }
+  void v_axis_labels(int n, const P& offset, epix_label_posn POSN);
+  void v_axis_masklabels(int n, const P& offset, epix_label_posn POSN);
 
-  inline void v_axis_labels(int n, const P& offset, epix_label_posn POSN)
-    { v_axis_labels(P(0,y_min), P(0,y_max), n, offset, POSN); }
-  inline void v_axis_masklabels(int n, const P& offset, epix_label_posn POSN)
-    { v_axis_masklabels(P(0,y_min), P(0,y_max), n, offset, POSN); }
-
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_OBJECTS */

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: Obcober 09, 2006
  */
 
 /* 
@@ -47,8 +47,6 @@
  *       J rotate (x1,x2,0)-plane 1/4 turn  (-b,a,0)
  *       % orthogonalization                u%v = u - ((u|v)/(v|v))*v
  */
-
-
 #ifndef EPIX_TRIPLES
 #define EPIX_TRIPLES
 
@@ -56,61 +54,38 @@
 
 namespace ePiX {
 
-  class P 
-    {
-    private:
-      double X1, X2, X3;
+  class P {
+  public:
+    P(double arg1=0, double arg2=0, double arg3=0);
 
-    public:
-      P(double arg1=0, double arg2=0, double arg3=0)
-	: X1(arg1), X2(arg2), X3(arg3) {}
+    double x1(void) const;
+    double x2(void) const;
+    double x3(void) const;
 
-      double x1(void) const { return X1; }
-      double x2(void) const { return X2; }
-      double x3(void) const { return X3; }
+    // increment operators
+    P& operator += (const P&);
+    P& operator -= (const P&);
+    P& operator *= (const double); // scalar multipication
 
-     // increment operators
-      P& operator += (const P& arg)
-	{
-	  X1 += arg.X1; X2 += arg.X2; X3 += arg.X3;
-	  return (*this);
-	}
+    // cross product
+    P& operator *= (const P&);
 
-      P& operator -= (const P& arg)
-	{
-	  X1 -= arg.X1; X2 -= arg.X2; X3 -= arg.X3;  
-	  return (*this);
-	}
+    // componentwise product
+    P& operator &= (const P&);
 
-      P& operator *= (const double c) // scalar multipication
-	{
-	  X1 *= c; X2 *= c; X3 *= c;
-	  return (*this);
-	}
+    // orthogonalization: u %= v is the vector of the form u-k*v perp to v
+    P& operator %= (const P&);
 
-      // cross product
-      P& operator *= (const P& v);
-
-      // componentwise product
-      P& operator &= (const P& v)
-	{
-	  X1 *= v.X1;
-	  X2 *= v.X2;
-	  X3 *= v.X3;
-
-	  return *this;
-	}
-
-      // orthogonalization u %= v: vector of the form u-k*v, perp to v
-      P& operator %= (const P& v);
-
-    }; // end of class P
+  private:
+    double m_X1, m_X2, m_X3;
+  }; // end of class P
 
   typedef P triple; // compatibility alias
 
-  const P E_1 = P(1,0,0);
-  const P E_2 = P(0,1,0);
-  const P E_3 = P(0,0,1);
+  // standard basis in global namespace
+  const P E_1(1,0,0);
+  const P E_2(0,1,0);
+  const P E_3(0,0,1);
 
   // vector space operations
   P operator- (const P& u);  // unary negation
@@ -119,28 +94,25 @@ namespace ePiX {
   // scalar multiplication
   P operator* (const double c, const P& v);
 
-  inline P midpoint(const P& u, const P& v, const double t=0.5)
-    {
-      return u + t*(v-u);
-    }
+  P midpoint(const P& u, const P& v, const double t=0.5);
 
   // cross product
-  P operator* (const P& u, const P& v);
-  P J(const P& arg); // quarter turn about E_3-axis
+  P operator* (const P&, const P&);
+  P J(const P&); // quarter turn about E_3-axis
 
   // dot product
-  double operator | (const P& u, const P& v);
-  inline double norm(const P& u) { return sqrt(u|u); }
+  double operator | (const P&, const P&);
+  double norm(const P&);
 
   // componentwise product (a,b,c)&(x,y,z)=(ax,by,cz)
-  P operator& (const P& u, const P& v);
+  P operator& (const P&, const P&);
   // orthogonalization
-  P operator% (const P& u, const P& v);
+  P operator% (const P&, const P&);
 
   // (in)equality
-  bool operator == (const P& u, const P& v);
-  bool operator != (const P& u, const P& v);
+  bool operator == (const P&, const P&);
+  bool operator != (const P&, const P&);
 
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_TRIPLES */

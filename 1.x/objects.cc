@@ -1,11 +1,11 @@
 /* 
- * objects.cc -- Simple picture objects: axes, grids, markers, polygons
+ * objects.cc -- ePiX axes, grids, markers, and labels
  *
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -32,15 +32,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <iostream>
-#include <sstream>
-#include <cstdarg>
-
 #include "globals.h"
 #include "triples.h"
 
-#include "camera.h"
 #include "output.h"
+
 #include "curves.h"
 #include "Label.h"
 #include "functions.h"
@@ -50,8 +46,6 @@ namespace ePiX {
 
   extern double pic_size;
   extern char *pic_unit;
-
-  extern epix_camera camera;
 
   // Picture objects
 
@@ -83,8 +77,7 @@ namespace ePiX {
     Label(base, lbl, TEXT, c).draw();
   }
 
-  void
-  masklabel(const P& base, std::string lbl)
+  void masklabel(const P& base, std::string lbl)
   {
     Label(base, lbl, TEXT, c, true).draw();
   }
@@ -153,7 +146,8 @@ namespace ePiX {
   }
 
   // arrow with label
-  void arrow(const P& tail, const P& head, const P& offset, std::string label_text,
+  void arrow(const P& tail, const P& head, const P& offset,
+	     std::string label_text,
 	     epix_label_posn align, double scale)
   {
     arrow(tail, head, scale);
@@ -171,13 +165,13 @@ namespace ePiX {
   }
 
   // Coordinate axes
-  static void 
-  draw_axis(const P& tail, const P& head, int n, int num_pts, epix_tick_type TICK)
+  void draw_axis(const P& tail, const P& head,
+		 int n, int num_pts, epix_tick_type TICK)
   {
     line(tail, head, 0, num_pts);
 
-    P location = tail;
-    P step  = (1.0/n)*(head - tail); // print n tick marks
+    P location(tail);
+    const P step((1.0/n)*(head - tail)); // print n tick marks
 
     if (TICK == H_AXIS) // test axis type outside loop
       for (int i=0; i <= n; ++i, location += step)
@@ -203,31 +197,51 @@ namespace ePiX {
     draw_axis(tail, head, n, num_pts, V_AXIS);
   }
 
-  /*
-   * h_axis_labels: Draws n+1 equally-spaced axis labels between 
-   *    <tail> and <head>. Automatically generates label values from
-   *    Cartesian coordinates, and has true-distance offsets.
-   *
-   * There is a separate version that takes a LaTeX-style alignment argument.
-   * The "unaligned" version tries to do constant alignment with labels that
-   * may or may not have a sign. It was easier to write a new function to
-   * handle labels with an alignment option than to modify the existing one.
-   */
+  void h_axis(int n)
+  {
+    h_axis(P(x_min,0), P(x_max,0), n);
+  }
+  void v_axis(int n)
+  {
+    v_axis(P(0,y_min), P(0,y_max), n);
+  }
 
-  static void
-  draw_axis_labels(const P& tail, const P& head, int n, const P& offset, 
-		   epix_tick_type TICK, bool mask)
+  // n+1 = #ticks, num_pts = #segments used to draw
+  void h_axis(int n, int num_pts) 
+  {
+    h_axis(P(x_min,0), P(x_max,0), n, num_pts);
+  }
+  void v_axis(int n, int num_pts) 
+  {
+    v_axis(P(0,y_min), P(0,y_max), n, num_pts);
+  }
+
+
+
+  // h_axis_labels: Draws n+1 equally-spaced axis labels between 
+  //    <tail> and <head>. Automatically generates label values from
+  //    Cartesian coordinates, and has true-distance offsets.
+  //
+  // There is a separate version that takes a LaTeX-style alignment argument.
+  // The "unaligned" version tries to do constant alignment with labels that
+  // may or may not have a sign. It was easier to write a new function to
+  // handle labels with an alignment option than to modify the existing one.
+
+  void draw_axis_labels(const P& tail, const P& head, int n, const P& offset, 
+			epix_tick_type TICK, bool mask)
   {
     bool neg_flag;
-    double label=0;
-    P current = tail;
-    P step = (1.0/n)*(head - tail);
+    double label(0);
+    P current(tail);
+    P step((1.0/n)*(head - tail));
 
     // determine if labels change sign (may be needed for alignment)
     if (TICK == H_AXIS && head.x1()*tail.x1() < 0)
       neg_flag=true;
+
     else if (TICK == V_AXIS && head.x2()*tail.x2() < 0)
       neg_flag=true;
+
     else
       neg_flag=false;
 
@@ -300,16 +314,21 @@ namespace ePiX {
     draw_axis_labels(tail, head, n, offset, V_AXIS, true);
   }
 
-  static double coord1(P arg) { return arg.x1(); }
-  static double coord2(P arg) { return arg.x2(); }
-  // axis labels with alignment option
-  static void
-  draw_axis_labels(const P& tail, const P& head, int n, const P& offset, 
-		   epix_tick_type TICK, bool mask, epix_label_posn POSN)
+  // Needed by draw_axis_labels to pass coordinates to Label constructor
+  double coord1(P arg)
   {
-    //    double label;
-    P current = tail;
-    P step = (1.0/n)*(head-tail);
+    return arg.x1();
+  }
+  double coord2(P arg)
+  {
+    return arg.x2();
+  }
+  // axis labels with alignment option
+  void draw_axis_labels(const P& tail, const P& head, int n, const P& offset, 
+			epix_tick_type TICK, bool mask, epix_label_posn POSN)
+  {
+    P current(tail);
+    P step((1.0/n)*(head-tail));
 
     for (int i=0; i<= n; ++i, current += step)
       {
@@ -342,4 +361,40 @@ namespace ePiX {
     draw_axis_labels(tail, head, n, offset, V_AXIS, true, POSN);
   }
 
-} /* end of namespace */
+  void h_axis_labels(int n, const P& offset)
+  {
+    h_axis_labels(P(x_min,0), P(x_max,0), n, offset);
+  }
+  void h_axis_masklabels(int n, const P& offset)
+  {
+    h_axis_masklabels(P(x_min,0), P(x_max,0), n, offset);
+  }
+
+  void h_axis_labels(int n, const P& offset, epix_label_posn POSN)
+  {
+    h_axis_labels(P(x_min,0), P(x_max,0), n, offset, POSN);
+  }
+  void h_axis_masklabels(int n, const P& offset, epix_label_posn POSN)
+  {
+    h_axis_masklabels(P(x_min,0), P(x_max,0), n, offset, POSN);
+  }
+
+
+  void v_axis_labels(int n, const P& offset)
+  {
+    v_axis_labels(P(0,y_min), P(0,y_max), n, offset);
+  }
+  void v_axis_masklabels(int n, const P& offset)
+  {
+    v_axis_masklabels(P(0,y_min), P(0,y_max), n, offset);
+  }
+
+  void v_axis_labels(int n, const P& offset, epix_label_posn POSN)
+  {
+    v_axis_labels(P(0,y_min), P(0,y_max), n, offset, POSN);
+  }
+  void v_axis_masklabels(int n, const P& offset, epix_label_posn POSN)
+  {
+    v_axis_masklabels(P(0,y_min), P(0,y_max), n, offset, POSN);
+  }
+} // end of namespace

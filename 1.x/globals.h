@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: May 14, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -33,8 +33,7 @@
  */
 
 /*
- *  This file provides the epix class to manage otherwise global 
- *  variables:
+ *  This file provides the epix class to "manage" global variables:
  *
  *  - dash_length (2 -- 200 true points; parameter same as dot_sep)
  *  - dash_fill   (0.05 -- 0.95, fraction of path filled when dashed)
@@ -56,13 +55,9 @@
 #include <string>
 #include <cmath>
 
-#ifdef EPIX_COMPILE_OUTPUT
 namespace ePiX {
-  std::string epix_version="EPIX_VERSION_NUMBER"; 
-}
-#endif
 
-namespace ePiX {
+  extern const std::string epix_version;
 
   enum epix_path_style  {SOLID, DASHED, DOTTED};
   //  enum epix_output_type {EEPIC}; // METAPOST, SVG...
@@ -70,16 +65,6 @@ namespace ePiX {
   // for backward compatibility, not in class epix below
   extern double x_min, x_max, x_size, y_min, y_max, y_size;
   extern double tix;
-
-  inline double min(double a, double b) { return a<b ? a : b; }
-  inline double max(double a, double b) { return a<b ? b : a; }
-
-  inline double snip_to(double var, const double arg1, const double arg2)  
-    {
-      if      (var < min(arg1,arg2)) var = min(arg1,arg2);
-      else if (var > max(arg1,arg2)) var = max(arg1,arg2);
-      return var;
-    }
 
   // pre-declare friends for gcc-4.1
   void dash_fill(double t=0.5);
@@ -130,68 +115,59 @@ namespace ePiX {
     static std::string fontface; // valid LaTeX font face
 
     // functions for setting style parameters
-    friend void dash_fill(double t)    { dashfill = snip_to(t,0.05,0.95); }
-    friend void dash_length(double len) { separation = snip_to(len,2,200); }
+    friend void dash_fill(double t);
+    friend void dash_length(double len);
 
-    friend void dot_sep(double len)     { separation = snip_to(len,2,200); }
-    friend void dot_size(double diam)    { dotsize = snip_to(diam,0.5,256); }
+    friend void dot_sep(double len);
+    friend void dot_size(double diam);
 
-    friend void gray(double depth) { gray_depth = snip_to(depth, 0, 1); }
+    friend void gray(double depth);
 
-    friend void radians(void)         { angle_units = 1.0; }
-    friend void degrees(void)         { angle_units = M_PI/180; }
-    friend void revolutions(void)     { angle_units = 2*M_PI; }
+    friend void radians();
+    friend void degrees();
+    friend void revolutions();
 
     // radians per angle unit
-    friend double angle(const double t) { return t*angle_units; }
+    friend double angle(const double t);
 
     // store label rotation angle internally in degrees
-    friend void label_angle(double t); // defined in functions.cc
+    friend void label_angle(double t);
 
     // set state variable
-    friend void solid(void)  { PATH_STYLE = SOLID; }
-    friend void dashed(double t) 
-      { 
-	PATH_STYLE = DASHED; 
-	if ( t != 0) dash_fill(t); // by default, leave
-      }
-    friend void dotted(double t) 
-      { 
-	PATH_STYLE = DOTTED; 
-	if (t != 0) dot_size(t);
-      }
+    friend void solid();
+    friend void dashed(double t);
+    friend void dotted(double t);
 
-    friend void clip(bool arg)   { clipping = arg; }
-    friend void crop(bool arg)   { cropping = arg; }
-    friend void fill(bool arg)   { fill_paths = arg; }
-    friend void use_pstricks(bool arg)   { using_pstricks = arg; }
+    friend void clip(bool arg);
+    friend void crop(bool arg);
+    friend void fill(bool arg);
+    friend void use_pstricks(bool arg);
 
     // set font size and face
-    friend void font_size(std::string arg) { fontsize = arg; }
-    friend void font_face(std::string arg)    { fontface = arg; }
+    friend void font_size(std::string arg);
+    friend void font_face(std::string arg);
 
     friend void begin(void); // defined in output.cc
 
     // set arrowhead parameters
-    friend void arrow_width(double w) { arrowwidth=fabs(0.5*w); }
-    friend void arrow_ratio(double r) { arrowratio=fabs(r); }
-    friend void arrow_camber(double arg)
-      { arrowcamber=snip_to(arg,0,1); }
-    friend void arrow_fill(double dens) { arrowfill=snip_to(dens,0,1);}
-    static double get_arrow_width(void)  { return arrowwidth; }
-    static double get_arrow_ratio(void)  { return arrowratio; }
-    static double get_arrow_camber(void) { return arrowcamber; }
-    static double get_arrow_fill(void)   { return arrowfill; }
+    friend void arrow_width(double w);
+    friend void arrow_ratio(double r);
+    friend void arrow_camber(double arg);
+    friend void arrow_fill(double dens);
+    static double get_arrow_width();
+    static double get_arrow_ratio();
+    static double get_arrow_camber();
+    static double get_arrow_fill();
 
     // for internal use
-    static double get_dashfill(void)   { return dashfill; }
-    static double get_dashlength(void) { return separation; }
+    static double get_dashfill();
+    static double get_dashlength();
 
-    static double get_gray(void)       { return gray_depth; }
-    static double get_dotsize(void)    { return dotsize; }
-    static double full_turn(void)      { return 2*M_PI/angle_units; }
-    static double get_labelangle(void) { return labelangle; } // in degrees
-    static epix_path_style path_style(void) { return PATH_STYLE; }
+    static double get_gray();
+    static double get_dotsize();
+    static double full_turn();
+    static double get_labelangle();
+    static epix_path_style path_style();
 
   private:
     static double dashfill;    // 0.05 --   0.95
@@ -213,25 +189,24 @@ namespace ePiX {
 
     static epix_path_style PATH_STYLE;
     static int begin_count; // number of times begin() has been called
-
   }; // end of class epix
 
-  // Constants not meant to be modifiable except at compile time
+
+  // Compile time constants
 
   // Precision-related constants:
   // ePiX's idea of too small/large
-  const double EPIX_EPSILON=0.0001;  // 10^-4
-  const double EPIX_INFTY=100000.0;  // 10^5
+  const double EPIX_EPSILON(0.0001);  // 10^-4
+  const double EPIX_INFTY(100000.0);  // 10^5
 
   // In calculus plotting, the interval between adjacent points is too large
   // for accuracy. Divide each such interval into this many subintervals
-  const int EPIX_ITERATIONS=200;
-
+  const int EPIX_ITERATIONS(200);
 
   // Output-formatting constants:
-  const int EPIX_NUM_PTS=80;     // # of points in ellipses, splines
-  const int EPIX_FILE_WIDTH=70;  // Width of output file
-  const int EPIX_PATH_LENGTH=60; // Number of points per path segment
+  const int EPIX_NUM_PTS(80);     // # of points in ellipses, splines
+  const int EPIX_FILE_WIDTH(70);  // Width of output file
+  const int EPIX_PATH_LENGTH(60); // Number of points per path segment
 
   // Enumeration types:
   enum epix_mark_type {PATH, CIRC, SPOT, RING, DOT, DDOT, PLUS, OPLUS, 
@@ -246,9 +221,8 @@ namespace ePiX {
 
   enum epix_integral_type {LEFT, RIGHT, UPPER, LOWER, TRAP, MIDPT};
 
-  // Deprecated constants
-
-  const int EPIX_PAIRS_PER_LINE=4;/* Number of pairs per line in output file */
+  // Deprecated constant
+  const int EPIX_PAIRS_PER_LINE(4);// Number of pairs per line in output file
 
 
   // <pic_unit> is one of the following valid LaTeX length units: 
@@ -257,23 +231,6 @@ namespace ePiX {
   extern double pic_size; // e.g., 1
   extern char *pic_unit;  // e.g., "pt" 
 
-
-  // Shape error types...
-  enum constructor_error_type {MALFORMED, MULTIPLICITY, COLLINEAR_PTS};
-  enum join_error_type {TANGENT, PARALLEL, COINCIDENT, NON_COPLANAR,
-			SEPARATED, CONCENTRIC};
-
-  // and handlers
-  struct constructor_error {
-    constructor_error_type type;
-    constructor_error(constructor_error_type x) { type = x; }
-  };
-
-  struct join_error {
-    join_error_type type;
-    join_error(join_error_type x) { type = x; }
-  };
-
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_GLOBALS */

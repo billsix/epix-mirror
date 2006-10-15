@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -46,75 +46,50 @@
  *
  *   Hiding test, latitude and longitudes on a sphere.
  */
-
 #ifndef EPIX_SPHERE
 #define EPIX_SPHERE
 
 #include "globals.h"
 #include "triples.h"
-#include "camera.h"
-#include "circle.h"
+#include "frame.h"
 
 namespace ePiX {
 
-  class sphere
-    {
-    private:
-      P ctr;
-      double rad;
+  class circle;
 
-    public:
-      sphere(const P& p1=P(0,0,0), double r=1) : ctr(p1), rad(r) { }
-      sphere(const P& p1, const P& p2);
+  class sphere {
+  public:
+    sphere(const P& p1=P(0,0,0), double r=1);
+    sphere(const P& p1, const P& p2);
 
-      P center() const { return ctr; }
-      double radius() const { return rad; }
+    P center() const;
+    double radius() const;
 
-      // translation
-      sphere& operator += (const P& arg)
-	{
-	  ctr += arg;
-	  return *this;
-	}
+    // translation
+    sphere& operator+= (const P&);
 
-      // scaling
-      sphere& operator *= (const double& arg)
-	{
-	  rad *= arg;
-	  return *this;
-	}
+    // scaling
+    sphere& operator*= (const double&);
 
-      // sphere
-      void draw();
+    void draw() const;
 
-    }; /* end of sphere class */
+  private:
+    P ctr;
+    double rad;
+  }; // end of sphere class
 
 
   // translation
-  inline sphere operator + (const sphere& sph, const P& arg)
-    {
-      sphere temp=sph;
-      return temp += arg;
-    }
-
-  inline sphere operator + (const P& arg, const sphere& sph)
-    {
-      sphere temp=sph;
-      return temp += arg;
-    }
+  sphere operator+ (const sphere&, const P&);
 
   // scaling about center
-  inline sphere operator * (const double& arg, const sphere& sph)
-    {
-      sphere temp=sph;
-      return temp *= arg;
-    }
+  sphere operator* (const double&, const sphere&);
 
   // intersection
-  circle operator * (const sphere& sph1, const sphere& sph2);
+  circle operator* (const sphere&, const sphere&);
 
 
-  // alternative constructor: specify pair of antipodal points
+  // named constructor: specify pair of antipodal points
   sphere poles(const P& p1, const P& p2);
 
 
@@ -135,6 +110,6 @@ namespace ePiX {
   void back_longitude(double lngtd, double lat_min, double lat_max,
 		      sphere S=sphere(), frame coords=frame());
 
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_SPHERE */

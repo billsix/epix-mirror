@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -35,110 +35,125 @@
 #include <iostream>
 
 #include "globals.h"
+#include "errors.h"
+
 #include "triples.h"
 
 #include "circle.h"
 #include "segment.h"
-#include "camera.h"
+#include "frame.h"
 
 #include "output.h"
-// #include "lengths.h"
-// #include "objects.h"
+
 #include "curves.h"
 
 namespace ePiX {
 
-  circle::circle(const P& arg1, const double arg2, const P& arg3) 
+  circle::circle(const P& arg1, const double arg2, const P& arg3)
+    : ctr(arg1), rad(arg2), perp_to(arg3)
   {
-    double temp=norm(arg3);
+    double temp(norm(arg3));
     if (temp < EPIX_EPSILON)
-      throw constructor_error(MALFORMED);
+      {
+	epix_warning("Degenerate circle normal, using (0,0,1)");
+	perp_to=E_3;
+      }
 
     else
-      {
-	ctr = arg1;
-	rad = arg2; 
-	perp_to = (1/temp)*arg3;
-      }
+      perp_to *= (1.0/temp); // normalize
   }
 
   // point-and-center constructor -- parallel to (x1,x2,0)-plane
-  circle::circle(const P& center, const P& point) 
+  circle::circle(const P& center, const P& point)
+    : ctr(center), rad(norm(point-center)), perp_to(E_3)
   { 
     if (fabs(E_3|(point-center)) > EPIX_EPSILON)
-      throw constructor_error(MALFORMED);
-    else
-      {
-	ctr = center;
-	rad = norm(point-center);
-	perp_to = E_3;
-      }
+      epix_warning("Circle requested with point not in (x,y) plane");
   }
+
   // three-point circle constructor
   circle::circle(const P& pt1, const P& pt2, const P& pt3)
   {
-    P D21=pt2-pt1, D31=pt3-pt1, D32=pt3-pt2;
+    P D21(pt2-pt1), D31(pt3-pt1), D32(pt3-pt2), N(D21*D31);
 
     if (norm(D21) < EPIX_EPSILON ||
 	norm(D31) < EPIX_EPSILON ||
 	norm(D32) < EPIX_EPSILON)
       throw constructor_error(MULTIPLICITY);
 
-    else if (norm(D21*D31) < EPIX_EPSILON)
+    else if (norm(N) < EPIX_EPSILON)
       throw constructor_error(COLLINEAR_PTS);
 
     else
       {
-	P temp = D21*D31;
-	perp_to = (1.0/norm(temp))*temp;
+	perp_to = (1.0/norm(N))*N;
 
-	P q2 = midpoint(pt1, pt2);
-	P dir2 = perp_to*(q2-pt1);
+	P q2(midpoint(pt1, pt2));
+	P dir2(perp_to*(q2-pt1));
 
-	P q3 = midpoint(pt1, pt3);
-	P dir3 = perp_to*(q3-pt1);
+	P q3(midpoint(pt1, pt3));
+	P dir3(perp_to*(q3-pt1));
 
 	ctr = segment(q2, q2+dir2)*segment(q3, q3+dir3);
 	rad = norm(ctr - pt1);
       }
   }
  
-  void circle::draw()
+  P circle::center() const
   {
-    double r = this->rad;
-    P N = this->perp_to;
-    frame axes;
+    return ctr;
+  }
+  double circle::radius() const
+  {
+    return rad;
+  }
+  P circle::perp() const
+  {
+    return perp_to;
+  }
 
-    if (norm(N*E_3) < EPIX_EPSILON)
-      axes = frame();
-    else
+  // translation
+  circle& circle::operator+= (const P& arg)
+  {
+    ctr += arg;
+    return *this;
+  }
+
+  // scaling
+  circle& circle::operator*= (const double& arg)
+  {
+    rad *= arg;
+    return *this;
+  }
+
+  void circle::draw() const
+  {
+    double r(rad);
+    P N(perp_to);
+    frame axes; // standard basis
+
+    if (EPIX_EPSILON <= norm(N*E_3))
       axes = frame(E_3*N, E_3, N);
 
-    ellipse(this->ctr, r*(axes.sea()), r*(axes.sky()));
+    ellipse(ctr, r*(axes.sea()), r*(axes.sky()));
  
     end_stanza();
   }
-  /*
-  void draw(circle arg)
-  {
-  arg.draw();
-  }
-  */
 
 
-  segment& operator * (const segment& arg_seg, const circle& arg_circle)
+  segment operator* (const segment& arg_seg, const circle& arg_circle)
   {
-    P dir = arg_seg.end2() - arg_seg.end1();
+    P dir(arg_seg.end2() - arg_seg.end1());
 
     if ( fabs(dir|arg_circle.perp()) > EPIX_EPSILON )
       throw join_error(NON_COPLANAR);
 
     else
       {
-	P to_ctr = arg_circle.center() - arg_seg.end1();
-	P line_perp = arg_circle.perp()*dir;
+	P to_ctr(arg_circle.center() - arg_seg.end1());
+	P line_perp(arg_circle.perp()*dir);
 	
-	double dist = (to_ctr|line_perp)/norm(line_perp);
+	double dist((to_ctr|line_perp)/norm(line_perp));
 
 	if (fabs(dist) > arg_circle.radius())
 	  throw join_error(SEPARATED);
@@ -148,59 +163,79 @@ namespace ePiX {
 
 	else
 	  {
-	    double y = sqrt(pow(arg_circle.radius(), 2) - dist*dist);
-	    P unit_x = -(1.0/norm(line_perp))*line_perp;
-	    P unit_y = (1.0/norm(dir))*dir;
+	    double y(sqrt(pow(arg_circle.radius(), 2) - dist*dist));
+	    P unit_x(-(1.0/norm(line_perp))*line_perp);
+	    P unit_y((1.0/norm(dir))*dir);
 
-	    P temp1 = dist*unit_x + y*unit_y;
-	    P temp2 = dist*unit_x - y*unit_y;
-	    return segment(temp1, temp2) += arg_circle.center();
+	    P temp1(dist*unit_x + y*unit_y);
+	    P temp2(dist*unit_x - y*unit_y);
+	    return segment(temp1, temp2) + arg_circle.center();
 	  }
       }
   }
 
-  segment& operator * (const circle& arg1, const circle& arg2)
+  segment operator* (const circle& arg1, const circle& arg2)
   {
-    P p1 = arg1.center();
-    P p2 = arg2.center();
-    P n1 = arg1.perp();
-    P n2 = arg2.perp();
+    const P p2(arg2.center());
+    const P n2(arg2.perp());
 
-    const double r1 = arg1.radius();
-    const double r2 = arg2.radius();
-    const double rad_diff = fabs(r2 - r1);
-    const double rad_sum = r2 + r1;
-    const double separation = norm(p2 - p1);
+    P dir(p2 - arg1.center()); // displacement between centers
 
-    if ((n1 != n2) && (n1 != -n2))
+    const double r1(arg1.radius());
+    const double r2(arg2.radius());
+    const double rad_diff(fabs(r2 - r1));
+    const double rad_sum(r2 + r1);
+    const double sep(norm(dir));
+
+    if (norm(arg1.perp()*arg2.perp()) > EPIX_EPSILON)
       throw join_error(NON_COPLANAR);
 
     else if (arg1.center() == arg2.center() && rad_diff < EPIX_EPSILON)
       throw join_error(COINCIDENT);
     
-    else if ( fabs(separation - rad_sum ) < EPIX_EPSILON || 
-	      fabs(separation - rad_diff) < EPIX_EPSILON )
+    else if ( fabs(sep - rad_sum ) < EPIX_EPSILON || 
+	      fabs(sep - rad_diff) < EPIX_EPSILON )
       throw join_error(TANGENT);
 
-    else if (separation > rad_sum)
+    else if (sep > rad_sum)
       throw join_error(SEPARATED);
 
-    else if (separation < rad_diff)
+    else if (sep < rad_diff)
       throw join_error(CONCENTRIC);
 
     else
       {
-	P dir_unit = (1.0/separation)*(p2-p1);
+	dir *= 1.0/sep;
 
-	double cos_theta 
-	  = (r1*r1 - r2*r2 - separation*separation)/(2*r2*separation);
-	double sin_theta = sqrt(1-cos_theta*cos_theta);
+	double COS((r1*r1 - r2*r2 - sep*sep)/(2*r2*sep));
+	double SIN(sqrt(1-COS*COS));
 
-	P temp1 = r2*(cos_theta*dir_unit+sin_theta*(n2*dir_unit));
-	P temp2 = r2*(cos_theta*dir_unit-sin_theta*(n2*dir_unit));
-
-	return segment(temp1, temp2) += p2;
+	return segment(p2 + r2*(COS*dir + SIN*(n2*dir)),
+		       p2 + r2*(COS*dir - SIN*(n2*dir)));
       }
   }
 
+  segment operator* (const circle& arg_circle, const segment& arg_seg)
+  {
+    return arg_seg*arg_circle;
+  }
+
+  // affine operations: translation by a triple...
+  circle operator+ (const circle& circ, const P& displace)
+  {
+    circle temp(circ);
+    return temp += displace; 
+  }
+
+  // and scaling by a double
+  circle operator* (const double& c, const circle& circ)
+  {
+    circle temp(circ);
+    return temp *= c; 
+  }
+  circle operator* (const circle& circ, const double& c)
+  {
+    circle temp(circ);
+    return temp *= c; 
+  }
 } /* end of namespace */

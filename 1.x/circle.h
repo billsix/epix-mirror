@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -47,53 +47,42 @@
  *    - draw() (ePiX ellipse)
  *    - circle*segment, circle*circle (segment def'd by pts of intersection)
  */
-
-
 #ifndef EPIX_CIRCLE
 #define EPIX_CIRCLE
 
 #include "globals.h"
 #include "triples.h"
-#include "segment.h"
 
 namespace ePiX {
 
-  class circle 
-    {
-    public:
-      // defaults to unit circle in (x1,x2,0) plane
-      circle(const P& arg1=P(0,0,0), const double arg2=1, const P& arg3=E_3);
+  class segment;
 
-      circle(const P& ctr, const P& pt); // center, and point, normal = E_3
-      circle(const P& pt1, const P& pt2, const P& pt3); // three points
+  class circle {
+  public:
+    // defaults to unit circle in (x1,x2,0) plane
+    circle(const P& arg1=P(0,0,0), const double arg2=1, const P& arg3=E_3);
 
-      P center() const { return ctr; }
-      double radius() const { return rad; }
-      P perp()   const { return perp_to; }
+    circle(const P& ctr, const P& pt); // center, and point, normal = E_3
+    circle(const P& pt1, const P& pt2, const P& pt3); // three points
 
-      // translation
-      circle& operator += (const P& arg)
-	{
-	  ctr += arg;
-	  return *this;
-	}
+    P center() const;
+    double radius() const;
+    P perp() const;
 
-      // scaling
-      circle& operator *= (const double& arg)
-	{
-	  rad *= arg;
-	  return *this;
-	}
+    // translation
+    circle& operator+= (const P&);
 
-      // circle
-      void draw();
+    // scaling
+    circle& operator*= (const double&);
 
-    private:
-      P ctr;
-      double rad;
-      P perp_to; // *unit* normal, even if rad = 0
+    void draw() const;
 
-    }; /* end of circle class */
+  private:
+    P ctr;
+    double rad;
+    P perp_to; // *unit* normal, even if rad = 0
+
+  }; /* end of circle class */
 
   // intersection operators
   /*
@@ -102,7 +91,7 @@ namespace ePiX {
    *   SEPARATED if coplanar but line defined by segment misses circle
    *   TANGENT if coplanar but line defined by segment tangent to circle
    */
-  segment& operator * (const segment&, const circle&);
+  segment operator* (const segment&, const circle&);
 
   /*
    * Throws the following exceptions:
@@ -112,35 +101,16 @@ namespace ePiX {
    *   SEPARATED if disjoint, neither contained in the other
    *   CONCENTRIC if disjoint, one contained in other (not nec same ctr)
    */
-  segment& operator * (const circle&, const circle&);
-
-  inline segment operator * (const circle& arg_circle, const segment& arg_seg)
-    { return arg_seg*arg_circle; }
+  segment operator* (const circle&, const circle&);
+  segment operator* (const circle&, const segment&);
 
   // affine operations: translation by a triple...
-  inline circle& operator + (const P& displace, const circle& circ)
-    { 
-      circle temp = circ;
-      return temp += displace; 
-    }
-  inline circle& operator + (const circle& circ, const P& displace)
-    { 
-      circle temp = circ;
-      return temp += displace; 
-    }
+  circle operator+ (const circle&, const P&);
 
   // and scaling by a double
-  inline circle& operator * (const double& c, const circle& circ)
-    { 
-      circle temp = circ;
-      return temp *= c; 
-    }
-  inline circle& operator * (const circle& circ, const double& c)
-    { 
-      circle temp = circ;
-      return temp *= c; 
-    }
+  circle operator* (const double&, const circle&);
+  circle operator* (const circle&, const double&);
 
-} /* end of namespace */
+} // end of namespace
 
 #endif /* EPIX_CIRCLE */

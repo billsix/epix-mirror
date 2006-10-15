@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 0.8.11rc12
- * Last Change: July 04, 2004
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -35,29 +35,74 @@
 #include <iostream>
 
 #include "globals.h"
+#include "errors.h"
 #include "triples.h"
-#include "cropping.h"
-// #include "path.h"
+
 #include "curves.h"
 #include "segment.h"
 
 namespace ePiX {
 
-  void segment::draw() { line(this->endpt1, this->endpt2); }
-
-  P& operator * (const segment& seg1, const segment& seg2)
+  static void debug_print(const P& arg, std::string msg="")
   {
-    P p1 = seg1.end1();
-    P p2 = seg1.end2();
-    P p3 = seg2.end1();
-    P p4 = seg2.end2();
+    std::cerr << msg << ": ("
+	      << arg.x1() << ","
+	      << arg.x2() << ","
+	      << arg.x3() << ")\n";
+  }
 
-    P dir1 = p2 - p1;
-    P dir2 = p4 - p3;
-    P normal = dir1*dir2; // cross product
-    double normal_length = norm(normal);
+  segment::segment(const P& p1, const P& p2)
+    : endpt1(p1), endpt2(p2) { }
 
-    if (fabs( ((p2 - p1)*(p3 - p1)) | (p4 - p1) ) > EPIX_EPSILON)
+  P segment::end1() const
+  {
+    return endpt1;
+  }
+  P segment::end2() const
+  {
+    return endpt2;
+  }
+
+  // translate
+  segment& segment::operator += (const P& arg)
+  {
+    endpt1 += arg;
+    endpt2 += arg;
+
+    return *this;
+  }
+
+  P segment::midpoint() const
+  {
+    return 0.5*(endpt1 + endpt2);
+  }
+
+  void segment::draw() const
+  {
+    line(endpt1, endpt2);
+  }
+  // end of class functions
+
+  segment operator+ (const segment& seg, const P& arg)
+  {
+    segment temp(seg);
+    return temp += arg;
+  }
+
+  // intersection
+  P operator* (const segment& seg1, const segment& seg2)
+  {
+    P p1(seg1.end1());
+    P dir1(seg1.end2() - p1);
+
+    P p3(seg2.end1());
+    P p4(seg2.end2());
+    P dir2(p4 - p3);
+
+    P normal(dir1*dir2); // cross product
+    double normal_length(norm(normal));
+
+    if (fabs( (dir1*(p3 - p1)) | (p4 - p1) ) > EPIX_EPSILON)
       throw join_error(NON_COPLANAR);
 
     else if ( normal_length < EPIX_EPSILON)
@@ -65,13 +110,12 @@ namespace ePiX {
 
     else
       {
-	P unit_normal = (1.0/normal_length)*normal;
-	P dir3 = dir2*unit_normal;
+	// normal lies in plane of segments, is perp to dir2
+	normal *= dir2;
 
-	// note: return value may not lie on either segment
-	double s = (dir3|(p3-p1))/(dir3|dir1);
-	return p1 += s*dir1;
+	// get t so that normal|(X - p3) = (normal|(p1 - p3 + t*dir1)) = 0.
+	// note: X may not lie on either segment
+	return p1 + ((normal|(p3-p1))/(normal|dir1))*dir1;
       }
   }
-
-} /* end of namespace */
+} // end of namespace

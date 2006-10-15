@@ -2,10 +2,10 @@
 #
 HEADER_FILE="epix.h"
 
-HEADERS="globals.h triples.h functions.h domain.h map.h pairs.h camera.h \
-     cropping.h path.h segment.h circle.h sphere.h plane.h polyhedron.h \
-     lengths.h output.h Label.h objects.h curves.h plots.h surface.h \
-     dataplot.h geometry.h"
+HEADERS="globals.h errors.h triples.h functions.h frame.h domain.h \
+     pairs.h camera.h cropping.h path.h segment.h circle.h sphere.h plane.h \
+     polyhedron.h lengths.h output.h colors.h Label.h objects.h curves.h \
+     plots.h surface.h dataplot.h geometry.h"
 
 # (N.B. Spaces in 2nd line are properly adjusted :)
 cat <<HEADER_HEADER > $HEADER_FILE

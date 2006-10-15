@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -32,46 +32,70 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <iostream>
+#include "globals.h"
+#include "errors.h"
 
-#include "plane.h"
+#include "circle.h"
 #include "polyhedron.h"
 #include "segment.h"
+#include "sphere.h"
+
 #include "path.h"
-#include "circle.h"
 #include "curves.h"
 #include "cropping.h"
+#include "plane.h"
 
 namespace ePiX {
 
-  extern epix_camera camera;
-
-  plane::plane(const P& point, const P& normal) : pt(point)
+  plane::plane(const P& point, const P& normal)
+    : m_pt(point), m_perp(normal)
   { 
-    double temp=norm(normal);
-    if (temp < EPIX_EPSILON)
-      throw constructor_error(MALFORMED);
+    double temp(norm(normal));
 
-    N = (1.0/temp)*normal;
+    if (temp < EPIX_EPSILON)
+      {
+	epix_warning("Degenerate plane normal, using (0,0,1)");
+	m_perp=E_3;
+      }
+
+    else
+      m_perp *= 1.0/temp;
   }
 
-  plane::plane(const P& p1, const P& p2, const P& p3) 
-  { 
-    P perp=(p3-p1)*(p2-p1);
-    double norm_perp=norm(perp);
+  plane::plane(const P& p1, const P& p2, const P& p3)
+    : m_pt(p1)
+  {
+    P perp((p3-p1)*(p2-p1));
+    double norm_perp(norm(perp));
+
     if (norm_perp < EPIX_EPSILON)
       throw constructor_error(COLLINEAR_PTS);
 
     else
-      {
-	pt = p1;
-	N = (1/norm_perp)*perp;
-      }
+      m_perp = (1/norm_perp)*perp;
+  }
+
+
+  P plane::normal() const
+  {
+    return m_perp;
+  }
+
+  plane& plane::reverse(void) 
+  { 
+    m_perp *= -1;
+    return *this;
+  }
+
+  plane& plane::operator += (const P& arg)
+  {
+    m_pt += arg;
+    return *this;
   }
 
   double plane::height(const P& arg) const
   {
-    return (arg-pt)|N;
+    return (arg-m_pt)|m_perp;
   }
 
   bool plane::contains(const P& arg) const
@@ -79,51 +103,46 @@ namespace ePiX {
     return (fabs(height(arg)) < EPIX_EPSILON); 
   }
 
-  bool plane::separates(const P arg1, const P arg2) const
+  bool plane::separates(const P& arg1, const P& arg2) const
   {
     return (height(arg1)*height(arg2) <= 0 );
   }
 
   bool plane::parallel_to (const plane& arg) const
   {
-    return (norm(N*arg.N)<EPIX_EPSILON);
+    return (norm(m_perp*arg.m_perp)<EPIX_EPSILON);
   }
 
   bool plane::operator== (const plane& arg) const
   {
-    // normals parallel and arg.pt lies in *this
-    return ( parallel_to(arg) &&
-	     ((pt - arg.pt)|N) < EPIX_EPSILON);
+    // normals parallel and arg.m_pt lies in *this
+    return ( parallel_to(arg) && ((m_pt - arg.m_pt)|m_perp) < EPIX_EPSILON);
   }
 
-
-  P operator* (const plane knife, const segment seg)
+  P operator* (const plane& knife, const segment& seg)
   {
-    P tail=seg.end1(), head=seg.end2();
-    double ptail=knife.height(tail);
-    double phead=knife.height(head);
-    double t=ptail/(ptail-phead);
+    P tail(seg.end1()), head(seg.end2());
 
-    return tail+t*(head-tail);
+    double ptail(knife.height(tail)), phead(knife.height(head));
+
+    return tail + (ptail/(ptail-phead))*(head-tail);
   }
 
   // draw Line of intersection between non-parallel planes
-  void plane::operator* (const plane P1) const
+  void plane::operator* (const plane& P1) const
   {
-    const plane P2=*this;
+    P N3((P1.m_perp)*m_perp);
+    double temp(norm(N3));
 
-    P N3=(P1.N)*(P2.N);
-    double temp=norm(N3);
-
-    if (temp<EPIX_EPSILON)
+    if (temp < EPIX_EPSILON)
       throw join_error(PARALLEL);
 
     else  // N3 non-zero, parallel to intersection
       {
 	N3 *= 1/temp; // normalize
 
-	P perp=(P1.N)*N3; // unit vector in P1, perp to intersection
-	P point=P1.pt + ((((P2.pt-P1.pt)|(P2.N))/(perp|(P2.N)))*perp);
+	P perp((P1.m_perp)*N3); // unit vector in P1, perp to intersection
+	P point(P1.m_pt + (((m_pt-P1.m_pt)|m_perp)/(perp|m_perp))*perp);
 
 	Line(point, point+N3); // draw line through points
       }
@@ -132,20 +151,20 @@ namespace ePiX {
   // intersection
   circle plane::operator* (const sphere& S) const
   {
-    double rad=S.radius();
-    P perp=(*this).N;
+    double rad(S.radius());
     // signed dist from S.ctr to *this
-    double height = ((*this).pt-S.center())|perp;
+    double height((m_pt - S.center())|m_perp);
 
-    if (rad<fabs(height))
+    if (rad < fabs(height))
       throw join_error(SEPARATED);
 
     else if (rad == fabs(height))
       throw join_error(TANGENT);
 
     else
-      return circle(S.center()+height*perp,
-		    sqrt(rad*rad-height*height), perp);
+      return circle(S.center() + height*m_perp,
+		    sqrt((rad - height)*(rad + height)),
+		    m_perp);
   }
 
   void plane::draw() const
@@ -161,20 +180,20 @@ namespace ePiX {
     P vert011(clip1_min(), clip2_max(), clip3_max());
     P vert111(clip1_max(), clip2_max(), clip3_max());
 
-    segment edge00=join(vert000, vert001);
-    segment edge01=join(vert001, vert011);
-    segment edge02=join(vert011, vert010);
-    segment edge03=join(vert010, vert000);
+    segment edge00(vert000, vert001);
+    segment edge01(vert001, vert011);
+    segment edge02(vert011, vert010);
+    segment edge03(vert010, vert000);
 
-    segment edge04=join(vert000, vert100);
-    segment edge05=join(vert001, vert101);
-    segment edge06=join(vert011, vert111);
-    segment edge07=join(vert010, vert110);
+    segment edge04(vert000, vert100);
+    segment edge05(vert001, vert101);
+    segment edge06(vert011, vert111);
+    segment edge07(vert010, vert110);
 
-    segment edge08=join(vert100, vert101);
-    segment edge09=join(vert101, vert111);
-    segment edge10=join(vert111, vert110);
-    segment edge11=join(vert110, vert100);
+    segment edge08(vert100, vert101);
+    segment edge09(vert101, vert111);
+    segment edge10(vert111, vert110);
+    segment edge11(vert110, vert100);
 
     // and edges
     one_skel walls(12, &edge00, &edge01, &edge02, &edge03, &edge04, &edge05,

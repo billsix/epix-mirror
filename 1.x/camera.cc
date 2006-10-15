@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: May 14, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -34,70 +34,17 @@
 
 // n.b. ePiX::trig functions are sensitive to current angle units
 
-#include <iostream>
+// #include <iostream>
 // #include <cstdlib>
 
 #include "globals.h"
 #include "functions.h"
 #include "triples.h"
+
+#include "frame.h"
 #include "camera.h"
-#include "output.h"
 
 namespace ePiX {
-
-  // frame constructor, suitable for (sea,sky,eye) frames: Usually we
-  // know the eye vector and want to preserve its direction. The frame
-  // is guaranteed to be right-handed, and the first arg is immaterial.
-  frame::frame(P arg1, P arg2, P arg3)
-  {
-    if (norm(arg2*arg3) < EPIX_EPSILON) // too nearly linearly dependent
-      epix_error("Linearly dependent arguments to frame");
-
-    // partial Gram-Schmidt
-    arg3 *= 1/norm(arg3); // normalize eye
-
-    arg2 = arg2%arg3; // orthogonalize sky_vector, preserving screen direction
-    arg2 *= 1/norm(arg2); // and normalize
-
-    frame1 = arg2*arg3;
-    frame2 = arg2;
-    frame3 = arg3;
-  }
-
-
-  frame& frame::rot1(double angle)
-  {
-    P temp2 = frame2;
-    P temp3 = frame3;
-
-    frame2 = (ePiX::cos(angle)*(temp2)) - (ePiX::sin(angle)*(temp3));
-    frame3 = (ePiX::sin(angle)*(temp2)) + (ePiX::cos(angle)*(temp3));
-
-    return *this;
-  }
-
-
-  frame& frame::rot2(double angle)
-  {
-    P temp3 = frame3;
-    P temp1 = frame1;
-
-    frame3 = (ePiX::cos(angle)*(temp3)) - (ePiX::sin(angle)*(temp1));
-    frame1 = (ePiX::sin(angle)*(temp3)) + (ePiX::cos(angle)*(temp1));
-
-    return *this;
-  }
-
-  frame& frame::rot3(double angle)
-  {
-    P temp1 = frame1;
-    P temp2 = frame2;
-
-    frame1 = (ePiX::cos(angle)*(temp1)) - (ePiX::sin(angle)*(temp2));
-    frame2 = (ePiX::sin(angle)*(temp1)) + (ePiX::cos(angle)*(temp2));
-
-    return *this;
-  }
 
   extern epix_camera camera;
 
@@ -107,14 +54,14 @@ namespace ePiX {
   // from "target" along "eye" axis
   pair shadow(const P& arg)
   {
-    P arg_vector = arg - camera.get_target();
+    P arg_vector(arg - camera.get_target());
 	
     // get frame coordinates; "|" = dot product
-    double u1=camera.sea()|arg_vector;
-    double u2=camera.sky()|arg_vector;
-    double u3=camera.eye()|arg_vector;
+    double u1(camera.sea()|arg_vector);
+    double u2(camera.sky()|arg_vector);
+    double u3(camera.eye()|arg_vector);
 
-    double dist = recip(camera.get_range());
+    double dist(recip(camera.get_range()));
 
     // inversion occurs if camera closer than object to screen plane
     return pair(u1/(1-dist*u3), u2/(1-dist*u3));
@@ -123,94 +70,128 @@ namespace ePiX {
   pair fisheye(const P& arg) 
   {
     // vector from camera to arg, based at camera
-    P arg_vector = arg - camera.get_viewpt();
-    double scale = recip(norm(arg_vector))*camera.get_range();
+    P arg_vector(arg - camera.get_viewpt());
+    double scale(recip(norm(arg_vector))*camera.get_range());
 
     // radially project to sphere through target centered at camera
-    P temp = scale*arg_vector;
-    double u1=camera.sea()|temp;
-    double u2=camera.sky()|temp;
+    P temp(scale*arg_vector);
+    double u1(camera.sea()|temp);
+    double u2(camera.sky()|temp);
 
     // orthogonal projection along eye()
     return pair(u1, u2);
   }
 
-  pair bubble(const P& arg) 
+  pair bubble(const P& arg)
   {
     // vector from camera to arg, based at camera
-    P arg_vector = arg - camera.get_viewpt();
-    double d = camera.get_range();
-    double scale = d*recip(norm(arg_vector));
+    P arg_vector(arg - camera.get_viewpt());
+    double d(camera.get_range());
+    double scale(d*recip(norm(arg_vector)));
 
     // radially project to sphere through target centered at camera
-    P temp = scale*arg_vector;
+    P temp(scale*arg_vector);
     // get coordinates in camera frame
-    double u1=camera.sea()|temp;
-    double u2=camera.sky()|temp;
-    double u3=camera.eye()|temp;
+    double u1(camera.sea()|temp);
+    double u2(camera.sky()|temp);
+    double u3(camera.eye()|temp);
 
     // stereographic projection from target antipode
     return (d/(d-u3))*pair(u1, u2);
   }
 
   // camera functions
-  epix_camera::epix_camera(void)
-    : viewpt(P(0,0,EPIX_INFTY)), target(P(0,0,0)), distance(EPIX_INFTY)
-  { 
-    orient = frame();
-    screen_projection = shadow;
+  epix_camera::epix_camera()
+    : viewpt(P(0,0,EPIX_INFTY)), target(P(0,0,0)), orient(frame()),
+      distance(EPIX_INFTY), screen_projection(shadow) { }
+
+  P epix_camera::get_viewpt() const
+  {
+    return viewpt;
+  }
+  P epix_camera::get_target() const
+  {
+    return target;
+  }
+  double epix_camera::get_range() const
+  {
+    return distance;
   }
 
-  void epix_camera::rotate_sea(double angle)
+  // get frame vectors
+  P epix_camera::sea() const
+  {
+    return orient.sea();
+  }
+  P epix_camera::sky() const
+  {
+    return orient.sky();
+  }
+  P epix_camera::eye() const
+  {
+    return orient.eye();
+  }
+
+  epix_camera& epix_camera::rotate_sea(double angle)
   { 
     orient.rot1(angle); 
     viewpt = target + distance*orient.eye();
+
+    return *this;
   }
 
   // yaw: rotate camera left/right
-  void epix_camera::rotate_sky(double angle)
+  epix_camera& epix_camera::rotate_sky(double angle)
   { 
     orient.rot2(angle); 
     viewpt = target + distance*orient.eye();
+
+    return *this;
   }
 
   // roll: rotate camera about viewing axis
-  void epix_camera::rotate_eye(double angle)
+  epix_camera& epix_camera::rotate_eye(double angle)
   { 
     orient.rot3(angle); // target unchanged
+
+    return *this;
   }
 
 
   // fix target, move viewpt radially along eye()
-  void epix_camera::range(double d)
+  epix_camera& epix_camera::range(double d)
   {
     if (d == 0)
       d = EPIX_INFTY;
 
     distance = d;
     viewpt = target + d*eye();
+
+    return *this;
   }
 
   // fix viewpt, move target radially along eye()
-  void epix_camera::focus(double d)
+  epix_camera& epix_camera::focus(double d)
   {
     if (d == 0)
       d = EPIX_INFTY;
 
     distance = d;
     target = viewpt + (-d)*eye();
+
+    return *this;
   }
 
   // fix target, set viewpt arbitrarily
-  void epix_camera::at(const P& arg) 
+  epix_camera& epix_camera::at(const P& arg) 
   {
     viewpt = arg;
-    P temp = arg - get_target();
-    double d = norm(temp);
+    P temp(arg - get_target());
+    double d(norm(temp));
     temp *= 1.0/d; // normalize
 
-    double z_rad = norm(temp%E_3);
-    double z_ht = temp|E_3;
+    double z_rad(norm(temp%E_3));
+    double z_ht(temp|E_3);
 
     if (z_rad < EPIX_EPSILON) // too close to "z-axis" through target
       {
@@ -226,17 +207,26 @@ namespace ePiX {
 
     // and in any case
     distance = d;
+
+    return *this;
   }
 
-  void epix_camera::look_at(const P& arg) 
+  epix_camera& epix_camera::at(const double a1,
+			       const double a2,
+			       const double a3)
+  {
+    return at(P(a1,a2,a3));
+  }
+
+  epix_camera& epix_camera::look_at(const P& arg) 
   {
     camera.target = arg;
-    P temp = camera.viewpt - arg;
-    double d = norm(temp);
+    P temp(camera.viewpt - arg);
+    double d(norm(temp));
     temp *= 1.0/d; // normalize
 
-    double z_rad = norm(temp%E_3);
-    double z_ht = temp|E_3;
+    double z_rad(norm(temp%E_3));
+    double z_ht(temp|E_3);
 
     if (z_rad < EPIX_EPSILON) // too close to "z-axis" through target
       {
@@ -252,6 +242,39 @@ namespace ePiX {
 
     // and in any case
     camera.distance = d;
+
+    return *this;
+  }
+
+  epix_camera& epix_camera::look_at(const double a1,
+				    const double a2,
+				    const double a3)
+  {
+    return look_at(P(a1,a2,a3));
+  }
+
+
+  // set projection mapping
+  epix_camera& epix_camera::lens(pair proj(const P&))
+  {
+    screen_projection = proj;
+    return *this;
+  }
+
+  // project a point to the screen ("shoot a photo")
+  pair epix_camera::operator() (const P& arg) const
+  {
+    return screen_projection(arg);
+  }
+
+  // global functions
+  void viewpoint(const P& arg)
+  {
+    ePiX::camera.at(arg);
+  }
+  void viewpoint(double a1, double a2, double a3)
+  {
+    ePiX::camera.at(a1,a2,a3);
   }
 
 } /* end of namespace */

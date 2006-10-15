@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.9
- * Last Change: July 28, 2006
+ * Version 1.0.15
+ * Last Change: October 09, 2006
  */
 
 /* 
@@ -34,6 +34,8 @@
 
 #include "globals.h"
 #include "triples.h"
+#include "errors.h"
+
 #include "domain.h"
 #include "cropping.h"
 
@@ -53,104 +55,97 @@ namespace ePiX {
   extern epix_camera camera;
 
   // half-turn in current units
-  static double epix_pi = angle(M_PI);
+  static double epix_pi(angle(M_PI));
 
   // Simple geometric objects
 
   // Lines take a stretch factor, roughly in percent
   void line(const P& tail, const P& head, const double expand)
   {
-    path data = path(tail, head, expand);
+    path data(tail, head, expand);
     data.draw();
   }
 
   void line(const P& tail, const P& head, const double expand,
 	    int num_pts)
   {
-    path data = path(tail, head, expand, num_pts);
+    path data(tail, head, expand, num_pts);
     data.draw();
   }
 
   // Line(p1, p2) -- draw uncropped portion of long line through p1, p2
   void Line(const P& arg1, const P& arg2) //, const int num_pts)
   {
-    pair screen_dir = camera(arg2)-camera(arg1);
+    pair screen_dir(camera(arg2)-camera(arg1));
     if (norm(screen_dir) < EPIX_EPSILON)
-      ; // draw nothing
+      return; // draw nothing
 
-    else
+    // else
+    P dir(arg2 - arg1);
+    dir *= 1/norm(dir);
+
+    const double BIG(EPIX_INFTY);
+    const double SMALL(0.05);   // Magic Number
+    // move endpoints far away
+    P tail(arg1 - BIG*dir);
+    P head(arg2 + BIG*dir);
+
+    // zi > 0 iff point is in front of camera
+    double z1(-(tail - camera.get_viewpt())|camera.eye());
+    double z2(-(head - camera.get_viewpt())|camera.eye());
+
+    if (z1 < SMALL) // if behind camera, move to front
       {
-	P dir = arg2 - arg1;
-	dir *= 1/norm(dir);
+	tail += ((z1 - SMALL)/(dir|camera.eye())) * dir;
+	z1 = SMALL;
+      }
 
-	const double BIG=EPIX_INFTY;
-	const double SMALL = 0.05;   // hardwired constant
-	// move endpoints far away
-	P tail = arg1 - BIG*dir;
-	P head = arg2 + BIG*dir;
+    if (z2 < SMALL)
+      {
+	head += ((z2 - SMALL)/(dir|camera.eye())) * dir;
+	z2 = SMALL;
+      }
 
-	// zi > 0 iff point is in front of camera
-	double z1 = -(tail - camera.get_viewpt())|camera.eye();
-	double z2 = -(head - camera.get_viewpt())|camera.eye();
+    if (crop_mask::Crop_Box.is_onscreen(arg1))
+      {
+	if (!crop_mask::Crop_Box.is_onscreen(tail))
+	  tail = seek_path_end(arg1, tail);
 
-	if (z1 < SMALL) // if behind camera, move to front
-	  {
-	    tail += ((z1 - SMALL)/(dir|camera.eye())) * dir;
-	    z1 = SMALL;
-	  }
+	if (!crop_mask::Crop_Box.is_onscreen(head))
+	  head = seek_path_end(arg1, head);
+      }
 
-	if (z2 < SMALL)
-	  {
-	    head += ((z2 - SMALL)/(dir|camera.eye())) * dir;
-	    z2 = SMALL;
-	  }
+    else if (crop_mask::Crop_Box.is_onscreen(arg2)) // arg1 cropped
+      {
+	if (!crop_mask::Crop_Box.is_onscreen(tail))
+	  tail = seek_path_end(arg2, tail);
 
-	if (crop_mask::Crop_Box.is_onscreen(arg1))
-	  {
-	    if (!crop_mask::Crop_Box.is_onscreen(tail))
-	      tail = seek_path_end(arg1, tail);
+	if (!crop_mask::Crop_Box.is_onscreen(head))
+	  head = seek_path_end(arg2, head);
+      }
 
-	    if (!crop_mask::Crop_Box.is_onscreen(head))
-	      head = seek_path_end(arg1, head);
-	  }
+    // else arg1, arg2 both cropped, do nothing for now
 
-	else if (crop_mask::Crop_Box.is_onscreen(arg2)) // arg1 cropped
-	  {
-	    if (!crop_mask::Crop_Box.is_onscreen(tail))
-	      tail = seek_path_end(arg2, tail);
+    // screen distance from (expanded) tail to head, in true pt
+    double dist(norm(p2t(c2s(camera(head)-camera(tail)))));
 
-	    if (!crop_mask::Crop_Box.is_onscreen(head))
-	      head = seek_path_end(arg2, head);
-	  }
+    // one vertex every dashlength true pt
+    int num_pts((int) ceil(dist/epix::get_dashlength()));
 
-	else // arg1, arg2 both cropped, do nothing for now
-	  ;
+    // get crop state
+    bool state(epix::cropping);
+    crop(true);
 
-	// screen distance from (expanded) tail to head, in true pt
-	double dist = norm(p2t(c2s(camera(head)-camera(tail))));
-
-	// one vertex every dashlength true pt
-	int num_pts = (int) ceil(dist/epix::get_dashlength());
-	//	std::cerr << "Line with " << num_pts << " points\n";
-
-	// get crop state
-	bool state = epix::cropping;
-	crop(true);
-
-	line(tail, head, 0, num_pts);
-	crop(state); // restore crop state
-      } // Line not parallel to eye
-
+    line(tail, head, 0, num_pts);
+    crop(state); // restore crop state
   } // end of Line
 
 
   // point-slope form
-  void
-  Line(const P& tail, double slope)
+  void Line(const P& tail, double slope)
   {
     Line(tail, tail+P(1, slope, 0));
   }
-
 
 
   void triangle(const P& arg1, const P& arg2, const P& arg3)
@@ -169,24 +164,22 @@ namespace ePiX {
       }
   }
 
-  void quad(const P& arg1, const P& arg2, 
-	    const P& arg3, const P& arg4)
+  void quad(const P& pt1, const P& pt2, const P& pt3, const P& pt4)
   {
     if (epix::path_style() == SOLID)
       {
         path data;
-	data.pt(arg1).pt(arg2).pt(arg3).pt(arg4).close().fill(epix::fill_paths);
+	data.pt(pt1).pt(pt2).pt(pt3).pt(pt4).close().fill(epix::fill_paths);
         data.draw();
       }
     else // dashed/dotted
       {
-	line(arg1, arg2);
-	line(arg2, arg3);
-	line(arg3, arg4);
-	line(arg4, arg1);
+	line(pt1, pt2);
+	line(pt2, pt3);
+	line(pt3, pt4);
+	line(pt4, pt1);
       }
   }
-
 
 
   // Draw coordinate rectangle with opposite corners as given. Arguments
@@ -195,9 +188,9 @@ namespace ePiX {
 
   void rect(const P& arg1, const P& arg2, bool solid)
   {
-    P diagonal = arg2 - arg1;
+    P diagonal(arg2 - arg1);
     P jump;
-    int perp_count = 0;
+    int perp_count(0);
 
     // count coordinate axes perp to diagonal and flag normal
     if (fabs(diagonal|E_1) < EPIX_EPSILON)
@@ -216,12 +209,7 @@ namespace ePiX {
 	jump = E_1&(diagonal);
       }
 
-    // no warning if rectangle is degenerate
-
-    P temp1 = arg1+jump;
-    P temp2 = arg2-jump;
-
-    quad(arg1, temp1, arg2, temp2);
+    quad(arg1, arg1+jump, arg2, arg2-jump);
   } // end rect
 
 
@@ -236,16 +224,16 @@ namespace ePiX {
   }
 
   void aarrow(const P& tail, const P& head, double scale)
-    {
-      P midpt = 0.5*(tail+head);
-      arrow(midpt, tail, scale);
-      arrow(midpt, head, scale);
-    }
+  {
+    P midpt(0.5*(tail+head));
+    arrow(midpt, tail, scale);
+    arrow(midpt, head, scale);
+  }
 
   void ellipse(const P& center, const P& axis1, const P& axis2,  
 	       const double t_min, const double t_max, int num_pts)
   {
-    path data=path(center, axis1, axis2, t_min, t_max, num_pts);
+    path data(center, axis1, axis2, t_min, t_max, num_pts);
     data.draw();
   }  
 
@@ -307,22 +295,23 @@ namespace ePiX {
   void arrow(const P& tail, const P& head, double scale)
   {
     // may assume head-tail is not the zero vector in object/screen
-    double ratio = epix::get_arrow_ratio();
-    double width = epix::get_arrow_width()*fabs(scale);
-    double dens  = epix::get_arrow_fill();
+    double ratio(epix::get_arrow_ratio());
+    double width(epix::get_arrow_width()*fabs(scale));
+    double dens(epix::get_arrow_fill());
 
     P tip1, tip2, tip3, base, stem;
-    P object_dir = head - tail;
-    double cos_theta = (object_dir|camera.eye())/norm(object_dir);
-    double sin_theta = sqrt(1 - cos_theta*cos_theta);
-    double arrowhead_height = sin_theta*width*ratio; // in true pt
-    double camber = arrowhead_height*epix::get_arrow_camber();
+    P object_dir(head - tail);
 
-    pair screen_dir = camera(head) - camera(tail);
-    pair picture_dir = c2s(screen_dir);
-    double true_sep = true_length(picture_dir); // in true pt
+    double cos_theta((object_dir|camera.eye())/norm(object_dir));
+    double sin_theta(sqrt(1 - cos_theta*cos_theta));
+    double arrowhead_height(sin_theta*width*ratio); // in true pt
+    double camber(arrowhead_height*epix::get_arrow_camber());
 
-    P object_unit = (1.0/true_sep)*object_dir; // projects to 1 true pt
+    pair screen_dir(camera(head) - camera(tail));
+    pair picture_dir(c2s(screen_dir));
+    double true_sep(true_length(picture_dir)); // in true pt
+
+    P object_unit((1.0/true_sep)*object_dir); // projects to 1 true pt
 
     if (arrowhead_height  < true_sep) // <tail> outside arrowhead
       {
@@ -340,25 +329,24 @@ namespace ePiX {
 
     // compute page normals in object coordinates
     // 1 true pt, in picture coords
-    pair picture_perp = (1.0/true_sep)*J(picture_dir); 
-    pair screen_perp  = s2c(picture_perp);
+    pair picture_perp((1.0/true_sep)*J(picture_dir));
+    pair screen_perp(s2c(picture_perp));
 
     // object, projects to 1 true pt normal
-    P object_perp = ((screen_perp.x1())*camera.sea()) +
-      ((screen_perp.x2())*camera.sky());
+    P object_perp(((screen_perp.x1())*camera.sea()) +
+		  ((screen_perp.x2())*camera.sky()));
 
     tip1 = stem + width*object_perp;
     tip2 = stem - width*object_perp;
 
     line(tail, base);
-    epix_path_style TEMP = epix::path_style(); // save path style
+    epix_path_style TEMP(epix::path_style()); // save path style
     solid();
     if (dens != 0)
       std::cout << "\n\\special{sh " << dens << "}%";
 
     path my_tip;
     my_tip.pt(base).pt(tip1).pt(tip3).pt(tip2).draw();
-    // polygon(4, &base, &tip1, &tip3, &tip2).draw();
     // restore path style
     if (TEMP == DASHED)
       dashed();
@@ -366,6 +354,10 @@ namespace ePiX {
       dotted();
   }
 
+  void ellipse(const P& center, const P& radius)
+  {
+    ellipse(center, radius.x1()*E_1, radius.x2()*E_2);
+  }
 
   // Standard half-ellipse functions
   void ellipse_left (const P& center, const P& radius)
@@ -407,9 +399,9 @@ namespace ePiX {
   void arc_arrow(const P& center, const double r, 
 		 const double start, const double finish, const double scale)
   {
-    bool fill_state=epix::fill_paths;
+    bool fill_state(epix::fill_paths);
 
-    double temp = subtended(r, scale);
+    double temp(subtended(r, scale));
     if (fabs(start - finish) >= temp) // long enough arc
       {
 	temp *= sgn(finish-start);
@@ -433,20 +425,20 @@ namespace ePiX {
   // spline arrowhead
   static void sparrowhead(P tail, P head, double scale=1)
   {
-    double ratio = epix::get_arrow_ratio();
-    double width = epix::get_arrow_width()*fabs(scale);
+    double ratio(epix::get_arrow_ratio());
+    double width(epix::get_arrow_width()*fabs(scale));
 
-    P object_dir = head - tail;
+    P object_dir(head - tail);
 
-    double cos_theta = (object_dir|camera.eye())/norm(object_dir);
-    double sin_theta = sqrt(1 - cos_theta*cos_theta);
-    double ht = sin_theta*width*ratio; // in true pt
+    double cos_theta((object_dir|camera.eye())/norm(object_dir));
+    double sin_theta(sqrt(1 - cos_theta*cos_theta));
+    double ht(sin_theta*width*ratio); // in true pt
 
-    pair screen_dir = camera(head) - camera(tail);
-    pair picture_dir = c2s(screen_dir);
-    double true_sep = true_length(picture_dir); // in true pt
+    pair screen_dir(camera(head) - camera(tail));
+    pair picture_dir(c2s(screen_dir));
+    double true_sep(true_length(picture_dir)); // in true pt
 
-    P object_unit = (1.0/true_sep)*object_dir; // projects to 1 true pt
+    P object_unit((1.0/true_sep)*object_dir); // projects to 1 true pt
 
     arrow(head-ht*object_unit, head, scale);
   }
@@ -456,7 +448,7 @@ namespace ePiX {
     path data(p1, p2, p3, EPIX_NUM_PTS);
     data.draw();
     // hack to align arrowhead when spline is highly curved
-    double wt=0.95; // Hardwired constant 0.95
+    double wt(0.95); // Hardwired constant 0.95
     sparrowhead(wt*p2+(1-wt)*p1, p3, scale);
   }
 
@@ -472,7 +464,7 @@ namespace ePiX {
   {
     path data(p1, p2, p3, p4, EPIX_NUM_PTS);
     data.draw();
-    double wt=0.95; // Hardwired constant 0.95
+    double wt(0.95); // Hardwired constant 0.95
     sparrowhead(wt*p3+(1-wt)*p2, p4, scale);
   }
 
@@ -509,13 +501,13 @@ namespace ePiX {
   // n1 x n2 Cartesian grid, where coarse = (n1, n2)
   void grid(const P& arg1, const P& arg2, mesh coarse, mesh fine)
   {
-    P diagonal = arg2 - arg1;
+    P diagonal(arg2 - arg1);
     P jump1, jump2; // sides of grid
 
-    int perp_count = 0;
+    int perp_count(0);
 
-    int N1 = coarse.n1();
-    int N2 = coarse.n2();
+    int N1(coarse.n1());
+    int N2(coarse.n2());
 
     // count coordinate axes diagonal is perp to and flag normal
     if (fabs(diagonal|E_1) < EPIX_EPSILON)
@@ -544,8 +536,8 @@ namespace ePiX {
     else
       {
 	// grid line spacing
-	P grid_step1 = (1.0/N1)*jump1;
-	P grid_step2 = (1.0/N2)*jump2;
+	P grid_step1((1.0/N1)*jump1);
+	P grid_step2((1.0/N2)*jump2);
 
 	for (int i=0; i <= N1; ++i)
 	  line(arg1+i*grid_step1, arg1+i*grid_step1+jump2, 0, fine.n2());
@@ -605,9 +597,9 @@ namespace ePiX {
   // Sample data for _/\_ standard Koch snowflake:
   // const int seed[] = {6, 4, 0, 1, -1, 0};
 
-  static P jump(int spokes, int length, const std::vector<int>& seed)
+  P jump(int spokes, int length, const std::vector<int>& seed)
   {
-    P sum = P(0,0);
+    P sum(P(0,0));
 
     for (int i=0; i< length; ++i)
       sum += cis(seed.at(i)*(epix::full_turn())/spokes);
@@ -615,22 +607,21 @@ namespace ePiX {
     return sum;
   }
 
-  void fractal(triple p, triple q, int depth, const int *pre_seed)
+  void fractal(const P& p, const P& q, const int depth, const int *pre_seed)
   {
-    int spokes = pre_seed[0];
-    int seed_length = pre_seed[1];
+    int spokes(pre_seed[0]);
+    int seed_length(pre_seed[1]);
     std::vector<int> seed(seed_length);
 
     // extract seed from pre_seed
-     for (int i=0; i<seed_length; ++i)
+    for (int i=0; i<seed_length; ++i)
       seed.at(i) = pre_seed[i+2];
 
     // Unit-length steps in <seed> sequence add up to <scale>
-    P scale = jump(spokes, seed_length, seed);
-    const double norm_scale = norm(scale);
+    P scale(jump(spokes, seed_length, seed));
 
     // Number of points in final fractal
-    int length = 1+(int)pow(seed_length, depth); 
+    int length(1+(int)pow(seed_length, depth));
     std::vector<int> dir(length);     // stepping information
     std::vector<vertex> data(length); // vertices
 
@@ -645,16 +636,18 @@ namespace ePiX {
 	for(int k=seed_length-1; 0 < k; --k)
 	  dir.at(k*(int)pow(seed_length,i) + j) = dir.at(j) + seed.at(k);
 
-    triple curr = p;
-    double radius = pow(norm_scale, -depth);
-    pair temp;     // pair increment between successive points
+    P curr(p);
+    // 10/09/06: -depth -> 1-depth
+    double radius(pow(norm(scale), 1-depth));
 
     for(int i=0; i<length; ++i)
       {
 	data.at(i) = vertex(curr);
-	// complex arithmetic...
-	temp = pair(polar(radius, 
-			  dir.at(i)*(epix::full_turn())/spokes))*pair(q-p);
+	// increment between successive points as a pair
+	pair temp((polar(radius, 
+			 dir.at(i)*(epix::full_turn())/spokes))*pair(q-p));
+
+	// complex arithmetic
 	temp /= pair(scale); // homothety to join p to q
 
 	curr += P(temp.x1(), temp.x2());
@@ -665,4 +658,4 @@ namespace ePiX {
     end_stanza();
   }
 
-} /* end of namespace */
+} // end of namespace

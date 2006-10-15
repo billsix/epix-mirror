@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 06, 2006
+ * Version 1.0.15
+ * Last Change: October 10, 2006
  */
 
 /* 
@@ -32,9 +32,11 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
+#include <cmath>
 #include "functions.h"
+#include "errors.h"
+
 #include "camera.h"
-#include "output.h"
 #include "cropping.h"
 
 namespace ePiX {
@@ -52,17 +54,40 @@ namespace ePiX {
 	      P( EPIX_INFTY, EPIX_INFTY, EPIX_INFTY));
 
 
-  crop_mask::crop_mask(const pair arg1, const pair arg2)
+  // input collinear Ps, check if b is between a and c
+  bool between(const P& a, const P& b, const P& c)
   {
-    x1_min = min(arg1.x1(), arg2.x1());
-    x1_max = max(arg1.x1(), arg2.x1());
-    x1_sz  = x1_max - x1_min;
-
-    x2_min = min(arg1.x2(), arg2.x2());
-    x2_max = max(arg1.x2(), arg2.x2());
-    x2_sz  = x2_max - x2_min;
+    if (((a-b) | (c-b)) < 0)
+      return true;
+    else 
+      return false;
   }
 
+  crop_mask::crop_mask(const pair arg1, const pair arg2)
+    : x1_min(min(arg1.x1(), arg2.x1())), x1_max(max(arg1.x1(), arg2.x1())),
+      x1_sz(x1_max - x1_min),
+      x2_min(min(arg1.x2(), arg2.x2())), x2_max(max(arg1.x2(), arg2.x2())),
+      x2_sz(x2_max - x2_min) { }
+
+  double crop_mask::x_sz() const
+  {
+    return x1_sz;
+  }
+  double crop_mask::y_sz() const
+  {
+    return x2_sz;
+  }
+
+  pair crop_mask::bl() const
+  {
+    return pair(x1_min, x2_min);
+  }
+  pair crop_mask::tr() const
+  {
+    return pair(x1_max, x2_max);
+  }
+
+  // translate by pair
   crop_mask& crop_mask::operator+= (const pair arg)
   {
     x1_min += arg.x1();
@@ -77,11 +102,69 @@ namespace ePiX {
   // not defined in header b/c of camera dependence
   bool crop_mask::is_onscreen(const P& arg) const
   {
-    pair temp = camera(arg);
-    double x = temp.x1(), y = temp.x2();
+    pair temp(camera(arg));
+    double x(temp.x1()), y(temp.x2());
     return ( (x1_min <= x) && (x <= x1_max) &&
 	     (x2_min <= y) && (y <= x2_max) );
   }
+
+  // Find t in [0,1] so that t*in + (1-t)*out is on the Crop_Box boundary
+  // by checking four cases. Assume "in" is in the Crop_Box and out isn't.
+  P crop_mask::seek_crop(const P& in, const P& out) const
+  {
+    // find t such that (1-t)*in + t*out projects to boundary
+    double t_min(0);
+    double t_max(1);
+    double mid(0.5);
+
+    while (norm(camera((1-t_max)*in+t_max*out)  -
+		camera((1-t_min)*in+t_min*out)) > EPIX_EPSILON)
+      {
+	// bisection method
+	mid = 0.5*(t_max + t_min);
+	if (is_onscreen((1-mid)*in + mid*out))
+	  t_min = mid;
+
+	else
+	  t_max = mid;
+
+      }
+    return (1-mid)*in + mid*out;
+  } // end of seek_crop
+
+
+  //// Friends of crop_mask ////
+
+  // Find endpoint of path segment by testing both clipping and cropping;
+  // algorithm works because only two convex criteria determine whether
+  // a point is invisible. Assume out is either clipped or cropped
+  P seek_path_end(const P& in, const P& out)
+  {
+    crop_mask& cropper = crop_mask::Crop_Box;
+    enclosure& clipper = enclosure::Clip_Box;
+
+    // out not clipped, must be cropped
+    if ((!epix::clipping) || clipper.is_inside(out))
+      return cropper.seek_crop(in, out);
+
+    // out not cropped, must be clipped
+    else if ((!epix::cropping) || cropper.is_onscreen(out))
+      return clipper.seek_clip(in, out);
+
+    else // out is clipped and cropped
+      {
+	P clip_endpoint(clipper.seek_clip(in, out));
+	P crop_endpoint(cropper.seek_crop(in, out));
+
+	// out is both clipped and cropped
+	if (between(in, crop_endpoint, clip_endpoint))
+	  return crop_endpoint;
+
+	else
+	  return clip_endpoint;
+      }
+  } // end of seek_path_end
+
 
   // functions in global scope for compatibility
   void bounding_box(const P& arg1, const P& arg2)
@@ -129,47 +212,64 @@ namespace ePiX {
   }
 
 
-  // Find t in [0,1] so that t*in + (1-t)*out is on the Crop_Box boundary
-  // by checking four cases. Assume "in" is in the Crop_Box and out isn't.
-  P crop_mask::seek_crop(const P& in, const P& out) const
+  void offset(const P& arg)
   {
-    // find t such that (1-t)*in + t*out projects to boundary
-    double t_min = 0;
-    double t_max = 1;
-    double mid=0.5;
+    crop_mask::Offset = pair(arg);
+  }
+  void offset(const double hoff, const double voff) 
+  {
+    crop_mask::Offset = pair(hoff, voff);
+  }
 
-    while (norm(camera((1-t_max)*in+t_max*out)  -
-		camera((1-t_min)*in+t_min*out)) > EPIX_EPSILON)
-      {
-	// bisection method
-	mid = 0.5*(t_max + t_min);
-	if (is_onscreen((1-mid)*in + mid*out))
-	  t_min = mid;
+  double h_size()
+  {
+    return crop_mask::Picture.x1_sz;
+  }
+  double v_size()
+  {
+    return crop_mask::Picture.x2_sz;
+  }
 
-	else
-	  t_max = mid;
+  double h_offset()
+  {
+    return crop_mask::Offset.x1();
+  }
+  double v_offset()
+  {
+    return crop_mask::Offset.x2();
+  }
 
-      }
-    return (1-mid)*in + mid*out;
-  } // end of seek_crop
+
+  //// enclosure functions ////
 
   enclosure::enclosure(const P& arg1, const P& arg2)
+    : x1_min(min(arg1.x1(), arg2.x1())), x1_max(max(arg1.x1(), arg2.x1())),
+      x2_min(min(arg1.x2(), arg2.x2())), x2_max(max(arg1.x2(), arg2.x2())),
+      x3_min(min(arg1.x3(), arg2.x3())), x3_max(max(arg1.x3(), arg2.x3())) { }
+
+
+  bool enclosure::is_clipped1(const P& arg) const
   {
-    x1_min = min(arg1.x1(), arg2.x1());
-    x1_max = max(arg1.x1(), arg2.x1());
-
-    x2_min = min(arg1.x2(), arg2.x2());
-    x2_max = max(arg1.x2(), arg2.x2());
-
-    x3_min = min(arg1.x3(), arg2.x3());
-    x3_max = max(arg1.x3(), arg2.x3());
+    double x1(arg.x1());
+    return !( (x1_min <= x1) && (x1 <= x1_max) );
   }
 
-  void clip_box(const P& arg1, const P& arg2)
+  bool enclosure::is_clipped2(const P& arg) const
   {
-    enclosure::Clip_Box = enclosure(arg1, arg2);
+    double x2(arg.x2());
+    return !( (x2_min <= x2) && (x2 <= x2_max) );
   }
 
+  bool enclosure::is_clipped3(const P& arg) const 
+  {
+    double x3(arg.x3());
+    return !( (x3_min <= x3) && (x3 <= x3_max) );
+  }
+
+  bool enclosure::is_inside(const P& arg) const
+  {
+    return !(is_clipped1(arg) || is_clipped2(arg) || is_clipped3(arg));
+  }
 
   // Find t in [0,1] so that t*in + (1-t)*out is on the Clip_Box boundary
   // by checking six cases. Assume "in" is in the Clip_Box and out isn't.
@@ -207,43 +307,64 @@ namespace ePiX {
     return ((1-t)*in) + (t*out);
   } // end of seek_clip
 
-  // input collinear Ps, check if b is between a and c
-  static bool between(P a, P b, P c)
+
+  //// Friends of enclosure ////
+  void clip_box(const P& arg1, const P& arg2)
   {
-    if (((a-b) | (c-b)) < 0)
-      return true;
-    else 
-      return false;
+    enclosure::Clip_Box = enclosure(arg1, arg2);
   }
 
-  // Find endpoint of path segment by testing both clipping and cropping;
-  // algorithm works because only two convex criteria determine whether
-  // a point is invisible. Assume out is either clipped or cropped
-  P seek_path_end(const P& in, const P& out)
+
+  bool is_in_bounds(const P& arg)
   {
-    crop_mask& cropper = crop_mask::Crop_Box;
-    enclosure& clipper = enclosure::Clip_Box;
+    return enclosure::Clip_Box.is_inside(arg);
+  }
 
-    // out not clipped, must be cropped
-    if ((!epix::clipping) || clipper.is_inside(out))
-      return cropper.seek_crop(in, out);
+  void clip_to(const P& arg) 
+  { 
+    enclosure::Clip_Box = enclosure(P(0,0,0), arg); 
+  }
+  void clip_box(const P& arg) 
+  { 
+    enclosure::Clip_Box = enclosure(arg, -arg); 
+  }
 
-    // out not cropped, must be clipped
-    else if ((!epix::cropping) || cropper.is_onscreen(out))
-      return clipper.seek_clip(in, out);
+  double clip1_min()
+  {
+    return enclosure::Clip_Box.x1_min;
+  }
+  double clip2_min()
+  {
+    return enclosure::Clip_Box.x2_min;
+  }
+  double clip3_min()
+  {
+    return enclosure::Clip_Box.x3_min;
+  }
 
-    else // out is clipped and cropped
-      {
-	P clip_endpoint = clipper.seek_clip(in, out);
-	P crop_endpoint = cropper.seek_crop(in, out);
+  double clip1_max()
+  {
+    return enclosure::Clip_Box.x1_max;
+  }
+  double clip2_max()
+  {
+    return enclosure::Clip_Box.x2_max;
+  }
+  double clip3_max()
+  {
+    return enclosure::Clip_Box.x3_max;
+  }
 
-	// out is both clipped and cropped
-	if (between(in, crop_endpoint, clip_endpoint))
-	  return crop_endpoint;
 
-	else
-	  return clip_endpoint;
-      }
-  } // end of seek_path_end
+  bool is_visible(const P& arg)
+  {
+    bool visible = true;
+    if (epix::clipping && !is_in_bounds(arg))
+      visible = false;
 
-} /* end of namespace */
+    if (epix::cropping && !crop_mask::Crop_Box.is_onscreen(arg))
+      visible = false;
+
+    return visible;
+  }
+} // end of namespace

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.7
- * Last Change: March 14, 2006
+ * Version 1.0.16
+ * Last Change: October 14, 2006
  */
 
 /* 
@@ -36,12 +36,13 @@
 #include <cmath>
 
 #include "globals.h"
-#include "output.h"
+#include "errors.h"
+
+#include "triples.h"
+
 #include "functions.h"
 
 namespace ePiX {
-
-  void epix_warning(std::string);
 
   // trig functions with angle units
   double cos(double t) { return std::cos(angle(t)); }
@@ -58,14 +59,17 @@ namespace ePiX {
   double asin(double arg) { return std::asin(arg)/angle(1); }
   double atan(double arg) { return std::atan(arg)/angle(1); }
 
-  void label_angle(double t) // declared in globals.h
- { 
-   double temp = angle(t)/(2*M_PI); // t in rotations
-   temp -= 0.5; // shift half a turn
-   temp -= ceil(temp); // map to (-1,0]
-   temp += 0.5; // shift back
-   epix::labelangle = 360*temp; // (-180, 180]
- }
+  double Cos(double t) { return ePiX::cos(t); }
+  double Sin(double t) { return ePiX::sin(t); }
+  double Tan(double t) { return ePiX::tan(t); }
+
+  double Sec(double t) { return ePiX::sec(t); }
+  double Csc(double t) { return ePiX::csc(t); }
+  double Cot(double t) { return ePiX::cot(t); }
+
+  double Acos(double t)  { return ePiX::acos(t); }
+  double Asin(double t)  { return ePiX::asin(t); }
+  double Atan(double t)  { return ePiX::atan(t); }
 
   P xyz(double x, double y, double z) 
   {
@@ -92,6 +96,14 @@ namespace ePiX {
     return sph(arg.x1(), arg.x2(), arg.x3());
   }
 
+  P polar(double r, double t)
+  {
+    return cyl(r, t, 0);
+  }
+  P cis(double t)
+  {
+    return cyl(1, t, 0);
+  }
 
   // Force double to [0,1]
   double clip_to_unit(double t)
@@ -167,12 +179,30 @@ namespace ePiX {
     }
   }
 
+  double min(const double a, const double b)
+  {
+    return a < b ? a : b;
+  }
+  double max(const double a, const double b)
+  {
+    return b < a ? a : b;
+  }
+
+  double snip_to(double var, const double arg1, const double arg2)  
+  {
+    if (var < min(arg1, arg2))
+      var = min(arg1,arg2);
+    else if (var > max(arg1, arg2))
+      var = max(arg1,arg2);
+    return var;
+  }
+
   // inf and sup of f on [a,b]
   double inf (double f(double), double a, double b)
   {
-    const int N = (int) ceil(fabs(b-a)); // N >= 1 unless a=b
-    double y = f(a);
-    double dx = (b-a)/(N*EPIX_ITERATIONS);
+    const int N((int) ceil(fabs(b-a))); // N >= 1 unless a=b
+    double y(f(a));
+    const double dx((b-a)/(N*EPIX_ITERATIONS));
 
     for (int i=1; i <= N*EPIX_ITERATIONS; ++i)
       y = min(y, f(a + i*dx));
@@ -182,9 +212,9 @@ namespace ePiX {
 
   double sup (double f(double), double a, double b)
   {
-    const int N = (int) ceil(fabs(b-a)); // N >= 1 unless a=b
-    double y = f(a);
-    double dx = (b-a)/(N*EPIX_ITERATIONS);
+    const int N((int) ceil(fabs(b-a))); // N >= 1 unless a=b
+    double y(f(a));
+    const double dx((b-a)/(N*EPIX_ITERATIONS));
 
     for (int i=1; i <= N*EPIX_ITERATIONS; ++i)
       y = max(y, f(a + i*dx));
@@ -192,18 +222,23 @@ namespace ePiX {
     return y;
   }
 
-  // I(ntegral) class helper
-  static inline double integrand(double f(double), double t, double dt)
-  { return (1.0/6)*(f(t) + 4*f(t+0.5*dt)+f(t + dt))*dt; } // Simpson's rule
-
-  double I::eval(const double t)
+  // Integral class helper
+  double integrand(double f(double), double t, double dt)
   {
-    double sum = 0; 
-    int N = 16*(int)ceil(fabs(t - x0)); // hardwired constant 16
+    return (1.0/6)*(f(t) + 4*f(t+0.5*dt)+f(t + dt))*dt;
+  } // Simpson's rule
+
+  Integral::Integral(double func(double), double a)
+    : f(func), x0(a) { }
+
+  double Integral::eval(const double t) const
+  {
+    double sum(0); 
+    const int N(16*(int)ceil(fabs(t - x0))); // hardwired constant 16
 
     if (N > 0)
       {
-	const double dx = (t - x0)/N;
+	const double dx((t - x0)/N);
 
 	for (int i=0; i < N; ++i)
 	  sum += integrand(f, x0+i*dx, dx);
@@ -212,19 +247,20 @@ namespace ePiX {
     return sum;
   }
 
-  P I::operator() (const P arg)
+  P Integral::operator() (const P& arg) const
   {
-    double t = arg.x1();
+    double t(arg.x1());
     return P(t, eval(t), 0);
   }
 
   double newton (double f(double), double g(double), double start)
   {
-    double guess = start;
-    int count=0; // number of iterations
+    double guess(start);
+    int count(0); // number of iterations
 
-    /* Hardwired constant 20 */
-    while ( (fabs(f(guess)-g(guess)) > EPIX_EPSILON) && (count < 20) )
+    // Hardwired constant 5
+    const int ITERS(5);
+    while ( (fabs(f(guess)-g(guess)) > EPIX_EPSILON) && (count < ITERS) )
       {
 	if (fabs(deriv(f, guess)-deriv(g, guess)) < EPIX_EPSILON)
 	  {
@@ -236,8 +272,8 @@ namespace ePiX {
 	++count;
       }
 
-    if (count == 20)
-      epix_warning("20 iterations in Newton's method");
+    if (count == ITERS)
+      epix_warning("Maximum number of iterations in Newton's method");
 
     return guess;
   }
@@ -248,25 +284,28 @@ namespace ePiX {
   }
 
   // Member functions
-  P D::operator() (const P& arg) const
+  Deriv::Deriv(double func(double), const double eps)
+    : f(func), dt(eps) { }
+
+  P Deriv::operator() (const P& arg) const
   {
-    double t=arg.x1();
+    double t(arg.x1());
     return P(t, deriv(f, t, dt), 0);
   }
 
-  double D::eval(const double t)
+  double Deriv::eval(const double t) const
   {
     return deriv(f, t, dt);
   }
 
   // one-sided derivatives
-  double D::right(const double t)
+  double Deriv::right(const double t) const
   {
     return  (2.0/dt)*(f(t+0.5*dt) - f(t));
   }
 
-  double D::left(const double t)
+  double Deriv::left(const double t) const
   {
     return (2.0/dt)*(f(t) - f(t-0.5*dt));
   }
-} /* end of namespace */
+} // end of namespace
