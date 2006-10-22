@@ -3,6 +3,19 @@ ePiX -- ChangeLog
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
 
+October 21, 2006 (v1.0.18)
+* (cropping.h) Order "enclosure" data elements consistently with
+  constructor (Julian Gilbey)
+* (path.cc) 
+  - Fix initialization order in path constructor (JG)
+  - Constructor assignments -> initialization
+* (path.{cc,h}) int arguments (e.g. EPIX_NUM_PTS) -> unsigned int
+* (globals.h) EPIX_NUM_PTS is unsigned int
+* (segment.cc) Remove debug_print (JG)
+
+October 17, 2006 (v1.0.17)
+* (contrib/epix_ext.h, {Double,Single}LogCoord.cc) Remove adplot
+
 October 14, 2006 (v1.0.16)
 * (functions.{cc,h})
   - Remove Const class

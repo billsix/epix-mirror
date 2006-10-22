@@ -204,7 +204,7 @@ namespace ePiX {
   const int EPIX_ITERATIONS(200);
 
   // Output-formatting constants:
-  const int EPIX_NUM_PTS(80);     // # of points in ellipses, splines
+  const unsigned int EPIX_NUM_PTS(80); // # of points in ellipses, splines
   const int EPIX_FILE_WIDTH(70);  // Width of output file
   const int EPIX_PATH_LENGTH(60); // Number of points per path segment
 

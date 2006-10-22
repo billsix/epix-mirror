@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 09, 2006
+ * Version 1.0.18
+ * Last Change: October 21, 2006
  */
 
 /* 
@@ -42,14 +42,6 @@
 #include "segment.h"
 
 namespace ePiX {
-
-  static void debug_print(const P& arg, std::string msg="")
-  {
-    std::cerr << msg << ": ("
-	      << arg.x1() << ","
-	      << arg.x2() << ","
-	      << arg.x3() << ")\n";
-  }
 
   segment::segment(const P& p1, const P& p2)
     : endpt1(p1), endpt2(p2) { }

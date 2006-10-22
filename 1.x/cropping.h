@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 10, 2006
+ * Version 1.0.18
+ * Last Change: October 21, 2006
  */
 
 /* 
@@ -160,8 +160,9 @@ namespace ePiX {
     friend double clip3_max();
 
   private:
-    double x1_min, x2_min, x3_min;
-    double x1_max, x2_max, x3_max;
+    double x1_min, x1_max;
+    double x2_min, x2_max;
+    double x3_min, x3_max;
 
     static enclosure Clip_Box;
 

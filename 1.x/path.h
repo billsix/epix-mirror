@@ -69,27 +69,28 @@ namespace ePiX {
   public:
 
     path(const std::vector<vertex>& data, bool loop);
-    path(int num_pts=0);
+    path(unsigned int num_pts=0);
 
     // line constructors
     path(const P& tail, const P& head, const double expand=0);
-    path(const P& tail, const P& head, const double expand, int num_pts);
+    path(const P&, const P&, const double expand, unsigned int num_pts);
 
     // finite-data paths (ellipse, spline)
     path(const P& center, const P& axis1, const P& axis2, 
 	 const double t_min, const double t_max,
-	 int num_pts=EPIX_NUM_PTS);
+	 unsigned int num_pts=EPIX_NUM_PTS);
 
     path(const P& p1, const P& p2, const P& p3, 
-	 int num_pts=EPIX_NUM_PTS);
+	 unsigned int num_pts=EPIX_NUM_PTS);
 
     path(const P& p1, const P& p2, const P& p3, const P& p4, 
-	 int num_pts=EPIX_NUM_PTS);
+	 unsigned int num_pts=EPIX_NUM_PTS);
 
 
-    path(P f(double), double t_min, double t_max, int num_pts=EPIX_NUM_PTS);
+    path(P f(double), double t_min, double t_max,
+	 unsigned int num_pts=EPIX_NUM_PTS);
     path(double f(double), double t_min, double t_max, 
-	 int num_pts=EPIX_NUM_PTS);
+	 unsigned int num_pts=EPIX_NUM_PTS);
 
     // append a point
     path& pt(const double, const double, const double=0);
@@ -127,8 +128,8 @@ namespace ePiX {
   }; // end of class path
 
   // polygon/polyline with variable number of vertices
-  path polygon(int num_pts ...);
-  path polyline(int num_pts ...);
+  path polygon(unsigned int num_pts ...);
+  path polyline(unsigned int num_pts ...);
 
 
   class path_pt {

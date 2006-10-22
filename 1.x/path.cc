@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 09, 2006
+ * Version 1.0.18
+ * Last Change: October 21, 2006
  */
 
 /* 
@@ -115,9 +115,9 @@ namespace ePiX {
   path::path(const std::vector<vertex>& data, bool loop)
     : vertices(data), closed(loop), filled(epix::fill_paths) { }
 
-  path::path(int num_pts)
-    : closed(false), filled(epix::fill_paths),
-      vertices(std::vector<vertex> (num_pts)) { }
+  path::path(unsigned int num_pts)
+    : vertices(std::vector<vertex> (num_pts)),
+      closed(false), filled(epix::fill_paths) { }
 
   // lines, without and with specified number of points
   path::path(const P& tail, const P& head, const double expand)
@@ -142,7 +142,7 @@ namespace ePiX {
 	// screen distance from (expanded) tail to head, in true pt
 	double dist(norm(p2t(c2s((1+c)*(camera(head) - camera(tail))))));
 
-	int num_pts((int) ceil(dist/epix::get_dashlength()));
+	unsigned int num_pts((unsigned int) ceil(dist/epix::get_dashlength()));
 
 	std::vector<vertex> data(num_pts+1);
   
@@ -160,11 +160,10 @@ namespace ePiX {
 
   
   path::path(const P& tail, const P& head, 
-	     const double expand, int num_pts)
-    : closed(false), filled(false)
+	     const double expand, unsigned int num_pts)
+    : vertices(std::vector<vertex> (num_pts+1)),
+      closed(false), filled(false)
   {
-    std::vector<vertex> data(num_pts+1);
-  
     double c(expm1(M_LN2*expand/100.0)); // 2^{expand/100} - 1
 
     // direction and starting location
@@ -173,39 +172,37 @@ namespace ePiX {
 
     dir *= ((1+c)/num_pts);
 
-    for (unsigned int i=0; i < data.size(); ++i, start += dir)
-      data.at(i) = vertex(start);
+    for (unsigned int i=0; i < num_pts+1; ++i, start += dir)
+      vertices.at(i) = vertex(start);
 
-    swap(vertices, data);
   } // end of line constructor
 
 
   // finite-data paths (ellipse, spline)
   path::path(const P& center, const P& axis1, const P& axis2, 
 	     const double t_min, const double t_max,
-	     int default_num_pts)
-    : closed(false)
+	     unsigned int default_num_pts)
+    : closed(false), filled(epix::fill_paths)
   {
     // default_num_pts = one full turn
     double frac(fabs(t_max-t_min)/(epix::full_turn()));
-    int num_pts((int) max(1, ceil(frac*default_num_pts)));
+    unsigned int num_pts((unsigned int) max(1, ceil(frac*default_num_pts)));
 
     std::vector<vertex> data(num_pts+1);
-    vertices = data;
-  
+
     const double dt((t_max - t_min)/num_pts);
     double t(t_min);
 
-    for (int i=0; i <= num_pts; ++i, t += dt) 
-      vertices.at(i) = vertex(center + ((Cos(t)*axis1)+(Sin(t)*axis2)));
-
-    filled = epix::fill_paths;
+    for (unsigned int i=0; i < num_pts+1; ++i, t += dt) 
+      data.at(i) = vertex(center + ((Cos(t)*axis1)+(Sin(t)*axis2)));
 
     if (fabs(frac - 1) < EPIX_EPSILON) // one full turn?
       {
-	vertices.pop_back();
+	data.pop_back();
 	closed = true;
       }
+
+    swap(vertices, data);
   } // end of ellipse constructor
 
 
@@ -222,12 +219,10 @@ namespace ePiX {
   }
 
 
-  path::path(const P& p1, const P& p2, const P& p3, const int num_pts)
-    : closed(false), filled(false)
+  path::path(const P& p1, const P& p2, const P& p3, unsigned int num_pts)
+    : vertices(std::vector<vertex> (num_pts+1)),
+      closed(false), filled(false)
   {
-    std::vector<vertex> data(num_pts+1);
-    vertices = data;
-  
     const double dt(1.0/num_pts);
 
     for (unsigned int i=0; i < vertices.size(); ++i) 
@@ -236,41 +231,36 @@ namespace ePiX {
 
 
   path::path(const P& p1, const P& p2, const P& p3, const P& p4,
-	     const int num_pts)
-    : closed(false), filled(false)
+	     unsigned int num_pts)
+    : vertices(std::vector<vertex> (num_pts+1)),
+      closed(false), filled(false)
   {
-    std::vector<vertex> data(num_pts+1);
-    vertices = data;
-
     const double dt(1.0/num_pts);
 
     for (unsigned int i=0; i < vertices.size(); ++i) 
       vertices.at(i) = spl_pt(p1, p2, p3, p4, i*dt);
   }
 
-  path::path(P f(double), double t_min, double t_max, int num_pts)
-    : closed(false), filled(false)
+  path::path(P f(double), double t_min, double t_max, unsigned int num_pts)
+    : vertices(std::vector<vertex> (num_pts+1)),
+      closed(false), filled(false)
   {
-    std::vector<vertex> data(num_pts+1);
-    vertices = data;
-
     const double dt((t_max - t_min)/num_pts);
     double t(t_min);
 
-    for (int i=0; i <= num_pts; ++i, t += dt) 
+    for (unsigned int i=0; i <= num_pts; ++i, t += dt) 
       vertices.at(i) = vertex(f(t));
   }
 
-  path::path(double f(double), double t_min, double t_max, int num_pts)
-    : closed(false), filled(false)
+  path::path(double f(double), double t_min, double t_max,
+	     unsigned int num_pts)
+    : vertices(std::vector<vertex> (num_pts+1)),
+      closed(false), filled(false)
   {
-    std::vector<vertex> data(num_pts+1);
-    vertices = data;
-
     const double dt((t_max - t_min)/num_pts);
     double t(t_min);
 
-    for (int i=0; i <= num_pts; ++i, t += dt) 
+    for (unsigned int i=0; i <= num_pts; ++i, t += dt) 
       vertices.at(i) = vertex(P(t,f(t)));
   }
 
@@ -748,14 +738,14 @@ namespace ePiX {
 
   // global functions
   // polygon/polyline
-  path polygon(int num_pts, ...)
+  path polygon(unsigned int num_pts, ...)
   {
     std::vector<vertex> data(num_pts);
 
     va_list ap;
     va_start(ap, num_pts);
   
-    for (int i=0; i < num_pts; ++i) 
+    for (unsigned int i=0; i < num_pts; ++i) 
       data.at(i) = vertex(*va_arg(ap, P*));
 
     va_end(ap);
@@ -763,14 +753,14 @@ namespace ePiX {
     return path(data, true); // closed
   }
 
-  path polyline(int num_pts, ...)
+  path polyline(unsigned int num_pts, ...)
   {
     std::vector<vertex> data(num_pts);
 
     va_list ap;
     va_start(ap, num_pts);
   
-    for (int i=0; i < num_pts; ++i) 
+    for (unsigned int i=0; i < num_pts; ++i) 
       data.at(i) = vertex(*va_arg(ap, P*));
 
     va_end(ap);
