@@ -3,8 +3,8 @@
  *
  * Andrew D. Hwang   <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *
- * Version 1.0.16
- * Last Change: October 14, 2006
+ * Version 1.0.19
+ * Last Change: October 23, 2006
  */
 
 /* 
@@ -104,16 +104,40 @@ namespace ePiX {
 
 
   // Slope, dart, and vector fields
+  // For slope and dart fields, the optional scale argument affects the
+  // (constant) drawn length of field elements. For vector fields, elements
+  // are drawn at true length, and "scale" affects the arrowhead size.
 
   // planar fields
-  void  slope_field(P F(double, double), const P& p, const P& q, int, int);
-  void   dart_field(P F(double, double), const P& p, const P& q, int, int);
-  void vector_field(P F(double, double), const P& p, const P& q, int, int);
+  void  slope_field(P F(double, double), const P& p, const P& q, int, int,
+		    const double scale=1.0);
+  void   dart_field(P F(double, double), const P& p, const P& q, int, int,
+		    const double scale=1.0);
+  void vector_field(P F(double, double), const P& p, const P& q, int, int,
+		    const double scale=1.0);
+
+  void  slope_field(P F(double, double), const domain& R,
+		    const double scale=1.0);
+  void   dart_field(P F(double, double), const domain& R,
+		    const double scale=1.0);
+  void vector_field(P F(double, double), const domain& R,
+		    const double scale=1.0);
 
   // spatial fields
-  void  slope_field(P F(double, double, double), const P&, const P&, int, int);
-  void   dart_field(P F(double, double, double), const P&, const P&, int, int);
-  void vector_field(P F(double, double, double), const P&, const P&, int, int);
+  void  slope_field(P F(double, double, double), const P&, const P&, int, int,
+		    const double scale=1.0);
+  void   dart_field(P F(double, double, double), const P&, const P&, int, int,
+		    const double scale=1.0);
+  void vector_field(P F(double, double, double), const P&, const P&, int, int,
+		    const double scale=1.0);
+
+  // spatial fields over a (3-D) domain
+  void  slope_field(P F(double, double, double), const domain&,
+		    const double scale=1.0);
+  void   dart_field(P F(double, double, double), const domain&,
+		    const double scale=1.0);
+  void vector_field(P F(double, double, double), const domain&,
+		    const double scale=1.0);
 
 
   // Solutions of ODE systems

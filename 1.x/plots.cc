@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.16
- * Last Change: October 14, 2006
+ * Version 1.0.19
+ * Last Change: October 23, 2006
  */
 
 /* 
@@ -235,16 +235,17 @@ namespace ePiX {
 
   // utility functions
   // vector, dart, and slope fields
-  void field_element(const P& tail, const P& head, epix_field_type TYPE)
+  void field_element(const P& tail, const P& head, epix_field_type TYPE,
+		     const double head_scale=1.0)
   {
     switch(TYPE) {
 
     case VECTOR:
-      arrow(tail, head);
+      arrow(tail, head, head_scale);
       break;
 
     case DART:
-      dart(tail, head); // assuming caller has adjusted length
+      dart(tail, head);
       break;
 
     case SLOPE:
@@ -257,7 +258,7 @@ namespace ePiX {
   } // end of field_element
 
   void draw_field(P F(double, double, double), P p, P q, int n1, int n2, 
-		  epix_field_type TYPE)
+		  epix_field_type TYPE, const double scale)
   {
     P diagonal(q-p);
     int perp_count(0);
@@ -308,8 +309,9 @@ namespace ePiX {
 	  if (norm(camera(base+vect) - camera(base)) < EPIX_EPSILON)
 	    marker(base, BBOX);
 
+	  // scale affects head size
 	  else if (TYPE == VECTOR)
-	    field_element(base, base + vect, VECTOR);
+	    field_element(base, base + vect, VECTOR, scale);
 
 	  else
 	    {
@@ -320,7 +322,8 @@ namespace ePiX {
 	      if ( object_len > EPIX_EPSILON) // not projected to zero
 		vect *= minimum/object_len;
 
-	      field_element(base - vect, base + vect, TYPE);
+	      // scale affects length of element, not head size
+	      field_element(base - scale*vect, base + scale*vect, TYPE);
 	    }
 	}
     end_stanza();
@@ -328,7 +331,7 @@ namespace ePiX {
 
 
   void draw_field(P F(double, double), P p, P q, int n1, int n2, 
-		  epix_field_type TYPE = VECTOR)
+		  epix_field_type TYPE, const double scale)
   {
     P diagonal(q-p);
     P jump1(E_1&diagonal);
@@ -352,8 +355,9 @@ namespace ePiX {
 	  if (norm(camera(base+vect) - camera(base)) < EPIX_EPSILON)
 	    marker(base, BBOX);
 
+	  // scale affects head size
 	  else if (TYPE == VECTOR)
-	    field_element(base, base + vect, VECTOR);
+	    field_element(base, base + vect, VECTOR, scale);
 
 	  else
 	    {
@@ -364,7 +368,8 @@ namespace ePiX {
 	      if ( object_len > EPIX_EPSILON) // not projected to zero
 		vect *= minimum/object_len;
 
-	      field_element(base - vect, base + vect, TYPE);
+	      // scale affects length of element, not head size
+	      field_element(base - scale*vect, base + scale*vect, TYPE);
 	    }
 	}
     end_stanza();
@@ -373,42 +378,108 @@ namespace ePiX {
 
   // planar fields
   void slope_field(P F(double, double),
-		   const P& p, const P& q, int n1, int n2)
+		   const P& p, const P& q, int n1, int n2, const double scale)
   {
-    draw_field(F, p, q, n1, n2, SLOPE);
+    draw_field(F, p, q, n1, n2, SLOPE, scale);
   }
 
   void dart_field(P F(double, double),
-		  const P& p, const P& q, int n1, int n2)
+		  const P& p, const P& q, int n1, int n2, const double scale)
   {
-    draw_field(F, p, q, n1, n2, DART);
+    draw_field(F, p, q, n1, n2, DART, scale);
   }
 
   void vector_field(P F(double, double),
-		    const P& p, const P& q, int n1, int n2)
+		    const P& p, const P& q, int n1, int n2, const double scale)
   {
-    draw_field(F, p, q, n1, n2, VECTOR);
+    draw_field(F, p, q, n1, n2, VECTOR, scale);
+  }
+
+  void  slope_field(P F(double, double), const domain& R, const double scale)
+  {
+    draw_field(F, R.corner1, R.corner2,
+	       R.coarse.n1(), R.coarse.n2(),
+	       SLOPE, scale);
+  }
+
+  void   dart_field(P F(double, double), const domain& R, const double scale)
+  {
+    draw_field(F, R.corner1, R.corner2,
+	       R.coarse.n1(), R.coarse.n2(), 
+	       DART, scale);
+  }
+
+  void vector_field(P F(double, double), const domain& R, const double scale)
+  {
+    draw_field(F, R.corner1, R.corner2,
+	       R.coarse.n1(), R.coarse.n2(), 
+	       VECTOR, scale);
   }
 
   // spatial fields
-  void slope_field(P F(double, double, double),
-		   const P& p, const P& q, int n1, int n2)
+  void  slope_field(P F(double, double, double),
+		    const P& p, const P& q, int n1, int n2, const double scale)
   {
-    draw_field(F, p, q, n1, n2, SLOPE);
+    draw_field(F, p, q, n1, n2, SLOPE, scale);
   }
 
-  void dart_field(P F(double, double, double),
-		  const P& p, const P& q, int n1, int n2)
+  void   dart_field(P F(double, double, double),
+		    const P& p, const P& q, int n1, int n2, const double scale)
   {
-    draw_field(F, p, q, n1, n2, DART);
+    draw_field(F, p, q, n1, n2, DART, scale);
   }
 
   void vector_field(P F(double, double, double), 
-		    const P& p, const P& q, int n1, int n2)
+		    const P& p, const P& q, int n1, int n2, const double scale)
   {
-    draw_field(F, p, q, n1, n2, VECTOR);
+    draw_field(F, p, q, n1, n2, VECTOR, scale);
   }
 
+  // spatial fields over a domain
+  void  slope_field(P F(double, double, double), const domain& R,
+		    const double scale)
+  {
+    P p(R.corner1), q(R.corner2);
+    double height(q.x3() - p.x3());
+    q -= height*E_3; // p.x3() == q.x3()
+
+    int i_max(R.coarse.n1()), j_max(R.coarse.n2()); // horizontal subdivisions
+    int k_max((R.dx3() > 0) ? R.coarse.n3() : 0); // vertical subdivisions
+
+    for (int k = 0; k <= k_max; ++k)
+      draw_field(F, p + (k*R.step3())*E_3, q + (k*R.step3())*E_3,
+		 i_max, j_max, SLOPE, scale);
+  }
+
+  void   dart_field(P F(double, double, double), const domain& R,
+		    const double scale)
+  {
+    P p(R.corner1), q(R.corner2);
+    double height(q.x3() - p.x3());
+    q -= height*E_3; // p.x3() == q.x3()
+
+    int i_max(R.coarse.n1()), j_max(R.coarse.n2()); // horizontal subdivisions
+    int k_max((R.dx3() > 0) ? R.coarse.n3() : 0); // vertical subdivisions
+
+    for (int k = 0; k <= k_max; ++k)
+      draw_field(F, p + (k*R.step3())*E_3, q + (k*R.step3())*E_3,
+		 i_max, j_max, DART, scale);
+  }
+
+  void vector_field(P F(double, double, double), const domain& R,
+		    const double scale)
+  {
+    P p(R.corner1), q(R.corner2);
+    double height(q.x3() - p.x3());
+    q -= height*E_3; // p.x3() == q.x3()
+
+    int i_max(R.coarse.n1()), j_max(R.coarse.n2()); // horizontal subdivisions
+    int k_max((R.dx3() > 0) ? R.coarse.n3() : 0); // vertical subdivisions
+
+    for (int k = 0; k <= k_max; ++k)
+      draw_field(F, p + (k*R.step3())*E_3, q + (k*R.step3())*E_3,
+		 i_max, j_max, VECTOR, scale);
+  }
 
   // Solutions of ODE systems
   // start at time 0

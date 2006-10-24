@@ -3,6 +3,13 @@ ePiX -- ChangeLog
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
 
+October 23, 2006 (v1.0.19)
+* (plots.{cc,h})
+  - Vector field arrows can be drawn with scaled heads
+  - Dart and slope fields' elements can be drawn at specified length
+  - Vector/dart/slope field plotting over a (possibly 3-D) domain
+* (New file: samples/extras/vfield.xp)
+
 October 21, 2006 (v1.0.18)
 * (cropping.h) Order "enclosure" data elements consistently with
   constructor (Julian Gilbey)
