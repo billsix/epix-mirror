@@ -1,0 +1,36 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double MAX(1);
+
+P F(double u, double v)
+{
+  return sph(1, u, v);
+}
+
+int main()
+{
+  bounding_box(P(-MAX,-MAX),P(MAX,MAX));
+  unitlength("1in");
+  picture(1,1);
+
+  begin();
+
+#ifdef SHADE
+  fill();
+#else
+  gray(0);
+#endif
+  revolutions();
+
+  camera.at(P(5, 4, 3));
+
+#ifdef COARSE
+  surface(F, domain(P(0,0), P(0.5, 1), mesh(6,12), mesh(60,60)));
+#else
+  surface(F, domain(P(0,0), P(0.5, 1), mesh(15,30), mesh(60,60)));
+#endif
+
+  end();
+}

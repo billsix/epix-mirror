@@ -42,10 +42,9 @@ int main() {
 
   line(observer, target);
 
+  fill();
   gray(0.5);
-  path temp1 = polygon(3, &F(P1), &F(P2), &F(P3));
-  temp1.set_fill();
-  temp1.draw();
+  triangle(F(P1), F(P2), F(P3));
 
   line(P1, F(P1));
   line(P2, F(P2));
@@ -55,11 +54,8 @@ int main() {
   line(observer, F(P2));
   line(observer, F(P3));
 
-  fill();
   gray(0.1);
-  path temp2 = polygon(3, &P1, &P2, &P3);
-  temp2.set_fill();
-  temp2.draw();
+  triangle(P1, P2, P3);
 
   line(P(0.5,2,-3), midpt);
   masklabel(P(0.5,2,-3), P(0,0), "Object", b);
@@ -74,9 +70,9 @@ int main() {
   dot(target);
 
   bold();
-  arrow(target, target+2*E_1);
-  arrow(target, target-2*E_2);
-  arrow(target, target+2*E_3);
+  arrow(target, target+2*E_1, 0.5);
+  arrow(target, target-2*E_2, 0.5);
+  arrow(target, target+2*E_3, 0.5);
 
   end();
 }
