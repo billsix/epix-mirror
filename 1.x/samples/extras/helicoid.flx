@@ -39,7 +39,7 @@ P morph(double u, double v)
 }
 
 // generalities
-class mesh_quad
+class element
 {
 private:
   P pt1;
@@ -50,7 +50,7 @@ private:
   double distance;
 
 public:
-  mesh_quad() 
+  element() 
   {
     pt1=P();
     pt2=P();
@@ -59,7 +59,7 @@ public:
     distance=camera.get_range();
   }
 
-  mesh_quad(P f(double u, double v), double u0, double v0)
+  element(P f(double u, double v), double u0, double v0)
   {
     pt1=f(u0+EPS,v0+EPS);
     pt2=f(u0+du-EPS,v0+EPS);
@@ -96,9 +96,9 @@ public:
 
 };
 
-class by_distance {
+class By_distance {
 public:
-  bool operator() (const mesh_quad& arg1, const mesh_quad& arg2)
+  bool operator() (const element& arg1, const element& arg2)
   {
     return arg1.how_far() > arg2.how_far(); 
   }
@@ -137,13 +137,13 @@ int main(int argc, char* argv[])
   crop();
   camera.range(20);
 
-  std::vector<mesh_quad> mesh(0);
+  std::vector<element> mesh(0);
 
   for (int i=0; i<N1; ++i)
     for (int j=0; j<N2; ++j)
-      mesh.push_back(mesh_quad(morph, -1+du*i, -2+dv*j));
+      mesh.push_back(element(morph, -1+du*i, -2+dv*j));
 
-  sort(mesh.begin(), mesh.end(), by_distance());
+  sort(mesh.begin(), mesh.end(), By_distance());
 
   pen(1.5);
   for (unsigned int i=0; i<mesh.size(); ++i)

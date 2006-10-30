@@ -3,12 +3,21 @@ ePiX -- ChangeLog
 Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
 
 
-October 23, 2006 (v1.0.19)
+October 29, 2006
+* (geometry.{cc,h}) Spherical arcs and lines, regular polyhedra
+* (New file: samples/extras/polyhedra.xp)
+
+October 28, 2006
+* (New files: samples/extras/{log,lorenz}.xp)
+
+October 24, 2006 (v1.0.19)
 * (plots.{cc,h})
   - Vector field arrows can be drawn with scaled heads
   - Dart and slope fields' elements can be drawn at specified length
   - Vector/dart/slope field plotting over a (possibly 3-D) domain
-* (New file: samples/extras/vfield.xp)
+* (New file:  samples/extras/vfield.xp)
+* (New files: samples/extras/affine.{cc,h,xp}) Sample library code,
+  instructions, and source file
 
 October 21, 2006 (v1.0.18)
 * (cropping.h) Order "enclosure" data elements consistently with

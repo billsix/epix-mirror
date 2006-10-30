@@ -3,20 +3,19 @@
 using namespace ePiX;
 
 // number of field lines per charge
-const int N=13;
+const int N(13);
 
 // charge magnitudes and locations
-const int charge1=1;
-const int charge2=1;
+const int charge1(1);
+const int charge2(1);
 
-const P Q1=P( 1,0);
-const P Q2=P(-1,0);
+const P Q1( 1,0);
+const P Q2(-1,0);
 
 // inverse-square electric field from a point charge at the origin
-P unit_charge(P arg) 
+P unit_charge(const P& arg) 
 { 
-  double denom=recip(arg|arg); // = 0 if (u,v)=(0,0)
-  return denom*arg;
+  return recip(arg|arg)*arg;
 }
 
 // electric field simulated by superimposing individual fields, then
@@ -24,9 +23,9 @@ P unit_charge(P arg)
 // plot quality:)
 P E(double x, double y)
 { 
-  P temp=P(x,y);
+  P temp(x,y);
   // superposition of charge fields
-  P E_temp=charge1*unit_charge(temp-Q1) + charge2*unit_charge(temp-Q2);
+  P E_temp(charge1*unit_charge(temp-Q1) + charge2*unit_charge(temp-Q2));
 
   // re-scale; recip(x)=1/x if x != 0, 0 if x=0
   return recip(E_temp|E_temp)*E_temp;
@@ -38,9 +37,9 @@ P potential(double x, double y)
   return J(E(x,y));
 }
 
-const double MAX=3;
+const double MAX(3);
 
-int main() 
+int main()
 {
   bounding_box(P(-MAX,-MAX),P(MAX,MAX));
   unitlength("1in");
@@ -54,7 +53,6 @@ int main()
   crop();
   degrees(); // change angle mode
 
-  P pt; // location of arrowhead
   // plot field lines
   blue();
   for (int i=0; i < N; ++i)
@@ -62,7 +60,9 @@ int main()
       // initial points trace a small circle about Q1 or Q2,
       ode_plot(E, Q1+polar(0.05, i*360.0/N), 10, 120);
       ode_plot(E, Q2-polar(0.05, i*360.0/N), 10, 120);
-      pt=flow(E, Q2-polar(0.05, i*360.0/N), 3, 12);
+
+      // location of arrowhead
+      P pt(flow(E, Q2-polar(0.05, i*360.0/N), 3, 12));
     }
 
   green();
@@ -84,7 +84,7 @@ int main()
   psset("linecolor=blue, fillcolor=blue");
   for (int i=0; i < N; ++i)
     {
-      pt=flow(E, Q2-polar(0.05, i*360.0/N), 3.5, 12);
+      P pt(flow(E, Q2-polar(0.05, i*360.0/N), 3.5, 12));
       arrow(pt, pt+0.01*E(pt.x1(), pt.x2()));
       arrow(-pt, -pt+0.01*E(-pt.x1(), -pt.x2()));
     }

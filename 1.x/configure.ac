@@ -1,6 +1,6 @@
 dnl Process this file with autoconf 2.59 or later
 dnl to produce a configure script.
-AC_INIT(epix, 1.0.19)
+AC_INIT(epix, 1.0.20)
 AC_PREREQ(2.60)
 AC_CONFIG_SRCDIR(globals.h)
 AM_INIT_AUTOMAKE

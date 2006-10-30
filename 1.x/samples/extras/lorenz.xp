@@ -1,0 +1,44 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double A1(10);
+const double A2(28);
+const double A3(2.6666);
+
+const double MAX(30);
+const double XMAX(50);
+const int GRID(6);
+
+P F(double x, double y, double z)
+{
+  return 0.01*P(A1*(y-x), x*(A2-z)-y, x*y-A3*z);
+}
+
+int main()
+{
+  bounding_box(P(-XMAX,-XMAX),P(XMAX,XMAX));
+  unitlength("1in");
+  picture(3,3);
+
+  begin();
+
+  arrow_fill(1);
+  // camera.at(P(-100, 85, 63)); // right
+  camera.at(P(-100, 90, 63)); // left
+  camera.look_at(P(0,0,MAX));
+  camera.range(500);
+
+  domain R(P(-MAX,-MAX,0), P(MAX,MAX,2*MAX), mesh(GRID,GRID,GRID), mesh());
+
+  dart_field(F, R.resize1(0,MAX), 0.5);
+
+  bold();
+  red();
+  ode_plot(F, P(10,0,0), 0, 2500, 2500);
+
+  plain();
+  dart_field(F, R.resize1(-MAX,0), 0.5);
+
+  end();
+}

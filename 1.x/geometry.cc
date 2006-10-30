@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 09, 2006
+ * Version 1.0.20
+ * Last Change: October 29, 2006
  */
 
 /* 
@@ -112,6 +112,151 @@ namespace ePiX {
   } // end of draw_sphereplot
 
 
+  // segment mapping class
+  class seg {
+  public:
+    seg(const P& tail, const P& head)
+      : m_tail(tail), m_head(head) { }
+
+    // so we can be plotted
+    P operator() (double t) const
+    {
+      return m_tail + t*(m_head - m_tail);
+    }
+
+  private:
+    P m_tail;
+    P m_head;
+  }; // end of class seg
+
+
+  // assumes seg contains the actual (scaled, translated) endpoints
+  void draw_sphere_arc(const seg& sgmt, double t_min, double t_max, 
+		       bool front, sphere_proj_type TYPE, const sphere& S)
+  {
+    P tail(sgmt(t_min)), head(sgmt(t_max));
+    double cos_theta(((head-S.center())|(tail-S.center()))/pow(S.radius(),2));
+    if (1-cos_theta < EPIX_EPSILON) // endpoints equal
+      return; // draw nothing
+
+    else if (1+cos_theta < EPIX_EPSILON) // endpoints antipodal
+      {
+	epix_warning("Spherical arc joins antipodes, no output");
+	return;
+      }
+    // else
+
+    int num_pts((int) ceil(EPIX_NUM_PTS*Acos(cos_theta)/epix::full_turn()));
+    if (num_pts < 2)
+      num_pts=2;
+
+    std::vector<vertex> data(num_pts+1);
+    double t(t_min);
+    const double dt((t_max - t_min)/num_pts);
+
+    P O(S.center());
+    double rad(S.radius());
+
+    for (int i=0; i <= num_pts; ++i, t += dt)
+      {
+	P loc(sgmt(t) - O); // location relative to O
+	data.at(i) = vertex(S.center() + rad*recip(norm(loc))*loc);
+      }
+
+    path temp(data, false);
+    temp.draw(S, front);
+  } // end of draw_sphereplot
+
+  // arc of great circle between non-antipodal points
+  void arc(const P& tail, const P& head, const bool front, const sphere& S)
+  {
+    draw_sphere_arc(seg(tail, head), 0, 1, front, RADIAL, S);
+  }
+
+
+  // user-space functions
+  void front_arc(const P& p1, const P& p2, const sphere& S)
+  {
+    const P ctr(S.center());
+    const double rad(S.radius());
+
+    arc(ctr+(rad/norm(p1))*p1, ctr+(rad/norm(p2))*p2, true, S);
+  }
+
+  void  back_arc(const P& p1, const P& p2, const sphere& S)
+  {
+    const P ctr(S.center());
+    const double rad(S.radius());
+
+    arc(ctr+(rad/norm(p1))*p1, ctr+(rad/norm(p2))*p2, false, S);
+  }
+
+  // join p1 to -p1 through p2
+  void front_arc2(const P& p1, const P& p2, const sphere& S)
+  {
+    front_arc(p1,  p2, S);
+    front_arc(p2, -p1, S);
+  }
+
+  void  back_arc2(const P& p1, const P& p2, const sphere& S)
+  {
+    back_arc(p1,  p2, S);
+    back_arc(p2, -p1, S);
+  }
+
+  void front_line(const P& p1, const P& p2, const sphere& S)
+  {
+    front_arc( p1,  p2, S);
+    front_arc( p2, -p1, S);
+    front_arc(-p1, -p2, S);
+    front_arc(-p2,  p1, S);
+  }
+
+
+  void back_line(const P& p1, const P& p2, const sphere& S)
+  {
+    back_arc( p1,  p2, S);
+    back_arc( p2, -p1, S);
+    back_arc(-p1, -p2, S);
+    back_arc(-p2,  p1, S);
+  }
+
+
+  void front_triangle(const P& p1, const P& p2, const P& p3, const sphere& S)
+  {
+    front_arc(p1, p2, S);
+    front_arc(p2, p3, S);
+    front_arc(p3, p1, S);
+  }
+
+  void  back_triangle(const P& p1, const P& p2, const P& p3, const sphere& S)
+  {
+    back_arc(p1, p2, S);
+    back_arc(p2, p3, S);
+    back_arc(p3, p1, S);
+  }
+
+  // local to this file
+  void front_dual(const P& p1, const P& p2, const P& p3, const sphere& S)
+  {
+    const P ctr(0.3333*(p1+p2+p3));
+
+    front_arc(ctr, 0.5*(p1+p2), S);
+    front_arc(ctr, 0.5*(p2+p3), S);
+    front_arc(ctr, 0.5*(p3+p1), S);
+  }
+
+  void  back_dual(const P& p1, const P& p2, const P& p3, const sphere& S)
+  {
+    const P ctr(0.3333*(p1+p2+p3));
+
+    back_arc(ctr, 0.5*(p1+p2), S);
+    back_arc(ctr, 0.5*(p2+p3), S);
+    back_arc(ctr, 0.5*(p3+p1), S);
+  }
+
+
+  // spherical plotting
   void frontplot_N(double f1(double), double f2(double),
 		   double t_min, double t_max, int num_pts, 
 		   const sphere& S)
@@ -152,6 +297,341 @@ namespace ePiX {
 		  int num_pts, const sphere& S)
   {
     draw_sphereplot(phi, t_min, t_max, num_pts, false, RADIAL, S);
+  }
+
+
+  // spherical polyhedra
+  void front_tetra(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+
+    const P ppp( f1+f2+f3);
+    const P pnn( f1-f2-f3);
+    const P npn(-f1+f2-f3);
+    const P nnp(-f1-f2+f3);
+
+    front_triangle(ppp,pnn,npn,S);
+    front_triangle(ppp,npn,nnp,S);
+    front_triangle(ppp,nnp,pnn,S);
+    front_triangle(nnp,pnn,npn,S);
+  }
+  void  back_tetra(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+
+    const P ppp( f1+f2+f3);
+    const P pnn( f1-f2-f3);
+    const P npn(-f1+f2-f3);
+    const P nnp(-f1-f2+f3);
+
+    back_triangle(ppp,pnn,npn,S);
+    back_triangle(ppp,npn,nnp,S);
+    back_triangle(ppp,nnp,pnn,S);
+    back_triangle(nnp,pnn,npn,S);
+  }
+
+  void front_cube(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+
+    const P ppp( f1+f2+f3);
+    const P npp(-f1+f2+f3);
+    const P nnp(-f1-f2+f3);
+    const P pnp( f1-f2+f3);
+
+    const P ppn( f1+f2-f3);
+    const P npn(-f1+f2-f3);
+    const P nnn(-f1-f2-f3);
+    const P pnn( f1-f2-f3);
+
+    front_arc(ppp,npp,S);
+    front_arc(npp,nnp,S);
+    front_arc(nnp,pnp,S);
+    front_arc(pnp,ppp,S);
+
+    front_arc(ppn,npn,S);
+    front_arc(npn,nnn,S);
+    front_arc(nnn,pnn,S);
+    front_arc(pnn,ppn,S);
+
+    front_arc(ppp,ppn,S);
+    front_arc(npp,npn,S);
+    front_arc(nnp,nnn,S);
+    front_arc(pnp,pnn,S);
+  }
+  void  back_cube(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+
+    const P ppp( f1+f2+f3);
+    const P npp(-f1+f2+f3);
+    const P nnp(-f1-f2+f3);
+    const P pnp( f1-f2+f3);
+
+    const P ppn( f1+f2-f3);
+    const P npn(-f1+f2-f3);
+    const P nnn(-f1-f2-f3);
+    const P pnn( f1-f2-f3);
+
+    back_arc(ppp,npp,S);
+    back_arc(npp,nnp,S);
+    back_arc(nnp,pnp,S);
+    back_arc(pnp,ppp,S);
+
+    back_arc(ppn,npn,S);
+    back_arc(npn,nnn,S);
+    back_arc(nnn,pnn,S);
+    back_arc(pnn,ppn,S);
+
+    back_arc(ppp,ppn,S);
+    back_arc(npp,npn,S);
+    back_arc(nnp,nnn,S);
+    back_arc(pnp,pnn,S);
+  }
+
+  void front_octa(const sphere& S, const frame& coords)
+  {
+    const P p1(coords.sea());
+    const P p2(coords.sky());
+    const P p3(coords.eye());
+
+    const P m1(-coords.sea());
+    const P m2(-coords.sky());
+    const P m3(-coords.eye());
+
+    // draw "even parity" triangles only
+    front_triangle(p1,p2,p3,S);
+    front_triangle(m1,m2,p3,S);
+
+    front_triangle(m1,p2,m3,S);
+    front_triangle(p1,m2,m3,S);
+  }
+  void  back_octa(const sphere& S, const frame& coords)
+  {
+    const P p1(coords.sea());
+    const P p2(coords.sky());
+    const P p3(coords.eye());
+
+    const P m1(-coords.sea());
+    const P m2(-coords.sky());
+    const P m3(-coords.eye());
+
+    // draw "even parity" triangles only
+    back_triangle(p1,p2,p3,S);
+    back_triangle(m1,m2,p3,S);
+
+    back_triangle(m1,p2,m3,S);
+    back_triangle(p1,m2,m3,S);
+  }
+
+
+  void front_dodeca(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+    const double gam(0.5*(1+sqrt(5)));
+
+    const P pop( gam*f1 + f3);
+    const P pom( gam*f1 - f3);
+    const P mom(-gam*f1 - f3);
+    const P mop(-gam*f1 + f3);
+
+    const P ppo( f1 + gam*f2);
+    const P pmo( f1 - gam*f2);
+    const P mmo(-f1 - gam*f2);
+    const P mpo(-f1 + gam*f2);
+
+    const P opp( f2 + gam*f3);
+    const P opm( f2 - gam*f3);
+    const P omm(-f2 - gam*f3);
+    const P omp(-f2 + gam*f3);
+
+    // faces surrounding pop
+    front_dual(pop, ppo, opp, S);
+    front_dual(pop, opp, omp, S);
+    front_dual(pop, omp, pmo, S);
+    front_dual(pop, pmo, pom, S);
+    front_dual(pop, pom, ppo, S);
+
+    // respective reflections about link of pop
+    front_dual(opp, ppo, mpo, S);
+    front_dual(omp, opp, mop, S);
+    front_dual(pmo, omp, mmo, S);
+    front_dual(pom, pmo, omm, S);
+    front_dual(ppo, pom, opm, S);
+
+    // and their antipodes
+    front_dual(mom, omm, mmo, S);
+    front_dual(mom, opm, omm, S);
+    front_dual(mom, mpo, opm, S);
+    front_dual(mom, mop, mpo, S);
+    front_dual(mom, mmo, mop, S);
+
+    front_dual(omm, pmo, mmo, S);
+    front_dual(opm, pom, omm, S);
+    front_dual(mpo, ppo, opm, S);
+    front_dual(mop, opp, mpo, S);
+    front_dual(mmo, omp, mop, S);
+  }
+
+  void  back_dodeca(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+    const double gam(0.5*(1+sqrt(5)));
+
+    const P pop( gam*f1 + f3);
+    const P pom( gam*f1 - f3);
+    const P mom(-gam*f1 - f3);
+    const P mop(-gam*f1 + f3);
+
+    const P ppo( f1 + gam*f2);
+    const P pmo( f1 - gam*f2);
+    const P mmo(-f1 - gam*f2);
+    const P mpo(-f1 + gam*f2);
+
+    const P opp( f2 + gam*f3);
+    const P opm( f2 - gam*f3);
+    const P omm(-f2 - gam*f3);
+    const P omp(-f2 + gam*f3);
+
+    // faces surrounding pop
+    back_dual(pop, ppo, opp, S);
+    back_dual(pop, opp, omp, S);
+    back_dual(pop, omp, pmo, S);
+    back_dual(pop, pmo, pom, S);
+    back_dual(pop, pom, ppo, S);
+
+    // respective reflections about link of pop
+    back_dual(opp, ppo, mpo, S);
+    back_dual(omp, opp, mop, S);
+    back_dual(pmo, omp, mmo, S);
+    back_dual(pom, pmo, omm, S);
+    back_dual(ppo, pom, opm, S);
+
+    // and their antipodes
+    back_dual(mom, omm, mmo, S);
+    back_dual(mom, opm, omm, S);
+    back_dual(mom, mpo, opm, S);
+    back_dual(mom, mop, mpo, S);
+    back_dual(mom, mmo, mop, S);
+
+    back_dual(omm, pmo, mmo, S);
+    back_dual(opm, pom, omm, S);
+    back_dual(mpo, ppo, opm, S);
+    back_dual(mop, opp, mpo, S);
+    back_dual(mmo, omp, mop, S);
+  }
+
+
+  void front_icosa(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+    const double gam(0.5*(1+sqrt(5)));
+
+    const P pop( gam*f1 + f3);
+    const P pom( gam*f1 - f3);
+    const P mom(-gam*f1 - f3);
+    const P mop(-gam*f1 + f3);
+
+    const P ppo( f1 + gam*f2);
+    const P pmo( f1 - gam*f2);
+    const P mmo(-f1 - gam*f2);
+    const P mpo(-f1 + gam*f2);
+
+    const P opp( f2 + gam*f3);
+    const P opm( f2 - gam*f3);
+    const P omm(-f2 - gam*f3);
+    const P omp(-f2 + gam*f3);
+
+    // faces surrounding pop
+    front_triangle(pop, ppo, opp, S);
+    front_triangle(pop, opp, omp, S);
+    front_triangle(pop, omp, pmo, S);
+    front_triangle(pop, pmo, pom, S);
+    front_triangle(pop, pom, ppo, S);
+
+    // respective reflections about link of pop
+    front_triangle(opp, ppo, mpo, S);
+    front_triangle(omp, opp, mop, S);
+    front_triangle(pmo, omp, mmo, S);
+    front_triangle(pom, pmo, omm, S);
+    front_triangle(ppo, pom, opm, S);
+
+    // and their antipodes
+    front_triangle(mom, omm, mmo, S);
+    front_triangle(mom, opm, omm, S);
+    front_triangle(mom, mpo, opm, S);
+    front_triangle(mom, mop, mpo, S);
+    front_triangle(mom, mmo, mop, S);
+
+    front_triangle(omm, pmo, mmo, S);
+    front_triangle(opm, pom, omm, S);
+    front_triangle(mpo, ppo, opm, S);
+    front_triangle(mop, opp, mpo, S);
+    front_triangle(mmo, omp, mop, S);
+  }
+
+  void  back_icosa(const sphere& S, const frame& coords)
+  {
+    const P f1(coords.sea());
+    const P f2(coords.sky());
+    const P f3(coords.eye());
+    const double gam(0.5*(1+sqrt(5)));
+
+    const P pop( gam*f1 + f3);
+    const P pom( gam*f1 - f3);
+    const P mom(-gam*f1 - f3);
+    const P mop(-gam*f1 + f3);
+
+    const P ppo( f1 + gam*f2);
+    const P pmo( f1 - gam*f2);
+    const P mmo(-f1 - gam*f2);
+    const P mpo(-f1 + gam*f2);
+
+    const P opp( f2 + gam*f3);
+    const P opm( f2 - gam*f3);
+    const P omm(-f2 - gam*f3);
+    const P omp(-f2 + gam*f3);
+
+    // faces surrounding pop
+    back_triangle(pop, ppo, opp, S);
+    back_triangle(pop, opp, omp, S);
+    back_triangle(pop, omp, pmo, S);
+    back_triangle(pop, pmo, pom, S);
+    back_triangle(pop, pom, ppo, S);
+
+    // respective reflections about link of pop
+    back_triangle(opp, ppo, mpo, S);
+    back_triangle(omp, opp, mop, S);
+    back_triangle(pmo, omp, mmo, S);
+    back_triangle(pom, pmo, omm, S);
+    back_triangle(ppo, pom, opm, S);
+
+    // and their antipodes
+    back_triangle(mom, omm, mmo, S);
+    back_triangle(mom, opm, omm, S);
+    back_triangle(mom, mpo, opm, S);
+    back_triangle(mom, mop, mpo, S);
+    back_triangle(mom, mmo, mop, S);
+
+    back_triangle(omm, pmo, mmo, S);
+    back_triangle(opm, pom, omm, S);
+    back_triangle(mpo, ppo, opm, S);
+    back_triangle(mop, opp, mpo, S);
+    back_triangle(mmo, omp, mop, S);
   }
 
 

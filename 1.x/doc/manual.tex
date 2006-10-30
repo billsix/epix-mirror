@@ -1,5 +1,5 @@
-%% March 07, 2006
-%% Version 1.0.7
+%% October 29, 2006
+%% Version 1.0.20
 \documentclass[12pt]{report}
 \usepackage{amsmath,latexsym,epic,eepic,pstcol,comment}%,framed}
 \usepackage[dvips,hyperref]{hyperref}
@@ -30,7 +30,7 @@
 \author{Andrew D. Hwang \\ 
   Department\ of Math and CS \\ 
   College of the Holy Cross}
-\date{Version 1.0.7,  March, 2006}
+\date{Version 1.1,  October, 2006}
 
 \begin{document}
 
@@ -241,26 +241,33 @@ doesn't do decompression,
 \end{verbatim}
 \code{cd} to the source directory, \filename{epix-x.y.z}.  The
 \filename{INSTALL} file contains detailed installation instructions.
-If you're impatient, the short of it is \code{./configure; make; make
-  install}.  Run \code{./configure --help} for a list of options.
+If you're impatient, the short of it is \code{./configure [--options];
+  make; make install}.  Run \code{./configure --help} for a list of
+options.
 
-There is an optional package, contributed by Svend Daug{\aa}rd
-Pedersen, that supplies extensions for enhanced Cartesian and
-logarithmic coordinate systems, and for hatching polygons and planar
-regions. The command \code{make contrib} builds this package, and
-\code{make doc-contrib} builds the documentation.
-
-In order to use the \filename{contrib} package, an input file must
-contain the line ``\code{using namespace ePiX\_contrib;}'' The
-documentation sources are installed in
-\filename{\$INSTALL/share/doc/epix}.
+\index{Contrib package}
+Svend Daug{\aa}rd Pedersen has kindly written an optional package that
+supplies extensions for enhanced Cartesian and logarithmic coordinate
+systems, and for hatching polygons and planar regions. \textbf{The
+  procedure for building and using this package has changed in
+  Version~1.1}. Instead of typing \code{make contrib}, you supply an
+option when configuring: \code{./configure --with-contrib; make; make
+  install}.  In order to use the \filename{contrib} package, an input
+file must contain the lines
+\begin{verbatim}
+  using namespace ePiX_contrib;
+  #include "epix_ext.h"
+\end{verbatim}
+Note that the \code{contrib} header must now be included explicitly.
 
 By default, \ePiX\ installs in subdirectories of
 \filename{/usr/local}; if you want to install elsewhere, supply
 \code{./configure} with the appropriate \code{--prefix}. The
 \filename{INSTALL} file contains detailed instructions. You may also
 want to consult \filename{POST-INSTALL} for information on setting
-your \code{PATH} variable so your shell can find \ePiX.
+your \code{PATH} variable so your shell can find \ePiX.  The manuals
+and sample document, both sources and compiled ps/pdf files, are
+installed in \filename{\$INSTALL/share/doc/epix}.
 \index{Installation|)}
 
 To re-iterate, \ePiX\ is not a stand-alone program, but consists of a
@@ -274,9 +281,13 @@ environment, or package \ePiX\ for other systems, please notify the
 author so that your work can be linked from the project page and
 mentioned in the documentation.
 
-Should it come to this, the command \code{make uninstall-all} will
-remove installed components of \ePiX\ from your system. You must be in
-the source directory, and may need to log in as \code{root}.
+The command \code{make uninstall} removes installed components of
+\ePiX\ from your system. You must be in the source directory, and may
+need to log in as \code{root}. (If you remove the sources, then later
+decide to uninstall, you must unpack the sources, \code{./configure}
+the package \emph{using the same options as when you installed}, then
+run \code{make uninstall}. If you kept the source directory after
+installing, you need not re-configure.)
 
 
 \subsection*{Other Sources}
@@ -306,20 +317,21 @@ The main project page may migrate to
 \end{verbatim}
 
 
+\subsection*{The Future}
+
+Future work on \ePiX\ will focus on Version~2, a fully 3-D capable
+library with many additional features: more sophisticated lighting and
+shading models, automatic hidden-object removal, and modular figure
+creation. Please visit the project page for information.
+
 \subsection*{Development}
 
-There is a (currently very low-traffic) mailing list for all things
-\ePiX-related:
+There are two mailing lists for both versions of \ePiX, one for user
+questions, one for development discussion. Please visit
 \begin{verbatim}
-  ahwang-epix@mathcs.holycross.edu
+  http://savannah.nongnu.org/mail/?group=epix
 \end{verbatim}
-You must be a subscriber in order to post, and a post must have a
-non-empty \code{Subject:} line.  To subscribe, send an empty message
-to
-\begin{verbatim}
-  ahwang-epix-subscribe@mathcs.holycross.edu
-\end{verbatim}
-Please contact the author if you are interested in development.
+to subscribe.
 
 
 \chapter{Getting Started}
@@ -1425,7 +1437,8 @@ Graph paper may be created by superimposing grids:
   \qquad
   \input{graphpaper.eepic}
 \end{center}
-  
+
+\index{Contrib package}
 S. D. Pedersen's \code{contrib} package provides enhanced Cartesian
 graphs. If this package is installed, the \code{contrib} documentation
 will be in \filename{\$INSTALL/share/doc/epix}.
@@ -2254,7 +2267,7 @@ Available constructors are:
 The first argument of the parametrized path constructor is a real- or
 vector-valued function of one variable. In each of the first five
 constructors, an optional final argument may be supplied to specify
-the number of points used. 
+the number of points used.
 
 \index{Pointer!and polyline}
 The polyline and polygon constructors accept an unknown number of
@@ -2269,6 +2282,15 @@ arguments; consequently, their arguments must be passed as
 This makes polylines and polygons inconvenient for quick-and-dirty
 use, but imposes little burden if the vertices have been defined
 elsewhere, as they might be in a logically structured file.
+
+A path may be built point-by-point with the \texttt{pt()} function,
+which accepts three (or two) doubles or a~\texttt{P}.
+\begin{verbatim}
+  path bord.pt(0,0).pt(2,0).pt(0,3); // polyline
+
+  path octa.close(); // declare new polygon
+  for (int i=0; i<8; ++i) octa.pt(polar(2, 45*i)); // assume degrees()
+\end{verbatim}
 
 \index{Path!operations on}
 Compound paths may be built by concatenation. If \code{path1}~and
@@ -2380,7 +2402,8 @@ constructors, intersection operators, affine transformations, and a
 \ePiX\ also provides features for spherical and hyperbolic geometry,
 especially the ability to draw lines in the half-plane and Poincar\'e
 disk models of the hyperbolic plane, and to draw latitudes,
-longitudes, and parametrized curves on a sphere.
+longitudes, great circle arcs, spherical triangles, regular polyhedra,
+and parametrized curves on a sphere.
 
 
 \subsection*{Triples and Frames}
@@ -2612,12 +2635,10 @@ requiring many quadrilaterals.
 \end{figure}
 
 
-A \code{domain} is defined by giving a pair of opposite corners, the
-coarse mesh, and the fine mesh. A domain's meshes are independent; the
-fine mesh need not be a ``multiple'' of the coarse mesh.  Indeed, the
-``fine'' mesh may be \emph{more coarse} than the ``coarse'' mesh.
-Usually, however, the fine mesh is a ``small multiple'' of the coarse
-mesh.
+A \code{domain} is defined a pair of opposite corners, the coarse
+mesh, and the fine mesh. A domain's meshes may be unrelated, but for
+``expected'' results the fine mesh should be a ``small multiple'' of
+the coarse mesh.
 
 \index{Domain!resizing}
 A domain can be resized in any coordinate direction for which the
@@ -2629,8 +2650,9 @@ domain~\code{R} above,
 defines a new domain having opposite corners $(0,0.5)$~and $(1,0.75)$.
 To the extent possible, resizing attempts to preserve absolute grid
 sizes. In this example, the new domain has $6\times4$~coarse mesh
-($18/4=4.5\to4$) and $12\times15$~fine mesh.  It's best to choose
-meshes so that resizing does not cause integer truncation.
+($18/4=4.5\to4$) and $12\times15$~fine mesh.  For ``expected''
+results, it's best to choose meshes so that resizing does not cause
+this sort of integer truncation.
 
 \index{Domain!slicing}
 A domain can be sliced by setting one variable to a constant; the
@@ -2655,7 +2677,7 @@ setting one variable to components of the coarse mesh:
 \end{center}
 
 When plotting a function of one variable, constructing a \code{domain}
-is possible but tedious.  The command
+may be tedious.  The alternative command
 \begin{verbatim}
   plot(f, t_min, t_max, n);
 \end{verbatim}
@@ -2681,7 +2703,47 @@ A function of 3~variables can be plotted over a 1-~or 2-dimensional
 domain, while a function of 2~variables cannot be plotted over a
 3-dimensional domain.
 \index{Domain|)}
-\index{Plotting|)}
+
+\ePiX\ provides three functions that implement surface plotting with
+hidden object removal, along the lines described in
+Section~\ref{section:hidden}.  The first plots a \texttt{P}-valued
+function~\texttt{F} of two \texttt{double} variables over a
+\texttt{domain~R}.  The second plots the surface of revolution
+obtained by revolving the parametric curve
+$t\mapsto\bigl(f(t),g(t)\bigr)$ about the $x$-axis. The parameter
+interval \verb+[x_min,x_max]+ is divided into \verb+n_lats+
+equal-length subintervals, and \verb+n_longs+ copies of the profile
+curve (24~by default) are drawn. The third revolves the same
+parametric curve about an arbitrary axis.
+\begin{verbatim}
+  void surface(P F(double, double), domain R);
+  void surface_rev(f, g, min_x, max_x, n_lats, n_longs);
+  void surface_rev(f, g, domain R, frame coords);
+\end{verbatim}
+If filling is active, each function shades the surface according to
+the angle between the normal vector and the direction to the camera,
+simulating constant ambient lighting.  Otherwise, the current level of
+gray is used. 
+
+As in unshaded plotting, the fine mesh is used to draw the boundaries
+of surface patches; this tends to make surfaces look smoother for
+modest-sized coarse meshes. If the coarse mesh too coarse, however,
+two visually undesirable effects can occur. First, adjacent regions of
+the surface may be shaded very differently, since shading is constant
+over patches defined by the coarse mesh. Second, a patch nearly
+tangent to a line of sight may be drawn badly if the patch bends back
+on itself, since only the edge of the \emph{patch} is drawn, not the
+edge of the mathematical surface.
+\begin{figure}[hbt]
+  \begin{center}
+    \input{artifact1.eepic}\hfil
+    \input{artifact2.eepic}\hfil
+    \input{artifact3.eepic}\hfil
+    \input{artifact4.eepic}
+  \end{center}
+  \caption{Coarse mesh artifacts; all fine meshes are the same.}
+\end{figure}
+\index{Hidden object removal} \index{Plotting|)}
 
 
 \subsection*{Utility Functions}
@@ -2698,22 +2760,23 @@ definite integrals.
   newton(f, g, x0); // find approximate crossing point
 \end{verbatim}
 Newton's method returns the crossing point of the given functions,
-starting from the specified seed. If a critical point is hit or
-20~iterations pass, a warning is issued and the current result
-(probably incorrect) is returned. The second function~$g$ defaults to
-the zero function if omitted. 
+starting from the specified seed, which should be reasonably close to
+the expected solution. If a critical point is hit or 5~iterations
+pass, a warning is issued and the current result (probably incorrect)
+is returned. The second function~$g$ defaults to the zero function if
+omitted.
 
-The classes \code{D}~and \code{I} are used to calculate values of
-derivatives and integrals, and to plot these functions.
+The classes \code{Deriv}~and \code{Integral} are used to calculate
+values of derivatives and integrals, and to plot these functions.
 \begin{verbatim}
-  D df=D(f);   // data structure representing the derivative
+  Deriv df(f); // function object: df(x) = f'(x)
   df.eval(t);  // return f'(t)
   df.left(t);  // deriv from left at t:  (f(t)-f(t-dt))/dt
   df.right(t); // deriv from right at t: (f(t+dt)-f(t))/dt
 
-  I prim=I(f,a); // representation of the integral from a
+  Integral prim(f,a); // function object: prim(x) = int_a^x f
   prim.eval(b);  // numerical integral of f over [a,b]
-  double val=I(f).eval(1);   // \int_0^1 f
+  double val(Integral(f).eval(1));   // val = \int_0^1 f
 \end{verbatim}
 The lower limit on an integral is~0 by default.
 
@@ -2735,8 +2798,8 @@ illustrate these features.
 functions, and draw approximating sums for definite integrals. Let
 \code{f}~be a real-valued function of one variable.
 \begin{verbatim}
-  plot(D(f), a, b, n);  // plot f' over [a,b]
-  plot(I(f, x0), a, b, n);
+  plot(Deriv(f), a, b, n);  // plot f' over [a,b]
+  plot(Integral(f, x0), a, b, n);
   riemann_sum(f, a, b, n, TYPE);
 \end{verbatim}
 The second command graphs the definite integral $x\mapsto\int_{x_0}^x
@@ -2764,17 +2827,34 @@ function of two variables; see the sample file \filename{dipole.xp}.
 function returns the result of starting at~$p_0$ and flowing by~$F$
 for time~$t_\mathrm{max}$, using Euler's method with~$n$ timesteps.
 This is useful for placing markers or arrowheads precisely along a
-flow line. A vector field itself may be drawn in three ways:
+flow line.
+
+A planar or spatial vector field itself may be plotted over a
+domain~\code{R} in three styles:
 \begin{verbatim}
-  vector_field(F, p, q, n1, n2); // proportional length
-  dart_field  (F, p, q, n1, n2); // constant length
-  slope_field (F, p, q, n1, n2); // directionless, const length
+  vector_field(F, R, [scale]); //  true length
+  dart_field  (F, R, [scale]); // const length
+  slope_field (F, R, [scale]); // const length
 \end{verbatim}
-The field is sampled at the grid points of the coordinate rectangle
-whose corners are specified.
-\index{Plotting!vector fields|)}
-\index{Plotting!calculus|)}
-\index{Calculus|)}
+The field is sampled at the grid points of the coarse mesh. If the
+domain is two-dimensional, the plot is a planar slice of the field,
+even if the field depends on three variables. If the domain is
+three-dimensional, the field is drawn in successive slices
+$x_3=\mathrm{const}$, starting at the height of the first corner
+of~\code{R} and ending at the height of the second corner.
+
+The optional final argument, which defaults to~$1$, scales the
+arrowheads in a vector field, and scales the (constant) length of
+field elements for slope and dart fields. The sample file
+\filename{extras/vfield.xp} illustrates these features, including the
+use of PSTricks line styles to effect object hiding.
+
+In each field-plotting command, the domain argument may be replaced by
+two points, representing corners of a coordinate rectangle, and two
+integers, the number of grid intervals in the selected coordinate
+directions. Only planar slices of a vector field can be plotted using
+the alternative syntax.  \index{Plotting!vector fields|)}
+\index{Plotting!calculus|)} \index{Calculus|)}
 
 
 \subsection*{Recursive Fractal Curves}  
@@ -2836,6 +2916,39 @@ By default, \code{coords} is the standard \code{frame} and \code{S} is
 the unit \code{sphere}. These commands draw only the portion of the
 curve that is visible from the current \code{viewpoint}. The function
 \code{back\_latitude} draws the invisible portion of a latitude line.
+
+Spherical arcs and triangles are described by their endpoints. Only
+the direction vector from the center of the sphere to an endpoint is
+significant; if a sphere is scaled or moved, the same function call
+will draw the corresponding object on the new sphere. 
+
+The following draw the visible (front) portions of great circle arcs:
+\begin{verbatim}
+  front_arc(p1, p2, S);  // short arc on S from p1 to p2
+  front_arc2(p1, p2, S); // arc from p1 to -p1 through p2
+  front_line(p1, p2, S); // great circle through p1 and p2
+\end{verbatim}
+For high-level convenience, triangles and regular (Platonic) polyhedra
+are provided. The sample file \filename{extras/polyhedra.xp}
+illustrates usage.
+\begin{verbatim}
+  front_triangle(p1, p2, p3, S); // spherical triangle
+  front_tetra(S, coords);  // regular tetrahedron
+  front_cube(S, coords);   //    hexahedron
+  front_octa(S, coords);   //    octahedron
+  front_dodeca(S, coords); //    dodecahedron
+  front_icosa(S, coords);  //    icosahedron
+\end{verbatim}
+Each function admits a \code{back} version that draws the hidden
+portion. The tetrahedron, cube, and octahedron are (up to scale)
+inscribed in the cube of side length~$2$ centered at the origin whose
+sides are parallel to~\code{frame}. The point $(1,1,1)$ is a vertex of
+the tetrahedron.
+
+Up to scale, the icosahedron's vertices lie on the golden rectangle
+with vertices $(\pm\gamma,0,\pm1)$ and its images under cyclic
+permutation of coordinates. The dodecahedron is dual to the
+icosahedron.
 
 Parametrized paths on the unit sphere can be specified either by
 radial projection of a space curve, or by stereographic projection of
@@ -2910,8 +3023,9 @@ Command-line options change these and other parameters; please use
 
 \section{Troubleshooting}
 
-Six files comprise \ePiX: a header (\filename{epix.h}), compiled
-library (\filename{libepix.a}), and four shell scripts (\code{epix},
+Seven files comprise \ePiX: a header (\filename{epix.h}), compiled
+library (\filename{libepix.a}), common shell code
+(\filename{epix-lib.sh}), and four shell scripts (\code{epix},
 \code{elaps}, \code{laps}, and~\code{flix}). These files are generated
 at compile time, using variables found in the \filename{Makefile}.  In
 addition to the executable portions of the program, there are sample
@@ -2927,7 +3041,7 @@ tar file, then \code{cd} to the source directory
 (\filename{epix-x.y.z\_complete}). Run the commands
 \begin{verbatim}
 ./configure [option(s)]
-make [all contrib doc-contrib]
+make
 make install
 \end{verbatim}
 (the last as \code{root}, if necessary).  If you have installed
@@ -2939,14 +3053,13 @@ The directory in which you install \ePiX\ is denoted
 following files:
 \begin{verbatim}
   $INSTALL/bin/{epix,elaps,laps,flix}
-  $INSTALL/include/epix-VERSION.h  $INSTALL/include/epix.h
-  $INSTALL/lib/libepix-VERSION.a   $INSTALL/lib/libepix.a
+  $INSTALL/include/epix.h
+  $INSTALL/lib/{libepix.a,epix-lib.sh}
   $INSTALL/share/man/man1/epix.1
 \end{verbatim}
-The documentation and samples are placed in
-\filename{\$INSTALL/share/doc/epix}.  Sample files, notes and README
-files, and configuration snippets are installed in subdirectories of
-\filename{\$INSTALL/share/epix}.
+The manual(s), sample document, notes and README files, and
+configuration snippets are installed in subdirectories of
+\filename{\$INSTALL/share/doc/epix}.
 
 
 \subsection*{Known Issues}
@@ -2972,7 +3085,7 @@ camera mis-placement and non-generic intersections. If the camera is
 too close to objects in the scene, the lens may try to divide by zero
 (or by a small epsilon), resulting in \code{nan} errors (or very large
 coordinates) in the output file. In this situation, \code{epix} will
-succeed, but \code{elaps} will hang. By contrast, an error message of
+succeed, but \code{elaps} will fail. By contrast, an error message of
 the form
 \begin{verbatim}
   /usr/local/bin/epix: line 275: 27333 Aborted ...
@@ -2988,7 +3101,7 @@ In any case, please notify the author of anomalous behavior.
 
 \paragraph{Script errors}
 If a script fails (the expected output file is non-existent or
-otherwise unreadable), re-run the script with the~\code{-vv} (verbose)
+otherwise unreadable), re-run the script with the~\code{-v} (verbose)
 option. This will print output and error messages to the screen.
 
 \paragraph{Command not found} In order to use \ePiX, the directory
@@ -3046,6 +3159,7 @@ language.
 
 
 \section{Hidden Object Removal}
+\label{section:hidden}
 
 \index{Hidden object removal|(}
 \index{Plotting!surface|(}
@@ -3053,61 +3167,63 @@ language.
 the input. The order is significant because PostScript builds a figure
 in layers: Objects are drawn over objects that come earlier in the
 file. Shaded polygons can be used to obtain surprisingly effective
-hidden object removal in surface meshes. The techniques are still
-provisional, however; this section describes a method that works for
-the author, though is not sufficiently refined for inclusion in the
-source code.
+hidden object removal in surface meshes. This section describes the
+data structures in \ePiX's \code{surface} functions.
 
-The basic idea is to create a shaded quadrilateral class that knows
-its distance to the camera.\index{Camera} To draw parametrized
-surfaces, quadrilaterals are written in any convenient order to a
-\CXX\ vector, then sorted by distance to the camera and printed to the
-output file in decreasing order of distance. The gray density of a
-mesh element depends on the cosine of the angle between the normal
-vector and the vector from the camera to the element. The method works
-acceptably well in practice: Several surfaces can be drawn, and the
-effect is fairly realistic. If the surface meshes are fine enough,
-intersections are accurate and not jagged. However, the output file
-tends to be enormous, and is not effectively human-readable.
+The basic idea is to create a shaded polygon class that knows its
+approximate distance to the camera.\index{Camera} For computational
+simplicity, a mesh ``facet'' is treated as a quadrilateral, located at
+the arithmetic mean of its vertices. A facet's boundary is created
+from a map and a domain by tracing a coarse mesh rectangle
+counterclockwise.
 
-The quadrilateral class might look like this:
+To draw a parametrized surface, facets are written in any convenient
+order to a \CXX\ vector, then sorted by distance to the camera and
+printed to the output file in decreasing order of distance. The gray
+density of a facet depends on the cosine of the angle between the
+normal vector and the vector from the camera to the element.
+
+The method above works fairly well for single surfaces, and for
+multiple surfaces that can be separated by planes. If a scene contains
+line-like elements in addition to a surface, the surface can be broken
+up (for example, with domain resizing) and the high-level scene
+elements ordered manually by distance to the camera.
+
+To treat scenes containing multiple surfaces with complicated
+situation (e.g., linked tori), hackery is required. The easiest
+approach is to mimic the functions in \filename{surface.cc}, adding
+all facets in the scene to a single list, then sorting and printing
+as above. (Even this technique does not work well if surface facets
+intersect.) A class for mesh facets might look like this:
 
 \begin{footnotesize}
 \begin{verbatim}
-class mesh_quad
-{
+class mesh_quad {
 private:
   P pt1, pt2, pt3, pt4;
   double distance;
 
 public:
-  mesh_quad() 
-  {
-    pt1=pt2=pt3=pt4=P();
-    distance=camera.get_range();
-  }
+  mesh_quad()
+    : distance(camera.get_range()) { }
 
   mesh_quad(P f(double u, double v), double u0, double v0)
+    : pt1(f(u0,v0), pt2(f(u0+du,v0)), pt3(f(u0+du,v0+dv)), pt4(f(u0,v0+dv))
   {
-    pt1=f(u0+EPS,v0+EPS);       // EPS = "shrinkage"
-    pt2=f(u0+du-EPS,v0+EPS);
-    pt3=f(u0+du-EPS,v0+dv-EPS);
-    pt4=f(u0+EPS,v0+dv-EPS);
-    
-    P center = 0.25*(pt1 + pt2 + pt3 + pt4);
-    distance = norm(center-camera.get_viewpt());
+    P center(0.25*(pt1 + pt2 + pt3 + pt4)); // crude approx of location
+    distance(norm(center-camera.get_viewpt()));
   }
 
   double how_far() const { return distance; }
 
-  void draw() 
+  void draw() const
   { 
-    P normal = (pt2 - pt1)*(pt4 - pt1);
+    P normal((pt2 - pt1)*(pt4 - pt1));
     normal *= 1/norm(normal);
 
-    double dens  = 0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
-    gray(dens); 
-    quad(pt1, pt2, pt3, pt4); 
+    double dens(0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT)));
+    gray(dens);
+    ePiX::quad(pt1, pt2, pt3, pt4);
   }
 };
 \end{verbatim}
@@ -3142,7 +3258,6 @@ class above can be used as follows in the body of the figure:
     mesh.at(i).draw();
 \end{verbatim}
 \end{footnotesize}
-For a complete file, please see \filename{samples/extras/tori.xp}.
 \index{Plotting!surface|)}\index{Hidden object removal|)}
 
 
@@ -3192,8 +3307,9 @@ used in an input file as follows:
 
 The next few sections outline the creation of a ``static library'' on
 GNU/Linux, and explain how to incorporate custom features at runtime.
-For more details, the source code, \filename{Makefile}, and your
-system's documentation should provide a good start.
+The sample files \filename{extras/affine.cc}~and
+\filename{extras/affine.h} illustrate the techniques described below,
+and may be used for guidance and experimentation.
 
 A small library is usually written as a \emph{header} file, which
 contains function declarations (also called ``prototypes''), and a
@@ -3211,8 +3327,8 @@ using ePiX::P;
 
 namespace Mine {   // to avoid name conflicts
   // functions for special relativity
-  double lorentz_norm(P);
-  bool   spacelike(P);
+  double lorentz_norm(const P&);
+  bool   spacelike(const P&);
 } // end of namespace
 #endif // MY_CODE
 \end{verbatim}
@@ -3237,12 +3353,12 @@ exactly.
 using namespace ePiX;
 
 namespace Mine {
-  double lorentz_norm(P arg)
+  double lorentz_norm(const P& arg)
   {
-    double x=arg.x1(), y=arg.x2(), z=arg.x3(); // extract coords
-    return -x*x + y*y + z*z;
+    double x(arg.x1()), y(arg.x2()), z(arg.x3()); // extract coords
+    return (y-x)*(y+x) + z*z; // -x^2 + y^2 + z^2
   }
-  bool spacelike(P arg)
+  bool spacelike(const P& arg)
   {
     return (lorentz_norm(arg) > 0); // true if inequality is
   }
@@ -3303,9 +3419,10 @@ therefore be used with multiple versions of \ePiX, a potentially
 useful feature if you regularly need to compile old source files, or
 simply prefer the syntax of an older version.
 
-To install and use (say) Version~0.8.5, build the package as usual,
-but \emph{do not use the makefile to install}. Instead, manually
-install the header and library only, using their version number:
+To install and use (say) Version~0.8.5, build the package according to
+its \filename{INSTALL} instructions, but \emph{do not use the makefile
+  to install}. Instead, manually install the header and library only,
+using their version number:
 \begin{verbatim}
 # install -m 644 epix.h /usr/local/include/epix-0.8.5.h
 # install -m 644 libepix.a /usr/local/lib/libepix-0.8.5.a

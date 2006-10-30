@@ -1,14 +1,65 @@
 ePiX -- samples/extras/README
 
-Last Change: August 25, 2004
+Last Change: October 29, 2006
 
 This directory contains additional sample files. Files with extension
-".flx" may be converted to mng animations. "cube.flx" compiles into a
-stereoscopic movie of a rotating cube, meant to be viewed with 3-D
-glasses.
+".flx" may be converted to gif or mng animations with the "flix" shell
+script.
 
-Please do
+affine.cc, affine.h: Library code for illustrating 2-D affine maps
 
-  flix -vv -h
+affine.xp: Sample file illustrating the use of external libraries.
+  Contains detailed instructions on building a library from affine.cc.
 
-for details on using flix.
+binom.cc: Generates pseudo-random data for histogram.xp
+
+butterfly.xp: a Thom catastrophe graph
+
+conic.xp: Projective equivalence of a parabola with a circle
+
+cube.flx: stereoscopic (3-D glasses) movie of a rotating cube
+
+demoivre.xp: A geometric proof of deMoivre's formula
+
+densityplot.xp: A gray-shaded interference pattern
+
+dipole.xp: Plotting flow lines and isobars
+
+golden_rect.xp: Constructing a golden rectangle
+
+helicoid.flx: Isometric deformation of a catenoid to a helicoid
+
+histogram.xp: Histograms of simulated coin tosses (see binom.cc)
+
+hyperboloid.xp: Two families of rulings on a hyperboloid
+
+lighting.h: Classes for lighting effects and color-shaded surfaces
+  (lighting.flx illustrates use)
+
+log.xp: The Riemann surface of log; object hiding with paths and surfaces
+
+lorenz.xp: A Lorenz attractor and its 3-D vector field
+
+mirrorball.flx: Using the circle class
+
+pendulum.flx: Phase diagram of an undamped pendulum
+
+polyhedra.xp: Spherical regular polyhedra. Compilation controlled
+  with pre-processor flags, e.g., "epix -DCOLOR -DDODECA polyhedra.xp"
+
+R_demo.xp: Gaussians from the R demo
+
+riemann.flx: Rotating the Riemann surface of sqrt(z) in R^4
+
+saddle.xp: A quadratic saddle using "surface" capabilities
+
+steiner.flx: Steiner's Roman surface, rotating
+
+stereo-left.xp: A crossed-eyes stereogram of the twisted cubic
+stereo-right.xp
+
+tori.xp: Interlocking tori
+
+trig.flx: Trigonometric functions
+
+vfield.xp: 3-D vector field plotting

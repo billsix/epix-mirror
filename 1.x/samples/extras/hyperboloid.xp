@@ -11,23 +11,24 @@ using namespace ePiX;
 // emphasis
 #define RULINGS
 
-const double MAX=3; // frame size
-const double MAX2=1.5;  // parameter domain size
-const double temp=sinh(MAX2);
+const double MAX(3); // frame size
+const double MAX2(1.5);  // parameter domain size
+const double temp(sinh(MAX2));
 
 // surface parametrization
 P hyperboloid(double u, double v) { return cyl(cosh(u), v, sinh(u)); }
 
-const int N1=36;  // latitudes
-const int N2=48;  // longitudes
+const int N1(36);  // latitudes
+const int N2(48);  // longitudes
 
-const int NUM_LINES=64; // # of rulings; should be a multiple of 4
+const int NUM_LINES(64); // # of rulings; should be a multiple of 4
 
 const P LIGHT(1,1,0.5);  // location of light, for shading
 const P VIEWPT(20, 0.5, 5);
 
-const double EPS=0.0; //0.025; // shrinkage
-const double du=2*MAX2/N1, dv=1.0/N2;
+const double EPS(0.0); //0.025; // shrinkage
+const double du(2*MAX2/N1);
+const double dv(1.0/N2);
 
 // colors of rulings
 void plus_color(void)
@@ -49,71 +50,63 @@ void minus_color(void)
 
 // draw a ruling, truncating at the plane x=0
 // (x,y,z) = (cos(th), sin(th), 0) + t*(-/+sin(t), +/-cos(t), 1)
-void l_plus(double t) 
+void l_plus(double t)
 {
-  double t_min = -temp, t_max = temp;
+  double t_min(-temp), t_max(temp);
   if (Cos(t) - t_max*Sin(t) < 0)
     t_max = Cot(t);
 
   if (Cos(t) - t_min*Sin(t) < 0)
     t_min = Cot(t);
 
-  P endpt1(Cos(t)-t_max*Sin(t), Sin(t)+t_max*Cos(t), t_max);
-  P endpt2(Cos(t)-t_min*Sin(t), Sin(t)+t_min*Cos(t), t_min);
-  line(endpt1, endpt2);
+  line(P(Cos(t) - t_max*Sin(t), Sin(t) + t_max*Cos(t), t_max),
+       P(Cos(t) - t_min*Sin(t), Sin(t) + t_min*Cos(t), t_min));
 }
 
 void l_minus(double t)
 {
-  double t_min = -temp, t_max = temp;
+  double t_min(-temp), t_max(temp);
   if (Cos(t) + t_max*Sin(t) < 0)
     t_max = -Cot(t);
 
   if (Cos(t) + t_min*Sin(t) < 0)
     t_min = -Cot(t);
 
-  P endpt1(Cos(t)+t_max*Sin(t), Sin(t)-t_max*Cos(t), t_max);
-  P endpt2(Cos(t)+t_min*Sin(t), Sin(t)-t_min*Cos(t), t_min);
-  line(endpt1, endpt2);
+  line(P(Cos(t)+t_max*Sin(t), Sin(t)-t_max*Cos(t), t_max),
+       P(Cos(t)+t_min*Sin(t), Sin(t)-t_min*Cos(t), t_min));
 }
 
 // generalities
-class mesh_quad
+class element
 {
 private:
   P pt1, pt2, pt3, pt4;
   double distance;
 
 public:
-  mesh_quad()
-  {
-    pt1=pt2=pt3=pt4=P();
-    distance=camera.get_range();
-  }
+  element()
+    : distance(camera.get_range()) { }
 
-  mesh_quad(P f(double u, double v), double u0, double v0)
+  element(P f(double u, double v), double u0, double v0)
+    : pt1(f(u0+EPS,v0+EPS)), pt2(f(u0+du-EPS,v0+EPS)),
+      pt3(f(u0+du-EPS,v0+dv-EPS)), pt4(f(u0+EPS,v0+dv-EPS))
   {
-    pt1=f(u0+EPS,v0+EPS);
-    pt2=f(u0+du-EPS,v0+EPS);
-    pt3=f(u0+du-EPS,v0+dv-EPS);
-    pt4=f(u0+EPS,v0+dv-EPS);
-
-    P center = 0.25*(pt1 + pt2 + pt3 + pt4);
-    P temp = camera.get_viewpt();
+    P center(0.25*(pt1 + pt2 + pt3 + pt4));
+    P temp(camera.get_viewpt());
 
     distance = norm(center-temp);
   }
 
   double how_far() const { return distance; }
 
-  void draw()
+  void draw() const
   {
-    P normal = (pt2 - pt1)*(pt4 - pt1);
+    P normal((pt2 - pt1)*(pt4 - pt1));
     normal *= 1/norm(normal);
 
 
 #ifdef SHADED
-    double dens  = 0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
+    double dens(0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT)));
     gray(dens);
 #endif
     
@@ -121,16 +114,16 @@ public:
   }
 };
 
-class by_distance {
+class By_distance {
 public:
-  bool operator() (const mesh_quad& arg1, const mesh_quad& arg2)
+  bool operator() (const element& arg1, const element& arg2)
   {
     return arg1.how_far() > arg2.how_far();
   }
 };
 
 
-int main() 
+int main()
 {
   bounding_box(P(-MAX,-MAX), P(MAX,MAX));
   unitlength("1in");
@@ -147,13 +140,13 @@ int main()
 #endif
 
   viewpoint(VIEWPT);
-  std::vector<mesh_quad> mesh(0);
+  std::vector<element> mesh(0);
 
   for (int i=0; i<N1; ++i)
     for (int j=0; j<N2; ++j)
-      mesh.push_back(mesh_quad(hyperboloid, -MAX2+du*i, dv*j));
+      mesh.push_back(element(hyperboloid, -MAX2+du*i, dv*j));
 
-  sort(mesh.begin(), mesh.end(), by_distance());
+  sort(mesh.begin(), mesh.end(), By_distance());
 
   for (unsigned int i=0; i<mesh.size(); ++i)
     mesh.at(i).draw();
@@ -182,8 +175,7 @@ int main()
 
   font_size("footnotesize");
   label(P(0,0,-1.5*temp), P(0,-24), 
-	"$\\ell_\\theta^-(t)=(\\cos\\theta, \\sin\\theta, 0) +
-          t(\\sin\\theta, -\\cos\\theta, 1)$", b);
+	"$\\ell_\\theta^-(t)=(\\cos\\theta, \\sin\\theta, 0) + t(\\sin\\theta, -\\cos\\theta, 1)$", b);
 
   font_size();
   plus_color();
@@ -195,8 +187,7 @@ int main()
 
   font_size("footnotesize");
   label(P(0,0,-1.5*temp), P(0,-12), 
-	"$\\ell_\\theta^+(t)=(\\cos\\theta, \\sin\\theta, 0) +
-          t(-\\sin\\theta, \\cos\\theta, 1)$", b);
+	"$\\ell_\\theta^+(t)=(\\cos\\theta, \\sin\\theta, 0) + t(-\\sin\\theta, \\cos\\theta, 1)$", b);
 
   end();
 }

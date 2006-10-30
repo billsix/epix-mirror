@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 09, 2006
+ * Version 1.0.20
+ * Last Change: October 29, 2006
  */
 
 /* 
@@ -39,6 +39,26 @@ namespace ePiX {
   class P;
   class sphere;
 
+  // All sphere line functions treat point arguments as unscaled
+  // displacements from the center of the sphere, not as absolute
+  // spatial locations.  If the center or radius of the sphere
+  // changes, the line automatically adjusts as expected.
+
+  // front portion of spherical segment joining p1 to p2
+  void front_arc(const P& p1, const P& p2, const sphere& S = sphere());
+  void  back_arc(const P& p1, const P& p2, const sphere& S = sphere());
+
+  // half-line joining p1 to -p1 through p2
+  void front_arc2(const P&, const P&, const sphere& S=sphere());
+  void  back_arc2(const P&, const P&, const sphere& S=sphere());
+
+  // great circle through p1 and p2
+  void front_line(const P&, const P&, const sphere& S=sphere());
+  void  back_line(const P&, const P&, const sphere& S=sphere());
+
+  void front_triangle(const P&, const P&, const P&, const sphere& S=sphere());
+  void  back_triangle(const P&, const P&, const P&, const sphere& S=sphere());
+
   // stereographic projection; path first projected vertically
   void frontplot_N(double f1(double), double f2(double),
 		   double t_min, double t_max, int num_pts, 
@@ -62,6 +82,22 @@ namespace ePiX {
 
   void backplot_R(P phi(double), double t_min, double t_max, 
 		  int num_pts, const sphere& S = sphere());
+
+  // spherical polyhedra
+  void front_tetra(const sphere& S=sphere(), const frame& coords=frame());
+  void  back_tetra(const sphere& S=sphere(), const frame& coords=frame());
+
+  void front_cube(const sphere& S=sphere(), const frame& coords=frame());
+  void  back_cube(const sphere& S=sphere(), const frame& coords=frame());
+
+  void front_octa(const sphere& S=sphere(), const frame& coords=frame());
+  void  back_octa(const sphere& S=sphere(), const frame& coords=frame());
+
+  void front_dodeca(const sphere& S=sphere(), const frame& coords=frame());
+  void  back_dodeca(const sphere& S=sphere(), const frame& coords=frame());
+
+  void front_icosa(const sphere& S=sphere(), const frame& coords=frame());
+  void  back_icosa(const sphere& S=sphere(), const frame& coords=frame());
 
   // Hyperbolic lines
   void hyperbolic_line (const P&, const P&);

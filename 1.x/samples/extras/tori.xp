@@ -1,5 +1,4 @@
 /* -*-ePiX-*- */
-#include <vector>
 #include "epix.h"
 using namespace ePiX;
 
@@ -13,20 +12,20 @@ const double r_0=0.95;   // minor radius
 const double EPS=0.0025; // shrinkage
 const double du=2.0/N1, dv=2.0/N2;
 
-class mesh_quad
+class element
 {
 private:
   P pt1, pt2, pt3, pt4;
   double distance;
 
 public:
-  mesh_quad() 
+  element() 
   {
     pt1=pt2=pt3=pt4=P();
     distance=camera.get_range();
   }
 
-  mesh_quad(P f(double u, double v), double u0, double v0)
+  element(P f(double u, double v), double u0, double v0)
   {
     pt1=f(u0+EPS,v0+EPS);
     pt2=f(u0+du-EPS,v0+EPS);
@@ -54,9 +53,9 @@ public:
 
 };
 
-class by_distance {
+class By_distance {
 public:
-  bool operator() (const mesh_quad& arg1, const mesh_quad& arg2)
+  bool operator() (const element& arg1, const element& arg2)
   {
     return arg1.how_far() > arg2.how_far(); 
   }
@@ -88,16 +87,16 @@ int main() {
   crop();
   fill();
 
-  std::vector<mesh_quad> mesh(0);
+  std::vector<element> mesh(0);
 
   for (int i=0; i<N1; ++i)
     for (int j=0; j<N2; ++j)
       {
-	mesh.push_back(mesh_quad(f1, -1+du*i, -1+dv*j));
-	mesh.push_back(mesh_quad(f2, -1+du*i, -1+dv*j));
+	mesh.push_back(element(f1, -1+du*i, -1+dv*j));
+	mesh.push_back(element(f2, -1+du*i, -1+dv*j));
       }
 
-  sort(mesh.begin(), mesh.end(), by_distance());
+  sort(mesh.begin(), mesh.end(), By_distance());
 
   for (unsigned int i=0; i<mesh.size(); ++i)
     mesh.at(i).draw();

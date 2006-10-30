@@ -15,10 +15,7 @@ domain R(P(0,0,0), P(1, 1.5, 1), mesh(24, 8, 32), mesh(24, 40, 80));
 
 int main(int argc, char* argv[])
 {
-  double tix;
-  if (argc == 0)
-    tix=0;
-  else
+  if (argc == 3)
     {
       char* arg;
       double temp1, temp2;

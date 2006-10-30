@@ -88,11 +88,11 @@ public:
 	  plain();
 	}
 
-      path border 
-	= polygon(8, &pt1, &pt2, &pt3, &pt4, &pt5, &pt6, &pt7, &pt8);
+      path border;
+      border.pt(pt1).pt(pt2).pt(pt3).pt(pt4);
+      border.pt(pt5).pt(pt6).pt(pt7).pt(pt8).close().fill();
 
       gray(dens);
-      border.set_fill();
       border.draw();
     }
     else { 
@@ -103,8 +103,8 @@ public:
 	  rgb(0.8, 0.6, 0.5);
 	  //	  red(0.8);
 	}
-      path border = polyline(5, &pt1, &pt2, &pt3, &pt4, &pt5);
-
+      path border;
+      border.pt(pt1).pt(pt2).pt(pt3).pt(pt4).pt(pt5).close();
       border.draw();
     }
 
@@ -114,7 +114,7 @@ public:
 
 bool mesh_elt::last_was_seg = false;
 
-class by_distance {
+class By_distance {
 public:
   bool operator() (const mesh_elt arg1, const mesh_elt arg2)
   { return (arg1.how_far()) > (arg2.how_far()); }
@@ -163,7 +163,7 @@ int main() {
   plot(cusp, -TMIN, TMIN, 80);
 
   plain();
-  stable_sort(mesh.begin(), mesh.end(), by_distance());
+  stable_sort(mesh.begin(), mesh.end(), By_distance());
 
   //  camera.range(20);
   //  for_each(mesh.begin(), mesh.end(), std::mem_fun(mesh_elt::draw));
