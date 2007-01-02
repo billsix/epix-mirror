@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 1.0.15
- * Last Change: October 10, 2006
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -31,6 +31,8 @@
  * along with ePiX; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include <list>
+
 #include "triples.h"
 #include "frame.h"
 
@@ -39,41 +41,49 @@
 namespace ePiX 
 {
   class domain;
+  class domain_list;
+  class facet;
 
-  class facet {
+  // manipulable collection of surface-like objects
+  class scenery {
   public:
-    // create quasi-planar region bounded by path segments in f(R)
-    facet(P f(double u, double v), const domain& R, double u0, double v0);
+    scenery() { };
+    scenery(P F(double, double), const domain& R);
+    scenery(P F(double, double, double), const domain& R);
 
-    // for surfaces of rotation
-    facet(double f(double), double g(double), const domain& R,
-	  double u0, double v0, const frame& coords=frame());
+    scenery(const scenery&);
+    scenery& operator= (const scenery&);
+    ~scenery();
 
-    double how_far(void) const;
- 
-    bool front_facing(void) const;
+    scenery& add(P F(double, double), const domain& R);
+    scenery& add(P F(double, double, double), const domain& R);
 
-    void draw(void);
+    scenery& add(P F(double, double), const domain_list&);
+    scenery& add(P F(double, double, double), const domain_list&);
+
+    void draw(); // not const: must sort facets
 
   private:
-    path bd;
-    P pt1, pt2, pt3, pt4, center, direction;
-    double distance;
-  };
+    std::list<facet*> m_data;
+  }; // end of class scenery
 
-
-  class by_distance {
-  public:
-    bool operator() (const facet&, const facet&);
-  };
-
-
+  // except as noted, dim(R) must be 2
   // cosine-shaded surface with fake z-buffered hidden object removal
   void surface(P F(double, double), const domain& R);
 
+  // for slices of maps R^3 -> R^3
+  void surface(P F(double, double, double), const domain& R);
+
+  // plot multiple slices
+  void surface(P F(double, double, double), const domain_list& R);
+
   // Surface from revolving the curve (f(t),g(t)) about the x-axis...
   void surface_rev(double f(double), double g(double),
-		   double min_x, double max_x, 
+		   double t_min, double t_max, 
+		   int latitudes, int longitudes=24);
+
+  void surface_rev(double f(double),
+		   double t_min, double t_max, 
 		   int latitudes, int longitudes=24);
 
   // or about the specified axis, with specified angle range

@@ -58,7 +58,7 @@ namespace ePiX {
     std::vector<segment> edges;
 
   public:
-    one_skel(void);
+    one_skel();
     one_skel(unsigned int num_edges ...); // list of edges
 
     one_skel(const one_skel& old);

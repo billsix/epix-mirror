@@ -30,21 +30,21 @@ CTAN:
 
 	http://www.ctan.org/tex-archive/graphics/epix
 
-Mailing list (to subscribe):
+Mailing lists:
 
-	ahwang-epix-subscribe@mathcs.holycross.edu
+	http://lists.nongnu.org/mail/?group=epix
 
 .SH DOCUMENTATION
 Sample files and an extensive tutorial introduction/reference manual
 come with the source code. Please look in
 .B @docdir@
-for these materials. The documentation can be downloaded in several
-formats from the project page. 
+for these materials. The documentation can be downloaded separately.
+Please consult the project page. 
 
 .SH "AUTHOR"
 .nf
 .na
-Andrew D. Hwang (rot 13: nujnat at zngupf dot ubylpebff dot rqh)
+Andrew D. Hwang (ahwang -at- mathcs -dot- holycross -dot- edu)
 Department of Mathematics and Computer Science
 College of the Holy Cross
 Worcester, MA 01610-2395, USA

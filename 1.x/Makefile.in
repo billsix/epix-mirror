@@ -248,7 +248,7 @@ libepix_a_LIBADD = $(libepix_a_CXXSOURCES:.cc=.o)
 # Makefile for ePiX v1.x
 #
 man_MANS = epix.1 elaps.1 flix.1 laps.1
-EPIX_CONFFILES = bash_completions epix.ebuild epix.el epix.spec
+EPIX_CONFFILES = bash_completions epix.el
 EPIX_NOTEFILES = AUTHORS BUGS ChangeLog COPYING INSTALL NEWS POST-INSTALL \
 	README README-changes README-porting THANKS VERSION
 

@@ -68,9 +68,9 @@
 #ifndef EPIX_LENGTHS
 #define EPIX_LENGTHS
 
-#include "pairs.h"
-
 namespace ePiX {
+
+  class pair;
 
   // If less than EPIX_EPSILON, set to zero 
   double truncate(double);

@@ -73,14 +73,14 @@ namespace ePiX {
   void dot_size(double diam=3);
   void gray(double depth=0.3);
 
-  void radians(void);
-  void degrees(void);
-  void revolutions(void);
+  void radians();
+  void degrees();
+  void revolutions();
   double angle(const double t);
 
   void label_angle(double t); // defined in functions.cc
 
-  void solid(void);
+  void solid();
   void dashed(double t=0);
   void dotted(double t=0);
 
@@ -92,7 +92,7 @@ namespace ePiX {
   void font_size(std::string arg="normalsize");
   void font_face(std::string arg="default");
 
-  void begin(void); // write figure header; defined in output.cc
+  void begin(); // write figure header; defined in output.cc
 
   void arrow_width(double w=3);
   void arrow_ratio(double r=5.5);
@@ -147,7 +147,7 @@ namespace ePiX {
     friend void font_size(std::string arg);
     friend void font_face(std::string arg);
 
-    friend void begin(void); // defined in output.cc
+    friend void begin(); // defined in output.cc
 
     // set arrowhead parameters
     friend void arrow_width(double w);

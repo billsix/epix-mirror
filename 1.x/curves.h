@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 1.0.15
- * Last Change: October 09, 2006
+ * Version 1.0.20
+ * Last Change: November 03, 2006
  */
 
 /* 
@@ -36,11 +36,11 @@
 #define EPIX_CURVES
 
 #include "globals.h"
-#include "triples.h"
-#include "domain.h"
-#include "cropping.h"
 
 namespace ePiX {
+
+  class P;
+  class mesh;
 
   extern double x_min, y_min, x_max, y_max;
 

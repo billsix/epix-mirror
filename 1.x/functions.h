@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.16
- * Last Change: October 14, 2006
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -68,6 +68,15 @@ namespace ePiX {
   double Acos(double t);
   double Asin(double t);
   double Atan(double t);
+
+  // additional hyperbolic functions and inverses
+  double sech(double);
+  double csch(double);
+  double coth(double);
+
+  double asech(double);
+  double acsch(double);
+  double acoth(double);
 
   // identity and zero functions, coordinate projections
   template<class T>T id(T arg) { return arg; }

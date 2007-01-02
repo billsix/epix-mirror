@@ -185,7 +185,7 @@ namespace ePiX {
     crop_mask::Crop_Box = crop_mask(pair(arg1), pair(arg2));
   }
 
-  void crop_box(void)
+  void crop_box()
   {
     crop_mask::Crop_Box = crop_mask::Bounding_Box;
   }

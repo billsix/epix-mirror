@@ -40,15 +40,15 @@ namespace ePiX {
   P::P(double arg1, double arg2, double arg3)
     : m_X1(arg1), m_X2(arg2), m_X3(arg3) { }
 
-  double P::x1(void) const
+  double P::x1() const
   {
     return m_X1;
   }
-  double P::x2(void) const
+  double P::x2() const
   {
     return m_X2;
   }
-  double P::x3(void) const
+  double P::x3() const
   {
     return m_X3;
   }

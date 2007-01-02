@@ -3,13 +3,12 @@
  *
  * Andrew D. Hwang   <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *
- * Version 1.0.16
- * Last Change: October 14, 2006
- *
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -36,7 +35,7 @@
  * This file provides plotting templates, with T a class
  *
  *  void plot_map_dom(const T&, const domain&)
- *  void plot_map_domlist(const T&, const std::vector<domain>&)
+ *  void plot_map_domlist(const T&, const domain_list&)
  *  void plot_function(const T&, double, double, int)
  *  void euler_plot(const T&, const P&, double, double, int)
  *  P    euler_flow(const T&, P start, double, int)
@@ -45,11 +44,15 @@
 #ifndef EPIX_PLOT_ALGO
 #define EPIX_PLOT_ALGO
 
+#include <list>
+
 #include "triples.h"
 #include "functions.h"
 #include "domain.h"
 
 namespace ePiX {
+
+  typedef std::list<domain>::const_iterator dolci;
 
   template<class T> void plot_map_dom(const T& map, const domain& R)
     {
@@ -128,11 +131,10 @@ namespace ePiX {
     }; // end of plot_map_dom
 
   // plot over a list of domains
-  template<class T> void plot_map_domlist(const T& map,
-					  const std::vector<domain>& R_list)
+  template<class T> void plot_map_domlist(const T& map, const domain_list& R)
     {
-      for (unsigned int i=0; i < R_list.size(); ++i)
-	plot_map_dom(map, R_list.at(i));
+      for (dolci p=R.m_list.begin(); p != R.m_list.end(); ++p)
+	plot_map_dom(map, *p);
     }
 
   // paths

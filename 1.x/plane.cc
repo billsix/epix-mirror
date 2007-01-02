@@ -81,7 +81,7 @@ namespace ePiX {
     return m_perp;
   }
 
-  plane& plane::reverse(void) 
+  plane& plane::reverse() 
   { 
     m_perp *= -1;
     return *this;

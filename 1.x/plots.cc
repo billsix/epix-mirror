@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.19
- * Last Change: October 23, 2006
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -56,6 +56,8 @@
 namespace ePiX {
 
   extern epix_camera camera;
+
+  typedef std::list<domain>::const_iterator dolci;
 
   // f:R -> R^3
   void plot(P f(double), double t_min, double t_max, int num_pts)
@@ -124,21 +126,33 @@ namespace ePiX {
     plot(proj1, proj2, f, p1, p2, coarse, fine);
   }
 
-  void plot(double f(double u1, double u2), const domain& R)
-  {
-    plot_map_dom(column_2var(proj1, proj2, f), R);
-  }
-
   // f:R^2 -> R^3
-  void plot(P f(double u1, double u2),
-	    const P& p1, const P& p2, const mesh& coarse, const mesh& fine)
-  {
-    plot_map_dom(surface_map(f), domain(p1, p2, coarse, fine));
-  }
-
   void plot(P f(double u1, double u2), const domain& R)
   {
     plot_map_dom(surface_map(f), R);
+  }
+
+  void plot(P f(double u1, double u2), const domain_list& R)
+  {
+    surface_map phi(f);
+
+    for (dolci p=R.m_list.begin(); p != R.m_list.end(); ++p)
+      plot_map_dom(phi, *p);
+  }
+
+
+  // f:R^3 -> R^3
+  void plot(P f(double, double, double), const domain& R)
+  {
+    plot_map_dom(space_map(f), R);
+  }
+
+  void plot(P f(double, double, double), const domain_list& R)
+  {
+    space_map phi(f);
+
+    for (dolci p=R.m_list.begin(); p != R.m_list.end(); ++p)
+      plot_map_dom(phi, *p);
   }
 
 

@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 09, 2006
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -32,7 +32,8 @@
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
 
-#include <vector>
+#include <list>
+#include <iostream>
 
 #include "globals.h"
 #include "triples.h"
@@ -42,10 +43,20 @@
 
 namespace ePiX {
 
+  typedef std::list<domain>::const_iterator dolci;
+
   mesh::mesh(int n1, int n2, int n3)
-    : mesh1((int)max(1, fabs(n1))),
-      mesh2((int)max(1, fabs(n2))),
-      mesh3((int)max(1, fabs(n3))) { }
+    : n_1((int)max(1, fabs(n1))),
+      n_2((int)max(1, fabs(n2))),
+      n_3((int)max(1, fabs(n3))) { }
+
+  mesh::mesh(int n)
+    : n_1((int)max(1, fabs(n))),
+      n_2((int)max(1, fabs(n))),
+      n_3((int)max(1, fabs(n))) { }
+
+  mesh::mesh() : n_1(1), n_2(1), n_3(1) { }
+
 
   domain::domain(P arg1, P arg2, mesh c, mesh f) 
     : corner1(arg1), corner2(arg2)
@@ -62,32 +73,45 @@ namespace ePiX {
   }
 
 
-  double domain::step1(void) const
+  int domain::dim() const
+  {
+    int D(0);
+    if (fabs(corner2.x1() - corner1.x1()) > EPIX_EPSILON)
+      ++D;
+    if (fabs(corner2.x2() - corner1.x2()) > EPIX_EPSILON)
+      ++D;
+    if (fabs(corner2.x3() - corner1.x3()) > EPIX_EPSILON)
+      ++D;
+
+    return D;
+  }
+
+  double domain::step1() const
   {
     return (corner2.x1() - corner1.x1())/coarse.n1();
   }
 
-  double domain::step2(void) const
+  double domain::step2() const
   {
     return (corner2.x2() - corner1.x2())/coarse.n2();
   }
 
-  double domain::step3(void) const
+  double domain::step3() const
   {
     return (corner2.x3() - corner1.x3())/coarse.n3();
   }
 
-  double domain::dx1(void) const
+  double domain::dx1() const
   {
     return (corner2.x1() - corner1.x1())/fine.n1();
   }
 
-  double domain::dx2(void) const
+  double domain::dx2() const
   {
     return (corner2.x2() - corner1.x2())/fine.n2();
   }
 
-  double domain::dx3(void) const
+  double domain::dx3() const
   {
     return (corner2.x3() - corner1.x3())/fine.n3();
   }
@@ -185,34 +209,78 @@ namespace ePiX {
 
 
   // coordinate slices
-  std::vector<domain> domain::slices1(void) const
+  std::list<domain> domain::slices1(const unsigned int n) const
   {
-    std::vector<domain> temp(1+coarse.n1());
+    unsigned int N(coarse.n1());
+    double du(step1());
 
-    for (int i=0; i <= coarse.n1(); ++i)
-      temp.at(i) = slice1(corner1.x1() + i*step1());
+    if (n > 0)
+      {
+	du *= N*1.0/n;
+	N = n;
+      }
 
-    return temp;
+    std::list<domain> val;
+
+    for (unsigned int i=0; i <= N; ++i)
+      val.push_back(slice1(corner1.x1() + i*du));
+
+    return val;
   }
 
-  std::vector<domain> domain::slices2(void) const
+  std::list<domain> domain::slices2(const unsigned int n) const
   {
-    std::vector<domain> temp(1+coarse.n2());
+    unsigned int N(coarse.n2());
+    double du(step2());
 
-    for (int j=0; j <= coarse.n2(); ++j)
-      temp.at(j) = slice2(corner1.x2() + j*step2());
+    if (n > 0)
+      {
+	du *= N*1.0/n;
+	N = n;
+      }
 
-    return temp;
+    std::list<domain> val;
+
+    for (unsigned int i=0; i <= N; ++i)
+      val.push_back(slice2(corner1.x2() + i*du));
+
+    return val;
   }
 
-  std::vector<domain> domain::slices3(void) const
+  std::list<domain> domain::slices3(const unsigned int n) const
   {
-    std::vector<domain> temp(1+coarse.n3());
+    unsigned int N(coarse.n3());
+    double du(step3());
 
-    for (int k=0; k <= coarse.n3(); ++k)
-      temp.at(k) = slice3(corner1.x3() + k*step3());
+    if (n > 0)
+      {
+	du *= N*1.0/n;
+	N = n;
+      }
 
-    return temp;
+    std::list<domain> val;
+
+    for (unsigned int i=0; i <= N; ++i)
+      val.push_back(slice3(corner1.x3() + i*du));
+
+    return val;
   }
 
+  domain_list::domain_list(std::list<domain> arg)
+    : m_list(arg) { }
+
+  domain_list& domain_list::add(const domain& arg)
+  {
+    m_list.push_back(arg);
+    return *this;
+  }
+
+  domain_list& domain_list::add(const domain_list& arg)
+  {
+    // Less efficient than m_list.splice(m_list.end(), arg), but preserves arg
+    for (dolci p=arg.m_list.begin(); p != arg.m_list.end(); ++p)
+      m_list.push_back(*p);
+
+    return *this;
+  }
 } // end of namespace

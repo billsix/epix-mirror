@@ -58,9 +58,9 @@ namespace ePiX {
   public:
     P(double arg1=0, double arg2=0, double arg3=0);
 
-    double x1(void) const;
-    double x2(void) const;
-    double x3(void) const;
+    double x1() const;
+    double x2() const;
+    double x3() const;
 
     // increment operators
     P& operator += (const P&);

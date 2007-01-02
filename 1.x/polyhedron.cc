@@ -51,11 +51,11 @@ namespace ePiX {
     cpv(const P& arg)
       : location(arg), angle(0) { }
 
-    P posn(void) const
+    P posn() const
     {
       return location;
     }
-    double get_angle(void) const
+    double get_angle() const
     {
       return angle;
     }

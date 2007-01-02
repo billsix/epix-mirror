@@ -40,10 +40,10 @@ elaps.1
 elaps.in
 #epix.1
 epix.1.in
-epix.ebuild
+#epix.ebuild
 epix.el
 epix.in
-epix.spec
+#epix.spec
 epix-lib.sh
 errors.h
 files

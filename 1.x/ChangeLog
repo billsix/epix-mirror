@@ -1,8 +1,52 @@
 ePiX -- ChangeLog
 
-Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+Andrew D. Hwang  <ahwang -at- mathcs -dot- holycross -dot- edu>
 
 
+December 29, 2006--January 01, 2007 (v1.1)
+* (make_header) Add <list> to epix.h
+* (domain.*)
+  - "dim" function, returns dimension of domain (0--3)
+  - "slices" take optional argument (number of slices)
+  - "slices" return list (not vector) of domains
+  - domain_list class (wrapper around std::list<domain>)
+  - mesh(n) defaults to mesh(n, n, n); formerly mesh(n, 1, 1)
+* (functions.*) Add sech, csch, coth, and inverses
+* (plot_algorithms.h) Use domain_list
+* (plots.*)
+  - New functions:
+      plot(P f(double, double), const domain_list&);
+      plot(P f(double, double, double), const domain&);
+      plot(P f(double, double, double), const domain_list&);
+  - Remove ambigous overloads:
+      plot(double f(double, double), const domain&);
+      plot(P f(double, double), const P&, const P&, const mesh&, const mesh&);
+* (surface.*)
+  - New functions:
+      surface(f(double, double), domain_list)
+      surface(f(double, double, double), domain)
+      surface(f(double, double, double), domain_list)
+      surface_rev(f(double), t_min, t_max, n_lats, n_longs)
+  - New class "scenery", for unions of surfaces
+  - Move facet, by_distance classes to cc file
+  - Misc cleanup
+* (New files samples/extras/decorate,minkowski,spherical.xp)
+
+November 11, 2006 (v1.0.21)
+* (epix.1.in, this file) Human-readable email address
+
+November 6, 2006 (v1.0.20)
+* Remove README-Authors, epix.ebuild, epix.spec
+
+November 3, 2006
+* (Several cc, h files)
+  - (void) -> ()
+  - Remove spurious dependencies
+* (make_header) errors.h, Label.h, lengths.h removed from epix.h
+* (contrib)
+  - h_scale and v_scale added to Hatch.cc (formerly inlined)
+  - (doc) Installation instructions updated
+	
 October 29, 2006
 * (geometry.{cc,h}) Spherical arcs and lines, regular polyhedra
 * (New file: samples/extras/polyhedra.xp)

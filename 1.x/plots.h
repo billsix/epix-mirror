@@ -3,12 +3,12 @@
  *
  * Andrew D. Hwang   <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  *
- * Version 1.0.19
- * Last Change: October 23, 2006
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -36,6 +36,7 @@
 namespace ePiX {
 
   class domain;
+  class domain_list;
   class Deriv;
   class Integral;
   class P;
@@ -75,25 +76,25 @@ namespace ePiX {
   void plot(double f(double u1, double u2),
 	    const P& p1, const P& p2, const mesh& coarse, const mesh& fine);
 
-  void plot(double f(double u1, double u2), const domain& R);
-
   // f:R^2 -> R^3
-  void plot(P f(double u1, double u2),
-	    const P& p1, const P& p2, const mesh& coarse, const mesh& fine);
+  void plot(P f(double, double), const domain&);
+  void plot(P f(double, double), const domain_list&);
 
-  void plot(P f(double u1, double u2), const domain& R);
+  // f:R^3 -> R^3
+  void plot(P f(double, double, double), const domain&);
+  void plot(P f(double, double, double), const domain_list&);
 
 
   // Derivatives and integrals
-  void plot_deriv(double f(double t), double a, double b, int num_pts);
+  void plot_deriv(double f(double), double a, double b, int num_pts);
 
   void plot_int(double f(double), double a, double b, int num_pts);
 
   void plot_int(double f(double), double x0, double a, double b, int num_pts);
 
-  void tan_line(double f1(double t), double f2(double t), double t0);
-  void tan_line(double f(double t), double t0);
-  void tan_line(P f(double t), double t0);
+  void tan_line(double f1(double), double f2(double), double t0);
+  void tan_line(double f(double), double t0);
+  void tan_line(P f(double), double t0);
 
   void envelope(double f1(double), double f2(double), double, double, int);
   void envelope(double f(double), double, double, int);

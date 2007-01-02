@@ -101,8 +101,8 @@ namespace ePiX {
     // concatenate, reversing second sequence
     path& operator-= (const path& vertices);
 
-    bool is_closed(void) const { return closed; }
-    bool is_filled(void) const { return filled; }
+    bool is_closed() const { return closed; }
+    bool is_filled() const { return filled; }
 
     // set attributes
     path& close(const bool arg=true);
@@ -116,7 +116,7 @@ namespace ePiX {
     void crop_to(const crop_mask& screen, const bool arg=true);
     void clip_to(const enclosure& world, const bool arg=true);
     //    void hide_by(bool hiding(const P));
-    void draw(void);
+    void draw();
 
     void draw(sphere, bool); // spherical plotting (front/back), in sphere.cc
 
