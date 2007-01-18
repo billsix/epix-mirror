@@ -88,15 +88,15 @@ namespace ePiX {
   vertex::vertex(const P& arg)
     : location(arg), onscreen(true), in_world(true) { }
 
-  P vertex::here(void) const
+  P vertex::here() const
   {
     return location;
   }
-  bool vertex::is_onscreen(void) const
+  bool vertex::is_onscreen() const
   {
     return onscreen;
   }
-  bool vertex::is_in_world(void) const
+  bool vertex::is_in_world() const
   {
     return in_world;
   }
@@ -775,7 +775,7 @@ namespace ePiX {
   path_pt::path_pt(const vertex& arg, bool is_start, bool is_end)
     : location(arg.here()), start(is_start), end(is_end) { }
 
-  void path_pt::unset(void)
+  void path_pt::unset()
   {
     start = end = false;
   }

@@ -36,7 +36,7 @@
 
 namespace ePiX {
 
-  const std::string epix_version("EPIX_VERSION_NUMBER"); 
+  const std::string epix_version("1.0.22"); 
 
   // for backward compatibility, not in epix class
   double x_min, x_max, x_size, y_min, y_max, y_size;

@@ -21,24 +21,22 @@ int main()
   bounding_box(P(-MAX,-MAX), P(MAX, MAX));
   unitlength("0.5in");
   picture(4,4);
-  //  offset(4,0);
+  // offset(4,0);
 
   begin();
 
-  domain R1(P(-MAX,-MAX), P(MAX,MAX), mesh(4,4), mesh(60,60));
-  domain R2(P(-4,-4), P(4,4), mesh(1,24), mesh(120,120));
-
-  viewpoint(1,-3,5);    camera.range(40);
+  camera.at(P(1,-3,5));
+  camera.range(40);
 
   clip_box(P(MAX,MAX,2*MAX));
   clip();
 
   red(); 
-  plot(f, R1);
+  plot(f, P(-MAX,-MAX), P(MAX,MAX), mesh(4,4), mesh(60,60));
 
   bold(); rgb(0.5,0.5,1); 
   line(P(MAX,-MAX,0), P(-MAX, MAX,0));
-  plot(F1, R2);
+  plot(F1, domain(P(-4,-4), P(4,4), mesh(1,24), mesh(120,120)));
 
   end(); 
 }

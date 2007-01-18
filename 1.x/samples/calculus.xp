@@ -1,15 +1,14 @@
 /* -*-ePiX-*- */
-/* calculus.c -- May 29, 2002 */
 #include "epix.h"
 using namespace ePiX;
 
-double MAX=2*M_PI;
+double MAX(2*M_PI);
 double f(double t)
 {
   return t*Sin(t);
 }
 
-int main() 
+int main()
 {
   unitlength("1pt");
   picture(240, 120);
@@ -32,10 +31,10 @@ int main()
   bold();
   plot(f, x_min, x_max, 90);
   green();
-  plot(D(f), x_min, x_max, 90);    // derivative class "D"
+  plot(Deriv(f), x_min, x_max, 90);
 
   blue();
-  plot(I(f, 0), x_min, x_max, 90); // definite integral from x=0
+  plot(Integral(f, 0), x_min, x_max, 90); // definite integral from 0
 
   end();
 }
