@@ -1,6 +1,6 @@
 ePiX -- samples/extras/README
 
-Last Change: October 29, 2006
+Last Change: December 31, 2006
 
 This directory contains additional sample files. Files with extension
 ".flx" may be converted to gif or mng animations with the "flix" shell
@@ -18,6 +18,8 @@ butterfly.xp: a Thom catastrophe graph
 conic.xp: Projective equivalence of a parabola with a circle
 
 cube.flx: stereoscopic (3-D glasses) movie of a rotating cube
+
+decorate.xp: Decorated shaded surface (see file for compiling)
 
 demoivre.xp: A geometric proof of deMoivre's formula
 
@@ -40,6 +42,8 @@ log.xp: The Riemann surface of log; object hiding with paths and surfaces
 
 lorenz.xp: A Lorenz attractor and its 3-D vector field
 
+minkowski.xp: A longitudinal slice of Minkowski space R^{2,1}
+
 mirrorball.flx: Using the circle class
 
 pendulum.flx: Phase diagram of an undamped pendulum
@@ -52,6 +56,8 @@ R_demo.xp: Gaussians from the R demo
 riemann.flx: Rotating the Riemann surface of sqrt(z) in R^4
 
 saddle.xp: A quadratic saddle using "surface" capabilities
+
+spherical.xp: Spherical coordinates (multiple shaded surfaces)
 
 steiner.flx: Steiner's Roman surface, rotating
 

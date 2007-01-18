@@ -46,8 +46,8 @@ namespace ePiX {
       pair(const double arg1=0, const double arg2=0) : X1(arg1), X2(arg2) { }
       pair(const P& arg); // take first two coordinates
 
-      double x1(void) const { return X1; }
-      double x2(void) const { return X2; }
+      double x1() const { return X1; }
+      double x2() const { return X2; }
 
       // unary increment operators
       pair& operator += (const pair& arg);

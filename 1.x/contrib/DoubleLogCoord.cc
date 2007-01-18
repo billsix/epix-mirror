@@ -10,6 +10,8 @@
  *
  * Last change February 7, 2004
  *
+ * Oct 17, 2006 -- Remove adplot
+ *
  */
 
 #include <cstring>
@@ -107,16 +109,18 @@ namespace ePiX_contrib
     return log10(func(pow(10,x)));
   }
 
+  /*
   void DoubleLogCoord::adplot(double f(double), double a, double b, int n)
   {
     func = f;
-    ::adplot(doubleLogFunc,a,b,n);
+    ePiX::adplot(doubleLogFunc,a,b,n);
   }
+  */
 
   void DoubleLogCoord::plot(double f(double), double a, double b, int n)
   {
     func = f;
-    ::plot(doubleLogFunc,a,b,n);
+    ePiX::plot(doubleLogFunc,a,b,n);
   }
 
 } // end of namespace

@@ -2,75 +2,26 @@
 #include "epix.h"
 using namespace ePiX;
 
-const int N1=24;  // latitudes
-const int N2=48;  // longitudes
+const int N1(24);  // latitudes
+const int N2(48);  // longitudes
 
-const P LIGHT(1,1,0.5);  // location of light, for shading
 const P VIEWPT(6, 3, 4);
 
-const double r_0=0.95;   // minor radius
-const double EPS=0.0025; // shrinkage
-const double du=2.0/N1, dv=2.0/N2;
-
-class element
+const double r_0(0.95); // minor radius
+const double R_0(2);    // major radius
+double g(double u)
 {
-private:
-  P pt1, pt2, pt3, pt4;
-  double distance;
-
-public:
-  element() 
-  {
-    pt1=pt2=pt3=pt4=P();
-    distance=camera.get_range();
-  }
-
-  element(P f(double u, double v), double u0, double v0)
-  {
-    pt1=f(u0+EPS,v0+EPS);
-    pt2=f(u0+du-EPS,v0+EPS);
-    pt3=f(u0+du-EPS,v0+dv-EPS);
-    pt4=f(u0+EPS,v0+dv-EPS);
-    
-    P center = 0.25*(pt1 + pt2 + pt3 + pt4);
-    P temp = camera.get_viewpt();
-
-    distance = norm(center-temp);
-  }
-
-  double how_far() const { return distance; }
-
-  void draw() 
-  { 
-    P normal = (pt2 - pt1)*(pt4 - pt1);
-    normal *= 1/norm(normal);
-
-    double dens  = 0.75*(1-pow(normal|LIGHT, 2)/(LIGHT|LIGHT));
-
-    gray(dens); 
-    ePiX::quad(pt1, pt2, pt3, pt4); 
-  }
-
-};
-
-class By_distance {
-public:
-  bool operator() (const element& arg1, const element& arg2)
-  {
-    return arg1.how_far() > arg2.how_far(); 
-  }
-};
+  return R_0 + r_0*Cos(u);
+}
 
 P f1(double u, double v)
 {
-  return polar(2+r_0*Cos(M_PI*u), M_PI*v) + P(0,0,r_0*Sin(M_PI*u)); // torus
+  return polar(g(u), v) + P(0,0,r_0*Sin(u));
 }
 
 P f2(double u, double v)
 {
-  return P(r_0*Sin(M_PI*u), 
-	   2+(2+r_0*Cos(M_PI*u))*Cos(M_PI*v),
-	     (2+r_0*Cos(M_PI*u))*Sin(M_PI*v));
+  return P(r_0*Sin(u), 2+ g(u)*Cos(v), g(u)*Sin(v));
 }
 
 int main() {
@@ -84,22 +35,15 @@ int main() {
   camera.look_at(P(0,1,0));
   camera.range(10);
 
+  revolutions();
   crop();
   fill();
 
-  std::vector<element> mesh(0);
+  domain R(P(0,0), P(1,1), mesh(N1, N2), mesh(3*N1, 3*N2));
 
-  for (int i=0; i<N1; ++i)
-    for (int j=0; j<N2; ++j)
-      {
-	mesh.push_back(element(f1, -1+du*i, -1+dv*j));
-	mesh.push_back(element(f2, -1+du*i, -1+dv*j));
-      }
-
-  sort(mesh.begin(), mesh.end(), By_distance());
-
-  for (unsigned int i=0; i<mesh.size(); ++i)
-    mesh.at(i).draw();
+  scenery tori(f1, R);
+  tori.add(f2, R);
+  tori.draw();
 
   end();
 }

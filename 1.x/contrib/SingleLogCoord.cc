@@ -99,16 +99,18 @@ namespace ePiX_contrib
     return log10(func(x));
   }
 
+  /*
   void SingleLogCoord::adplot(double f(double), double a, double b, int n)
   {
     func = f;
-    ::adplot(singleLogFunc,a,b,n);
+    ePiX::adplot(singleLogFunc,a,b,n);
   }
+  */
 
   void SingleLogCoord::plot(double f(double), double a, double b, int n)
   {
     func = f;
-    ::plot(singleLogFunc,a,b,n);
+    ePiX::plot(singleLogFunc,a,b,n);
   }
 
 } // end of namespace

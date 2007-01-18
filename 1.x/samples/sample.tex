@@ -923,46 +923,45 @@ int main()
 
 \clearpage
 
-\noindent \ePiX\ provides ``clipping'', a 3-dimensional analogus of 
-cropping; figure elements that lie outside a coordinate box are removed.
+\noindent \ePiX\ provides ``clipping'', which removes figure elements
+that lie outside a specified box and can be used (with manual
+ordering) to layer figure elements for hidden object removal.
 
 \begin{figure}[hbt]
 \begin{center}
 \input{pole.eepic}
-\vspace*{-2.25in}
+\vspace*{-2.5in}
 \begin{verbatim}
 #include "epix.h"
 using namespace ePiX;
-
-P F(double x, double y) { return P(x, y, x/(x*x+y*y)); }
-P pt0=P(), pt1 = P(1.5,1.5), pt2 = P(-1.5,1.5);
-domain R(-pt1, pt1, mesh(24,24), mesh(72,72));
+const int M=8;
+double MAX=1.5, Bd=2;
+P F(double x, double y) // fake pole
+{ return P(x, y, x/(0.01+x*x+y*y)); }
+P pt1 = P(-MAX,-MAX), pt2 = P(MAX, MAX);
 
 int main() 
 {
-  bounding_box(-pt1, pt1);
+  bounding_box(P(-Bd,-Bd), P(Bd,Bd));
   unitlength("1in");
   picture(2.5,2.5);
 
   begin();
-  viewpoint(-2,-4,3);  camera.range(10);
-  clip_box(P(-1.5,0,-2), P(1.5,1.5,2)); clip();
+  domain R(pt1, pt2, mesh(2*M,2*M), mesh(4*M,4*M));
+  label(P(x_min, y_max), P(2,-2), "$z=\\mathrm{Re}\\,\\frac{1}{x+iy}$", br);
+  viewpoint(6,8,5); Light=P(-4,10,10);
 
-  magenta(); grid(pt0, pt1, 6, 6); // right half, w/layering
-  bold(); black(); plot(F, R);     // surface mesh
+  clip(); clip_box(P(-Bd,-Bd,-Bd), P(Bd,Bd,0)); fill(); surface(F, R); // bottom half
+  gray(0); rect(pt1, pt2);  fill(false);
+  pen(0.15); rgb(0.75,0.75,0.75); plot(F, R); plain();  // simulate transparency
 
-  label(P(0, 0, -1.5), P(2,0), 
-        "$\\displaystyle z=\\mathrm{Re}\\,\\frac{1}{x+iy}$", r);
+  clip(false); magenta(); grid(pt1, pt2, M, M); // axes
+  arrow(P(-Bd,0,0), P(Bd,0,0));  label(P(Bd,0), P(-4,-2), "$x$", l); 
+  arrow(P(0,-Bd,0), P(0,Bd,0));  label(P(0,Bd), P( 2,-2), "$y$", br);
+  arrow(P(0, 0, 0), P(0,0,2.5)); label(P(0,0,2.5), P(0,4), "$z$", t);
 
-  plain(); gray(0); fill(); rect(pt0, pt2); // left half
-  fill(false); magenta(); grid(pt0, pt2, 6, 6);
-  label(P(0,0), P(2,-2), "0", br);
-  label(P(x_max,0), P(2,0), "$x$", r); 
-  label(P(0,y_max), P(-1,2), "$y$", t);
-
-  pen(1.5); red(); plot(F, R.slice2(0)); // graph over real axis
-  // re-draw mesh to simulate transparency
-  pen(0.15); rgb(0.5,0.5,0.5); plot(F, R.resize1(-1.5,0));
+  clip(); clip_box(P(-Bd,-Bd,0), P(Bd,Bd,Bd)); fill(); surface(F, R); // top half
+  fill(false); pen(1.5); red(); plot(F, R.resize1(0.5,MAX).slice2(0));
   end();
 }
 \end{verbatim}

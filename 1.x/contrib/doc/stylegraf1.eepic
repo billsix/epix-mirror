@@ -1,0 +1,25 @@
+%% Generated from stylegraf1.cc on Sun Mar 19 14:58:19 GMT 2006 by
+%% ePiX-1.0.7
+%%
+%%   Cartesian bounding box: [-2.2,3] x [0,1]
+%%   Actual size: 13cm x 0.5cm
+%%   Figure offset: right by 0cm, up by 0cm
+%%
+\setlength{\unitlength}{1cm}
+\begin{picture}(13,0.5)(-0,-0)
+%% ---
+\thinlines%
+\put(3,0.175){\line(1,0){10}}%
+\put(2.96485,-0.0534489){\makebox(0.070292,0.070292)[tc]{\scriptsize 0.1}}%
+\drawline(3,0.122281)(3,0.227719)%
+\put(5.46485,-0.0534489){\makebox(0.070292,0.070292)[tc]{\scriptsize 1.0}}%
+\drawline(5.5,0.122281)(5.5,0.227719)%
+\put(7.96485,-0.0534489){\makebox(0.070292,0.070292)[tc]{\scriptsize 10}}%
+\drawline(8,0.122281)(8,0.227719)%
+\put(10.4649,-0.0534489){\makebox(0.070292,0.070292)[tc]{\scriptsize 100}}%
+\drawline(10.5,0.122281)(10.5,0.227719)%
+\put(12.9649,-0.0534489){\makebox(0.070292,0.070292)[tc]{\scriptsize 1000}}%
+\drawline(13,0.122281)(13,0.227719)%
+%% ---
+\put(0,0.0695621){$stdstyle=1$:}
+\end{picture}

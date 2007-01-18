@@ -1,0 +1,112 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+/*
+ * Compile with, e.g. elaps -DLINEFIELD decorate.xp
+ */
+
+const int N1(24);  // latitudes
+const int N2(48);  // longitudes
+
+const double du(1.0/N1);
+const double dv(1.0/N2);
+
+const P VIEWPT(6, 3, 4);
+
+const double r_0(0.95); // minor radius
+const double R_0(2);    // major radius
+double g(double u)
+{
+  return R_0 + r_0*Cos(u);
+}
+
+P F(double u, double v)
+{
+  return polar(g(u), v) + P(0,0,r_0*Sin(u));
+}
+
+namespace ePiX {
+  class mesh_quad {
+  private:
+    P pt1, pt2, pt3, pt4, center;
+    double distance;
+
+  public:
+    mesh_quad(P f(double u, double v), double u0, double v0)
+      : pt1(f(u0,v0)), pt2(f(u0+du,v0)), pt3(f(u0+du,v0+dv)), pt4(f(u0,v0+dv)),
+	center(0.25*(pt1 + pt2 + pt3 + pt4)),
+	distance(norm(center-camera.get_viewpt())) { }
+	  
+    double how_far() const { return distance; }
+
+    void draw() const
+    { 
+      P direction(center-camera.get_viewpt());
+      P normal((pt2 - pt1)*(pt4 - pt1));
+      normal *= 1/norm(normal);
+
+      gray(0.75*(1-pow(normal|(recip(distance)*direction), 2)));
+
+#ifdef NORMAL
+      if ((normal|direction) < 0)
+	{
+	  blue();
+	  arrow(center, center-0.5*normal, 0.5);
+	  black();
+	}
+#endif
+      fill();
+      ePiX::quad(pt1, pt2, pt3, pt4);
+      fill(false);
+
+#ifdef NORMAL
+      if ((normal|direction) > 0)
+	{
+	  blue();
+	  arrow(center, center-0.5*normal, 0.5);
+	  black();
+	}
+#endif
+
+#ifdef LINEFIELD
+      red();
+      line(pt1, 0.5*(pt3+pt4));
+      line(0.5*(pt1+pt2), pt3);
+      black();
+#endif
+    }
+  };
+
+  class by_distance {
+  public:
+    bool operator() (const mesh_quad& arg1, const mesh_quad& arg2)
+    { return arg1.how_far() > arg2.how_far(); }
+  };
+} // end of namespace
+
+int main() {
+  bounding_box(P(-3,-3),P(3,3));
+  unitlength("1in");
+  picture(4,4);
+
+  begin();
+
+  viewpoint(VIEWPT);
+  camera.range(10);
+
+  revolutions();
+
+  std::vector<mesh_quad> mesh;
+
+  for (int i=0; i<N1; ++i)
+    for (int j=0; j<N2; ++j)
+      mesh.push_back(mesh_quad(F, i*du, j*dv));
+
+  sort(mesh.begin(), mesh.end(), by_distance());
+
+  //  arrow_fill(1);
+  for (unsigned int i=0; i<mesh.size(); ++i)
+    mesh.at(i).draw();
+
+  end();
+}

@@ -32,6 +32,18 @@ using namespace ePiX;
 
 namespace ePiX_contrib
 {
+  // declared in epix_ext.h
+  double h_scale(double x_posn)
+  {
+    double t((x_posn - x_min)*h_size()/x_size);
+    return (fabs(t) < EPIX_EPSILON) ? 0 : t;
+  }
+  double v_scale(double y_posn)
+  {
+    double t((y_posn - y_min)*v_size()/y_size);
+    return (fabs(t) < EPIX_EPSILON) ? 0 : t;
+  }
+
   static void lineThickness(char* thicknessStr);
 
   struct Line

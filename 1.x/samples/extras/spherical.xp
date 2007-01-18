@@ -1,0 +1,63 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double MAX(3);
+
+int main()
+{
+  bounding_box(P(-MAX,-MAX),P(MAX,MAX));
+  unitlength("1in");
+  picture(6,6);
+
+  begin();
+
+  camera.at(30,5,20);
+
+  revolutions();
+
+  domain R(P(0,0,-0.25), P(3,1,0.25), mesh(12, 48, 24), mesh(12, 96, 120));
+ 
+  std::list<domain> cuts;
+
+  double Phi(7.0/48), Theta(7.0/48);
+
+  cuts.push_back(R.slice1(2));
+  cuts.push_back(R.slice2(0));
+  cuts.push_back(R.slice2(Theta));
+  cuts.push_back(R.slice3(0));
+  cuts.push_back(R.slice3(Phi));
+
+  fill();
+  surface(sph, cuts);
+  fill(false);
+
+  arrow_fill(1);
+  arrow(P(3,0,0), P(3.5,0,0));
+  label(P(3.5,0,0), P(-2,-2), "$x$", bl);
+
+  arrow(P(0,3,0), P(0,3.5,0));
+  label(P(0,3.5,0), P(2,-2), "$y$", br);
+
+  arrow(P(0,0,3), P(0,0,3.5));
+  label(P(0,0,3.5), P(0,4), "$z$", t);
+
+  bold();
+  arc_arrow(P(0,0,0), 2, 0.5*Theta, Theta);
+  arc_arrow(P(0,0,0), 2, 0.5*Theta, 0);
+
+  aarrow(P(0,0,0), sph(2, Theta, Phi));
+
+  label(sph(2, 0.5*Theta, 0), P(2,2), "$\\theta$", t);
+  label(sph(2, Theta, 0.5*Phi), P(-2,0), "$\\phi$", l);
+  label(sph(1, Theta, Phi), P(2,-2), "$\\rho$", br);
+
+
+  dashed();
+  plain();
+  line(P(0,0,0), P(2,0,0));
+  line(P(0,0,0), sph(2, Theta, 0));
+  line(P(0,0,0), sph(2, Theta, Phi));
+
+  end();
+}

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.23
- * Last Change: January 02, 2007
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /* 
@@ -106,22 +106,6 @@ namespace ePiX {
   {
     return P(r*(Cos(t))*(Cos(phi)), r*(Sin(t))*(Cos(phi)), r*(Sin(phi)));
   }
-
-  P log_log(double x, double y, double z)
-  {
-    return P(log10(x), log10(y), z);
-  }
-
-  P log_lin(double x, double y, double z)
-  {
-    return P(log10(x), y, z);
-  }
-
-  P lin_log(double x, double y, double z)
-  {
-    return P(x, log10(y), z);
-  }
-
 
   P cylindrical(P arg)
   {

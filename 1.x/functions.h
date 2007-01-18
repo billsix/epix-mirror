@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.23
- * Last Change: January 02, 2007
+ * Version 1.1
+ * Last Change: January 01, 2007
  */
 
 /* 
@@ -90,11 +90,6 @@ namespace ePiX {
   P xyz(double x, double y, double z=0);
   P cyl(double r, double t, double z);
   P sph(double r, double t, double phi);
-
-  // for log data plotting
-  P log_log(double x, double y, double z=0);
-  P log_lin(double x, double y, double z=0);
-  P lin_log(double x, double y, double z=0);
 
   P cylindrical(P arg);
   P spherical(P arg);

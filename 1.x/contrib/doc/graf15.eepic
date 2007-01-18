@@ -1,0 +1,151 @@
+%% Generated from graf15.cc on Sun Mar 19 14:58:08 GMT 2006 by
+%% ePiX-1.0.7
+%%
+%%   Cartesian bounding box: [-1,1] x [0,2]
+%%   Actual size: 60mm x 60mm
+%%   Figure offset: right by 0mm, up by 0mm
+%%
+\setlength{\unitlength}{5mm}
+\begin{picture}(12,12)(-0,-0)
+%% ---
+%% horizontal logarithmic axis:
+%% vertical logarithmic axis:
+%% Coordinate system in box: [-1,1] x [0,2]
+%%
+%% horizontal axis:
+\thicklines%
+\put(0,0){\line(1,0){12}}%
+\put(-0.070292,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 0.1}}%
+\thinlines%
+\drawline(0,-0.105438)(0,0.105438)%
+\path(0,0)(0,12)%
+\allinethickness{0.03mm}%
+\path(0.58146,0)(0.58146,12)%
+\path(1.05655,0)(1.05655,12)%
+\path(1.45823,0)(1.45823,12)%
+\put(1.73589,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 2}}%
+\thinlines%
+\drawline(1.80618,-0.105438)(1.80618,0.105438)%
+\path(1.80618,0)(1.80618,12)%
+\allinethickness{0.03mm}%
+\path(2.38764,0)(2.38764,12)%
+\put(2.79244,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 3}}%
+\thinlines%
+\drawline(2.86273,-0.105438)(2.86273,0.105438)%
+\path(2.86273,0)(2.86273,12)%
+\allinethickness{0.03mm}%
+\path(3.61236,0)(3.61236,12)%
+\put(4.12353,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 5}}%
+\thinlines%
+\drawline(4.19382,-0.105438)(4.19382,0.105438)%
+\path(4.19382,0)(4.19382,12)%
+\allinethickness{0.03mm}%
+\path(4.66891,0)(4.66891,12)%
+\path(5.07059,0)(5.07059,12)%
+\path(5.41854,0)(5.41854,12)%
+\path(5.72546,0)(5.72546,12)%
+\put(5.92971,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 1.0}}%
+\thinlines%
+\drawline(6,-0.105438)(6,0.105438)%
+\path(6,0)(6,12)%
+\allinethickness{0.03mm}%
+\path(6.58146,0)(6.58146,12)%
+\path(7.05655,0)(7.05655,12)%
+\path(7.45823,0)(7.45823,12)%
+\put(7.73589,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 2}}%
+\thinlines%
+\drawline(7.80618,-0.105438)(7.80618,0.105438)%
+\path(7.80618,0)(7.80618,12)%
+\allinethickness{0.03mm}%
+\path(8.38764,0)(8.38764,12)%
+\put(8.79244,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 3}}%
+\thinlines%
+\drawline(8.86273,-0.105438)(8.86273,0.105438)%
+\path(8.86273,0)(8.86273,12)%
+\allinethickness{0.03mm}%
+\path(9.61236,0)(9.61236,12)%
+\put(10.1235,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 5}}%
+\thinlines%
+\drawline(10.1938,-0.105438)(10.1938,0.105438)%
+\path(10.1938,0)(10.1938,12)%
+\allinethickness{0.03mm}%
+\path(10.6689,0)(10.6689,12)%
+\path(11.0706,0)(11.0706,12)%
+\path(11.4185,0)(11.4185,12)%
+\path(11.7255,0)(11.7255,12)%
+\put(11.9297,-0.456898){\makebox(0.140584,0.140584)[tc]{\scriptsize 10}}%
+\thinlines%
+\drawline(12,-0.105438)(12,0.105438)%
+\path(12,0)(12,12)%
+\allinethickness{0.03mm}%
+\thinlines%
+%% ---
+%% vertical axis:
+\thicklines%
+\put(0,0){\line(0,1){12}}%
+\put(-0.456898,-0.070292){\makebox(0.140584,0.140584)[r]{\scriptsize 1.0}}%
+\thinlines%
+\drawline(-0.105438,0)(0.105438,0)%
+\path(0,0)(12,0)%
+\allinethickness{0.03mm}%
+\path(0,0.58146)(12,0.58146)%
+\path(0,1.05655)(12,1.05655)%
+\path(0,1.45823)(12,1.45823)%
+\put(-0.456898,1.73589){\makebox(0.140584,0.140584)[r]{\scriptsize 2}}%
+\thinlines%
+\drawline(-0.105438,1.80618)(0.105438,1.80618)%
+\path(0,1.80618)(12,1.80618)%
+\allinethickness{0.03mm}%
+\path(0,2.38764)(12,2.38764)%
+\put(-0.456898,2.79244){\makebox(0.140584,0.140584)[r]{\scriptsize 3}}%
+\thinlines%
+\drawline(-0.105438,2.86273)(0.105438,2.86273)%
+\path(0,2.86273)(12,2.86273)%
+\allinethickness{0.03mm}%
+\path(0,3.61236)(12,3.61236)%
+\put(-0.456898,4.12353){\makebox(0.140584,0.140584)[r]{\scriptsize 5}}%
+\thinlines%
+\drawline(-0.105438,4.19382)(0.105438,4.19382)%
+\path(0,4.19382)(12,4.19382)%
+\allinethickness{0.03mm}%
+\path(0,4.66891)(12,4.66891)%
+\path(0,5.07059)(12,5.07059)%
+\path(0,5.41854)(12,5.41854)%
+\path(0,5.72546)(12,5.72546)%
+\put(-0.456898,5.92971){\makebox(0.140584,0.140584)[r]{\scriptsize 10}}%
+\thinlines%
+\drawline(-0.105438,6)(0.105438,6)%
+\path(0,6)(12,6)%
+\allinethickness{0.03mm}%
+\path(0,6.58146)(12,6.58146)%
+\path(0,7.05655)(12,7.05655)%
+\path(0,7.45823)(12,7.45823)%
+\put(-0.456898,7.73589){\makebox(0.140584,0.140584)[r]{\scriptsize 2}}%
+\thinlines%
+\drawline(-0.105438,7.80618)(0.105438,7.80618)%
+\path(0,7.80618)(12,7.80618)%
+\allinethickness{0.03mm}%
+\path(0,8.38764)(12,8.38764)%
+\put(-0.456898,8.79244){\makebox(0.140584,0.140584)[r]{\scriptsize 3}}%
+\thinlines%
+\drawline(-0.105438,8.86273)(0.105438,8.86273)%
+\path(0,8.86273)(12,8.86273)%
+\allinethickness{0.03mm}%
+\path(0,9.61236)(12,9.61236)%
+\put(-0.456898,10.1235){\makebox(0.140584,0.140584)[r]{\scriptsize 5}}%
+\thinlines%
+\drawline(-0.105438,10.1938)(0.105438,10.1938)%
+\path(0,10.1938)(12,10.1938)%
+\allinethickness{0.03mm}%
+\path(0,10.6689)(12,10.6689)%
+\path(0,11.0706)(12,11.0706)%
+\path(0,11.4185)(12,11.4185)%
+\path(0,11.7255)(12,11.7255)%
+\put(-0.456898,11.9297){\makebox(0.140584,0.140584)[r]{\scriptsize 100}}%
+\thinlines%
+\drawline(-0.105438,12)(0.105438,12)%
+\path(0,12)(12,12)%
+\allinethickness{0.03mm}%
+\thinlines%
+%% ---
+\end{picture}

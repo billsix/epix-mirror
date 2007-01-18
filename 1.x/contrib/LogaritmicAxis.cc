@@ -18,6 +18,7 @@
 #include <cstring>
 #include <cfloat>
 
+#include "../lengths.h"
 #include "epix_ext.h"
 
 #define smallValue (1000*DBL_EPSILON)

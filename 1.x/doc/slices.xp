@@ -2,34 +2,38 @@
 #include "epix.h"
 using namespace ePiX;
 
+void my_grid(const P& loc, int N1, int N2, std::string lab)
+{
+  if (0 < N1)
+    {
+      const double dx(1.0/N1);
+      for (int i=-N1; i<= N1; ++i)
+	line(loc+P(i*dx,0), loc+P(i*dx,2));
+    }
+
+  if (0 < N2)
+    {
+      const double dy(1.0/N2);
+      for (int i=0; i<= N2; ++i)
+	line(loc+P(-1,2*i*dy), loc+P(1,2*i*dy));
+    }
+
+  label(loc, P(0,-4), "\\code{"+lab+"}", b);
+}
+
 int main() 
 {
-  bounding_box(P(0,0),P(8,2));
+  bounding_box(P(0,0),P(7,2));
   unitlength("1in");
   picture(5,0.75);
 
   begin();
 
-  grid(P(0,0), P(2,2), 12, 8);
-  label(P(1,0), P(0,-4), "\\code{R}", b);
-
-  /*
-  dashed();
-  grid(P(3,0), P(5,2), mesh(1, 1), mesh(6,4));
-  grid(P(6,0), P(8,2), mesh(1, 1), mesh(6,4));
-
-  solid();
-  */
   bold();
-  for (int i=0; i<= 12; ++i)
-    line(P(3+i*1.0/6, 0),P(3+i*1.0/6, 2));
 
-  label(P(4,0), P(0,-4), "\\code{R.slices1()}", b);
-
-  for (int i=0; i<= 8; ++i)
-    line(P(6, i*1.0/4), P(8, i*1.0/4));
-
-  label(P(7,0), P(0,-4), "\\code{R.slices2()}", b);
+  my_grid(P(1,0), 4, 7, "R");
+  my_grid(P(3.5,0), 4, 0, "R.slices1()");
+  my_grid(P(6,0), 0, 3, "R.slices2(3)");
 
   end();
 }
