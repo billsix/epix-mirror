@@ -1,15 +1,15 @@
 /* 
  * objects.cc -- ePiX axes, grids, markers, and labels
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality 
+ * figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 10, 2006
+ * Version 1.0.23
+ * Last Change: January 04, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -31,6 +31,8 @@
  * along with ePiX; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+
+#include <sstream>
 
 #include "globals.h"
 #include "triples.h"
@@ -182,6 +184,38 @@ namespace ePiX {
 	v_axis_tick(location);
 
     else // TICK == NULL or unknown
+      ;
+
+    end_stanza();
+  }
+
+  void draw_log_axis(const P& tail, const P& head,
+		     unsigned int segs, unsigned int base, epix_tick_type TICK)
+  {
+    line(tail, head, 0, segs);
+
+    const P step((1.0/segs)*(head - tail));
+    const double denom(log(base));
+
+    if (TICK == H_AXIS)
+      {
+	for (unsigned int i=0; i < segs; ++i)
+	  for (int j=1; j<base; ++j)
+	    h_axis_tick(tail + (i+log(j)/denom)*step);
+
+	h_axis_tick(head);
+      }
+
+    else if (TICK == V_AXIS)
+      {
+	for (unsigned int i=0; i < segs; ++i)
+	  for (int j=1; j<base; ++j)
+	    v_axis_tick(tail + (i+log(j)/denom)*step);
+
+	v_axis_tick(head);
+      }
+
+    else
       ;
 
     end_stanza();
@@ -396,5 +430,62 @@ namespace ePiX {
   void v_axis_masklabels(int n, const P& offset, epix_label_posn POSN)
   {
     v_axis_masklabels(P(0,y_min), P(0,y_max), n, offset, POSN);
+  }
+
+  void h_axis_log_labels(const P& tail, const P& head,
+			 const P& offset, epix_label_posn POSN)
+  {
+    if (EPIX_EPSILON < (tail.x2() - head.x2()) ) // non-horizontal axis
+      return;
+
+    // else
+    double my_y(tail.x2());
+    double x_lo(min(tail.x1(), head.x1()));
+    double x_hi(max(tail.x1(), head.x1()));
+
+    // get integer bounds in [x_lo, x_hi]
+    int k_lo((int) ceil(x_lo)),  k_hi((int) floor(x_hi)), segs(k_hi - k_lo);
+
+    for (int i = k_lo; i <= k_hi; ++i)
+      {
+	std::stringstream obuf;
+	obuf << "$10^{" << i << "}$";
+
+	label(P(i, my_y), offset, obuf.str(), POSN);
+      }
+  }
+
+  void v_axis_log_labels(const P& tail, const P& head,
+			 const P& offset, epix_label_posn POSN)
+  {
+    if (EPIX_EPSILON < (tail.x1() - head.x1()) ) // non-vertical axis
+      return;
+
+    // else
+    double my_x(tail.x1());
+    double y_lo(min(tail.x2(), head.x2()));
+    double y_hi(max(tail.x2(), head.x2()));
+
+    int k_lo((int) ceil(y_lo)),  k_hi((int) floor(y_hi)), segs(k_hi - k_lo);
+
+    for (int i = k_lo; i <= k_hi; ++i)
+      {
+	std::stringstream obuf;
+	obuf << "$10^{" << i << "}$";
+
+	label(P(my_x, i), offset, obuf.str(), POSN);
+      }
+  }
+
+  void h_log_axis(const P& tail, const P& head,
+		  unsigned int segs, unsigned int base)
+  {
+    draw_log_axis(tail, head, segs, base, H_AXIS);
+  }
+
+  void v_log_axis(const P& tail, const P& head,
+		  unsigned int segs, unsigned int base)
+  {
+    draw_log_axis(tail, head, segs, base, V_AXIS);
   }
 } // end of namespace

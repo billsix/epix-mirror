@@ -1,15 +1,15 @@
 /*
- * curves.h -- Ellipses, arcs, splines
+ * curves.h -- Ellipses, arcs, splines, coordinate grids
  *
- * This file is part of ePiX, a preprocessor for creating high-quality
- * line figures in LaTeX
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
- * Version 1.0.20
- * Last Change: November 03, 2006
+ * Version 1.0.23
+ * Last Change: January 04, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -131,6 +131,31 @@ namespace ePiX {
   // polar grid with n1 rings and n2 sectors
   void polar_grid(double r, int n1, int n2);
 
+
+  // (semi-)logarithmic grids specified by corners and numbers of orders of
+  // magnitude or grid divisions in each direction. Optional arguments
+  // specify the log base (10 by default). If corners are omitted, the grid
+  // fills the bounding box.
+  void log_grid(const P& arg1, const P& arg2,
+		unsigned int segs1, unsigned int segs2,
+		unsigned int base1=10, unsigned int base2=10);
+
+  void log1_grid(const P& arg1, const P& arg2,
+		 unsigned int segs1, unsigned int segs2,
+		 unsigned int base1=10);
+
+  void log2_grid(const P& arg1, const P& arg2,
+		 unsigned int segs1, unsigned int segs2,
+		 unsigned int base2=10);
+
+  void log_grid(unsigned int segs1, unsigned int segs2,
+		unsigned int base1=10, unsigned int base2=10);
+
+  void log1_grid(unsigned int segs1, unsigned int segs2,
+		 unsigned int base1=10);
+
+  void log2_grid(unsigned int segs1, unsigned int segs2,
+		 unsigned int base2=10);
 
   // fractal generation
   //

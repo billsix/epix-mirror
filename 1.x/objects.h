@@ -1,15 +1,15 @@
 /* 
  * objects.h -- ePiX axes, grids, markers, and labels
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality 
+ * figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 10, 2006
+ * Version 1.0.23
+ * Last Change: January 04, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -149,6 +149,19 @@ namespace ePiX {
 
   void v_axis_labels(int n, const P& offset, epix_label_posn POSN);
   void v_axis_masklabels(int n, const P& offset, epix_label_posn POSN);
+
+  // labels written $10^i$ at coord i
+  void h_axis_log_labels(const P& tail, const P& head,
+			 const P& offset, epix_label_posn POSN);
+
+  void v_axis_log_labels(const P& tail, const P& head,
+			 const P& offset, epix_label_posn POSN);
+
+  void h_log_axis(const P& tail, const P& head,
+		  unsigned int segs, unsigned int base=10);
+
+  void v_log_axis(const P& tail, const P& head,
+		  unsigned int segs, unsigned int base=10);
 
 } // end of namespace
 

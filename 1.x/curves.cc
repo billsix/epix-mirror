@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 09, 2006
+ * Version 1.0.23
+ * Last Change: January 04, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -584,6 +584,118 @@ namespace ePiX {
   {
     polar_grid(radius, mesh(n1,n2), mesh(n1,EPIX_NUM_PTS));
   }
+
+
+  // logarithmic grids
+
+  // local helpers
+  void grid_lines1_log(double x_lo, double x_hi, double y_lo, double y_hi,
+		       unsigned int segs, unsigned int base)
+  {
+    if (segs == 0)
+      return;
+
+    const double dx((x_hi-x_lo)/segs); // "major grid" steps
+    const double denom(log(base));  // "minor"/log grid scale factor
+
+    for (unsigned int i=0; i < segs; ++i)
+      for (int j=1; j<base; ++j)
+	{
+	  double x_tmp(x_lo + dx*(i+log(j)/denom));
+
+	  line(P(x_tmp, y_lo), P(x_tmp, y_hi));
+	}
+
+    line(P(x_hi,y_lo), P(x_hi, y_hi)); // draw rightmost line manually
+  }
+
+  void grid_lines2_log(double x_lo, double x_hi, double y_lo, double y_hi,
+		       unsigned int segs, unsigned int base)
+  {
+    if (segs == 0)
+      return;
+
+    const double dy((y_hi-y_lo)/segs);
+    const double denom(log(base));
+
+    for (unsigned int i=0; i < segs; ++i)
+      for (int j=1; j<base; ++j)
+	{
+	  double y_tmp(y_lo + dy*(i+log(j)/denom));
+
+	  line(P(x_lo, y_tmp), P(x_hi, y_tmp));
+	}
+
+    line(P(x_hi,y_lo), P(x_hi, y_hi));
+  }
+
+  // global functions
+  void log_grid(const P& arg1, const P& arg2,
+		unsigned int segs1, unsigned int segs2,
+		unsigned int base1, unsigned int base2)
+  {
+    grid_lines1_log(min(arg1.x1(), arg2.x1()), max(arg1.x1(), arg2.x1()),
+		    min(arg1.x2(), arg2.x2()), max(arg1.x2(), arg2.x2()),
+		    segs1, base1);
+
+    grid_lines2_log(min(arg1.x1(), arg2.x1()), max(arg1.x1(), arg2.x1()),
+		    min(arg1.x2(), arg2.x2()), max(arg1.x2(), arg2.x2()),
+		    segs2, base2);
+  }
+
+  void log1_grid(const P& arg1, const P& arg2,
+		 unsigned int segs1, unsigned int segs2,
+		 unsigned int base1)
+  {
+    grid_lines1_log(min(arg1.x1(), arg2.x1()), max(arg1.x1(), arg2.x1()),
+		    min(arg1.x2(), arg2.x2()), max(arg1.x2(), arg2.x2()),
+		    segs1, base1);
+
+    grid_lines2_log(min(arg1.x1(), arg2.x1()), max(arg1.x1(), arg2.x1()),
+		    min(arg1.x2(), arg2.x2()), max(arg1.x2(), arg2.x2()),
+		    segs2, 2);
+  }
+
+  void log2_grid(const P& arg1, const P& arg2,
+		 unsigned int segs1, unsigned int segs2,
+		 unsigned int base2)
+  {
+    grid_lines1_log(min(arg1.x1(), arg2.x1()),
+		    max(arg1.x1(), arg2.x1()),
+		    min(arg1.x2(), arg2.x2()),
+		    max(arg1.x2(), arg2.x2()),
+		    segs1, 2);
+
+    grid_lines2_log(min(arg1.x1(), arg2.x1()),
+		    max(arg1.x1(), arg2.x1()),
+		    min(arg1.x2(), arg2.x2()),
+		    max(arg1.x2(), arg2.x2()),
+		    segs2, base2);
+  }
+
+
+  // grids fill bounding box
+  void log_grid(unsigned int segs1, unsigned int segs2,
+		unsigned int base1, unsigned int base2)
+  {
+    grid_lines1_log(x_min, x_max, y_min, y_max, segs1, base1);
+    grid_lines2_log(x_min, x_max, y_min, y_max, segs2, base2);
+  }
+
+  void log1_grid(unsigned int segs1, unsigned int segs2,
+		 unsigned int base1)
+  {
+    grid_lines1_log(x_min, x_max, y_min, y_max, segs1, base1);
+    grid_lines2_log(x_min, x_max, y_min, y_max, segs2, 2);
+  }
+
+  void log2_grid(unsigned int segs1, unsigned int segs2,
+		 unsigned int base2)
+  {
+    grid_lines1_log(x_min, x_max, y_min, y_max, segs1, 2);
+    grid_lines2_log(x_min, x_max, y_min, y_max, segs2, base2);
+  }
+
 
   // fractal generation
   //
