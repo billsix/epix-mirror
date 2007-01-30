@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.23
- * Last Change: January 03, 2007
+ * Last Change: January 29, 2007
  */
 
 /* 
@@ -556,6 +556,10 @@ namespace ePiX {
 
     std::vector<vertex> data(num_entries);
 
+    // get crop state
+    bool temp_crop(epix::cropping);
+    crop();
+
     // create path
     for (unsigned int i=0; i < num_entries; ++i)
       try 
@@ -588,6 +592,8 @@ namespace ePiX {
 	//	if (m_select(data.at(i).here()))
 	Label(data.at(i).here(), "", TYPE, c).draw();
 
+    // restore state
+    crop(temp_crop);
   }
 
   void data_file::plot(epix_mark_type TYPE, P f(double, double, double),
@@ -882,6 +888,10 @@ namespace ePiX {
   {
     epix_warning("plot(FILEDATA...) is obsolete; use data_file");
 
+    // get crop state
+    bool temp_crop(epix::cropping);
+    crop();
+
     unsigned int num_entries(data_columns.at(0).size());
 
     std::vector<vertex> data(num_entries);
@@ -917,6 +927,7 @@ namespace ePiX {
       for (unsigned int i=0; i < num_entries; ++i)
 	Label(data.at(i).here(), "", TYPE, c).draw();
 
+    crop(temp_crop);
   }
 
 
