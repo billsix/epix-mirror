@@ -1,11 +1,11 @@
 /* 
  * functions.cc -- non-standard mathematical functions
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality 
+ * figures in LaTeX
  *
- * Version 1.1
- * Last Change: January 01, 2007
+ * Version 1.0.23
+ * Last Change: January 29, 2007
  */
 
 /* 
@@ -124,6 +124,21 @@ namespace ePiX {
   P cis(double t)
   {
     return cyl(1, t, 0);
+  }
+
+  P log_log(double x, double y, double z)
+  {
+    return P(log10(x), log10(y), z);
+  }
+
+  P log_lin(double x, double y, double z)
+  {
+    return P(log10(x), y, z);
+  }
+
+  P lin_log(double x, double y, double z)
+  {
+    return P(x, log10(y), z);
   }
 
   // Force double to [0,1]
