@@ -135,8 +135,8 @@ AUTOHEADER = ${SHELL} /home/hwang/epix/devel/savannah/test/epix/1.x/missing --ru
 AUTOMAKE = ${SHELL} /home/hwang/epix/devel/savannah/test/epix/1.x/missing --run automake-1.9
 AWK = gawk
 BASH_PATH = /bin/bash
-BUILD_CONTRIB_FALSE = 
-BUILD_CONTRIB_TRUE = #
+BUILD_CONTRIB_FALSE = #
+BUILD_CONTRIB_TRUE = 
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -146,7 +146,7 @@ CXX = g++
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"epix\" -DPACKAGE_TARNAME=\"epix\" -DPACKAGE_VERSION=\"1.1\" -DPACKAGE_STRING=\"epix\ 1.1\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"epix\" -DVERSION=\"1.1\" -DSTDC_HEADERS=1 -DHAVE_STRTOD=1
+DEFS = -DPACKAGE_NAME=\"epix\" -DPACKAGE_TARNAME=\"epix\" -DPACKAGE_VERSION=\"1.0.22\" -DPACKAGE_STRING=\"epix\ 1.0.22\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"epix\" -DVERSION=\"1.0.22\" -DSTDC_HEADERS=1 -DHAVE_STRTOD=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
@@ -171,16 +171,16 @@ OBJEXT = o
 PACKAGE = epix
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = epix
-PACKAGE_STRING = epix 1.1
+PACKAGE_STRING = epix 1.0.22
 PACKAGE_TARNAME = epix
-PACKAGE_VERSION = 1.1
+PACKAGE_VERSION = 1.0.22
 PATH_SEPARATOR = :
 RANLIB = ranlib
 RUNTIME_COMPILER = /usr/bin/g++
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 1.1
+VERSION = 1.0.22
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__fastdepCC_FALSE = #
@@ -219,7 +219,7 @@ sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 sysconfdir = ${prefix}/etc
 target_alias = 
-#MAYBE_DIRS = contrib contrib/doc
+MAYBE_DIRS = contrib contrib/doc
 SUBDIRS = . samples doc $(MAYBE_DIRS)
 
 # Now stuff for this directory specifically
@@ -854,7 +854,7 @@ uninstall-man: uninstall-man1
 	uninstall-pkglibLIBRARIES
 
 
-#  # Must be in this order!
+  # Must be in this order!
 
 # Headers
 epix.h: $(libepix_a_HDRS)

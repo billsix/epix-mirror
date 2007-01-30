@@ -16,6 +16,7 @@
 
 # Makefile.am for ePiX v1.x "doc" directory
 #
+
 srcdir = .
 top_srcdir = ..
 
@@ -46,6 +47,15 @@ mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
 SOURCES =
 DIST_SOURCES =
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(docdir)"
+docDATA_INSTALL = $(INSTALL_DATA)
+DATA = $(doc_DATA)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = ${SHELL} /home/hwang/epix/devel/savannah/test/epix/1.x/missing --run aclocal-1.9
 AMDEP_FALSE = #
@@ -56,8 +66,8 @@ AUTOHEADER = ${SHELL} /home/hwang/epix/devel/savannah/test/epix/1.x/missing --ru
 AUTOMAKE = ${SHELL} /home/hwang/epix/devel/savannah/test/epix/1.x/missing --run automake-1.9
 AWK = gawk
 BASH_PATH = /bin/bash
-BUILD_CONTRIB_FALSE = 
-BUILD_CONTRIB_TRUE = #
+BUILD_CONTRIB_FALSE = #
+BUILD_CONTRIB_TRUE = 
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -67,7 +77,7 @@ CXX = g++
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"epix\" -DPACKAGE_TARNAME=\"epix\" -DPACKAGE_VERSION=\"1.1\" -DPACKAGE_STRING=\"epix\ 1.1\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"epix\" -DVERSION=\"1.1\" -DSTDC_HEADERS=1 -DHAVE_STRTOD=1
+DEFS = -DPACKAGE_NAME=\"epix\" -DPACKAGE_TARNAME=\"epix\" -DPACKAGE_VERSION=\"1.0.22\" -DPACKAGE_STRING=\"epix\ 1.0.22\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"epix\" -DVERSION=\"1.0.22\" -DSTDC_HEADERS=1 -DHAVE_STRTOD=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
@@ -92,16 +102,16 @@ OBJEXT = o
 PACKAGE = epix
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = epix
-PACKAGE_STRING = epix 1.1
+PACKAGE_STRING = epix 1.0.22
 PACKAGE_TARNAME = epix
-PACKAGE_VERSION = 1.1
+PACKAGE_VERSION = 1.0.22
 PATH_SEPARATOR = :
 RANLIB = ranlib
 RUNTIME_COMPILER = /usr/bin/g++
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 1.1
+VERSION = 1.0.22
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__fastdepCC_FALSE = #
@@ -140,24 +150,18 @@ sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 sysconfdir = ${prefix}/etc
 target_alias = 
-EPIXFLAGS = --no-defaults -I. -L. -lepix -vv
-LN_SF = ln -sf
-SUFFIXES = .xp .eepic
-XPS = alignment_lr.xp alignment.xp arrow1.xp arrow2.xp arrow3.xp basepoint.xp \
-	box.xp camera.xp cb.xp dots.xp graphpaper.xp koch.xp marker.xp \
-	pathstyle.xp plot_a.xp plot_b.xp scaling.xp semicirc.xp sgn.xp \
-	sinx.xp slices.xp tori.xp
+EPIXFLAGS = --no-defaults -I.. -L.. -lepix -v
+XPS := $(wildcard *.xp)
+EEPICS = $(XPS:.xp=.eepic)
+CLEANFILES = *~ *.aux *.dvi *.log *.out *.idx *.ilg *.ind *.toc \
+	  manual_src.tar manual.pdf manual.ps \
+	  manual_src.tar.gz manual.pdf.gz manual.ps.gz manual-stamp
 
-EEPICS = alignment_lr.eepic alignment.eepic arrow1.eepic arrow2.eepic \
-	arrow3.eepic basepoint.eepic box.eepic camera.eepic cb.eepic \
-	dots.eepic graphpaper.eepic koch.eepic marker.eepic pathstyle.eepic \
-	plot_a.eepic plot_b.eepic scaling.eepic semicirc.eepic sgn.eepic \
-	sinx.eepic slices.eepic tori.eepic
-
+MAINTAINERCLEANFILES = *.eepic *.aux *.dvi *.log *.out *.toc *.idx *.ind *.ilg
+doc_DATA = manual.pdf.gz manual.ps.gz manual_src.tar.gz
 all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .xp .eepic
 $(srcdir)/Makefile.in: # $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -188,6 +192,23 @@ $(top_srcdir)/configure: # $(am__configure_deps)
 $(ACLOCAL_M4): # $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 uninstall-info-am:
+install-docDATA: $(doc_DATA)
+	@$(NORMAL_INSTALL)
+	test -z "$(docdir)" || $(mkdir_p) "$(DESTDIR)$(docdir)"
+	@list='$(doc_DATA)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(docDATA_INSTALL) '$$d$$p' '$(DESTDIR)$(docdir)/$$f'"; \
+	  $(docDATA_INSTALL) "$$d$$p" "$(DESTDIR)$(docdir)/$$f"; \
+	done
+
+uninstall-docDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(doc_DATA)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(docdir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(docdir)/$$f"; \
+	done
 tags: TAGS
 TAGS:
 
@@ -224,8 +245,11 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile
+all-am: Makefile $(DATA)
 installdirs:
+	for dir in "$(DESTDIR)$(docdir)"; do \
+	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -243,6 +267,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -250,6 +275,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
+	-test -z "$(MAINTAINERCLEANFILES)" || rm -f $(MAINTAINERCLEANFILES)
+clean: clean-am
+
 clean-am: clean-generic mostlyclean-am
 
 distclean: distclean-am
@@ -266,7 +294,7 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-docDATA
 
 install-exec-am:
 
@@ -292,109 +320,43 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-docDATA uninstall-info-am
 
 .PHONY: all all-am check check-am clean clean-generic distclean \
 	distclean-generic distdir dvi dvi-am html html-am info info-am \
-	install install-am install-data install-data-am install-exec \
-	install-exec-am install-info install-info-am install-man \
-	install-strip installcheck installcheck-am installdirs \
-	maintainer-clean maintainer-clean-generic mostlyclean \
-	mostlyclean-generic pdf pdf-am ps ps-am uninstall uninstall-am \
+	install install-am install-data install-data-am \
+	install-docDATA install-exec install-exec-am install-info \
+	install-info-am install-man install-strip installcheck \
+	installcheck-am installdirs maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic pdf \
+	pdf-am ps ps-am uninstall uninstall-am uninstall-docDATA \
 	uninstall-info-am
 
 
-.xp.eepic:
-	@./epix ${EPIXFLAGS} $<
-
-.eepic:
-	@./epix ${EPIXFLAGS} $^ -o $@
-
-all:	${XPS} epix laps epix.h libepix.a eepics \
-	manual.pdf.gz manual.ps.gz src-package
-
-.PHONY: all epix laps epix.h libepix.h eepics src-package clean clean-all
-
-epix:
-	@${LN_SF} ../epix .
-
-laps:
-	@${LN_SF} ../laps .
-
-epix.h:
-	@${LN_SF} ../epix.h .
-
-libepix.a:
-	@${LN_SF} ../libepix.a .
-
-eepics:	${EEPICS}
-
-src-package:	src-package-stamp
+%.eepic: %.xp
+	../epix-local $(EPIXFLAGS) $<
 
 # tar up tex, xp, and eepic files
-src-package-stamp:	manual.tex manual.aux manual.ind ${XPS} ${EEPICS}
-	@tar -cf - manual.{aux,ind,tex,toc} ${XPS} ${EEPICS} | \
-		gzip -9 > ../epix-${VERSION}_manual_src.tar.gz; \
-	touch src-package-stamp
-
-manual.aux:	manual.tex
-	@latex manual &>/dev/null
-
-manual.idx:	manual.tex
-	@latex manual &>/dev/null
-
-manual.ind:	manual.idx
-	@latex manual.tex &>/dev/null; latex manual.tex &>/dev/null; \
+manual-stamp: manual.tex $(XPS) $(EEPICS)
+	latex -interaction=batchmode manual &>/dev/null
+	latex -interaction=batchmode manual &>/dev/null
 	makeindex manual.idx &>/dev/null
+	touch manual-stamp
+
+manual_src.tar.gz: manual-stamp
+	tar -cf manual_src.tar manual.aux manual.ind manual.tex manual.toc \
+	   $(XPS) $(EEPICS)
+	gzip -9 manual_src.tar
 
 #PS
-manual.ps:	manual.aux manual.ind ${EEPICS}
-	@./laps manual.tex
+manual.ps.gz: manual-stamp
+	../laps-local manual.tex
+	gzip -9 manual.ps
 
-manual.ps.gz:	manual.ps
-	@mv manual.ps epix-${VERSION}_manual.ps; \
-		gzip -9 epix-${VERSION}_manual.ps; \
-	mv epix-${VERSION}_manual.ps.gz ..
-
-#PDF
-manual.pdf:	manual.aux manual.ind ${EEPICS}
-	@./laps --pdf manual.tex
-
-manual.pdf.gz:	manual.pdf
-	@mv manual.pdf epix-${VERSION}_manual.pdf; \
-		gzip -9 epix-${VERSION}_manual.pdf; \
-	mv epix-${VERSION}_manual.pdf.gz ..
-
-# eepic files
-alignment_lr.eepic:	alignment_lr.xp
-alignment.eepic:	alignment.xp
-arrow1.eepic:		arrow1.xp
-arrow2.eepic:		arrow2.xp
-arrow3.eepic:		arrow3.xp
-basepoint.eepic:	basepoint.xp
-box.eepic:		box.xp
-camera.eepic:		camera.xp
-cb.eepic:		cb.xp
-dots.eepic:		dots.xp
-graphpaper.eepic:	graphpaper.xp
-koch.eepic:		koch.xp
-marker.eepic:		marker.xp
-pathstyle.eepic:	pathstyle.xp
-plot_a.eepic:		plot_a.xp
-plot_b.eepic:		plot_b.xp
-scaling.eepic:		scaling.xp
-semicirc.eepic:		semicirc.xp
-sgn.eepic:		sgn.xp
-sinx.eepic:		sinx.xp
-slices.eepic:		slices.xp
-tori.eepic:		tori.xp
-
-clean:
-	@-${RM} *.{dvi,log,out,ilg} epix-${VERSION}_manual* \
-	epix epix.h laps libepix.a src-package-stamp *~
-
-clean-all:	clean
-	@-${RM} *.{aux,eepic,idx,toc,ind}
+#PDF; no point compressing it
+manual.pdf.gz: manual-stamp
+	../laps-local --pdf manual.tex
+	gzip -9 manual.pdf
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

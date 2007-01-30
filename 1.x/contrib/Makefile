@@ -14,6 +14,10 @@
 
 
 
+# Makefile.am for ePiX-1.x "contrib" directory
+#
+
+
 srcdir = .
 top_srcdir = ..
 
@@ -35,24 +39,36 @@ NORMAL_UNINSTALL = :
 PRE_UNINSTALL = :
 POST_UNINSTALL = :
 subdir = contrib
-DIST_COMMON = $(srcdir)/Makefile.am $(srcdir)/Makefile.in
+DIST_COMMON = $(include_HEADERS) $(srcdir)/Makefile.am \
+	$(srcdir)/Makefile.in
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(SHELL) $(top_srcdir)/mkinstalldirs
 CONFIG_CLEAN_FILES =
-LIBRARIES = $(noinst_LIBRARIES)
+am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
+am__vpath_adj = case $$p in \
+    $(srcdir)/*) f=`echo "$$p" | sed "s|^$$srcdirstrip/||"`;; \
+    *) f=$$p;; \
+  esac;
+am__strip_dir = `echo $$p | sed -e 's|^.*/||'`;
+am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(includedir)"
+pkglibLIBRARIES_INSTALL = $(INSTALL_DATA)
+LIBRARIES = $(pkglib_LIBRARIES)
 AR = ar
 ARFLAGS = cru
 libepixext_a_AR = $(AR) $(ARFLAGS)
-libepixext_a_DEPENDENCIES = CartesianCoord.o CoordAxis.o CoordSystem.o \
+am__DEPENDENCIES_1 = CartesianCoord.o CoordAxis.o CoordSystem.o \
 	DoubleLogCoord.o Hatch.o LinearAxis.o LogaritmicAxis.o \
 	PicCommand.o SingleLogCoord.o
-am_libepixext_a_OBJECTS = CartesianCoord.$(OBJEXT) CoordAxis.$(OBJEXT) \
+libepixext_a_DEPENDENCIES = $(am__DEPENDENCIES_1)
+am__objects_1 = CartesianCoord.$(OBJEXT) CoordAxis.$(OBJEXT) \
 	CoordSystem.$(OBJEXT) DoubleLogCoord.$(OBJEXT) Hatch.$(OBJEXT) \
 	LinearAxis.$(OBJEXT) LogaritmicAxis.$(OBJEXT) \
 	PicCommand.$(OBJEXT) SingleLogCoord.$(OBJEXT)
+am__objects_2 =
+am_libepixext_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 libepixext_a_OBJECTS = $(am_libepixext_a_OBJECTS)
 DEFAULT_INCLUDES = -I. -I$(srcdir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
@@ -62,8 +78,14 @@ CXXCOMPILE = $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) \
 CXXLD = $(CXX)
 CXXLINK = $(CXXLD) $(AM_CXXFLAGS) $(CXXFLAGS) $(AM_LDFLAGS) $(LDFLAGS) \
 	-o $@
+COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
+	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
+CCLD = $(CC)
+LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
 SOURCES = $(libepixext_a_SOURCES)
 DIST_SOURCES = $(libepixext_a_SOURCES)
+includeHEADERS_INSTALL = $(INSTALL_HEADER)
+HEADERS = $(include_HEADERS)
 ETAGS = etags
 CTAGS = ctags
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
@@ -76,8 +98,8 @@ AUTOHEADER = ${SHELL} /home/hwang/epix/devel/savannah/test/epix/1.x/missing --ru
 AUTOMAKE = ${SHELL} /home/hwang/epix/devel/savannah/test/epix/1.x/missing --run automake-1.9
 AWK = gawk
 BASH_PATH = /bin/bash
-BUILD_CONTRIB_FALSE = 
-BUILD_CONTRIB_TRUE = #
+BUILD_CONTRIB_FALSE = #
+BUILD_CONTRIB_TRUE = 
 CC = gcc
 CCDEPMODE = depmode=gcc3
 CFLAGS = -g -O2
@@ -87,7 +109,7 @@ CXX = g++
 CXXDEPMODE = depmode=gcc3
 CXXFLAGS = -g -O2
 CYGPATH_W = echo
-DEFS = -DPACKAGE_NAME=\"epix\" -DPACKAGE_TARNAME=\"epix\" -DPACKAGE_VERSION=\"1.1\" -DPACKAGE_STRING=\"epix\ 1.1\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"epix\" -DVERSION=\"1.1\" -DSTDC_HEADERS=1 -DHAVE_STRTOD=1
+DEFS = -DPACKAGE_NAME=\"epix\" -DPACKAGE_TARNAME=\"epix\" -DPACKAGE_VERSION=\"1.0.22\" -DPACKAGE_STRING=\"epix\ 1.0.22\" -DPACKAGE_BUGREPORT=\"\" -DPACKAGE=\"epix\" -DVERSION=\"1.0.22\" -DSTDC_HEADERS=1 -DHAVE_STRTOD=1
 DEPDIR = .deps
 ECHO_C = 
 ECHO_N = -n
@@ -112,16 +134,16 @@ OBJEXT = o
 PACKAGE = epix
 PACKAGE_BUGREPORT = 
 PACKAGE_NAME = epix
-PACKAGE_STRING = epix 1.1
+PACKAGE_STRING = epix 1.0.22
 PACKAGE_TARNAME = epix
-PACKAGE_VERSION = 1.1
+PACKAGE_VERSION = 1.0.22
 PATH_SEPARATOR = :
 RANLIB = ranlib
 RUNTIME_COMPILER = /usr/bin/g++
 SET_MAKE = 
 SHELL = /bin/sh
 STRIP = 
-VERSION = 1.1
+VERSION = 1.0.22
 ac_ct_CC = gcc
 ac_ct_CXX = g++
 am__fastdepCC_FALSE = #
@@ -160,21 +182,17 @@ sbindir = ${exec_prefix}/sbin
 sharedstatedir = ${prefix}/com
 sysconfdir = ${prefix}/etc
 target_alias = 
-
-# Makefile.am for ePiX-1.x "contrib" directory
-#
-noinst_LIBRARIES = libepixext.a
-libepixext_a_SOURCES = CartesianCoord.cc CoordAxis.cc CoordSystem.cc \
+libepixext_a_CXXSOURCES = CartesianCoord.cc CoordAxis.cc CoordSystem.cc \
 	DoubleLogCoord.cc Hatch.cc LinearAxis.cc LogaritmicAxis.cc \
 	PicCommand.cc SingleLogCoord.cc
 
-libepixext_a_LIBADD = CartesianCoord.o CoordAxis.o CoordSystem.o \
-	DoubleLogCoord.o Hatch.o LinearAxis.o LogaritmicAxis.o PicCommand.o \
-	SingleLogCoord.o
-
-EXT_HEADER = epix_ext.h
-LN_SF = ln -sf
-EPIX_LIB = libepix-${VERSION}.a
+libepixext_a_HDRS = epix_ext.h
+libepixext_a_SOURCES = $(libepixext_a_CXXSOURCES) $(libepixext_a_HDRS)
+libepixext_a_LIBADD = $(libepixext_a_CXXSOURCES:.cc=.o)
+pkglib_LIBRARIES = libepixext.a
+include_HEADERS = $(libepixext_a_HDRS)
+CLEANFILES = *~ $(libepixext_a_OBJECTS)
+INCLUDES = -I..
 all: all-am
 
 .SUFFIXES:
@@ -208,13 +226,35 @@ $(top_srcdir)/configure: # $(am__configure_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): # $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
+install-pkglibLIBRARIES: $(pkglib_LIBRARIES)
+	@$(NORMAL_INSTALL)
+	test -z "$(pkglibdir)" || $(mkdir_p) "$(DESTDIR)$(pkglibdir)"
+	@list='$(pkglib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    f=$(am__strip_dir) \
+	    echo " $(pkglibLIBRARIES_INSTALL) '$$p' '$(DESTDIR)$(pkglibdir)/$$f'"; \
+	    $(pkglibLIBRARIES_INSTALL) "$$p" "$(DESTDIR)$(pkglibdir)/$$f"; \
+	  else :; fi; \
+	done
+	@$(POST_INSTALL)
+	@list='$(pkglib_LIBRARIES)'; for p in $$list; do \
+	  if test -f $$p; then \
+	    p=$(am__strip_dir) \
+	    echo " $(RANLIB) '$(DESTDIR)$(pkglibdir)/$$p'"; \
+	    $(RANLIB) "$(DESTDIR)$(pkglibdir)/$$p"; \
+	  else :; fi; \
+	done
 
-clean-noinstLIBRARIES:
-	-test -z "$(noinst_LIBRARIES)" || rm -f $(noinst_LIBRARIES)
-libepixext.a: $(libepixext_a_OBJECTS) $(libepixext_a_DEPENDENCIES) 
-	-rm -f libepixext.a
-	$(libepixext_a_AR) libepixext.a $(libepixext_a_OBJECTS) $(libepixext_a_LIBADD)
-	$(RANLIB) libepixext.a
+uninstall-pkglibLIBRARIES:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkglib_LIBRARIES)'; for p in $$list; do \
+	  p=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(pkglibdir)/$$p'"; \
+	  rm -f "$(DESTDIR)$(pkglibdir)/$$p"; \
+	done
+
+clean-pkglibLIBRARIES:
+	-test -z "$(pkglib_LIBRARIES)" || rm -f $(pkglib_LIBRARIES)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -246,6 +286,23 @@ include ./$(DEPDIR)/SingleLogCoord.Po
 #	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) \
 #	$(CXXCOMPILE) -c -o $@ `$(CYGPATH_W) '$<'`
 uninstall-info-am:
+install-includeHEADERS: $(include_HEADERS)
+	@$(NORMAL_INSTALL)
+	test -z "$(includedir)" || $(mkdir_p) "$(DESTDIR)$(includedir)"
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  f=$(am__strip_dir) \
+	  echo " $(includeHEADERS_INSTALL) '$$d$$p' '$(DESTDIR)$(includedir)/$$f'"; \
+	  $(includeHEADERS_INSTALL) "$$d$$p" "$(DESTDIR)$(includedir)/$$f"; \
+	done
+
+uninstall-includeHEADERS:
+	@$(NORMAL_UNINSTALL)
+	@list='$(include_HEADERS)'; for p in $$list; do \
+	  f=$(am__strip_dir) \
+	  echo " rm -f '$(DESTDIR)$(includedir)/$$f'"; \
+	  rm -f "$(DESTDIR)$(includedir)/$$f"; \
+	done
 
 ID: $(HEADERS) $(SOURCES) $(LISP) $(TAGS_FILES)
 	list='$(SOURCES) $(HEADERS) $(LISP) $(TAGS_FILES)'; \
@@ -324,8 +381,11 @@ distdir: $(DISTFILES)
 	done
 check-am: all-am
 check: check-am
-all-am: Makefile $(LIBRARIES)
+all-am: Makefile $(LIBRARIES) $(HEADERS)
 installdirs:
+	for dir in "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(includedir)"; do \
+	  test -z "$$dir" || $(mkdir_p) "$$dir"; \
+	done
 install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
@@ -343,6 +403,7 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
+	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -350,7 +411,9 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-clean-am: clean-generic clean-noinstLIBRARIES mostlyclean-am
+clean: clean-am
+
+clean-am: clean-generic clean-pkglibLIBRARIES mostlyclean-am
 
 distclean: distclean-am
 	-rm -rf ./$(DEPDIR)
@@ -368,9 +431,9 @@ info: info-am
 
 info-am:
 
-install-data-am:
+install-data-am: install-includeHEADERS
 
-install-exec-am:
+install-exec-am: install-pkglibLIBRARIES
 
 install-info: install-info-am
 
@@ -395,47 +458,29 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-info-am
+uninstall-am: uninstall-includeHEADERS uninstall-info-am \
+	uninstall-pkglibLIBRARIES
 
 .PHONY: CTAGS GTAGS all all-am check check-am clean clean-generic \
-	clean-noinstLIBRARIES ctags distclean distclean-compile \
+	clean-pkglibLIBRARIES ctags distclean distclean-compile \
 	distclean-generic distclean-tags distdir dvi dvi-am html \
 	html-am info info-am install install-am install-data \
-	install-data-am install-exec install-exec-am install-info \
-	install-info-am install-man install-strip installcheck \
+	install-data-am install-exec install-exec-am \
+	install-includeHEADERS install-info install-info-am \
+	install-man install-pkglibLIBRARIES install-strip installcheck \
 	installcheck-am installdirs maintainer-clean \
 	maintainer-clean-generic mostlyclean mostlyclean-compile \
 	mostlyclean-generic pdf pdf-am ps ps-am tags uninstall \
-	uninstall-am uninstall-info-am
+	uninstall-am uninstall-includeHEADERS uninstall-info-am \
+	uninstall-pkglibLIBRARIES
 
 
-all:	epix.h libepix.a ${OBJECTS}
-	ar -ru ../${EPIX_LIB} ${OBJECTS}
-	ranlib ../${EPIX_LIB}
+libepixext.a: ../epix.h $(libepixext_a_OBJECTS)
+	ar -ru $@ $(libepixext_a_OBJECTS)
+	$(RANLIB) $@
 
-.PHONY: all epix.h libepix.a clean clean-all
-
-epix.h:
-	@$(LN_SF) ../epix.h .
-
-libepix.a:
-	@$(LN_SF) ../libepix.a .
-
-CartesianCoord.o:	CartesianCoord.cc	${EXT_HEADER}
-CoordAxis.o:		CoordAxis.cc		${EXT_HEADER}
-CoordSystem.o:		CoordSystem.cc		${EXT_HEADER}
-DoubleLogCoord.o:	DoubleLogCoord.cc	${EXT_HEADER}
-Hatch.o:		Hatch.cc		${EXT_HEADER}
-LinearAxis.o:		LinearAxis.cc		${EXT_HEADER}
-LogaritmicAxis.o:	LogaritmicAxis.cc	${EXT_HEADER}
-PicCommand.o:		PicCommand.cc		${EXT_HEADER}
-SingleLogCoord.o:	SingleLogCoord.cc	${EXT_HEADER}
-
-clean:
-	@-rm -f ${OBJECTS} epix.h libepix.a
-
-clean-all:
-	@-rm -f ${OBJECTS} epix.h libepix.a
+# object file dependencies
+$(libepixext_a_LIBADD): %.o: %.cc $(libepixext_a_HEADERS) ../epix.h
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

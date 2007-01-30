@@ -5,7 +5,7 @@
  * figures in LaTeX 
  *
  * Version 1.0.23
- * Last Change: January 04, 2007
+ * Last Change: January 29, 2007
  */
 
 /* 
@@ -488,4 +488,72 @@ namespace ePiX {
   {
     draw_log_axis(tail, head, segs, base, V_AXIS);
   }
+
+  /*
+  // string-valued functions for axis labels
+  // raw Cartesian coordinates
+  std::string axis1_label(double x, double y)
+  {
+    std::stringstream obuf;
+    obuf << "$" << x << "$";
+
+    return obuf.str();
+  }
+
+  std::string axis2_label(double x, double y)
+  {
+    std::stringstream obuf;
+    obuf << "$" << y << "$";
+
+    return obuf.str();
+  }
+
+  // TeX-padded Cartesian coordinates
+  std::string axis1_pad_label(double x, double y)
+  {
+    std::stringstream obuf;
+    obuf << "$";
+    if (0 <= x)
+      obuf << "\\phantom{-}";
+
+    obuf << x << "$";
+
+    return obuf.str();
+  }
+
+  std::string axis2_pad_label(double x, double y)
+  {
+    std::stringstream obuf;
+    obuf << "$";
+    if (0 <= y)
+      obuf << "\\phantom{-}";
+
+    obuf << y << "$";
+
+    return obuf.str();
+  }
+
+  // log coordinates
+  std::string log_axis1_label(double x, double y)
+  {
+    std::stringstream obuf;
+    int N((int) floor(x));
+    unsigned int k((unsigned int) floor(pow(10, x-N)));
+
+    obuf << "$" << k << "\\times10^{" << N << "}$";
+
+    return obuf.str();
+  }
+
+  std::string log_axis2_label(double x, double y)
+  {
+    std::stringstream obuf;
+    int N((int) floor(y));
+    unsigned int k((unsigned int) floor(pow(10, y-N)));
+
+    obuf << "$" << k << "\\times10^{" << N << "}$";
+
+    return obuf.str();
+  }
+  */
 } // end of namespace
