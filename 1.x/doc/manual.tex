@@ -1,5 +1,5 @@
-%% January 01, 2007
-%% Version 1.1
+%% February 11, 2007
+%% Version 1.0.23
 \documentclass[12pt]{report}
 \usepackage{amsmath,latexsym,epic,eepic,pstcol,comment}%,framed}
 \usepackage[dvips,hyperref]{hyperref}
@@ -30,7 +30,7 @@
 \author{Andrew D. Hwang \\ 
   Department\ of Math and CS \\ 
   College of the Holy Cross}
-\date{Version 1.1,  January, 2007}
+\date{Version 1.0.23,  February, 2007}
 
 \begin{document}
 
@@ -1474,89 +1474,145 @@ graphs is shaded.
 \subsection*{Data plotting} 
 
 \index{Plotting!data|(}\index{Data file|(emph}
-Files of numerical data can be manipulated, analyzed, and plotted.
-The format for a data file is one or more floating-point numbers per
-line, with the same number of entries per line. A line in a data file
-that starts with a~\code{\%} is a comment. 
+Files of numerical data can be created, manipulated, analyzed,
+plotted (paths, scatter plots, and histograms), read, and written. 
+The format for a data file is one or more floating-point
+numbers per line, with the same number of entries per line. Anything
+that appears on a line after the \LaTeX\ comment character~\code{\%}
+is a comment. 
 
-\index{Point!from data file}
-Roughly, the basic plot command reads numbers from two (or three)
-columns of a specified file, treats them as coordinates, and plots the
-resulting points.
+\index{Point!from data file} \index{Plotting!logarithmic(emph|} \ePiX\
+provides two types of \code{plot} command for file data. The first
+facilitates plotting selected columns; the second simplifies plotting
+the first two columns with one or both scales logarithmic. Either form
+can be used to plot selected columns logarithmically.
+
+Suppose \filename{mydata.dat} contains at least 5~columns. The
+commands
 \begin{verbatim}
-  plot("filename", STYLE, columns, [i_1], [i_2], [i_3], [F]);
+  plot("mydata.dat", DOWN);
+  plot("mydata.dat", PLUS, log_lin);
+  plot("mydata.dat", SPOT, 2, 4, 5, sph);
+\end{verbatim}
+plot the first two columns of \filename{mydata.dat}, putting
+a~``$\bigtriangledown$'' at each point; plot the first two columns on
+a semi-log graph with the first coordinate logarithmic, putting
+a~``$+$'' at each point; and extract the second, fourth, and fifth
+columns of the file, treat them as spherical coordinates, and put
+a~``$\bullet$'' at each point.
+
+The general commands, with optional arguments in square brackets,
+read numbers from two or three columns of a specified file, pass
+them as arguments to a \code{P}-valued function~\code{F}, and plot the
+resulting points:
+\begin{verbatim}
+  plot("filename", STYLE, [i_1], [i_2], [i_3], [F]);
+  plot("filename", STYLE, F, [i_1], [i_2], [i_3]);
 \end{verbatim}
 \index{Path!style}
 The first argument is the name of the data file. The \code{STYLE} may
 be \code{PATH}, which joins the points in the order they appear, or
 any of the marker types\index{Marker types} in
-Table~\ref{table:marker}.  Next comes the number of columns (entries
-per line); if there are fewer columns than expected in the file,
-nothing is plotted, while if there are more columns than expected, a
-warning is issued but the data is plotted.  The remaining arguments
-are optional. The integers~$i_k$ specify columns from which to extract
-data. The column entries are fed to the \code{P}-valued
-function~\code{F} to obtain points. If~\code{F} is omitted, it
-defaults to the Cartesian point constructor. If~$i_3$ is omitted, the
-$i_1$~and $i_2$~columns are used to create points; by default,
-$i_1=1$~and $i_2=2$. For example, if \filename{mydata.dat} contains
-6~columns of numbers, then the respective commands
-\begin{verbatim}
-  plot("mydata.dat", DOWN, 6);
-  plot("mydata.dat", BOX, 6, 2, 4, 5, sph);
-\end{verbatim}
-plot the first two columns of \filename{mydata.dat}, putting
-a~``$\bigtriangledown$'' at each point; and extract the second,
-fourth, and fifth columns of the file, treat them as spherical
-coordinates, and put a~``\input{box.eepic}'' at each point.
+Table~\ref{table:marker}.  The integers~$i_k$ specify columns from
+which to extract data; these default, respectively, to the first
+column, second column, and null (a column of zeroes). If the
+``coordinate system''~\code{F} is omitted in the first command, it
+defaults to the Cartesian point constructor. The function~\code{F} is
+mandatory in the second form; useful choices include \code{log\_log},
+\code{log\_lin}, and~\code{lin\_log}, which plot the corresponding
+coordinate logarithmically.
 
-For more elaborate (e.g., user-defined) analysis, data may be read
-into a \code{FILEDATA} structure. A \code{FILEDATA} is a
-\CXX~vector of columns, each column having as many entries as there
-are lines of data in the file. The snippet below reads data from a
-file, then plots the result.
-\begin{verbatim}
-  FILEDATA my_cols(6);          // vector of 6 columns
-  read("mydata.dat", my_cols);  // read data from file
-  ...                           // code to mangle data
-  plot(my_cols, BOX, 2, 4, 5, sph);
-\end{verbatim}
-The number of columns needn't be specified in the \code{plot} command,
-since it was provided when the data was read.  The post-\code{TYPE}
-options are identical to the earlier plot command.  The $j$th~entry of
-the $i$th~column is called \code{my\_cols.at(i).at(j)}.
 
-\index{Linear regression}
-\ePiX\ implements simple numerical functions of a \code{FILEDATA}
-structure:
+\subsection*{\code{data\_file}}
+
+For more elaborate analysis, the \code{data\_file} class presents an
+interface to a file as an ordered list of columns. There are two
+primary ways to create a \code{data\_file}: read in an external file,
+or generate data (up to three columns) using specified
+\code{double}-valued functions. In the constructors below, each
+function~\code{fi} is a \code{double}-valued function of one variable.
 \begin{verbatim}
-  avg(my_cols, i_1);     // arithmetic mean of the i_1 column
-  var(my_cols, i_1);     // variance of the i_1 column
-  covar(my_cols, i_1, i_2); 
-  regression(my_cols, i_1, i_2);  // draw regression line
+  data_file DF("my_data"); // read data from disk file
+  data_file DF(f1, t_min, t_max, num_pts); // values of f1
+  data_file DF(f1, f2, t_min, t_max, num_pts);
+  data_file DF(f1, f2, f3, t_min, t_max, num_pts);
+  data_file DF(3);  // create empty data_file with 3 columns
+  DF.read("file1").read("file2"); // read two disk files
 \end{verbatim}
-The covariance of two columns is obtained by subtracting the
-respective averages entry by entry, then taking the dot product. The
-regression line is the least-squares best fit for predicting
-column~$i_2$ from column~$i_1$.
+
+Once a \code{data\_file} exists, its columns can be transformed by
+application of a user-specified function, averaged, correlated,
+extracted (for use by other code), scatter plotted, and written to a
+disk file at specified precision. Below, the function~\code{f} is a
+\code{double}-valued function of one variable and~\code{F} is a
+\code{P}-valued function of two or three variables, whose components
+are written back to the selected columns.
+\begin{verbatim}
+  DF.transform(f, 3);    // apply f to col3
+  DF.transform(F, 2, 4); // apply F to col2, col4
+  double t(DF.dot(3,2)); // t = dot product of col2, col3
+  double av(DF.avg(2));  // av = mean of col2
+  double v(DF.var(1));   // population variance of col1
+  double cor(DF.covar(1, 3)); // covariance of col1, col3
+  DF.regression(1,3);    // plot regression line
+\end{verbatim}
+A \code{data\_file} is scatter plotted using syntax as described above for
+data files. The output is cropped automatically to the bounding box.
+\begin{verbatim}
+  DF.plot(STYLE, [i1], [i2], [i3], [F]);
+  DF.plot(STYLE, F, [i1], [i2], [i3]);
+\end{verbatim}
+
+A \code{data\_file} can be written to a disk file as raw data, or in
+specified format. Below, \code{fmt} denotes a \code{string}-valued
+formatting function of two variables and \filename{myfile} is the
+name of the disk file to be written.
+\begin{verbatim}
+  DF.precision(4);    // set to 4 significant figures
+  DF.write("myfile"); // write as tab-separated columns
+  DF.write("myfile", fmt, [i1], [i2]); // apply fmt to cols
+\end{verbatim}
+A column can be extracted as a \code{C++}~\code{vector} for
+use by another function:
+\begin{verbatim}
+  DF.column(i);    // i-th column
+  DF.column(f, i); // i-th column, transformed by f
+\end{verbatim}
 
 
 \subsection*{Histograms}
 
-\index{Histograms} \ePiX\ can read data from a file and plot a
-histogram with equal-length subdivisions. The syntax is similar to the
-\code{plot} commands for data:
+\index{Histograms} For flexible histogram creation, \ePiX\ provides
+the \code{data\_bins} class, which models a specified interval divided
+into intervals at specified locations, not necessarily
+equally-spaced. The lifetime of a \code{data\_bins} has two stages. In
+the first, ``cuts'' (endpoints of subintervals) are added. Once data
+is read, the cuts are ``locked'', and cannot subsequently be changed.
 \begin{verbatim}
-  histogram("mydata.dat", cols, col_index, [low, high, n, scale]);
-  histogram(my_cols, col_index, [low, high, n, scale]);
+  // [xmin, xmax] divided into n equal intervals, 1 by default
+  data_bins db(xmin, xmax, [n]);
+  db.cut(x);  // add a cut at x (if x is in bounds)
+  db.read(vector<double>); // read data, lock bins
+  unsigned int count(db.pop());   // current population
+  db.histogram([c]);  // rectangles scaled by c (1 by default)
+  db.plot([c]);       // spline interpolation
 \end{verbatim}
-As with data-plotting commands, the number of columns in a data file
-and the column index are mandatory. The data bins span the interval
-from \code{low}~to \code{high}, with \code{n+2}~bins---\code{n} in the
-interval itself, a bin below \code{low}, and one above \code{high}. By
-default, bins run from \verb+x_min+~to \verb+x_max+ and have unit
-width, and the area under the histogram is unity. The final parameter
-acts as a multiplier (possibly negative) on the vertical scale.
+The height of a histogram rectangle is the population of the
+corresponding bin; this behavior differs from earlier versions.
+
+This code snippet illustrates a few of the features described above.
+\begin{verbatim}
+  data_file DF("myfile.dat");
+  DF.transform(log_log);   // act on first two columns
+  data_bins db(-6, 4, 20); // [-6, 4], 20 subintervals
+  db.read(DF.column(1));   // read col1
+  db.histogram();
+
+  DF.plot(BOX);            // log-log scatter plot
+  DF.regression(1, 2);     // plot regression line
+  DF.write("log_log.dat"); // write to a disk file
+\end{verbatim}
+\index{Plotting!logarithmic|)}
 \index{Plotting!data|)}
 \index{Plotting|)}
 \index{Data file|)}

@@ -68,7 +68,8 @@ libepix_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 = camera.o circle.o colors.o cropping.o curves.o \
 	dataplot.o domain.o frame.o functions.o geometry.o globals.o \
 	Label.o lengths.o objects.o output.o pairs.o path.o plane.o \
-	plots.o polyhedron.o segment.o sphere.o surface.o triples.o
+	plots.o polyhedron.o segment.o sphere.o spline.o surface.o \
+	triples.o
 libepix_a_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_1 = camera.$(OBJEXT) circle.$(OBJEXT) colors.$(OBJEXT) \
 	cropping.$(OBJEXT) curves.$(OBJEXT) dataplot.$(OBJEXT) \
@@ -77,7 +78,7 @@ am__objects_1 = camera.$(OBJEXT) circle.$(OBJEXT) colors.$(OBJEXT) \
 	lengths.$(OBJEXT) objects.$(OBJEXT) output.$(OBJEXT) \
 	pairs.$(OBJEXT) path.$(OBJEXT) plane.$(OBJEXT) plots.$(OBJEXT) \
 	polyhedron.$(OBJEXT) segment.$(OBJEXT) sphere.$(OBJEXT) \
-	surface.$(OBJEXT) triples.$(OBJEXT)
+	spline.$(OBJEXT) surface.$(OBJEXT) triples.$(OBJEXT)
 am__objects_2 =
 am__objects_3 = $(am__objects_2) $(am__objects_2) $(am__objects_2) \
 	$(am__objects_2) $(am__objects_2)
@@ -231,13 +232,13 @@ libepix_a_CXXSOURCES = camera.cc circle.cc colors.cc cropping.cc curves.cc \
 	dataplot.cc domain.cc frame.cc functions.cc geometry.cc globals.cc \
 	Label.cc lengths.cc \
 	objects.cc output.cc pairs.cc path.cc plane.cc plots.cc polyhedron.cc \
-	segment.cc sphere.cc surface.cc triples.cc
+	segment.cc sphere.cc spline.cc surface.cc triples.cc
 
 # header groups for build deps
 H_GLOBALS = globals.h errors.h triples.h functions.h map.h pairs.h
 H_OUTPUTS = camera.h cropping.h frame.h lengths.h output.h colors.h
 H_OBJECTS = Label.h sphere.h segment.h circle.h plane.h polyhedron.h objects.h
-H_PATHS = domain.h path.h curves.h plots.h dataplot.h
+H_PATHS = domain.h path.h curves.h plots.h dataplot.h spline.h
 H_EXTRAS = geometry.h
 libepix_a_HDRS = $(H_GLOBALS) $(H_OUTPUTS) $(H_OBJECTS) $(H_PATHS) \
 	$(H_EXTRAS)
@@ -370,6 +371,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/polyhedron.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/segment.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sphere.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/spline.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/surface.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/triples.Po@am__quote@
 

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 1.1
- * Last Change: January 01, 2007
+ * Version 1.0.24
+ * Last Change: February 27, 2007
  */
 
 /*
@@ -47,7 +47,7 @@ namespace ePiX
   // manipulable collection of surface-like objects
   class scenery {
   public:
-    scenery() { };
+    scenery();
     scenery(P F(double, double), const domain& R);
     scenery(P F(double, double, double), const domain& R);
 
@@ -61,32 +61,35 @@ namespace ePiX
     scenery& add(P F(double, double), const domain_list&);
     scenery& add(P F(double, double, double), const domain_list&);
 
-    void draw(); // not const: must sort facets
+    // remove backward-pointing faces? 0=no, -1=front, 1=back
+    scenery& cull(int);
+    void draw(int cull=0); // not const: must sort facets
 
   private:
+    int m_cull;
     std::list<facet*> m_data;
   }; // end of class scenery
 
   // except as noted, dim(R) must be 2
   // cosine-shaded surface with fake z-buffered hidden object removal
-  void surface(P F(double, double), const domain& R);
+  void surface(P F(double, double), const domain& R, int cull=0);
 
   // for slices of maps R^3 -> R^3
-  void surface(P F(double, double, double), const domain& R);
+  void surface(P F(double, double, double), const domain& R, int cull=0);
 
   // plot multiple slices
-  void surface(P F(double, double, double), const domain_list& R);
+  void surface(P F(double, double, double), const domain_list& R, int cull=0);
 
   // Surface from revolving the curve (f(t),g(t)) about the x-axis...
   void surface_rev(double f(double), double g(double),
 		   double t_min, double t_max, 
-		   int latitudes, int longitudes=24);
+		   int latitudes, int longitudes=24, int cull=0);
 
   void surface_rev(double f(double),
 		   double t_min, double t_max, 
-		   int latitudes, int longitudes=24);
+		   int latitudes, int longitudes=24, int cull=0);
 
   // or about the specified axis, with specified angle range
   void surface_rev(double f(double), double g(double), 
-		   const domain& R, const frame& coords=frame());
+		   const domain& R, int cull=0, const frame& coords=frame());
 } // end of namespace ePiX

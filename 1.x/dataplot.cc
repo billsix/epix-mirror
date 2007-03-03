@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.23
- * Last Change: January 29, 2007
+ * Version 1.0.24
+ * Last Change: March 02, 2007
  */
 
 /* 
@@ -45,9 +45,9 @@
 #include "functions.h"
 #include "triples.h"
 #include "path.h"
+#include "spline.h"
 
 #include "Label.h"
-// #include "objects.h"
 #include "curves.h"
 #include "output.h"
 
@@ -184,7 +184,7 @@ namespace ePiX {
     : m_precision(PRECISION), m_data(1)
   {
     const double dt((t_max - t_min)/num_pts);
-    for (int i=0; i<= num_pts; ++i)
+    for (unsigned int i=0; i<= num_pts; ++i)
       m_data.at(0).push_back(f(t_min+i*dt));
   }
 
@@ -193,7 +193,7 @@ namespace ePiX {
     : m_precision(PRECISION), m_data(2)
   {
     const double dt((t_max - t_min)/num_pts);
-    for (int i=0; i<= num_pts; ++i)
+    for (unsigned int i=0; i<= num_pts; ++i)
       {
 	m_data.at(0).push_back(f1(t_min+i*dt));
 	m_data.at(1).push_back(f2(t_min+i*dt));
@@ -206,7 +206,7 @@ namespace ePiX {
     : m_precision(PRECISION), m_data(3)
   {
     const double dt((t_max - t_min)/num_pts);
-    for (int i=0; i<= num_pts; ++i)
+    for (unsigned int i=0; i<= num_pts; ++i)
       {
 	m_data.at(0).push_back(f1(t_min+i*dt));
 	m_data.at(1).push_back(f2(t_min+i*dt));
@@ -273,6 +273,8 @@ namespace ePiX {
 	  } // end of file
 	input.close();
       }
+
+    return *this;
   } // end of data_file::read(const char*)
 
 
@@ -404,8 +406,8 @@ namespace ePiX {
   // return selected column
   std::vector<double> data_file::column(unsigned int n) const
   {
-    if (n < m_data.size())
-      return m_data.at(n);
+    if (1 <= n && n <= m_data.size())
+      return m_data.at(n-1);
     else
       {
 	epix_warning("Out of range argument to data_file::column()");
@@ -420,14 +422,14 @@ namespace ePiX {
     std::vector<double> value(m_data.at(0).size());
     unsigned int col(n);
 
-    if (m_data.size() <= n)
+    if (col < 1 || m_data.size() < col)
       {
 	epix_warning("Out of range argument to data_file::column()");
-	col=0;
+	col=1;
       }
 
     for (unsigned int i=0; i<m_data.at(0).size(); ++i)
-      value.at(i) = f(m_data.at(col).at(i));
+      value.at(i) = f(m_data.at(col-1).at(i));
 
     return value;
   }
@@ -633,6 +635,12 @@ namespace ePiX {
       rect(P(m_lo,0), P(m_hi, scale*m_count));
     }
 
+    P loc(const double scale) const
+    {
+      std::cerr << m_lo << ", " << m_hi << "\n";
+      return P(0.5*(m_lo + m_hi), scale*m_count);
+    }
+
     d_bin* clone() const
     {
       return new d_bin(*this);
@@ -645,13 +653,13 @@ namespace ePiX {
 
 
   //// data_bins functions ////
-  data_bins::data_bins(const double x_min, const double x_max, unsigned int n)
-    : m_lo_val(min(x_min,x_max)), m_hi_val(max(x_min,x_max)),
-      m_pop(0), m_lo_ct(0), m_hi_ct(0), m_cuts_locked(false)
+  data_bins::data_bins(const double lo, const double hi, unsigned int n)
+    : m_lo_val(min(lo, hi)), m_hi_val(max(lo, hi)),
+      m_lo_ct(0), m_hi_ct(0), m_pop(0), m_cuts_locked(false)
   {
-    // divide [x_min, x_max] into n pieces (n>0), or into unit pieces (n=0)
-    const double dx(n>0 ? (m_hi_val - m_lo_val)/n : 1);
+    // divide [lo, hi] into n pieces (n>0), or into unit pieces (n=0)
     unsigned int ct(n>0 ? n : (unsigned int)(m_hi_val - m_lo_val));
+    const double dx((m_hi_val - m_lo_val)/ct);
 
     for (unsigned int i=0; i<=ct; ++i)
       m_cuts.push_back(m_lo_val + i*dx);
@@ -725,6 +733,8 @@ namespace ePiX {
 
     for (VDCI p=data.begin(); p != data.end(); ++p)
       insert(*p);
+
+    return *this;
   }
 
   // rectangles
@@ -760,12 +770,16 @@ namespace ePiX {
 	epix_warning("obuf.str()");
       }
 
-    // TO DO: Interpolate data points
-    /*
+    std::vector<P> vertices;
+
     for (std::vector<d_bin*>::const_iterator p=m_bins.begin();
 	 p != m_bins.end(); ++p)
-      (*p)->draw(scale);
-    */
+      vertices.push_back((*p)->loc(scale));
+
+    n_spline tmp(vertices);
+
+    // TO DO: Avoid magic number
+    tmp.data(20).draw();
   }
 
 
@@ -784,8 +798,12 @@ namespace ePiX {
 	for (std::list<double>::const_iterator curr = m_cuts.begin();
 	     curr != m_cuts.end(); ++curr)
 	  {
-	    m_bins.push_back(new d_bin(*curr, *(++curr)));
-	    --curr;
+	    std::list<double>::const_iterator next(curr);
+	    ++next;
+	    if (next != m_cuts.end())
+	      m_bins.push_back(new d_bin(*curr, *(next)));
+	    else
+	      m_bins.push_back(new d_bin(*curr, m_hi_val));
 	  }
       }
   }
@@ -816,6 +834,30 @@ namespace ePiX {
 	else
 	  epix_warning("data_bin::insert() internal error");
       }
+  }
+
+
+  void plot(const char* filename, epix_mark_type TYPE,
+	    unsigned int col1, unsigned int col2, unsigned int col3,
+	    P f(double, double, double))
+  {
+    data_file DF(filename);
+    DF.plot(TYPE, col1, col2, col3, f);
+  }
+
+  void plot(const char* filename, epix_mark_type TYPE,
+	    P f(double, double, double),
+	    unsigned int col1, unsigned int col2, unsigned int col3)
+  {
+    data_file DF(filename);
+    DF.plot(TYPE, col1, col2, col3, f);
+  }
+
+  void histogram(const char* filename, unsigned int col, data_bins db)
+  {
+    data_file DF(filename);
+    db.read(DF.column(col));
+    db.histogram();
   }
 
 

@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality
  * line figures in LaTeX
  *
- * Version 1.1
- * Last Change: January 01, 2007
+ * Version 1.0.24
+ * Last Change: February 27, 2007
  */
 
 /*
@@ -73,7 +73,7 @@ namespace ePiX {
  
     bool front_facing() const;
 
-    void draw();
+    void draw(int cull);
 
   private:
     P pt1, pt2, pt3, pt4, center, direction;
@@ -272,11 +272,23 @@ namespace ePiX {
 
   bool facet::front_facing() const
   {
-    return ((camera.get_viewpt()-center)|(pt3-center)) > -EPIX_EPSILON;
+    P N((pt1-center)*(pt2-center));
+    if (norm(N) < EPIX_EPSILON)
+      N = (pt1-center)*(pt3-center);
+
+    if (norm(N) < EPIX_EPSILON)
+      N = (pt1-center)*(pt4-center);
+
+    return ((camera.get_viewpt()-center)|N) > -EPIX_EPSILON;
   }
 
-  void facet::draw()
+  void facet::draw(int cull)
   {
+    if ((cull ==  1 && front_facing()) ||
+        (cull == -1 && !front_facing()))
+      return;
+
+    // else
     bool my_fill(epix::fill_paths); // get fill state
     if (my_fill) // calculate cosine^2 of normal angle
       {
@@ -308,7 +320,10 @@ namespace ePiX {
   }
 
 
+  scenery::scenery() : m_cull(0) { }
+
   scenery::scenery(P F(double, double), const domain& R)
+    : m_cull(0)
   {
     // construct sorted list of facet*s
     if (R.dim() != 2)
@@ -385,6 +400,7 @@ namespace ePiX {
 
 
   scenery::scenery(P F(double, double, double), const domain& R)
+    : m_cull(0)
   {
     if (R.dim() != 2)
       {
@@ -463,6 +479,7 @@ namespace ePiX {
 
 
   scenery::scenery(const scenery& sc)
+    : m_cull(0)
   {
     for (std::list<facet*>::const_iterator p=sc.m_data.begin();
 	 p!=sc.m_data.end(); ++p)
@@ -485,6 +502,8 @@ namespace ePiX {
 	  delete *p;
 
 	swap(m_data, tmp);
+
+        m_cull=sc.m_cull;
       }
 
     return *this;
@@ -527,59 +546,70 @@ namespace ePiX {
       }	
   }
 
-  void scenery::draw()
+  scenery& scenery::cull(int c)
+  {
+    if (c == 0)
+      m_cull=0;
+    else if (c > 0)
+      m_cull=1;
+    else
+      m_cull=-1;
+    return *this;
+  }
+
+  void scenery::draw(int cull)
   {
     // sort(m_data.begin(), m_data.end(), by_distance());
 
     for (std::list<facet*>::iterator p=m_data.begin(); p!=m_data.end(); ++p)
-      (*p)->draw();
+      (*p)->draw(cull);
   }
 
 
   //// User-accessible functions ////
-  void surface(P F(double, double), const domain& R)
+  void surface(P F(double, double), const domain& R, int cull)
   {
     scenery surf(F, R);
-    surf.draw();
+    surf.draw(cull);
   }
 
 
   // for slices of maps R^3 -> R^3
-  void surface(P F(double, double, double), const domain& R)
+  void surface(P F(double, double, double), const domain& R, int cull)
   {
     scenery surf(F, R);
-    surf.draw();
+    surf.draw(cull);
   }
 
-  void surface(P F(double, double, double), const domain_list& R)
+  void surface(P F(double, double, double), const domain_list& R, int cull)
   {
     scenery tmp;
 
     for (dolci p= R.m_list.begin(); p!=R.m_list.end(); ++p)
       tmp.add(F, *p);
 
-    tmp.draw();
+    tmp.draw(cull);
   }
 
 
   void surface_rev(double f(double), double g(double), 
-		   double min_x, double max_x, int i_max, int j_max)
+		   double min_x, double max_x, int i_max, int j_max, int cull)
   {
     surface_rev(f, g,
 		domain(P(min_x, 0), P(max_x, 2*M_PI/angle(1)),
-		       mesh(i_max, j_max), mesh(i_max, j_max)));
+		       mesh(i_max, j_max), mesh(i_max, j_max)), cull);
   }
 
   void surface_rev(double f(double),
-		   double min_x, double max_x, int i_max, int j_max)
+		   double min_x, double max_x, int i_max, int j_max, int cull)
   {
     surface_rev(id, f,
 		domain(P(min_x, 0), P(max_x, 2*M_PI/angle(1)),
-		       mesh(i_max, j_max), mesh(i_max, j_max)));
+		       mesh(i_max, j_max), mesh(i_max, j_max)), cull);
   }
 
   void surface_rev(double f(double), double g(double), 
-		   const domain& R, const frame& coords)
+		   const domain& R, int cull, const frame& coords)
   {
     if (R.dx3() > 0)
       epix_warning("surface_rev() ignores domain's third coordinate");
@@ -603,7 +633,7 @@ namespace ePiX {
 
     for (std::list<facet*>::iterator p=mesh.begin(); p!=mesh.end(); ++p)
       {
-	(*p)->draw();
+	(*p)->draw(cull);
 	delete *p;
       }
   }

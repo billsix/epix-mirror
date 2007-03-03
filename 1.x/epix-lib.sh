@@ -147,7 +147,7 @@ function ePiX_version
     SPAMMY="${SPAMMY}$(echo ubylpebff|$my_decode).$(echo rqh|$my_decode)>"
 
 cat <<VERSION
-$PROG is part of ePiX, Version 1.0.22
+$PROG is part of ePiX, Version EPIX_VERSION_NUMBER
 
 Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
 Andrew D. Hwang  $SPAMMY

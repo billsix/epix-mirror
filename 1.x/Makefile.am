@@ -21,12 +21,12 @@ libepix_a_CXXSOURCES = camera.cc circle.cc colors.cc cropping.cc curves.cc \
 	dataplot.cc domain.cc frame.cc functions.cc geometry.cc globals.cc \
 	Label.cc lengths.cc \
 	objects.cc output.cc pairs.cc path.cc plane.cc plots.cc polyhedron.cc \
-	segment.cc sphere.cc surface.cc triples.cc
+	segment.cc sphere.cc spline.cc surface.cc triples.cc
 # header groups for build deps
 H_GLOBALS = globals.h errors.h triples.h functions.h map.h pairs.h
 H_OUTPUTS = camera.h cropping.h frame.h lengths.h output.h colors.h
 H_OBJECTS = Label.h sphere.h segment.h circle.h plane.h polyhedron.h objects.h
-H_PATHS = domain.h path.h curves.h plots.h dataplot.h
+H_PATHS = domain.h path.h curves.h plots.h dataplot.h spline.h
 H_EXTRAS = geometry.h
 libepix_a_HDRS = $(H_GLOBALS) $(H_OUTPUTS) $(H_OBJECTS) $(H_PATHS) \
 	$(H_EXTRAS)

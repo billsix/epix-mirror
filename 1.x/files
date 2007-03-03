@@ -1,4 +1,4 @@
-# Version 1.0.22 
+# Version 1.0.23 
 AUTHORS
 BUGS
 ChangeLog
@@ -87,6 +87,8 @@ segment.cc
 segment.h
 sphere.cc
 sphere.h
+spline.cc
+spline.h
 surface.cc
 surface.h
 triples.cc

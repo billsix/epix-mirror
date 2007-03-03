@@ -5,7 +5,7 @@
  * line figures in LaTeX 
  *
  * Version 1.0.23
- * Last Change: January 03, 2007
+ * Last Change: February 11, 2007
  */
 
 /* 
@@ -149,7 +149,7 @@ namespace ePiX {
 
   class data_bins {
   public:
-    data_bins(const double x_min, const double x_max, unsigned int n=1);
+    data_bins(const double lo, const double hi, unsigned int n=1);
 
     data_bins(const data_bins&);
     data_bins& operator= (const data_bins&);
@@ -182,17 +182,18 @@ namespace ePiX {
   }; // end of class data_bins
 
 
-  /* Potential global functions for convenience...
-  // scatter plots
+  //// Global functions that use file_data, data_bins ////
   void plot(const char* filename, epix_mark_type TYPE,
 	    unsigned int col1=1, unsigned int col2=2, unsigned int col3=0,
 	    P f(double, double, double) = xyz);
 
   void plot(const char* filename, epix_mark_type TYPE,
-	    P f(double, double, double));
+	    P f(double, double, double),
+	    unsigned int col1=1, unsigned int col2=2, unsigned int col3=0);
 
-  void histogram(const char* filename, unsigned int col, const data_bins&);
-  */
+  // pass 3rd arg by value
+  void histogram(const char* filename, unsigned int col, data_bins);
+
 
   ///////////////////////////////////////////////////
   //// OBSOLETE FUNCTION CALLS -- may be removed //// 

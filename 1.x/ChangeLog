@@ -2,8 +2,27 @@ ePiX -- ChangeLog
 
 Andrew D. Hwang  <ahwang -at- mathcs -dot- holycross -dot- edu>
 
+March 2, 2007
+* (New files spline.{cc,h}) Create natural splines from vector of P
+* (dataplot.cc) Implement data_bins::draw() using splines
+	
+February 27, 2007
+* (surface.{cc,h}) Backface culling in surface, surface_rev
 
-December 29, 2006--January 01, 2007 (v1.1)
+February 24, 2007
+* (dataplot.cc)
+  - data_file::column() accepts index 1, ..., size()
+  - Out of range bug in data_bins::initialize()
+  - Piecewise-linear data_bins::plot implemented
+
+January 03--29, 2007 (v1.0.23)
+* (functions.*) log_log, log_lin, lin_log functions
+* (dataplot.{cc,h}
+  - New classes data_file, data_bins
+  - FILEDATA and old data plotting functions deprecated
+* (objects.*) Logarithmic axes and labels
+
+December 29, 2006--January 01, 2007 (v1.0.22)
 * (make_header) Add <list> to epix.h
 * (domain.*)
   - "dim" function, returns dimension of domain (0--3)
