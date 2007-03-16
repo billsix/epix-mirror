@@ -64,7 +64,8 @@ namespace ePiX {
   class data_file {
   public:
     explicit data_file(unsigned int n=2);
-    explicit data_file(const char*); // get size from first line of file
+    explicit data_file(const char*, const char* delim = " ",
+    	const char* commt = "%"); // get size from first line of file
 
     // file made from components
     data_file(double f(double),
@@ -111,6 +112,12 @@ namespace ePiX {
     // set C++ output precision for write
     void precision(unsigned int n=6) const;
 
+	// Setters and getters for delimiter and comment character
+	void delimiter(const char* delim) { m_delim = delim; }
+	std::string delimiter() { return m_delim; }
+	void comment(const char* commt) { m_commt = commt; }
+	std::string comment() { return m_commt; }
+
     // write raw data to file
     void write(const char* filename) const;
 
@@ -140,10 +147,15 @@ namespace ePiX {
 	      unsigned int col3=0) const;
 
   private:
+	std::vector<double> tokenise(std::string line);
+	unsigned int entries(const char* filename);
+
     mutable unsigned int m_precision;
     // selection m_select;
 
     std::vector<std::vector<double> > m_data;
+    std::string m_delim;		// Field delimiter
+    std::string m_commt;		// Comment character
   }; // end of class data_file
 
 

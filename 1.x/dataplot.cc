@@ -68,38 +68,62 @@ namespace ePiX {
     return arg;
   }
 
-  unsigned int entries(const char* filename)
+  unsigned int data_file::entries(const char* filename)
   {
-    std::ifstream input(filename);
-    if (!input)
-      {
-	epix_warning("Cannot open file");
-	return(0);
-      }
+	std::ifstream input(filename);
+	if (!input)
+	{
+		epix_warning("Cannot open file");
+		return(0);
+	}
 
-    // else
-    std::string linebuf;
-    double curr_entry;
-    unsigned int entry_count(0);
+	// else
+	std::string linebuf;
+	std::vector<double> tmp;
 
-    while (getline(input, linebuf) && entry_count == 0)
-      {
-	// strip comments
-	linebuf = linebuf.substr(0, linebuf.find_first_of("%"));
-	if (linebuf.length() > 0)
-	  {
-	    std::istringstream linestream(linebuf, std::ios_base::in);
+	while (getline(input, linebuf) && tmp.size() == 0)
+	{
+		// strip comments
+		linebuf = linebuf.substr(0, linebuf.find_first_of(m_commt));
+		if (linebuf.length() > 0)
+			tmp = tokenise(linebuf);
+	}
 
-	    while (linestream >> curr_entry)
-	      ++entry_count;
-	  }
-      }
+	input.close();
 
-    input.close();
-
-    return entry_count; // "0" signals error
+	if (tmp.size() == 0)
+		epix_warning("No columns found in data file");
+	
+	return tmp.size();
   } // end of entries(const char*)
 
+
+  std::vector<double> data_file::tokenise(std::string line)
+  {
+	// Tokenise the line using the given delimiter, return a vector of doubles
+	size_t pos = line.find(m_delim, 0);
+	std::string tmpStr;
+	double tmpDbl;
+	std::vector<double> tmpVec;
+	while(pos != std::string::npos)
+	{
+		tmpStr = line.substr(0, pos);
+		line.erase(0, pos+1);
+		std::istringstream convStr(tmpStr);
+		if (!(convStr >> tmpDbl))
+			tmpDbl = 0;
+		tmpVec.push_back(tmpDbl);
+		pos = line.find(m_delim, 0);
+	}
+	if (line.size())
+	{
+		std::istringstream convStr(line);
+		if (!(convStr >> tmpDbl))
+			tmpDbl = 0;
+		tmpVec.push_back(tmpDbl);
+	}
+	return tmpVec;
+}
 
   /*
   // selection functions
@@ -124,57 +148,14 @@ namespace ePiX {
   data_file::data_file(unsigned int n)
     : m_precision(PRECISION), m_data(n) { }
 
-  data_file::data_file(const char* filename)
-    : m_precision(PRECISION), m_data(entries(filename))
+  data_file::data_file(const char* filename, const char* delim, const char* commt )
+    : m_precision(PRECISION)
   {
-    if (0 < m_data.size()) // file contains data
-      {
-	std::ifstream input(filename); // open file
-	std::string linebuf;
-	double curr_entry;
-	unsigned int entry_count;
-
-	bool warned(false);
-
-	while (getline(input, linebuf))
-	  {
-	    // strip comments
-	    linebuf = linebuf.substr(0, linebuf.find_first_of("%"));
-	    if (linebuf.length() > 0)
-	      {
-		std::istringstream linestream(linebuf, std::ios_base::in);
-
-		entry_count=0;
-		while (linestream >> curr_entry)
-		  {
-		    try 
-		      {
-			m_data.at(entry_count++).push_back(curr_entry);
-		      }
-
-		    catch (std::out_of_range)
-		      {
-			if (!warned)
-			  epix_warning("File has more columns than allocated");
-
-			warned = true;
-		      }
-		  }
-
-		// found enough entries?
-		if (entry_count < m_data.size())
-		  {
-		    if (!warned)
-		      epix_warning("File has fewer columns than expected");
-
-		    warned = true;
-		  }
-
-	      } // linebuf non-empty
-
-	  } // end of file
-	input.close();
-      }
+	m_delim = delim;
+	m_commt = commt;
+	m_data.resize(entries(filename));
+	if (m_data.size() > 0) // file contains data
+		read(filename);
   } // end of data_file(const char*)
 
 
@@ -217,65 +198,57 @@ namespace ePiX {
 
   data_file& data_file::read(const char* filename)
   {
-    unsigned int columns(entries(filename));
-    if (columns != m_data.size())
-      {
-	std::stringstream msg;
-	msg << "Column count mismatch in file " << filename;
-	epix_warning(msg.str());
-      }
+	unsigned int columns(entries(filename));
+	if (columns != m_data.size())
+	{
+		std::stringstream msg;
+		msg << "Column count mismatch in file " << filename;
+		epix_warning(msg.str());
+	}
 
-    else
-      {
-	std::ifstream input(filename);
-	std::string linebuf;
-	double curr_entry;
-	unsigned int entry_count;
+	else
+	{
+		std::ifstream input(filename);
+		std::string linebuf;
+		std::vector<double> line;
 
-	bool warned(false);
+		bool warned(false);
 
-	while (getline(input, linebuf))
-	  {
-	    // strip comments
-	    linebuf = linebuf.substr(0, linebuf.find_first_of("%"));
-	    if (linebuf.length() > 0)
-	      {
-		std::istringstream linestream(linebuf, std::ios_base::in);
+		while (getline(input, linebuf))
+		{
+			// strip comments
+			linebuf = linebuf.substr(0, linebuf.find_first_of(m_commt));
+			if (linebuf.length() > 0)
+			{
+				line = tokenise(linebuf);
 
-		entry_count=0;
-		while (linestream >> curr_entry)
-		  {
-		    try 
-		      {
-			m_data.at(entry_count++).push_back(curr_entry);
-		      }
-
-		    catch (std::out_of_range)
-		      {
-			if (!warned)
-			  epix_warning("File has more columns than allocated");
-
-			warned = true;
-		      }
-		  }
-
-		// found enough entries?
-		if (entry_count < m_data.size())
-		  {
-		    if (!warned)
-		      epix_warning("File has fewer columns than expected");
-
-		    warned = true;
-		  }
-
-	      } // linebuf non-empty
-
-	  } // end of file
-	input.close();
-      }
-
+				if (line.size() > m_data.size())
+				{
+					if (!warned)
+					{
+						epix_warning("File has more columns than allocated");
+						warned = true;
+					}
+				}
+				else if (line.size() < m_data.size())
+				{
+					if (!warned)
+					{
+						epix_warning("File has less columns than allocated");
+						warned = true;
+					}
+				}
+				else
+				{
+					for (unsigned int i = 0; i < m_data.size(); i++)
+						m_data.at(i).push_back(line.at(i));
+				}
+			} // linebuf non-empty
+		} // end of file
+		input.close();
+	}
     return *this;
-  } // end of data_file::read(const char*)
+  } // end of data_file::read(const char*, const std::string&)
 
 
     // transform column(s)
@@ -463,7 +436,7 @@ namespace ePiX {
 	output << m_data.at(0).at(j);
 	for (unsigned int i=1; i < cols; ++i)
 	  output << "\t" << m_data.at(i).at(j);
-      
+
 	output << std::endl;
       }
     output.close();
