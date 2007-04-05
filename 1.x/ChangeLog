@@ -2,6 +2,21 @@ ePiX -- ChangeLog
 
 Andrew D. Hwang  <ahwang -at- mathcs -dot- holycross -dot- edu>
 
+April 5, 2007 (v1.0.24)
+* Fix missing #include declarations (Martin Michlmayr, Julian Gilbey)
+  - (errors.h) #include <cstdlib>
+  - (polyhedron.cc, surface.cc) #include <algorithm>
+
+March 16, 2007
+* (dataplots.{cc,h}) (Marcus Hanwell)
+  - Updates to data_file
+  - Tokenizer to read files
+  - User-modifiable delimiter, comment characters
+	
+March 3, 2007
+* (objects.cc) Axis labels of small abs. value rounded to zero
+* (dataplot.cc) Warning string bug
+	
 March 2, 2007
 * (New files spline.{cc,h}) Create natural splines from vector of P
 * (dataplot.cc) Implement data_bins::draw() using splines

@@ -4,12 +4,12 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 09, 2005
+ * Version 1.0.24
+ * Last Change: April 5, 2007
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
@@ -34,6 +34,7 @@
 
 #include <iostream>
 #include <cstdarg>
+#include <algorithm>
 
 #include "triples.h"
 

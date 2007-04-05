@@ -4,8 +4,8 @@
  * This file is part of ePiX, a preprocessor for creating high-quality 
  * line figures in LaTeX 
  *
- * Version 1.0.15
- * Last Change: October 10, 2006
+ * Version 1.0.23
+ * Last Change: April 5, 2007
  */
 
 /* 
@@ -35,6 +35,7 @@
 #ifndef EPIX_ERRORS
 #define EPIX_ERRORS
 
+#include <cstdlib>
 #include <iostream>
 #include <string>
 

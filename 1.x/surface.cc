@@ -5,7 +5,7 @@
  * line figures in LaTeX
  *
  * Version 1.0.24
- * Last Change: February 27, 2007
+ * Last Change: April 5, 2007
  */
 
 /*
@@ -31,6 +31,8 @@
  * along with ePiX; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include <algorithm>
+
 #include "globals.h"
 #include "errors.h"
 
