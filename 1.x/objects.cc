@@ -4,8 +4,8 @@
  * This file is part of ePiX, a C++ library for creating high-quality 
  * figures in LaTeX 
  *
- * Version 1.0.23
- * Last Change: January 29, 2007
+ * Version 1.0.24
+ * Last Change: March 03, 2007
  */
 
 /* 
@@ -31,6 +31,7 @@
  * along with ePiX; if not, write to the Free Software Foundation, Inc.,
  * 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
  */
+#include <iostream>
 
 #include <sstream>
 
@@ -48,6 +49,11 @@ namespace ePiX {
 
   extern double pic_size;
   extern char *pic_unit;
+
+  inline double trunc8(double t)
+  {
+    return (fabs(t) < EPIX_EPSILON) ? 0 : t;
+  }
 
   // Picture objects
 
@@ -266,7 +272,6 @@ namespace ePiX {
   {
     bool neg_flag;
     double label(0);
-    P current(tail);
     P step((1.0/n)*(head - tail));
 
     // determine if labels change sign (may be needed for alignment)
@@ -279,54 +284,58 @@ namespace ePiX {
     else
       neg_flag=false;
 
-    for (int i=0; i<= n; ++i, current += step)
-      if (is_visible(current))
-	{
-	  // Compute proper type of label
-	  if (TICK == H_AXIS)
-	    label = current.x1();
+    for (int i=0; i<= n; ++i)
+      {
+	P current(tail+i*step);
 
-	  else if (TICK == V_AXIS)
-	    label = current.x2();
+	if (is_visible(current))
+	  {
+	    // Compute proper type of label
+	    if (TICK == H_AXIS)
+	      label = trunc8(current.x1());
 
-	  else // stub for future "z-axis" labelling...
-	    ;
-	  newl();
-	  epix_put();
-	  print(current, offset);
+	    else if (TICK == V_AXIS)
+	      label = trunc8(current.x2());
 
-	  // Put sign on label?
-	  if (neg_flag && label >= 0)
-	    {	      
-	      lbrace();
-	      dollar();
-	      epix_neg(); // Let TeX worry about the non-existent "-"
-	      // mask label?
-	      if (mask)
-		{
-		  epix_colorbox();
-		  epix_math_grouping(label);
-		}
-	      else
-		epix_grouping(label);
+	    else // stub for future "z-axis" labelling...
+	      ;
+	    newl();
+	    epix_put();
+	    print(current, offset);
 
-	      dollar();
-	      rbrace();
-	    }
-	  else
-	    {
-	      if (mask)
-		{
-		  lbrace();
-		  epix_colorbox();
-		}
+	    // Put sign on label?
+	    if (neg_flag && label >= 0)
+	      {	      
+		lbrace();
+		dollar();
+		epix_neg(); // Let TeX worry about the non-existent "-"
+		// mask label?
+		if (mask)
+		  {
+		    epix_colorbox();
+		    epix_math_grouping(label);
+		  }
+		else
+		  epix_grouping(label);
 
-	      epix_math_grouping(label);
-
-	      if (mask)
+		dollar();
 		rbrace();
-	    }
-	} // end of is_visible(current)
+	      }
+	    else
+	      {
+		if (mask)
+		  {
+		    lbrace();
+		    epix_colorbox();
+		  }
+
+		epix_math_grouping(label);
+
+		if (mask)
+		  rbrace();
+	      }
+	  } // end of is_visible(current)
+      }
 
     end_stanza();
   }
@@ -351,11 +360,11 @@ namespace ePiX {
   // Needed by draw_axis_labels to pass coordinates to Label constructor
   double coord1(P arg)
   {
-    return arg.x1();
+    return trunc8(arg.x1());
   }
   double coord2(P arg)
   {
-    return arg.x2();
+    return trunc8(arg.x2());
   }
   // axis labels with alignment option
   void draw_axis_labels(const P& tail, const P& head, int n, const P& offset, 

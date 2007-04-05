@@ -46,17 +46,17 @@ namespace ePiX {
     const unsigned int N(m_vertices.size()-1);
 
     // notation and algorithm from John H. Matthews and Kurtis K. Fink
-    std::vector<double> tmp_h(N+1);
-    std::vector<double> tmp_d(N+1);
-    std::vector<double> tmp_u(N+1);
-    std::vector<double> tmp_y(N+1);
+    std::vector<double> tmp_h(N+1); // h_k = x_{k+1} - x_k
+    std::vector<double> tmp_d(N+1); // d_k = (y_{k+1} - y_k)/h_k
+    std::vector<double> tmp_u(N+1); // u_k = 6*(d_{k+1} - d_k)
+    std::vector<double> tmp_y(N+1); // y_k
 
     // entries of tridiagonal coefficient matrix
-    std::vector<double> tmp_A(N+1);
-    std::vector<double> tmp_C(N+1);
-    std::vector<double> tmp_D(N+1);
+    std::vector<double> tmp_A(N+1);   // subdiagonal of coefficient matrix
+    std::vector<double> tmp_C(N+1);   // superdiagonal
+    std::vector<double> tmp_D(N+1); // diagonal
 
-    std::vector<double> tmp_m(N+1);
+    std::vector<double> tmp_m(N+1); // m_k = S"(x_k), 1 <= k <= N-1
 
     // initialize...
     for (unsigned int i = 0; i <= N; ++i)
@@ -75,22 +75,23 @@ namespace ePiX {
 	    if (0 < i)
 	      {
 		tmp_u.at(i) = 6*(tmp_d.at(i) - tmp_d.at(i-1));
+		tmp_D.at(i) = 2*(tmp_h.at(i) + tmp_h.at(i-1));
 
-		tmp_A.at(i) = tmp_h.at(i);
-		tmp_C.at(i) = tmp_h.at(i);
+		if (i <= N-2)
+		  {
+		    tmp_A.at(i) = tmp_h.at(i);
+		    tmp_C.at(i) = tmp_h.at(i);
+		  }
 	      }
 	  }
-
-	if (0 < i)
-	  tmp_D.at(i) = 2*(tmp_h.at(i-1) + tmp_h.at(i));
       }
 
     for (unsigned int i=2; i <= N; ++i)
       {
-	double tmp(tmp_A.at(i-1)/tmp_D.at(i-1));
+	const double ratio(tmp_A.at(i-1)/tmp_D.at(i-1));
 
-	tmp_D.at(i) -= tmp*tmp_C.at(i-1);
-	tmp_u.at(i) -= tmp*tmp_u.at(i-1);
+	tmp_D.at(i) -= ratio*tmp_C.at(i-1);
+	tmp_u.at(i) -= ratio*tmp_u.at(i-1);
       }
 
     tmp_m.at(N) = tmp_u.at(N-1)/tmp_D.at(N-1);
