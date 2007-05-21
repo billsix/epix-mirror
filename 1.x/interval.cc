@@ -5,7 +5,7 @@
  * figures in LaTeX 
  *
  * Version 1.0.25
- * Last Change: May 20, 2007
+ * Last Change: May 21, 2007
  *
  * 
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
@@ -140,11 +140,15 @@ namespace ePiX {
     return 0.5*(m_rmin + m_rmax);
   }
 
+
+  // Magic number
+  const double EPS(1.0e-10);
+
   bool interval::contains(const double x) const
   {
-    // check bounds at each endpoint, shave off open ends
-    return ( (m_closed_l ? (m_rmin <= x) : (m_rmin + EPIX_EPSILON < x)) &&
-	     (m_closed_r ? (x <= m_rmax) : (x < m_rmax - EPIX_EPSILON)) );
+    // check bounds at each endpoint
+    return ( (m_closed_l ? (m_rmin - EPS <= x) : (m_rmin + EPS < x)) &&
+	     (m_closed_r ? (x <= m_rmax + EPS) : (x < m_rmax - EPS)) );
   }
 
   // Minkowski sum
