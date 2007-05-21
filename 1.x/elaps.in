@@ -23,7 +23,8 @@ ELAPS_EXTENSIONS="eepic xp flx cc c C cpp" # or NULL
 ELAPS_DOT_EXT=".${ELAPS_EXTENSIONS// /|.}" # for usage message
 
 # default options
-ELAPS_PKGS="latexsym,amsmath,rotating,epic,eepic,pstcol"
+ELAPS_PKGS="latexsym,amsmath,rotating,epic,eepic"
+ELAPS_PSTRICKS="pstricks"
 ELAPS_SIZE=12 # figure compiled in [12pt]{article}
 
 ELAPS_PDF="no"    # Create PDF file?
@@ -89,6 +90,9 @@ Options:
     -ps, --ps
       Create standalone PostScript file (overrides --pdf)
 
+    --pstcol
+      Use (older) pstcol package instead of pstricks
+
     -P<printer>
       dvips printer options, e.g. "-Pamz", may be given on the command 
       line. They are also read from ~/.dvipsrc if this file exists.
@@ -106,7 +110,7 @@ function elaps_make_latex ()
 {
 cat <<LaTeX >> $1
 \documentclass[${ELAPS_SIZE}pt]{article}
-\usepackage{$ELAPS_PKGS}
+\usepackage{$ELAPS_PKGS,$ELAPS_PSTRICKS}
 \setlength{\textwidth}{7.5in}
 \setlength{\textheight}{9.5in}
 \setlength{\oddsidemargin}{-0.5in}
@@ -180,6 +184,11 @@ function elaps_parse_options ()
         -ps|--ps)
             ELAPS_PS="yes"
             ELAPS_PDF="no" # redundant; enforced by logic later
+            shift
+            ;;
+
+        --pstcol)
+            ELAPS_PSTRICKS="pstcol"
             shift
             ;;
 

@@ -66,23 +66,23 @@ AR = ar
 ARFLAGS = cru
 libepix_a_AR = $(AR) $(ARFLAGS)
 am__DEPENDENCIES_1 = camera.o circle.o colors.o cropping.o curves.o \
-	dataplot.o domain.o frame.o functions.o geometry.o globals.o \
-	Label.o lengths.o objects.o output.o pairs.o path.o plane.o \
-	plots.o polyhedron.o segment.o sphere.o spline.o surface.o \
-	triples.o
+	dataplot.o data_bins.o data_file.o data_mask.o domain.o \
+	frame.o functions.o geometry.o globals.o interval.o Label.o \
+	lengths.o objects.o output.o pairs.o path.o plane.o plots.o \
+	polyhedron.o segment.o sphere.o spline.o surface.o triples.o
 libepix_a_DEPENDENCIES = $(am__DEPENDENCIES_1)
 am__objects_1 = camera.$(OBJEXT) circle.$(OBJEXT) colors.$(OBJEXT) \
 	cropping.$(OBJEXT) curves.$(OBJEXT) dataplot.$(OBJEXT) \
+	data_bins.$(OBJEXT) data_file.$(OBJEXT) data_mask.$(OBJEXT) \
 	domain.$(OBJEXT) frame.$(OBJEXT) functions.$(OBJEXT) \
-	geometry.$(OBJEXT) globals.$(OBJEXT) Label.$(OBJEXT) \
-	lengths.$(OBJEXT) objects.$(OBJEXT) output.$(OBJEXT) \
-	pairs.$(OBJEXT) path.$(OBJEXT) plane.$(OBJEXT) plots.$(OBJEXT) \
-	polyhedron.$(OBJEXT) segment.$(OBJEXT) sphere.$(OBJEXT) \
-	spline.$(OBJEXT) surface.$(OBJEXT) triples.$(OBJEXT)
+	geometry.$(OBJEXT) globals.$(OBJEXT) interval.$(OBJEXT) \
+	Label.$(OBJEXT) lengths.$(OBJEXT) objects.$(OBJEXT) \
+	output.$(OBJEXT) pairs.$(OBJEXT) path.$(OBJEXT) \
+	plane.$(OBJEXT) plots.$(OBJEXT) polyhedron.$(OBJEXT) \
+	segment.$(OBJEXT) sphere.$(OBJEXT) spline.$(OBJEXT) \
+	surface.$(OBJEXT) triples.$(OBJEXT)
 am__objects_2 =
-am__objects_3 = $(am__objects_2) $(am__objects_2) $(am__objects_2) \
-	$(am__objects_2) $(am__objects_2)
-am_libepix_a_OBJECTS = $(am__objects_1) $(am__objects_3)
+am_libepix_a_OBJECTS = $(am__objects_1) $(am__objects_2)
 libepix_a_OBJECTS = $(am_libepix_a_OBJECTS)
 binSCRIPT_INSTALL = $(INSTALL_SCRIPT)
 SCRIPTS = $(bin_SCRIPTS)
@@ -229,20 +229,28 @@ pkglib_LIBRARIES = libepix.a
 pkglib_DATA = epix-lib.sh
 include_HEADERS = epix.h
 libepix_a_CXXSOURCES = camera.cc circle.cc colors.cc cropping.cc curves.cc \
-	dataplot.cc domain.cc frame.cc functions.cc geometry.cc globals.cc \
-	Label.cc lengths.cc \
+	dataplot.cc data_bins.cc data_file.cc data_mask.cc \
+	domain.cc frame.cc functions.cc \
+	geometry.cc globals.cc interval.cc Label.cc lengths.cc \
 	objects.cc output.cc pairs.cc path.cc plane.cc plots.cc polyhedron.cc \
 	segment.cc sphere.cc spline.cc surface.cc triples.cc
 
-# header groups for build deps
-H_GLOBALS = globals.h errors.h triples.h functions.h map.h pairs.h
-H_OUTPUTS = camera.h cropping.h frame.h lengths.h output.h colors.h
-H_OBJECTS = Label.h sphere.h segment.h circle.h plane.h polyhedron.h objects.h
-H_PATHS = domain.h path.h curves.h plots.h dataplot.h spline.h
-H_EXTRAS = geometry.h
-libepix_a_HDRS = $(H_GLOBALS) $(H_OUTPUTS) $(H_OBJECTS) $(H_PATHS) \
-	$(H_EXTRAS)
+libepix_a_HDRS = camera.h circle.h colors.h cropping.h curves.h \
+	dataplot.h data_bins.h data_file.h data_mask.h \
+	domain.h errors.h frame.h functions.h \
+	globals.h geometry.h interval.h Label.h lengths.h map.h \
+	objects.h output.h pairs.h path.h plane.h plots.h polyhedron.h \
+	segment.h sphere.h spline.h surface.h triples.h
 
+
+# header groups for build deps
+#H_GLOBALS = globals.h errors.h triples.h functions.h map.h pairs.h
+#H_OUTPUTS = camera.h cropping.h frame.h lengths.h output.h colors.h
+#H_OBJECTS = Label.h sphere.h segment.h circle.h plane.h polyhedron.h objects.h
+#H_PATHS = domain.h path.h curves.h plots.h dataplot.h spline.h
+#H_EXTRAS = geometry.h
+#libepix_a_HDRS = $(H_GLOBALS) $(H_OUTPUTS) $(H_OBJECTS) $(H_PATHS) \
+#	$(H_EXTRAS)
 libepix_a_SOURCES = $(libepix_a_CXXSOURCES) $(libepix_a_HDRS)
 libepix_a_LIBADD = $(libepix_a_CXXSOURCES:.cc=.o)
 
@@ -355,12 +363,16 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/colors.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/cropping.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/curves.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_bins.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_file.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/data_mask.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/dataplot.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/domain.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/frame.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/functions.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/geometry.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/globals.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/interval.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lengths.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/objects.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/output.Po@am__quote@
@@ -882,17 +894,17 @@ libepix.a: $(libepix_a_OBJECTS)
 	$(RANLIB) libepix.a
 
 # object file dependencies
-$(libepix_a_LIBADD): %.o: %.cc %.h $(H_GLOBALS)
+$(libepix_a_LIBADD): %.o: %.cc %.h $(libepix_a_HDRS)
 
 # These ones have extra dependencies
-Label.o camera.o cropping.o functions.o lengths.o : $(H_OUTPUTS)
-path.o segment.o : $(H_OUTPUTS)
-
-segment.o : $(H_PATHS)
-
+# Label.o camera.o cropping.o functions.o lengths.o : $(H_OUTPUTS)
+# path.o segment.o : $(H_OUTPUTS)
+#
+# segment.o : $(H_PATHS)
+#
 # And these depend on all of the groups of header files
-circle.o curves.o dataplot.o geometry.o objects.o : $(libepix_a_HDRS)
-output.o plots.o plane.o polyhedron.o sphere.o : $(libepix_a_HDRS)
+# circle.o curves.o dataplot.o geometry.o objects.o : $(libepix_a_HDRS)
+# output.o plots.o plane.o polyhedron.o sphere.o : $(libepix_a_HDRS)
 
 # Manpage
 epix.1: epix.1.in

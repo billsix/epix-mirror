@@ -18,18 +18,27 @@ pkglib_DATA = epix-lib.sh
 include_HEADERS = epix.h
 
 libepix_a_CXXSOURCES = camera.cc circle.cc colors.cc cropping.cc curves.cc \
-	dataplot.cc domain.cc frame.cc functions.cc geometry.cc globals.cc \
-	Label.cc lengths.cc \
+	dataplot.cc data_bins.cc data_file.cc data_mask.cc \
+	domain.cc frame.cc functions.cc \
+	geometry.cc globals.cc interval.cc Label.cc lengths.cc \
 	objects.cc output.cc pairs.cc path.cc plane.cc plots.cc polyhedron.cc \
 	segment.cc sphere.cc spline.cc surface.cc triples.cc
+
+libepix_a_HDRS = camera.h circle.h colors.h cropping.h curves.h \
+	dataplot.h data_bins.h data_file.h data_mask.h \
+	domain.h errors.h frame.h functions.h \
+	globals.h geometry.h interval.h Label.h lengths.h map.h \
+	objects.h output.h pairs.h path.h plane.h plots.h polyhedron.h \
+	segment.h sphere.h spline.h surface.h triples.h
+
 # header groups for build deps
-H_GLOBALS = globals.h errors.h triples.h functions.h map.h pairs.h
-H_OUTPUTS = camera.h cropping.h frame.h lengths.h output.h colors.h
-H_OBJECTS = Label.h sphere.h segment.h circle.h plane.h polyhedron.h objects.h
-H_PATHS = domain.h path.h curves.h plots.h dataplot.h spline.h
-H_EXTRAS = geometry.h
-libepix_a_HDRS = $(H_GLOBALS) $(H_OUTPUTS) $(H_OBJECTS) $(H_PATHS) \
-	$(H_EXTRAS)
+#H_GLOBALS = globals.h errors.h triples.h functions.h map.h pairs.h
+#H_OUTPUTS = camera.h cropping.h frame.h lengths.h output.h colors.h
+#H_OBJECTS = Label.h sphere.h segment.h circle.h plane.h polyhedron.h objects.h
+#H_PATHS = domain.h path.h curves.h plots.h dataplot.h spline.h
+#H_EXTRAS = geometry.h
+#libepix_a_HDRS = $(H_GLOBALS) $(H_OUTPUTS) $(H_OBJECTS) $(H_PATHS) \
+#	$(H_EXTRAS)
 
 libepix_a_SOURCES = $(libepix_a_CXXSOURCES) $(libepix_a_HDRS)
 
@@ -73,17 +82,17 @@ libepix.a: $(libepix_a_OBJECTS)
 	$(RANLIB) libepix.a
 
 # object file dependencies
-$(libepix_a_LIBADD): %.o: %.cc %.h $(H_GLOBALS)
+$(libepix_a_LIBADD): %.o: %.cc %.h $(libepix_a_HDRS)
 
 # These ones have extra dependencies
-Label.o camera.o cropping.o functions.o lengths.o : $(H_OUTPUTS)
-path.o segment.o : $(H_OUTPUTS)
-
-segment.o : $(H_PATHS)
-
+# Label.o camera.o cropping.o functions.o lengths.o : $(H_OUTPUTS)
+# path.o segment.o : $(H_OUTPUTS)
+#
+# segment.o : $(H_PATHS)
+#
 # And these depend on all of the groups of header files
-circle.o curves.o dataplot.o geometry.o objects.o : $(libepix_a_HDRS)
-output.o plots.o plane.o polyhedron.o sphere.o : $(libepix_a_HDRS)
+# circle.o curves.o dataplot.o geometry.o objects.o : $(libepix_a_HDRS)
+# output.o plots.o plane.o polyhedron.o sphere.o : $(libepix_a_HDRS)
 
 # Manpage
 epix.1: epix.1.in

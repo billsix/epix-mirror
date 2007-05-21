@@ -1,14 +1,40 @@
 ePiX -- ChangeLog
 
-Andrew D. Hwang  <ahwang -at- mathcs -dot- holycross -dot- edu>
+Andrew D. Hwang (ADH)  <ahwang -at- mathcs -dot- holycross -dot- edu>
+Marcus Hanwell  (MH)   <marcus -at- cryos -dot- net>
+	
+May 20, 2007 (ADH)
+* (dataplot.cc, dataplot.h)
+  - Split off files data_bins.*, data_file.* data_mask.*
+  - dataplot.* contains (only) deprecated (FILEDATA-style) plotting.
+* (New files: interval.cc, interval.h) Interval class, for data_mask
+* (elaps.in)
+  - Make "pstricks" the default PSTricks package
+  - New option "--pstcol"
+	
+April 29, 2007 (ADH)
+* (dataplot.cc, dataplot.h)
+  - Default data delimiter is TAB (not SPACE)
+  - Default separator, comment are std::string, not const char*
+  - data_file::write() uses delim character as separator
+  - Warning messages include name of calling function and/or data file
 
-April 5, 2007 (v1.0.24)
-* Fix missing #include declarations (Martin Michlmayr, Julian Gilbey)
+April 15, 2007 (Julian Gilbey)
+* (pkg) contrib/.deps removed from tarball
+	
+April 9, 2007
+* (dataplot.cc)
+  - Add comment/delimiter initializations to constructors
+* (dataplot.h) Add const declaration to comment, delimiter functions
+* (files) Add debug.h
+
+April 5, 2007 -- v1.0.24  (Martin Michlmayr, Julian Gilbey)
+* Fix missing #include declarations
   - (errors.h) #include <cstdlib>
   - (polyhedron.cc, surface.cc) #include <algorithm>
 
 March 16, 2007
-* (dataplots.{cc,h}) (Marcus Hanwell)
+* (dataplot.cc, dataplot.h)
   - Updates to data_file
   - Tokenizer to read files
   - User-modifiable delimiter, comment characters

@@ -1,6 +1,6 @@
 dnl Process this file with autoconf 2.60 or later
 dnl to produce a configure script.
-AC_INIT(epix, 1.0.24)
+AC_INIT(epix, 1.0.25)
 AC_PREREQ(2.60)
 AC_CONFIG_SRCDIR(camera.h)
 AM_INIT_AUTOMAKE

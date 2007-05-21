@@ -33,6 +33,13 @@ curves.cc
 curves.h
 dataplot.cc
 dataplot.h
+data_bins.cc
+data_bins.h
+data_file.cc
+data_file.h
+data_mask.cc
+data_mask.h
+debug.h
 depcomp
 domain.cc
 domain.h
@@ -58,6 +65,8 @@ geometry.h
 globals.cc
 globals.h
 install-sh
+interval.cc
+interval.h
 Label.cc
 Label.h
 laps.1
