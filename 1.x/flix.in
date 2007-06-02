@@ -10,7 +10,7 @@
 # LaTeX packages may be specified on the command line or in the config
 # file ~/.dvipsrc, just as for elaps
 #
-# Copyright (C) 2004, 2005, 2006
+# Copyright (C) 2004, 2005, 2006, 2007
 # Andrew D. Hwang   <For address, do "flix -V">
 # 
 
@@ -59,6 +59,7 @@ declare GXX_INCLUDES
 declare GXX_LIBDIRS
 GXX_LIBS="-lm"
 GXX_POSTLIBS="-lepix"
+declare -a GXX_DEFINES
 
 function flix_help 
 {
@@ -102,6 +103,9 @@ Options:
 
     -t, --tmax
       Set maximum time on animation interval (default 1.0).
+
+    -D*
+      Pass preprocessor definition to the compiler
 
     -I*, -L*, -l*, -W*, -i*, -u, -x
       Passed to g++ (q.v.)
@@ -233,6 +237,22 @@ while [ "$1" != "${1#-}" ]; do
             shift 2; continue
             ;;
 
+        -D)
+        if [ $# -lt 2 ]; then ePiX_die "Missing argument to \"$1\" option"; fi
+            if [ "$2" != "${2#-}" ]; then
+                GXX_DEFINES=("${GXX_DEFINES[@]}" "-D$2")
+                shift 2; continue
+            else
+                ePiX_warn "Ignoring option \"$1\" followed by \"$2\""
+                shift 1; continue
+            fi
+            ;;
+ 
+        -D*)
+            GXX_DEFINES=("${GXX_DEFINES[@]}" "$1")
+            shift 1; continue
+            ;;
+ 
         -I)
         if [ $# -lt 2 ]; then ePiX_die "Missing argument to \"$1\" option"; fi
             GXX_INCLUDES="$GXX_INCLUDES -I$2"; shift 2; continue
@@ -338,7 +358,7 @@ function flix_compile_files()
 
         # Compile executable
         TMP_CMD=($COMPILER "${EPIX_TEMPDIR}/$TEMP_INPUT" $FLIX_WARNS \
-            -o "${EPIX_TEMPDIR}/$TEMP_BIN" \
+            "${GXX_DEFINES[@]}" -o "${EPIX_TEMPDIR}/$TEMP_BIN" \
             $HDR_PATH $GXX_INCLUDES $LIB_PATH $GXX_LIBDIRS $GXX_LIBS \
             $GXX_POSTLIBS $FLIX_FLAGS)
 
