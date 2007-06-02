@@ -4,7 +4,7 @@
 #
 # Options: --help for usage, --version for version and license
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
 # Andrew D. Hwang   <For address, do "laps -V">
 # 
 
@@ -39,6 +39,9 @@ Options:
 
     -v, --verbose
       Scroll output/error messages
+
+    -H|--huge
+      Use hugelatex (if available)
 
     -i, -int, --interactive
       Run (La)TeX interactively (implies --verbose)
@@ -76,6 +79,15 @@ while [ "$1" != "${1#-}" ]; do
 	    laps_help
 	    exit 0
 	    ;;
+
+        -H|--huge)
+            if [ $(which hugelatex 2> /dev/null) ]; then
+                LATEX="hugelatex"
+            else
+                ePiX_warn "  hugelatex not available, ignoring \"$1\" option"
+            fi
+            shift
+            ;;
 
         -i|-int|--interactive)
             EPIX_STDOUT="$SYSTEM_STDOUT"

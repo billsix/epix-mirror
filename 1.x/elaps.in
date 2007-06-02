@@ -11,7 +11,7 @@
 # searches for completions in the order of preference dictated by the
 # variable EPIX_EXTENSIONS. A warning is issued for multiple matches.
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
 # Andrew D. Hwang   <For address, do "elaps -V">
 # 
 
@@ -33,6 +33,7 @@ ELAPS_PS="no"     # Create PS file instead of EPS?
 declare -a EPIX_OPTS
 declare -a DVIPS_OPTS
 
+LATEX_BIN=latex  # elaps only uses [huge]latex, not pdflatex or pslatex
 LATEX_INTERACT="scrollmode"
 
 # auxiliary programs
@@ -70,6 +71,9 @@ Options:
 
     -v, --verbose
       Show success/failure messages
+
+    -H, --huge
+      Use hugelatex (if available)
 
     -i, --interactive
       Run LaTeX interactively (implies verbose)
@@ -140,6 +144,15 @@ function elaps_parse_options ()
 	    exit 0
 	    ;;
 
+        -H|--huge)
+            if [ $(which hugelatex 2> /dev/null) ]; then
+                LATEX_BIN=hugelatex
+            else
+                ePiX_warn "  hugelatex not available, ignoring \"$1\" option"
+            fi
+            shift
+            ;;
+
         -i|--interactive)
             EPIX_STDOUT="$SYSTEM_STDOUT"
             LATEX_INTERACT="errorstopmode"
@@ -194,7 +207,7 @@ function elaps_parse_options ()
 
         -p|--pkg)
             if [ "$2" != "${2#-}" ]; then
-                elaps_warn "\"$1\" cannot be followed by \"$2\"; skipping"
+                ePiX_warn "\"$1\" cannot be followed by \"$2\"; skipping"
                 shift 1
             else
                 ELAPS_PKGS="$ELAPS_PKGS,$2"
@@ -317,8 +330,8 @@ function elaps_process_files()
 
         elaps_make_latex "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_EEPIC"
 
-        # Create $ELAPS_TEMP_PS; elaps always uses latex
-        TMP_CMD=(latex -interaction=$LATEX_INTERACT "$ELAPS_TEMP_LATEX")
+        # Create $ELAPS_TEMP_PS
+        TMP_CMD=($LATEX_BIN -interaction=$LATEX_INTERACT "$ELAPS_TEMP_LATEX")
 
         ePiX_command "${TMP_CMD[@]}"
 
