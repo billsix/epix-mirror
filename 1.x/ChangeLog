@@ -2,7 +2,21 @@ ePiX -- ChangeLog
 
 Andrew D. Hwang (ADH)  <ahwang -at- mathcs -dot- holycross -dot- edu>
 Marcus Hanwell  (MH)   <marcus -at- cryos -dot- net>
-	
+
+August 4, 2007 (ADH)
+* (elaps.in)
+  - Save eepic file, create backup if eepic file exists
+  - Unset temporary variables on loop exit
+
+June 2, 2007 (ADH)
+* (elaps.in)
+  - New option -H|--huge, use hugelatex (if available)
+  - Option -p operates silently
+*  (laps.in) -H|--huge option, use hugelatex (if available)
+
+June 1, 2007 (ADH)
+* (flix.in) Pass -D* option(s) to the compiler, not to elaps
+
 May 20, 2007 (ADH)
 * (dataplot.cc, dataplot.h)
   - Split off files data_bins.*, data_file.* data_mask.*

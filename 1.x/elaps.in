@@ -211,7 +211,6 @@ function elaps_parse_options ()
                 shift 1
             else
                 ELAPS_PKGS="$ELAPS_PKGS,$2"
-                echo "$PROG: Using LaTeX package \"$2\"" > "$EPIX_STDERR"
                 shift 2
             fi
             ;;
@@ -312,20 +311,28 @@ function elaps_process_files()
 
         # Create eepic file if necessary
         if [ "$EPIX_SUFFIX" != "eepic" ]; then
-            TMP_CMD=(@bindir@/epix "${EPIX_OPTS[@]}" -o "$ELAPS_TEMP_EEPIC" "$EPIX_INFILE")
+	    if [ -f "$EPIX_OUTFILE" ]; then # back up existing file
+		mv -f "$EPIX_OUTFILE"  "$EPIX_OUTFILE"~
+	    fi
+
+            TMP_CMD=(@bindir@/epix "${EPIX_OPTS[@]}" -o "$EPIX_OUTFILE" "$EPIX_INFILE")
 
             ePiX_command "${TMP_CMD[@]}"
 	    echo "---" | tee -a "$EPIX_LOGFILE" > "$EPIX_STDOUT"
 
-          if [ "$EPIX_INFILE" -nt "$ELAPS_TEMP_EEPIC" ]; then
+	    if [ "$EPIX_INFILE" -nt "$EPIX_OUTFILE" ]; then
                 ePiX_warn "\"${TMP_CMD[*]}\" failed"
+		unset EPIX_OUTFILE
+		unset EPIX_OUTROOT
                 let failure=failure+1
                 continue
-            fi
 
-        else
+	    else
+		ln -s "$EPIX_OUTFILE" "$ELAPS_TEMP_EEPIC"
+	    fi
+
+        else # we were passed an eepic file name
             ln -s "$EPIX_INFILE" "$ELAPS_TEMP_EEPIC"
-
         fi
 
         elaps_make_latex "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_EEPIC"
@@ -336,7 +343,11 @@ function elaps_process_files()
         ePiX_command "${TMP_CMD[@]}"
 
         if [ "$ELAPS_TEMP_LATEX" -nt "$ELAPS_TEMP_DVI" ]; then
-            ePiX_warn "\"${TMP_CMD[*]}\" failed"
+	    # Report informative (but fake) command line
+	    ePiX_warn "\"$LATEX_BIN -interaction=$LATEX_INTERACT ${EPIX_INROOT}.tex\" failed"
+	    rm -f "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_EEPIC" # clean temps
+	    unset EPIX_OUTFILE
+	    unset EPIX_OUTROOT
             let failure=failure+1
             continue
 	else
@@ -348,7 +359,11 @@ function elaps_process_files()
         ePiX_command "${TMP_CMD[@]}"
 
         if [ "$ELAPS_TEMP_DVI" -nt "$ELAPS_TEMP_PS" ]; then
-            ePiX_warn "\"${TMP_CMD[*]}\" failed"
+	    # Report informative (but fake) command line
+	    ePiX_warn "\"dvips ${DVIPS_OPTS[@]} -f -o ${EPIX_INROOT}.ps ${EPIX_INROOT}.dvi\" failed"
+
+	    unset EPIX_OUTFILE
+	    unset EPIX_OUTROOT
             let failure=failure+1
             continue
 	else
@@ -394,12 +409,12 @@ function elaps_process_files()
         fi
 
         let success=success+1
+	unset EPIX_OUTFILE
+	unset EPIX_OUTROOT
 
         # and clean up
         rm -f "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_DVI" "$ELAPS_TEMP_PS" \
             "$ELAPS_TEMP_EEPIC" "$PROG-$PID.aux" "$PROG-$PID.log"
-
-        if [ "$EPIX_OUTROOT" = "$EPIX_INROOT" ]; then unset EPIX_OUTROOT; fi
 
         echo -e "\nTranscript written on $EPIX_LOGFILE" > "$EPIX_STDOUT"
 
