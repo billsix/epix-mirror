@@ -1,0 +1,499 @@
+#! /bin/bash
+# 
+# elaps: Convert an epix file to encapsulated Postscript, i.e. epix2eps
+# 
+# Options: --help for usage, --version for version and license
+#
+# Compiler flags may be specified on the command line or in the config
+# file ~/.epixrc. The script attempts to deal intelligently with missing
+# or multiple extensions. If the input file has a recognized extension,
+# there's no issue. If only the root name <infile> is given, the script
+# searches for completions in the order of preference dictated by the
+# variable EPIX_EXTENSIONS. A warning is issued for multiple matches.
+#
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
+# Andrew D. Hwang   <For address, do "elaps -V">
+# 
+
+. "@pkgdatadir@/epix-lib.sh"
+
+
+# Search these extensions in order of preference
+ELAPS_EXTENSIONS="eepic xp flx cc c C cpp" # or NULL
+ELAPS_DOT_EXT=".${ELAPS_EXTENSIONS// /|.}" # for usage message
+
+# default options
+ELAPS_PKGS="latexsym,amsmath,rotating"
+declare ELAPS_PSTCOL
+ELAPS_SIZE=12 # figure compiled in [12pt]{article}
+
+# file(s) containing LaTeX preamble commands
+declare -a ELAPS_PREAMBLES
+
+ELAPS_PDF="no"    # Create PDF file?
+ELAPS_PS="no"     # Create PS file instead of EPS?
+
+declare -a EPIX_OPTS
+declare -a DVIPS_OPTS
+
+LATEX_BIN=latex  # elaps only uses [huge]latex, not pdflatex or pslatex
+LATEX_INTERACT="scrollmode"
+
+# auxiliary programs
+PS2EPS="ps2epsi"
+
+# internal filenames
+PID=$$
+ELAPS_TEMP_EEPIC="$PROG-$PID".eepic
+ELAPS_TEMP_LATEX="$PROG-$PID".tex
+ELAPS_TEMP_DVI="$PROG-$PID".dvi
+ELAPS_TEMP_PS="$PROG-$PID".ps
+ELAPS_TEMP_EPSI="$PROG-$PID".epsi
+
+# globals to pass tokens
+ELAPS_USER_OUT="no" # user specified output file?
+
+declare -a ELAPS_FILE_LIST
+declare -a TMP_CMD
+
+declare -a TEMPFILES
+trap '[ -n "${TEMPFILES[*]}" ] && rm -f "${TEMPFILES[@]}"' 0 1 2 3 7 10 13 15
+
+TEMPFILES=("$ELAPS_TEMP_EEPIC" "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_DVI" \
+    "$ELAPS_TEMP_PS" "$ELAPS_TEMP_EPSI" )
+
+function elaps_help()
+{
+cat <<"HELP"
+Options:
+    -h, --help
+      Show this message and exit
+
+    -V, --version, --gpl
+      Show version and license
+
+    -v, --verbose
+      Show success/failure messages
+
+    -H, --huge
+      Use hugelatex (if available)
+
+    -i, --interactive
+      Run LaTeX interactively (implies verbose)
+
+    -n, --no-config
+      Ignore $(HOME)/.dvipsrc
+
+    -o, --output
+      Specify output file (ONLY for use with a single input file)
+
+    --pst
+      Write eepic file using PSTricks macros
+
+    --tikz
+      Write eepic file using tikz macros
+
+    --eepic
+      Write eepic file using eepic macros
+
+    -p, --pkg <LaTeX package>
+      Use an additional LaTeX package in the temporary LaTeX file, e.g. 
+      "-p floatflt". Multiple packages are specified one per "-p" flag.
+
+    --preamble <file>
+      Append contents of <file> to the LaTeX preamble
+
+    -pdf, --pdf
+      Create PDF file instead of EPS
+
+    -ps, --ps
+      Create standalone PostScript file (overrides --pdf)
+
+    --pstcol
+      Use (obsolete) pstcol package instead of pstricks
+
+    -P<printer>
+      dvips printer options, e.g. "-Pamz", may be given on the command 
+      line. They are also read from ~/.dvipsrc if this file exists.
+
+    --size
+      Set default font size: 10, 11, or 12 (default)
+
+    Other options are passed to epix (q.v.).
+
+HELP
+ePiX_bugreport
+
+} # End of elaps_help
+
+# Generate US letter-friendly LaTeX file
+function elaps_make_latex ()
+{
+    ALL_LATEX_PKGS="$ELAPS_PKGS"
+
+# Get LATEX_PKGS from input file
+    ePiX_usepackages $2
+    if [ ! -z "$LATEX_PKGS" ]; then # should always be true...
+	ALL_LATEX_PKGS="$ALL_LATEX_PKGS,$LATEX_PKGS"
+    else # compatibility fallback
+	ALL_LATEX_PKGS="$ALL_LATEX_PKGS,epic,eepic,pstricks"
+    fi
+
+# Clear global
+    unset LATEX_PKGS
+
+# No effect unless file requires pstricks
+    if [ ! -z "$ELAPS_PSTCOL" ]; then
+	ALL_LATEX_PKGS="${ALL_LATEX_PKGS/pstricks/$ELAPS_PSTCOL/}"
+    fi
+
+cat <<LaTeX1 >> $1
+\documentclass[${ELAPS_SIZE}pt]{article}
+\usepackage{$ALL_LATEX_PKGS}
+\setlength{\textwidth}{7.5in}
+\setlength{\textheight}{9.5in}
+\setlength{\oddsidemargin}{-0.5in}
+\setlength{\topmargin}{0in}
+\pagestyle{empty}
+LaTeX1
+
+# get user-specified preamble commands, which override the defaults above
+for file in "${ELAPS_PREAMBLES[@]}"; do
+    if [ -f $file ]; then
+	cat $file >> $1
+    fi
+done
+
+cat <<LaTeX2 >> $1
+\begin{document}
+\vfil
+\begin{center}
+\input{$2}
+\end{center}
+\vfil
+\end{document}
+LaTeX2
+} # End of elaps_make_latex
+
+
+function elaps_parse_options ()
+{
+    while [ "$1" != "${1#-}" ]; do 
+        case "$1" in
+
+        -h|--help)
+	    ePiX_usage elaps $ELAPS_DOT_EXT
+	    elaps_help
+	    exit 0
+	    ;;
+
+        -H|--huge)
+            if [ $(which hugelatex 2> /dev/null) ]; then
+                LATEX_BIN=hugelatex
+            else
+                ePiX_warn "  hugelatex not available, ignoring \"$1\" option"
+            fi
+            shift
+            ;;
+
+        -i|--interactive)
+            QUIET=0
+            LATEX_INTERACT="errorstopmode"
+            shift
+            ;;
+
+        -n|--no-config) # do not use ~/.dvipsrc
+            export DVIPSRC=/dev/null
+            shift
+            ;;
+
+        -o|--output)
+            if [ "$2" = "${2%%.eps}.eps" ]; then
+                EPIX_OUTROOT="${2%%.eps}"
+
+            elif [ "$2" = "${2%%.pdf}.pdf" ]; then
+                ELAPS_PDF="yes"
+                EPIX_OUTROOT="${2%%.pdf}"
+
+            else
+                EPIX_OUTROOT="$2"
+            fi
+            ELAPS_USER_OUT="yes"
+            shift 2
+            ;;
+
+	--pst)
+	    EPIX_OPTS=("${EPIX_OPTS[@]}" "-DEPIX_FMT_PSTRICKS")
+	    shift; continue
+	    ;;
+
+	--tikz)
+	    EPIX_OPTS=("${EPIX_OPTS[@]}" "-DEPIX_FMT_TIKZ")
+	    shift; continue
+	    ;;
+
+	--eepic)
+	    EPIX_OPTS=("${EPIX_OPTS[@]}" "-DEPIX_FMT_EEPIC")
+	    shift; continue
+	    ;;
+
+        -P)
+            DVIPS_OPTS=("${DVIPS_OPTS[@]}" "-P$2")
+            shift 2
+            ;;
+
+        -P*)
+            DVIPS_OPTS=("${DVIPS_OPTS[@]}" "$1")
+            shift
+            ;;
+
+        -pdf|--pdf)
+            ELAPS_PDF="yes"
+            shift
+            ;;
+
+        -ps|--ps)
+            ELAPS_PS="yes"
+            ELAPS_PDF="no" # redundant; enforced by logic later
+            shift
+            ;;
+
+        --pstcol)
+            ELAPS_PSTCOL="pstcol,xcolor"
+            shift
+            ;;
+
+        -p|--pkg)
+            if [ "$2" != "${2#-}" ]; then
+                ePiX_warn "\"$1\" cannot be followed by \"$2\"; skipping"
+                shift 1
+            else
+                ELAPS_PKGS="$ELAPS_PKGS,$2"
+                shift 2
+            fi
+            ;;
+
+        -p*)
+            ELAPS_PKGS="$ELAPS_PKGS,${1#-p}"
+            shift
+            ;;
+
+        --preamble)
+            ELAPS_PREAMBLES=("${ELAPS_PREAMBLES[@]}" "$2") ; shift 2; continue
+	    ;;
+
+        # Deliberately undocumented; run silently
+        -q|--quiet)
+            QUIET=1
+            LATEX_INTERACT="batchmode"
+            shift; continue
+            ;;
+
+        --size)
+            ELAPS_SIZE="$2"
+            shift 2
+            ;;
+
+        -V|--version|--gpl)
+            ePiX_version elaps
+            ePiX_license
+            exit 0
+	    ;;
+
+        -v|--verbose)
+            if [ -z "$2" ]; then 
+                echo "Please use -V for version"
+                exit 0
+            fi
+            QUIET=0
+            shift
+            ;;
+
+        -vv)
+            echo "Discontinued option -vv; please use -v for verbose output"
+            exit 0
+            ;;
+
+
+        # pass other options to epix
+        -i*|-u|-x|-I|-L|-l|-W)
+	    EPIX_OPTS=("${EPIX_OPTS[@]}" "$1" "$2")
+            shift 2
+            ;;
+
+        -b) 
+            ePiX_warn "Skipping option \"$1 $2\""
+            shift 2
+            ;;
+
+        *)
+            EPIX_OPTS=("${EPIX_OPTS[@]}" "$1")
+            shift
+            ;;
+        esac
+    done
+
+    # Assume remaining parameters are input files
+    INFILE_COUNT=$#
+
+    if [ "$ELAPS_USER_OUT" = "yes" -a $INFILE_COUNT -gt 1 ]; then
+        shift $(($INFILE_COUNT - 1))
+        ePiX_warn "Output file specified with multiple input files. Skipping all but \"$*\""
+    fi
+
+    ELAPS_FILE_LIST=("$@")
+} # end of elaps_parse_options()
+
+
+function elaps_process_files() 
+{
+    if [ -z "$1" ]; then
+        ePiX_die "No input file specified"
+    fi
+
+    # file counts
+    local processed=0
+    local success=0
+    local failure=0
+
+    for EPIX_INFILE in "${ELAPS_FILE_LIST[@]}"; do
+
+        # sets EPIX_INROOT, EPIX_SUFFIX, EPIX_NOTFOUND, touches EPIX_LOGFILE
+        epix_parse_filename "$EPIX_INFILE" "$ELAPS_EXTENSIONS"
+        let processed=processed+1
+
+        if [ "$EPIX_NOTFOUND" = "yes" ]; then
+            let failure=failure+1
+            continue
+        fi
+
+        : ${EPIX_OUTROOT:=$EPIX_INROOT}
+        EPIX_OUTFILE="$EPIX_OUTROOT".eepic
+
+        # Create eepic file if necessary
+        if [ "$EPIX_SUFFIX" != "eepic" ]; then
+	    if [ -f "$EPIX_OUTFILE" ]; then # back up existing file
+		mv -f "$EPIX_OUTFILE"  "${EPIX_OUTFILE}~"
+	    fi
+
+            TMP_CMD=(@bindir@/epix "${EPIX_OPTS[@]}" -o "$EPIX_OUTFILE" "$EPIX_INFILE")
+
+            ePiX_command "${TMP_CMD[@]}"
+	    ePiX_echo "---"
+
+	    if [ "$EPIX_INFILE" -nt "$EPIX_OUTFILE" ]; then
+                ePiX_warn "\"${TMP_CMD[*]}\" failed"
+		unset EPIX_OUTFILE
+		unset EPIX_OUTROOT
+                let failure=failure+1
+                continue
+
+	    else
+		cp -p "$EPIX_OUTFILE" "$ELAPS_TEMP_EEPIC"
+	    fi
+
+        else # we were passed an eepic file name
+            cp -p "$EPIX_INFILE" "$ELAPS_TEMP_EEPIC"
+        fi
+
+        elaps_make_latex "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_EEPIC"
+
+        # Create $ELAPS_TEMP_PS
+        TMP_CMD=($LATEX_BIN -interaction=$LATEX_INTERACT "$ELAPS_TEMP_LATEX")
+
+        ePiX_command "${TMP_CMD[@]}"
+
+        if [ "$ELAPS_TEMP_LATEX" -nt "$ELAPS_TEMP_DVI" ]; then
+	    # Report informative (but fake) command line
+	    ePiX_warn "\"$LATEX_BIN -interaction=$LATEX_INTERACT ${EPIX_INROOT}.tex\" failed"
+	    rm -f "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_EEPIC" # clean temps
+	    unset EPIX_OUTFILE
+	    unset EPIX_OUTROOT
+            let failure=failure+1
+            continue
+	else
+	    ePiX_echo "---"
+        fi
+
+        TMP_CMD=(dvips "${DVIPS_OPTS[@]}" -f -o "$ELAPS_TEMP_PS" "$ELAPS_TEMP_DVI")
+
+        ePiX_command "${TMP_CMD[@]}"
+
+        if [ "$ELAPS_TEMP_DVI" -nt "$ELAPS_TEMP_PS" ]; then
+	    # Report informative (but fake) command line
+	    ePiX_warn "\"dvips ${DVIPS_OPTS[@]} -f -o ${EPIX_INROOT}.ps ${EPIX_INROOT}.dvi\" failed"
+
+	    unset EPIX_OUTFILE
+	    unset EPIX_OUTROOT
+            let failure=failure+1
+            continue
+	else
+	    ePiX_echo "---"
+        fi
+
+        if [ "$ELAPS_PS" = "yes" ]; then
+            # fix title; can't conveniently put sed command into ePiX_command
+            ePiX_echo -n "sed \"s/$PROG-$PID/$EPIX_INROOT/g\" \"$ELAPS_TEMP_PS\""
+            ePiX_echo " > \"$EPIX_OUTROOT.ps\""
+
+            sed "s/$PROG-$PID/$EPIX_INROOT/g" "$ELAPS_TEMP_PS" \
+                > "$EPIX_OUTROOT.ps"
+
+        else
+            # Create eps file,
+            TMP_CMD=("$PS2EPS" "$ELAPS_TEMP_PS")
+            ePiX_command "${TMP_CMD[@]}"
+
+            # fix title,
+            ePiX_echo -n "sed \"s/$PROG-$PID/$EPIX_INROOT/g\" \"$ELAPS_TEMP_EPSI\""
+            ePiX_echo " > \"$EPIX_OUTROOT.eps\""
+
+            sed "s/$PROG-$PID/$EPIX_INROOT/g" \
+                "$ELAPS_TEMP_EPSI" > "$EPIX_OUTROOT.eps" &&
+            rm -f "$ELAPS_TEMP_EPSI"
+
+            # create pdf if requested,
+            if [ "$ELAPS_PDF" = "yes" ]; then
+                ePiX_echo -n "grep -v \"^%%Orientation:\" \"$EPIX_OUTROOT.eps\""
+                ePiX_echo " | epstopdf --filter --outfile=\"$EPIX_OUTROOT.pdf\""
+                # avoid ghostscript rotation bug
+                grep -v "^%%Orientation:" "$EPIX_OUTROOT.eps" \
+                    | epstopdf --filter --outfile="$EPIX_OUTROOT.pdf"
+                rm -f "$EPIX_OUTROOT.eps" # clean up eps
+            fi
+        fi
+
+        let success=success+1
+	unset EPIX_OUTFILE
+	unset EPIX_OUTROOT
+
+        # and clean up
+        rm -f "$ELAPS_TEMP_LATEX" "$ELAPS_TEMP_DVI" "$ELAPS_TEMP_PS" \
+            "$ELAPS_TEMP_EEPIC" "$PROG-$PID.aux" "$PROG-$PID.log"
+
+        ePiX_echo -e "\nTranscript written on $EPIX_LOGFILE"
+
+    done # for EPIX_INFILE in $INFILE_LIST
+
+    if [ $processed -gt 1 ]; then
+        if [ "$QUIET" -eq 0 ];
+        then
+            echo "$processed files processed: $success successfully, $failure failed" >&2
+        fi
+    fi
+} # elaps_process_files()
+
+
+## Script proper starts here ##
+
+if [ $# -eq 0 ]; then 
+    ePiX_usage elaps $ELAPS_DOT_EXT
+    elaps_help
+    exit 0
+fi
+
+elaps_parse_options "$@"
+
+elaps_process_files "${ELAPS_FILE_LIST[@]}"
+
+exit 0

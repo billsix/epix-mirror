@@ -1,0 +1,123 @@
+ePiX-1.2 -- POST-INSTALL
+ 
+Last Change: September 12, 2007
+ 
+This file contains post-install configuration instructions for users.
+Please consult the following files as appropriate:
+
+INSTALL -- Detailed installation instructions
+NEWS -- Recent major changes (see ChangeLog for code changes)
+README -- General overview and information
+
+
+CONVENTIONS
+
+Lines starting with a "%" denote commands typed at a shell prompt. 
+Lines starting with a "#" denote commands run as root.
+Don't type the prompt characters "%" or "#". :)
+
+"$(prefix)" stands for the complete path to the install directory,
+e.g. "/usr/local" or "/home/pootle/epix".
+
+Files mentioned below are installed in $(prefix)/share/doc/epix/config/
+
+
+PROGRAMMABLE COMPLETION in bash
+
+If you type "epix c[TAB]", bash normally displays all files and
+directories whose name starts with "c". If programmable completion is
+enabled, bash will show only those files whose name starts with "c"
+*and* whose extension is that of an epix input file.
+
+Programmable completion in bash is available only with Version 2.05 and
+later, and you must install Ian MacDonald's bash completion package. Do
+a search for "bash programmable completion" at
+
+  http://freshmeat.net
+
+The file "$(prefix)/share/doc/epix/config/bash_completions" contains
+programmable completion code for ePiX's shell scripts. These lines
+should be put into your bash config file (~/.bashrc) just after the
+line that includes the system-wide bash completion config file (q.v.).
+
+
+EMACS MODE
+
+Jay Belanger has kindly provided an emacs mode (epix.el) for working
+with epix source files. To use epix mode, put a copy of the file
+"epix.el" in your emacs load path; under GNU/Linux, an appropriate
+system directory is /usr/share/emacs. If you are not the superuser,
+use a directory such as ${HOME}/share/emacs:
+ 
+% mkdir -p ~/share/emacs
+% cp $(prefix)/share/doc/epix/config/epix.el ~/share/emacs/
+
+Then add these lines to your .emacs file:
+---(snip)--- 
+(setq load-path (cons "~/share/emacs/" load-path))
+(setq auto-mode-alist (cons '("\\.xp" . epix-mode) auto-mode-alist))
+(autoload 'epix-mode "epix" "ePiX editing mode" t)
+(setq epix-mark-files-as-epix t)
+(setq epix-insert-template-in-empty-buffer t)
+
+(autoload 'flix-mode "epix" "ePiX editing mode" t)
+(setq auto-mode-alist (cons '("\\.flx" . flix-mode) auto-mode-alist))
+---(snip)---
+
+Change "~/share/emacs/" in the first line as appropriate. If you open
+a new file with extension ".xp" or ".flx", emacs will automatically
+insert a matching preamble template and enter epix-mode or flix-mode,
+respectively.  You can then compile and preview ePiX source files with
+emacs commands, or read the info file; please see epix.el for more
+details.
+
+If necessary (for instance, if your source file must have extension
+".cc" for some reason), you can enter epix mode manually by typing 
+
+M-x epix-mode
+
+in emacs. (The notation "M-x" means the emacs META key, usually ESC,
+followed by "x".) 
+
+
+OTHER CONFIG FILES
+
+The files ~/.dvipsrc and ~/.epixrc affect the behavior of epix, elaps,
+and laps. The use of .epixrc is documented in the tutorial. Neither
+file is required in order to use ePiX.
+
+
+SETTING the PATH
+
+If you've installed ePiX but receive a "command not found" error
+message when trying to compile figures, you probably need to set your
+PATH, the shell environment variable listing the directories to be
+searched for executable code.
+
+As above, $(prefix) stands for the directory in which ePiX has been
+installed and "%" denotes a prompt. Below, $(prefix) must be replaced
+with the actual path.  Issue the command
+
+% echo $PATH
+
+If $(prefix)/bin is not shown, you must determine what shell you're
+using and edit the appropriate shell configuration file. Do
+
+% ?
+
+If the response is:		Put this line:			Into the file:
+-------------------		--------------			--------------
+bash: ?: command not found	export PATH=$PATH:$(prefix)/bin	~/.bashrc
+
+?: no match			setenv PATH $PATH:$(prefix)/bin	~/.cshrc
+
+In the first case, do not put spaces around the equals sign.  If the
+response is something else, please consult your system administrator
+for assistance.
+
+Now re-load the appropriate configuration file and try an ePiX command:
+
+% source ~/.bashrc
+% epix --help
+
+If this still doesn't work, please consult your system administrator.

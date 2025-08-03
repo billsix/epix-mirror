@@ -1,0 +1,912 @@
+ePiX 1.2.x
+
+Andrew D. Hwang  <ahwang -at- holycross -dot- edu>
+2020-03.21
+	Version 1.2.19
+	* Complex.cc:
+	 - (logC, sqrtC): Fix implementation typos
+
+2017-09.17
+	Version 1.2.18
+	* Makefile.am: Fix epix.el handling of bashpath and bindir (Thanks
+	to Danilo Alves and Julian Gilbey)
+	* make_header: Add "#include <algorithm>" (Thanks to Julian
+	Gilbey)
+	* Complex.cc, Complex.h: (Arg, norm) New functions
+
+2017-07.20
+	Version 1.2.17
+	* path_data.cc: (path_data::clip, path_data::clip_to) Use m_filled
+	instead of m_closed to decide whether to clip as a loop.
+	* Complex.cc, Complex.h, Sline.cc, Sline.h: New files
+	* triples.h, triples.cc: Add constructor from Complex
+	* doc/manual.tex: Remove index of functions
+
+2016-05.18
+	Version 1.2.16
+	Fixes and enhancements to the emacs mode (Thanks to Brent
+	Spillner)
+	* epix.el.in: Use C-c C-f to control output format (except in flix
+	mode), reconfigure C-c C-v to display viewer asynchronously (new
+	emacs variable epix-call-elaps-viewer-synchronously)
+	* Makefile.in: Invoke epix and elaps using bash explicitly (Ubuntu
+	doesn't link /bin/sh to bin/bash), add configured $(bindir) as
+	prefix for epix/elaps/flix
+
+2015-08.20
+	Version 1.2.15
+	* format.cc: (format::print_paths) Test ep != edges.end() before
+	(*ep).is_seen() in while loop (David Binderman)
+
+2014-05.13
+	Version 1.2.14
+	* picture_data.cc: (print_to) Call the_page.m_screen->print_to
+	before fmt.pic_header (Emilio Salazar)
+
+2013-10.13
+	Version 1.2.13
+	Minor bug fixes (Thanks to Julian Gilbey and Daniel Schepler)
+	* elaps.in, epix.in, epix-lib.sh, flix.in, laps.in: Fix error
+	message piping
+	* doc/epix.texi: Fix xrefs
+	* doc/Makefile.am: Quell automake warnings
+
+2013-08.01
+	Version 1.2.12
+	Minor bug fixes (Thanks to Julian Gilbey)
+	* laps.in:
+	 - "--interactive" runs latex in errorstopmode
+	 - "--verbose" runs latex in nonstopmode
+	* doc/Makefile.am:
+	 - Run latex in nonstopmode, don't discard errors
+	 - Run laps-local in --verbose mode
+
+2013-07.09
+	Version 1.2.11
+	* doc/epix.texi: Update for texinfo 5.0 (Thanks to Julian Gilbey
+	and David Sephirot)
+
+2012-04.01
+	Version 1.2.10
+	Minor bug fixes (Thanks to Julian Gilbey and Lucas Nussbaum)
+	* doc/manual.tex: Update hyperref options
+	* Makefile.am, elaps.in, epix.in, flix.in, laps.in: Automake
+	updates
+	* THANKS: Update Debian URL
+
+2011-08.06
+	Version 1.2.9
+	* doc/arrow.xp: Remove obsolete options ARROW25, ARROW50
+	* doc/arrow25.xp, doc/arrow50.xp: Remove tikz_format() calls
+	* doc/arrow.eepic, doc/arrow25.eepic, doc/arrow50.eepic: recompile
+
+2011-06.23
+	Version 1.2.8
+	* doc/graphpaper.xp, doc/marker.xp: x_min -> xmin(), etc.
+	* doc/graphpaper.eepic, doc/marker.eepic: recompile
+
+2010-04.14
+	* make_header: #include <cstdlib>
+
+2010-01.24
+	Version 1.2.7
+	Automake updates (Julian Gilbey)
+	* Makefile.am: ./mkinstalldirs -> $(mkinstalldirs)
+	* files: Omit aclocal.m4
+
+2009-02.15
+	Version 1.2.6
+	Bugfixes for NetBSD (Aran Clauson)
+	* make_header: #! /bin/bash -> #! /bin/sh
+	* doc/Makefile.am: &>/dev/null -> 2>&1 >/dev/null (5 instances)
+
+2009-01.31
+	* curves.cc:
+	 - (line) Use one segment by default
+	 - (Line) Reduce length, increase num_pts
+
+2009-01.25
+	* triples.cc: (is_valid) Remove test for |(x,y,z)|^2 < INFTY
+	  (Mike Protts)
+
+2008-06.30
+	* epix.el.in, Makefile.am: Look for info file in @infodir@
+	* samples/Makefile.am, doc/makefile.am: ":=" -> "="
+
+2008-06.18
+	Version 1.2.5
+	* surface.cc: Get id (identity) from map.h
+	* map.h: Use typename instead of class in templates
+	* utils.cc: (truncate) Hard-code upper bound 0.0001
+	* constants.h: EPIX_EPSILON = 10^-6
+	* samples/bowl.xp: Reverse culling arguments
+
+2008-05.06
+	* axis.cc: (draw_labels) (Ryszard Tanas)
+	 - Truncate tmp_lbl
+	 - remove labels that are eps-close to unmarked
+
+2008-05.06 (ADH)
+	* edge_data.h: (shift) New function
+
+2008-05.04 (ADH)
+	* segment.cc, segment.h:
+	 - (midpoint) Accept optional parameter
+	 - (draw) Accept stretch argument
+	* path_data.cc, path_data.h, path.cc, path.h: (data) New function
+
+2008-03.09
+	Version 1.2.4
+
+2008-03.09
+	Version 1.2.3
+	* errors.h: Include <cstdlib> (Julian Gilbey)
+	* epix.1.in: Remove second line of file (Julian Gilbey)
+	* doc/epix.texi: New file (Julian Gilbey)
+	* doc/manual.tex: Add index of functions
+	
+2008-01-01
+	* Several files: Change "pallet" to "palette"
+	
+2007-12-14 (ADH)
+	* epix.in, flix.in: Read config files without spawning a subshell
+	* elaps.in: --preamble option
+	
+2007-12.06 (ADH)
+	Version 1.2.2
+	* plane.cc: Reverse unit normal in 3-point constructor (Maik Beckmann)
+	* facet.cc: Reverse unit normals
+
+	* epix.in, flix.in: Use .exe suffix on temporary binary for Cygwin
+	  (Ben Tillman)
+	* epix.in, elaps.in, flix.in: Use "cp -p" instead of "ln -s" (Ben
+	  Tillman, Jay Belanger)
+
+2007-11.12 (ADH)
+	* Color.cc, Color.h: Move comparison operators out of Color class
+
+2007-10.30 (ADH)
+	* Color.cc, Color_CMY.cc, Color_CMYK.cc, Color_Gray.cc,
+	  Color_RGB.cc, Color_Sep.cc: Use std::min, std::max
+
+	* flix.in: Use flix_seq to generate frame numbers (P.T. Kornman)
+
+2007-10.03 (ADH)
+	Version 1.2.1
+	* configure.ac, Makefile.am: New option --enable-epix-el
+	  (formerly --with-nolisp)
+	* doc/Makefile.am: Build ps, pdf under manual-stamp so package can
+	  be built with parallel make (error noted by René Rebe)
+
+2007-09.28 (ADH)
+	* legend_tile.cc, legend_tile.h: Store offset as a pair
+	* legend.cc: (draw) Pass offset as a pair
+	* screen_data.cc: (paste) "affine" object named af, not affine
+
+2007-09.26 (ADH)
+	Version 1.2.0-2
+	* debug.h, interval.cc: #include <cstdlib> (Maik Beckmann)
+	* (Multiple files) Replace const double arguments by double
+
+2007-09.25 (ADH)
+	Version 1.2.0-1
+	* doc/plotting3.xp: crop -> set_crop, and update image
+
+2007-09.24 (ADH)
+	Version 1.1.22 (promoted to 1.2.0)
+	* lens.cc: bubble lens projects to camera sphere
+
+	* angle_units.cc, angle_units.h: (convert_to_radians) Remove
+	 - (to_radians, to_degrees, from_degrees) New functions
+	 - Store rad/unit, unit/deg, and rev/unit for efficiency
+	
+	* state.cc, state.h: (angle) Remove function
+	 - (full_turn) Reimplement as from_degrees(360)
+	* functions.cc: Use angle_state::to_radians in trig functions
+	
+	* glyph.cc: (map_by) Reimplement label angle computation
+	* label_style.cc, label_style.h: New public void constructor
+	 - Non-void constructor is private
+	 - (label_angle) Pass non-const double
+	 - (label_angle) Use the_angle_style to convert to degrees
+	 - (label_angle()) Returns degrees, not current angle units
+
+2007-09.23 (ADH)
+	Version 1.1.21
+	* affine.cc, affine.h: Member functions accept P as well as pair
+
+2007-09.22 (ADH)
+	* length.cc: Remove support for scaled pt
+	* state.cc, state.h: crop() -> set_crop()
+	 - (crop) New function, calls screen::crop
+	 - (crop_rectangle, crop_ellipse, crop_diamond): Set crop state
+
+	* lens.cc: fisheye, bubble are *not* linear
+	* lens.cc, lens.h: (needs_clip) New function
+	* camera.cc, camera.h: (needs_clip) New function
+	 - the_camera() -> cam()
+	* path_data.cc: (photo) Clip to camera.front_plane only if nec.
+	* arrow_data.cc: (photo) Clip to camera.front_plane only if nec.
+
+	* facet.cc, geometry.cc: camera, the_camera() -> cam()
+	* arrow_data.cc, axis.cc, curves.cc, label_data.cc, legend.cc,
+	  legend_item.cc, path.cc, path_data.cc, screen_data.cc,
+	  sphere.cc, state.cc: the_camera() -> cam()
+
+2007-09.19 (ADH)
+	Version 1.1.20
+	* pen_line.cc: (add_to_palette) Needn't check for unset
+	* pen_data.cc, pen_data.h: (is_empty) New member
+	* pen_fill.cc: (is_unset) Check line pen for invisibility
+	 - (print_to) If bd non-solid, draw fill/border only if visible
+	 - (add_to_palette) Needn't check for unset colors
+	* eepic.cc: (print_line) No base layer if narrower than line
+	* pst.cc: (print_line) Adjust base layer width (m_bwidth too large)
+
+2007-09.18 (ADH)
+	Version 1.1.19
+	* affine.cc: Group scaling operators in parentheses
+	* glyph.cc: (map_by) Map offset direction, not length
+
+2007-09.17 (ADH)
+	* format.cc: (print_mark) Use mask color for circ background, add
+	  to palette if necessary
+	 - Fix label padding
+	 - Draw label border if pen width is positive
+	* markers.cc: (circ) Handle like other markers
+	 - (marker) Handle CIRC like other types
+	* label_style.cc: (seen_through) Needn't check for unset mask
+	* label_style.h: Default label_pad 0
+
+	* picture.cc: Remove mp_format stubs
+
+	* data_bins.cc, data_bins.h: Handle data on cuts
+	 - New data member m_cut_hits
+	 - (d_bin::insert) Rename add_datum
+	 - Copy constructor mis-copied d_bins
+	 - Implement m_bins as a list, not a vector
+
+2007-09.16 (ADH)
+	Version 1.1.18
+	* pair_map.cc, pair_map.h: Rename file, class to affine
+	* epix.h: Add affine.h
+	* screen.cc, screen.h: Pass-through affine operations
+	 - (apply) New member function
+	* screen_data.cc, screen_data.h: Affine operations on contents
+
+	* label_data.cc, label_data.h: Store offset as a pair
+	* axis.cc, markers.cc: (label) Adjust label_data ctor
+	* glyph.cc, glyph.h: Store offset as a pair
+	* glyph.cc: (map_to) Adjust offset, label angle
+	* legend_item.cc: (key) Adjust glyph ctor
+
+2007-09.15 (ADH)
+	* pair_map.cc, pair_map.h: Complete re-write
+	* screen_data.cc: (paste) Use new pair_map ctor
+	
+	* utils.cc, utils.h: (get_chars) New function
+	* path_style.cc: Rename get_breaks -> __epix_get_breakpts
+	 - (extract) Move to utils, rename -> get_chars
+	 - Use get_chars to extract dot/dash pattern
+	 - (__epix_get_breakpts) Check for anomalous patterns
+
+	* screen_data.cc, screen_data.h: (is_cropped) Remove
+	* screen.cc, screen.h: (is_cropped) Remove
+
+2007-09.14 (ADH)
+	* format.cc: (print_color) Check for empty vector of densities
+	* picture_data.cc: (add_to_palette) Check for unset color
+	
+	* label_style.cc, label_style.h: Dependency cleanup
+	* format.cc, legend.cc, markers.cc, state.cc: Consequent changes
+	* arrow_data.cc, Color_Neutral.cc, glyph.cc, legend.cc,
+	  path_data.h, path.cc, pen_arrow.cc, pen_data.cc, pen_fill.cc
+	  picture.cc, picture_data.cc, plots.cc: Dependency cleanup 
+	
+2007-09.14 (ADH)
+	Version 1.1.17
+	* functions.cc, functions.h: (clip_to_unit) Move to Color_Utils
+	* Color_Utils.cc: #include "Color_Utils.h"
+	* Color_Utils.cc, Color_Utils.h: Move clip_to_unit from functions
+	
+2007-09.13 (ADH)
+	* length.cc, length.h: (operator+, operator*) Pass one arg by value
+
+	* configure.ac, Makefile.am: --with-nolisp option (for Gentoo)
+	 - Make scripts dependent on epix.el (to force build before install)
+
+	* Color_Base.h: print_to(format) -> model, densities
+	 - Color is not a friend class
+	* Color.cc, Color.h: (print_to) Remove function
+	 - (model, densities) New functions
+	* Color_CMY.cc, Color_CMY.h, Color_CMYK.cc, Color_CMYK.h: Same
+	* Color_Gray.cc, Color_Gray.h, Color_RGB.cc, Color_RGB.h: Same
+	* Color_Neutral.cc, Color_Neutral.h, Color_Sep.cc, Color_Sep.h: Same
+
+	* format.cc, format.h: (print_color(string, string, vector<double>)
+	  New function, calls existing print_color functions
+
+	* plane.cc, plane.h: (pt, perp) New member functions
+	 - Intersection operators aren't friends
+	* intersections.cc: Use Plane member functions
+	
+2007-09.12 (ADH)
+	* (Update README et. al.)
+
+2007-09.11 (ADH)
+	Version 1.1.16
+	* picture.cc, picture.h: (end_picture) New function (formerly end)
+	 - (end) Set output format on command-line flags, call end_picture
+
+	* elaps.in, epix.in, flix.in: --pst, --tikz, --eepic options
+
+2007-09.10 (ADH)
+	* facet.cc: (draw) Handle unset pen, reorganize logic
+	
+	* Makefile.am: Install all headers under $(pkgincludedir)
+	 - Remove libepix_a_HDRS from libepix_a_LIBADD deps
+	* make_header: Preserve include guards in epix.h
+	 - Include string
+	 - Don't include cstdio
+	* Color.h, Color_CMY.h, Color_CMYK.h, Color_Gray.h,
+	  Color_Neutral.h, Color_RGB.h, Color_Sep.h, Color_Utils.h:
+	  EPIX2 -> EPIX in include guard symbol
+
+2007-09.09 (ADH)
+	* eepic.cc: (print_circle_marker) Set allinethickness, draw once
+
+	* markers.h: (right_angle, arc_measure) Default size 8pt (was 12)
+
+2007-09.08 (ADH)
+	Version 1.1.15
+	* arrow_style.cc, arrow_style.h, pen_arrow.cc, state.cc, state.h:
+	  camber -> inset
+	* constants.h: ACAMBER -> INSET
+	
+	* label_style.cc, label_style.h: (is_masked) New function
+	* markers.cc: (label) Get mask flag from current label style
+
+	* glyph.cc: (print_to) Don't call print_latex_hbox on label text
+	
+	* screen_data.h: Remove void constructor
+	
+	* pair_map.cc, pair_map.h: const pair args -> const pair&
+
+	* screen_data.cc, screen_data.h: Store mask-indep corners
+	 - (paste) Use corners, not mask, to generate affine_map
+	 - (add_tile(tile*)) clone argument
+	 - (extract, extract_diamond, extract_ellipse) New functions
+
+	* screen.cc: pair2P -> __epix_pair2P, accept const pair&
+	 - (extract, extract_diamond, extract_ellipse) New functions
+
+2007-09.07 (ADH)
+	* format.h: (print_circle_marker) New function
+	* format.cc: (print_latex_marker) Needn't handle dot-like marks
+	  - (print_mark) Use print_circle_marker for dot-like marks
+	  - (print_edge) Use print_circle_marker for path dots
+
+	* eepic.cc, eepic.h: (print_circle_marker) New function
+	* pst.cc, pst.h:     (print_circle_marker) New function
+	* tikz.cc, tikz.h:   (print_circle_marker) New function
+	
+	* tikz.cc: (put_box) truncate coordinates
+
+2007-09.05 (ADH)
+	* format.cc: (print_latex_hbox) "default" -> "rm"
+	 - "normalsize" -> "nsz"
+	* label_style.h: (label_state) Same as above
+	* state.h: (font_size, font_face) Same as above
+
+	* mask_rectangle.h, mask_ellipse.h, mask_diamond.h: Remove void
+	  constructor
+
+	* pen_fill.cc: (print_to, add_to_palette) No action if is_empty
+
+2007-08.31 (ADH)
+	* epix-lib.sh: Remove unused global EPIX_VERBOSE
+	 - New global LATEX_PKGS
+	 - (ePiX_usepackages) New function (only used by elaps)
+
+	* elaps.in: (elaps_make_latex) Get LaTeX packages from input file
+
+2007-08.30 (ADH)
+	Version 1.1.14
+	* format.h: (usepackages) New function
+	* format.c (file_comments) Call usepackages
+
+	* eepic.cc, eepic.h: (usepackages)
+	* pts.cc, pst.h: (usepackages)
+	* tikz.cc, tikz.h: (usepackages)
+	* fmt_template.cc, fmt_template.h: (usepackages)
+
+2007-08.30 (ADH)
+	Version 1.1.13
+	* epix.el.in: New file
+	* epix.el: Obsolete file removed
+
+2007-08.29 (ADH)
+	* hatching.cc, hatching.h: Reimplement
+
+2007-08.25 (ADH)
+	* format.cc, format.h: (path_break) Default implementation
+	 - (path_conector) New virtual function, default implementation
+	 - (print_edge, print_paths) Use path_connector
+	 - (xdefinecolor) Non-virtual functions for xcolor formats
+
+	* tikz.cc, tikz.h: New files
+
+	* eepic.cc: (print_color) Use xdefinecolor
+	* eepic.cc, eepic.h: (path_break) Use default implementation
+	* pst.cc, pst.h: (path_break) Use default implementation
+
+	* picture.cc, picture.h: (mp_format, print_mp) Comment out
+	 - pgf_format -> tikz_format
+	 - print_pgf -> print_tikz
+
+2007-08.23 (ADH)
+	* clipping.cc, clipping.h: New face list m_extras
+	 - (clip_face, clip_slice, clip_restore) New functions
+	* state.cc, state.h: (clip_face, clip_slice, clip_restore) New
+	  functions
+	 - (label_border) Accept double for length arg
+
+	* legend.cc: (draw) Position is not camera-dependent
+
+	* picture.cc, picture.h: (border) Accept double for length arg
+	* screen.cc, screen.h: (border) Accept double for length arg
+
+2007-08.21 (ADH)
+	Version 1.1.12
+	* axis.cc: log labels in decimal by default, sci available
+	
+2007-08.20 (ADH)
+	* axis.cc, axis.h: (unmark(double)) New member function
+	
+2007-08.19 (ADH)
+	* label_data.cc: (label_data(P, mark, align): Axis tick markers
+	  restrictively aligned, cannot be rotated
+
+	* legend_tile.cc, legend_tile.h: Copy ctor/assign, destructor
+
+	* lens.cc, lens.h: New files
+	 - Add clone function
+	* camera.cc, camera.h: Factor out Lens code
+	 - Add copy ctor/assign
+
+	* picture.cc, picture.h: (pic_units_per_pt, units_per_pic_unit,
+	  pt_to_screen) New functions for true-size drawing
+	 - Remove svg functions
+
+	* markers.cc, markers.h: (right_angle, arc_measure, axis_break,
+	  h_error_bar, v_error_bar) New functions
+
+	
+2007-08.18 (ADH)
+	Version 1.1.11
+	* screen_data.cc, screen_data.h: (print_to) Accept bool flag to
+	  encapsulate in a picture-like environment
+
+	* format.h: (reset_state) New pure virtual function
+	* eepic.cc, eepic.h, pst.cc, pst.h: (reset_state) New function
+
+2007-08.17 (ADH)
+	* format.cc, format.h: (start_picture, end_picture, print_palette,
+	  print_latex_hbox, set_unitlength) New functions
+	 - (pic_header, pic_footer) Implemented in lower-level functions
+	* glyph.cc: (print_to) Font attributes handled in format.
+
+	* legend_item.cc, legend_item.h: New files
+	* legend_tile.cc, legend_tile.h: New files
+
+2007-08.16 (ADH)
+	* format.cc, format.h: (print_latex_label) Masking flag
+	 - (print_latex_label) Always print text color
+
+	* legend.cc, legend.h: New files
+
+	* length.cc, length.h: (name) New member function
+
+2007-08.15 (ADH)
+	* fmt_template.cc, fmt_template.h: New files
+
+	* active_screen.cc, active_screen.h: screen_broker class replaces
+	  global screen pointer active_screen
+
+	* picture.cc, picture.h: (inlay, inlay_vertical, inlay_horizontal)
+	  New functions
+	 - (deactivate) New function
+	 - (activate) Re-implement using screen_broker
+
+	* arrow_data.cc, axis.cc, curves.cc, label_data.cc, path.cc,
+	  path_data.cc, state.cc: Use active_screen()
+
+2007-08.12 (ADH)
+	* curves.cc: grid calls rect for outmost lines (enables filling)
+
+	* format.h: Re-design interface
+	* eepic.cc, eepic.h, pst.cc, pst.h: Re-implement
+	
+	* glyph.cc, pen_fill.cc, pen_line.cc: Re-implement print_to
+	* pen_arrow.cc: Generate own arrow head data
+	* picture_data.cc: Reimplement print_to
+	* pen_fill.h: Remove hatch angle members
+
+2007-08.09 (ADH)
+	Version 1.1.10
+	* mask_diamond.cc, mask_ellipse.cc, mask_rectangle.cc: (backing)
+	  Use plain backing color for edge
+
+	* domain.cc: (resize1, resize2, resize3) Hack to avoid round-down
+
+2007-08.08 (ADH)
+	* curves.cc, curves.h: (line) Make num_pts argument unsigned
+	* curves.cc: (line, triangle, quad, arrow) Sensitive to whether
+	  camera preserves lines
+
+	* constants.h: New constants MAX_LOG_BASE, DEF_PRECISION, MAX_PRECISION
+
+2007-08.07 (ADH)
+	* frac.cc, frac.h: New files (rational number class)
+	
+	* pen_arrow.cc: (print_to) Use copy of label_state to print a dot
+
+	* label_data.cc, label_data.h: (mask_color, text_color, align_to)
+	  New pass-through functions
+	* markers.cc, markers.h: Label commands use label_data
+	  pass-through
+	 - Move axis and axis label functions to new file axis.cc
+	* axis.cc, axis.h: New files (Coordinate axes, global functions)
+	 - New log label commands with same signature as Cartesian versions
+	 - New axes along sides of bounding box
+	
+	* eepic.cc, pst.cc: (pic_header, pic_footer, print_color) Print
+	  "%" at end of line
+
+2007-08.06 (ADH)
+	* state_data.h: Remove file
+	* state.cc: Include style headers explicitly
+
+	* pst.cc: (pic_footer, pic_header) Don't use pspicture* when cropping
+
+2007-08.04 (ADH)
+	* epix-lib.sh (ePiX_usage, ePiX_version): Update copyright,
+	  licence notices
+	 - Get script name from caller
+	 - (ePiX_bugreport) New function
+	* elaps.in, epix.in, flix.in, laps.in: Specify script name for
+	  usage, version
+	 - Call ePiX_bugreport at end of help
+
+	* triples.cc, triples.h: (Several binary operators) Pass first
+	  argument as value when implementation must copy anyway
+
+2007-08.03 (ADH)
+	Version 1.1.9
+	* flix.in: (flix_png) Pass tmax to bc, don't let shell evaluate
+
+	* path_data.c: (photo) Print filled only if >= 3 non-null edges
+
+2007-08.02 (ADH)
+	* spline.cc: (data) Indexing errors; increase max indices by 1
+
+	* data_bins.cc: (plot) Use 20 intervals per spline
+	 - (bar_chart, histogram, plot): Check for sero population
+	 - (bar_chart) Bar height = frac of population in bin
+	 - (histogram) Box height = frac of pop per horizontal unit
+	 - (pop) Implement function
+
+	* path_style.cc: (path_state(string)) Fix test for solidity
+
+	* README-changes, README-porting: Removed
+
+2007-08.01 (ADH)
+	* functions.h: Remove "D", "I" aliases for Deriv, Integral
+	* functions.cc: (recip) Return 1.0/x (sec, csc, tan have poles)
+	* functions.cc, functions.h: Remove nine lowercase trig functions
+	* plots.cc: D -> Deriv, I -> Integral
+
+	* triples.h: Remove "triple" alias for P
+	* triples.cc, triples.h: New member function is_valid()
+	 - (midpoint) Remove function
+	* circle.cc: Replace P::midpoint
+
+	* elaps.in: Keep eepic file, back up existing file if any
+	 - Unset EPIX_OUTFILE, EPIX_OUTROOT on loop exit
+	 - Print informative (but fake) lines on latex/dvips failure
+
+	* curves.cc, curves.h: (spline(vector<P>, int)) New function
+	* data_bins.cc: (plot) Draw piecewise-cubic spline, not n_spline
+
+2007-07.31 (ADH)
+	* crop_algorithms.h: (loopify)
+	 - Increment twice after insertion
+	 - Erase lone edge correctly
+
+	* markers.cc, markers.h: (h_axis_tick, v_axis_tick) Alignment option
+	 - (h_axis, h_log_axis, v_axis, v_log_axis) Alignment option
+	* label_data.cc, label_data.h: (label_data(P, mark_type)) Accepts
+	  alignment option
+	* eepic.cc: (print_mark) Handle alignment
+	* pst.cc: (print_mark) Handle alignment
+	 - (print_edges) Use pspolygon for closed paths
+
+	* path_data.cc, path_data.h: New constructor from list of edge3d
+	 - (is_closed, is_filled) Move body to source file
+	 - vector<P>, list<edge3d> constructors do not fill unless closed
+	* plot_algorithms.h: (plot_map_dom, euler_plot) Build plots from
+	  edges, not vertices
+	 - (plot_map_dom) Don't close or fill surface/solid plots
+
+2007-07.30 (ADH)
+	* circle.cc, circle.h, plane.cc, plane.h, segment.cc, segment.h,
+	  sphere.cc, sphere.h:
+	 - Remove intersection member operators
+	 - Add bool malformed member, constructor for malformed objects
+	 - Intersection operators do not throw
+	* intersections.cc, intersections.h: New files, handle
+	  intersections of object classes
+	* make_header: Add intersections.h
+
+2007-07.29 (ADH)
+	* errors.h: Remove error type enums
+	
+	* data_file.cc: (write(fmt)) Column indices reversed in try block
+	
+	* curves.cc: (ellipse_left, ellipse_right) Correct angle bounds
+	* path.cc: Ellipse constructor creates path containing specified
+	  number of edges
+
+	* markers.cc: marker(P, circ) calls circ
+	 - masked log axis labels
+	 - log axis labels accept optional base argument
+	
+	* eepic.cc, pst.cc: BOX and DOT, BBOX and DDOT of the same size
+	 - Label padding works more similarly to PSTricks
+	* pst.cc: (print(label_state, string)) If no label border, set
+	  linestyle=none
+	* glyph.cc: (print_to) Handle font face
+
+	* constants.h: AVG_DOT=4 (was 2), AVG_TICK=3 (was 2)
+	 - Arrow head parameter bounds (MIN_AWIDTH, MIN_ARATIO, etc.)
+	* arrow_style.cc, arrowhead_style.h:
+	 - Handle bounds on arrow head dimensions
+	 - (width, ratio, camber, fill) Return arrowhead_state& (not void)
+	
+	* state.cc: (dash_size) Pass unchecked argument to path_state
+	 - (dot_size, tick_size) Pass unchecked argument to marker_state
+	* marker_style.cc: (dot_size, tick_size)
+	 - Handle unchecked arg
+	 - Return marker_style& (not void)
+	* path_style.cc: (dash_size) Handle unchecked arg
+
+2007-07.28 (ADH)
+	Version 1.1.8
+	* eepic.cc: (print(label_state, string)): Fix masklabel padding
+	* markers.cc: Don't pad axis labels with \phantom{-}
+	* camera.cc: No warning if point is behind film plane
+	* screen_data.cc: backing(), border() activate cropping
+	* data_file.cc: (read) Don't try to read empty files
+	 - (column) Check for empty m_data
+
+2007-07.22 (ADH)
+	* data_mask.cc: (reverse) return *this
+	* length.cc: (get_lengths) Initialize len1, len2
+	* crop_algorithms.h: (loopify) If only one edge is visible, return
+	  empty edge list.
+
+2007-07.19 (ADH)
+	* edge_data.h: Rename seen() -> is_seen(), null() -> is_null()
+	* crop_algorithms.h, pen_fill.cc, pen_line.cc: seen() -> is_seen()
+	* pen_arrow.cc, pen_arrow.h: Remove member m_at_base (unused)
+	 - (crop_to) Shaft visibility bug
+	 - (print_to) Draw ddot if head, tail project to same location
+	* arrow_data.cc, arrow_data.h: Remove member m_at_base (unused)
+	 - Remove clip() function (constructor applies automatically)
+	 - seen() -> is_seen()
+	* format.h, eepic.h, pst.h: (print_arrow) Omit alignment argument
+	* eepic.cc, pst.cc: (print_arrow) Change signature, reimplement
+	 - seen() -> is_seen()
+	* constants.h: Names in all caps
+	 - New constants MIN_CLIP, TWO_PI
+	 - BBOLD_WIDTH is 1.2pt (was 1.6pt)
+	* angle_units.cc, hatching.cc, marker_style.cc, path_style.cc,
+	  state.cc: Use capitalized constants
+	* camera.cc, camera.h: Use MIN_CLIP
+	 - Rename function to_front() -> clip_plane()
+
+2007-07.17 (ADH)
+	* crop_algorithms.h: New file for path-chopping templates
+	* halfspace.cc, halfspace.h: Remove private member functions
+	 - Use crop_algorithms.h
+	* screen_crop.cc, screen_crop.h: New files for crop_path_2nd,
+	  crop_loop_2nd (from edge_data.cc)
+	* edge_data.h: Move crop_path_2nd, crop_loop_2nd to screen_crop.cc
+	  (file contains only template class and two typedefs)
+	* edge_data.cc: Remove file
+
+2007-07.16 (ADH)
+	* state.cc: (fill(true)) Set fill color to White() if unset
+	* halfspace.cc, halfspace.h: (clip_path) Out-of-order bug
+	 - Move constructor body from header.
+
+2007-07.14 (ADH)
+	Version 1.1.7
+	* eepic.cc, eepic.h, pst.cc, pst.h: Implement path styles
+	 - (print_edge, print_edges) New functions
+	 - (print_line) Implement in terms of print_edge
+	 - (print_verbatim): New function
+	* verbatim.cc, verbatim.h: New files, implementing tile class for
+	  verbatim output to file
+	* picture.cc, picture.h: (write, pre_write, post_write) New
+	  functions to write verbatim strings to output
+	* screen.h: Declare global "write" function a friend
+	* picture_data.cc, picture_data.h: Add support for pre- and
+	  post-written strings in output
+	* constants.h: Default axis ticks 4pt long
+
+2007-07.13 (ADH)
+	* path_style.cc, path_style.h: Interface redesign
+	 - String-parsing implementation
+	 - Use constants.h
+	* marker_style.cc: Use constants.h
+	* state.cc: Reimplement path style functions
+	 - Use constants.h
+	 - (dash_size) New function
+	 - (dash_fill, dash_length) Functions removed
+	 - (pen(Color, double), base(Color, double)) New functions
+	* label_data.cc: Constructors set tick mark color to line color
+	* edge_data.h: (length) New member function
+
+2007-07.08 (ADH)
+	* markers.cc: (h_axis, h_axis_labels, v_axis, v_axis_labels) If no
+	  endpoints are specified, use dimensions of active screen
+	* curves.cc: (grid, log_grid) If corners not specified, use
+	  corners of active screen
+	* pst.cc: (print_arrow) Draw head manually
+	  (print_line) Use PSTricks border attribute in two-pen versions
+	  (update_base) Bug fixes
+	* facet.cc, facet.h: New files
+	* surface.cc: Factor out utility classes facet, by_distance
+	 - Support domain-dependent coloring
+	* path_data.cc: (photo) Print unfilled paths in chunks of 250
+	  points to ameliorate LaTeX overflow
+
+2007-07.07 (ADH)
+	Version 1.1.6
+	* surface.cc, surface.h: Support position-dependent coloring
+
+2007-07.06 (ADH)
+	* eepic.cc, pst.cc: (print(style, string)) Fix alignment bug
+	  (print_mark) No padding, border
+	* screen.cc, screen.h, screen_data.cc, screen_data.h: (is_cropped)
+	  New function to add support for label cropping
+	* format.h, eepic.cc, eepic.h: Change signature of pic_header
+	* pst.cc, pst.h: Add support for label cropping
+	* picture_data.cc: (print_to) Pass crop flag
+
+2007-07.05 (ADH)
+	* markers.h: (h_axis_log_labels, v_axis_log_labels) Align argument
+	  defaults to none
+	* picture.cc, picture.h: (eepic, pst) New functions to set output
+	  format. (mp, pgf, svg stubs written.)
+	* camera.cc: (to_front) Min clip distance is 0.01
+	* path_data.cc: (photo) Clip by camera.to_front()
+
+2007-07.04 (ADH)
+	* pst.cc, pst.h: New files
+	* eepic.cc: Implement label borders and padding
+	* state.cc, state.h: (new functions)
+	 - plain(Color), bold(Color), bbold(Color), set line Color/width
+	 - rgb(P), cmyk(P), use components as densities
+	 - New functions to set label attributes
+	   . label_color(Color);
+	   . label_pad(string);
+	   . label_border(Color, [string]), label_border(string);
+	   . no_label_border();
+	* curves.cc, curves.h: (draw_rect, swatch, rect(P, P, bool),
+	  draw_polar_grid) Remove functions
+	* domain.cc, domain.h:
+	 - No default domain constructor
+	 - New constructor domain(P, P, mesh)
+	 - Inline 1-dim'l constructor moved to cc file
+	 - domain data members made private
+	   New functions corner1_x1(), coarse_n1(), etc.
+	 - "Net" typename removed
+	* plot_algorithms.h, plots.cc, surface.cc: Use domain state
+	  functions
+	* data_bins.cc, data_bins.h: (bar_chart) New function
+	* data_file.cc, data_file.h: New global functions
+	 - plot(filename, mark_type, col1, col2, col3, [F])
+	   plot(filename, mark_type, F, col1, col2, col3)
+	 - histogram, bar_chart
+
+2007-07.03 (ADH)
+	* dataplot.cc, dataplot.h: Break up and remove files
+	* data_bins.cc, data_bins.h, data_file.cc, data_file.h,
+	  data_mask.cc, data_mask.h, interval.cc, interval.h: New files
+	* samples: Remove sample document
+	* doc: Update
+
+2007-06.28 (ADH)
+	* circle,cc, circle.h:
+	 - Rename class -> Circle
+	 - Remove m_filled data member, fill operator
+	 - Remove translation, scaling operators += and *=
+	 - (translate) Rename "shift"
+	 - (move_to) New function
+	 - Circle::draw() fills according to current paint style
+	 - (circle) New functions which draw automatically
+	* sphere.cc, sphere.h:
+	 - Rename class -> Sphere
+	 - Remove translation, scaling operators += and *=
+	 - (shift, move_to, scale) New functions
+	 - (poles) Remove global function
+	 - (sphere) New functions which draw automatically
+	* plane.cc, plane.h:
+	 - Rename class -> Plane
+	 - (shift, move_to) New functions
+	 - Remove translate, separates, parallel_to, contains, height
+	   functions
+	 - (draw) Reimplement 
+	* segment.cc, segment.h:
+	 - Rename class -> Segment
+	 - (shift, move_to, scale) New functions
+	 - Remove translation operator +=
+	* path.cc, path.h,path_data.cc, path_data.h: Update class names
+	  Circle, Plane, Segment, Sphere
+	* polyhedron.cc, polyhedron.h: Remove files
+
+2007-06.25 (ADH)
+	* contrib: Remove package
+	* surface.cc: (facet) Class contains a normal vector,
+	  (facet::front_facing) Use normal vector to test
+
+2007-06.25 (ADH)
+	* surface.cc: (facet::draw) Use "direction" to compute density
+	* path.cc: (ellipse constructor) Don't close/fill automatically
+	* curves.cc: (ellipse) Close/fill if appropriate
+	* format.h, eepic.cc, eepic.h: (file_comment) New function
+	* picture_data.cc, picture_data.h: (file_header) Move to format.h
+	* path_data.cc, path_data.h: (draw) Implement base pen,
+	   draw filled regions with both pens
+	* state.cc, state.h: Functions to control drawing state
+	 - pen(Color, [string]), base(Color, [string])
+	 - fill(Color)
+	* doc/manual.tex: Update
+
+2007-06.20 (ADH)
+	Version 1.1.5
+	* pen_arrow.cc, pen_arrow.h: Store shaft as edge, not as two pairs
+	* format.h, eepic.cc, eepic.h: (print_arrow) Adjust call syntax
+	* mask_diamond.cc, mask_ellipse.cc: (crop_to) Fix crop criterion
+	* geometry.cc, geometry.h: Re-implement spherical geometry
+	* sphere.cc, sphere.h: (latitude, longitude) Move to geometry.*
+	* functions.cc, functions.h
+	 - Remove templates for id, zero, proj1, proj2, min, max
+	   (put id, proj1, proj2 in map.h)
+	 - Implement "zero" function with four call signatures
+	* plots.cc: (shadeplot) Path closure bug
+	* path.cc: (ellipse constructors) Close and fill if appropriate
+	* markers.cc: (arrow) Re-implement labeled arrow
+	* label_data.cc, label_data.h: Add visibility flag
+	* glyph.cc: (print_to) Implement font_size
+	* edge_data.cc: (crop_path_2nd) Loop processing bug
+
+2007-06.19 (ADH)
+	Version 1.1.4
+
+	Clipping and cropping work. Elliptical and diamond-shaped screen
+	masks are implemented.
+
+2007-06.03 (ADH)
+	Version 1.1.3, first public release
+
+	Implements ePiX-2's color capabilities, including named models
+	(RGB, CMY, CMYK, and Gray), color blending, filtering, CMYK
+	separation, limited transparency, color filling and colorable
+	arrows in eepic, decorable screens, and page markup.
+
+	The global parameters x_min, etc., should be replaced with
+	function calls, e.g. xmin(), from now on. Aside from this, the
+	syntax is backward compatible with Version 1.0.x.

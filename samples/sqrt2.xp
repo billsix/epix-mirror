@@ -1,0 +1,64 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// MAX^2 = radius of plot
+const double MAX(1.5);
+
+// complex square root in polar coordinates
+P f(double u, double v)
+{
+  return P(u*u*Cos(v), u*u*Sin(v), u*Cos(0.5*v));
+}
+
+// restrictions of sqrt to real axis, unit circle
+P sqrt_re(double t) { return f(t,0); }
+P sqrt_im(double t) { return f(1,t); }
+
+int main() {
+  picture(P(-4, -4), P(4, 2), "4x3in");
+
+  begin();
+
+  camera.filter(RGB_Neutral());
+
+  backing(Magenta(0.1));
+  set_crop();
+
+  revolutions();
+  label(P(xmin(), ymax()), P(2,-2), "Branches of $\\sqrt{z}$", br);
+
+  camera.at(6, -2, 2);
+  camera.range(4);
+  domain R(P(0,0), P(MAX,2), mesh(16, 80), mesh(16, 160));
+
+  // transparent branch
+  pen(Green(0.7), "0.15pt");
+  scenery surf(f, R.resize2(1,2));
+
+  fill(White(0.7));
+  pen(Black());
+  // opaque branch
+  surf.add(f, R.resize2(0,1));
+
+  surf.draw();
+  nofill();
+  // boundary curve, unit circle, axes, grid, labels
+  bbold(Red());
+
+  plot(sqrt_re, -MAX, 0, 30);
+
+  bold(Blue());
+  arrow(P(0,0,0), P(2,0,0));
+  arrow(P(0,0,0), P(0,2,0));
+
+  label_color(Blue());
+  label(P(2,0,0), P(0,-4), "$\\mathrm{Re}\\,z$", b);
+  label(P(0,2,0), P(4, 0), "$\\mathrm{Im}\\,z$", r);
+
+  bbold(Yellow());
+  plot(sqrt_re, 0, MAX, 30);
+
+  pst_format();
+  end();
+}

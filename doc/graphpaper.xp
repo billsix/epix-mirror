@@ -1,0 +1,22 @@
+/* -*-ePiX-*- */
+/* graphpaper.xp -- June 23, 2011 */
+#include "epix.h"
+using namespace ePiX;
+
+int main()
+{
+  picture(P(-2,-1), P(2,1), "2 x 1in");
+
+  begin();
+
+  pen(0.25);
+  grid(10*xsize(), 10*ysize());
+
+  pen(0.5);
+  grid(2*xsize(), 2*ysize());
+
+  pen(1);
+  grid(xsize(), ysize());
+
+  end();
+}

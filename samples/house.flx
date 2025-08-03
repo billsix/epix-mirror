@@ -1,0 +1,88 @@
+/* -*-flix-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double DY(0.1);
+const int N(200);
+const double dN(1.0/N);
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix()=temp1/temp2;
+    }
+
+  picture(P(0,0), P(5,3), "5 x 3in");
+
+  begin();
+  set_crop();
+  // sky
+  bbold();
+  for (int i=0; i<2*N; ++i)
+    {
+      // fade blue gradient to black
+      rgb((1-0.6*tix())*(0.5-0.25*dN*i),
+	  (1-0.6*tix())*(0.5-0.25*dN*i),
+	  (1-0.6*tix())*(1-0.2*dN*i));
+
+      line(P(0,1+i*dN), P(5,1+i*dN));
+    }
+
+  // sun
+  pen(4);
+  revolutions();
+  for (int i=1; i<=10; ++i)
+    {
+      // redden as tix() -> 1
+      rgb((1-0.25*tix())*(1-0.01*i), (1-tix())*(1-0.015*i), 0);
+      circle(P(3+0.5*tix(), 2.5 - 2*tix()), 0.025*i);
+    }
+
+  // roof
+  red(0.6*(1-0.6*tix()));
+  line(P(0.9,1.5), P(1.5,1.8));
+  line(P(2.1,1.5), P(1.5,1.8));
+
+  // lawn
+  bbold();
+  for (int i=0; i<N; ++i)
+    {
+      // fade green gradient to black
+      green((1-0.6*tix())*0.4*(1+i*dN));
+
+      line(P(0,i*dN), P(5,i*dN));
+    }
+
+  plain();
+  fill();
+  gray(0.2+0.8*tix());
+
+  path house;
+  house.pt(P(1,1-DY)).pt(P(2,1-DY)).pt(P(2, 1.5)).pt(P(1.5,1.75)).pt(P(1,1.5));
+  house.close().fill();
+  house.draw();
+
+  gray(0.1+0.4*tix());
+
+  rect(P(1.2,1.1), P(1.4, 1.3)); // window
+
+  pen(2);
+  dot_size(1);
+  rgb(0.8*(1-tix()), 0.8*(1-tix()), 0);
+  ring(P(1.65, 1.15)); // doorknob
+
+  fill(false);
+  plain(Black());
+  rect(P(1.6, 1-DY), P(1.85, 1.4)); // door frame
+
+  bold(RGB((1-tix())*(0.6),(1-tix())*(0.4),(1-tix())*(0.2)));
+  grid(P(1.2,1.1), P(1.4, 1.3), 2, 2); // panes
+
+  end();
+}

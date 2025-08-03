@@ -1,0 +1,88 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+#include "std_F.h" // include the custom header
+using namespace ePiX;
+
+// September 23, 2007
+//
+// The instructions below assume you've copied this file and the
+// sample files std_F.cc and std_F.h into a directory where you
+// have write permission.
+//
+// To build std_F.cc, you'll need to run commands similar to
+//
+//   g++ -I. -c std_F.cc
+//   ar -ru libaff.a std_F.o
+//   ranlib libaff.a
+//
+// Respectively, these compile std_F.cc into an object file, std_F.o;
+// create a static library named libaff.a containing the object code;
+// and create an index in libaff.a for the linker, so the library can
+// be used in external programs, such as the one built from this
+// source file. (On Mac OSX, you may need to run ranlib *after* moving
+// the library file to its permanent home.)
+//
+// You may give the library a different name, but it MUST begin "lib"
+// and have the extension ".a": "libblug.a" and "libaff-1.0.a" are all
+// right, but "mylib.a" or "libaff.test" are not. You refer to the
+// library by its name with "lib" and ".a" removed, as in "blug" or
+// "aff-1.0".
+//
+// To compile this source file (the one you're reading now), build
+// libaff.a as described above, then run the command
+//
+//   epix -I. -L. -laff std_F.xp
+//
+// Files (such as this one) that use an external library cannot be
+// compiled from emacs, since there is no way to pass the required
+// options; they must be compiled at a shell prompt.
+//
+// Please consult the gcc documentation ("g++ --help") for information on
+// what each option does.
+
+
+// About this file:
+//
+// "F" is the first letter of the Roman alphabet that has no non-trivial
+// symmetries.
+//
+// std_F is a class for representing plane affine maps; please consult
+// the manual for general information of ePiX's plane affine map class.
+//
+
+int main()
+{
+  picture(P(0,0), P(6,6), "4x4in");
+
+  begin();
+  degrees();
+
+  grid(6,6);
+
+  std_F F1; // the standard F
+  affine af1; // the identity map
+
+  F1.draw();
+
+  // stretch along the main diagonal
+  af1.rotate(45).v_scale(3).h_scale(0.75).rotate(-45);
+
+  // flip over the main diagonal and translate
+  af1.reflect(45).shift(pair(3,2));
+
+  // apply af, set style, and draw
+  F1.map_by(af1).fill(Black(0.6)).backing(Blue(1.8)).draw();
+
+  std_F F2;
+  affine af2;
+  af2.rotate(60).scale(1.5).shift(pair(5,0));
+  F2.map_by(af2).backing(RGB(1,0.8,0.2)).fill(Green(0.6)).draw();
+
+  std_F F3;
+  // define af3 by images of e1, e2, origin
+  affine af3(pair(2-sqrt(3), 6), pair(2,3), pair(2,5));
+  F3.map_by(af3).backing(Black(0.4)).fill(White()).draw();
+
+  pst_format();
+  end();
+}

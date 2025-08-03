@@ -1,0 +1,134 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const P pt1(2,-1);
+const P pt2(1,2);
+const P pt3(-2,0);
+
+void altitude_color()
+{
+  blue(1.4);
+}
+
+#ifdef BISECTORS
+void bisector_color()
+{
+  green(1.4);
+}
+#endif
+
+// project arg to line through tail, head
+P drop_perp(const P& arg, const P& tail, const P& head)
+{
+  return arg - ((arg - tail)%(head - tail)); // % = orthogonalization
+}
+
+#ifdef BISECTORS
+P bisector(const P& arg, const P& tail, const P& head)
+{
+  P dir_tl(tail - arg);
+  dir_tl *= 1.0/norm(dir_tl);
+
+  P dir_hd(head - arg);
+  dir_hd *= 1.0/norm(dir_hd);
+
+  Segment bisect(arg, arg + 0.5*(dir_tl + dir_hd));
+
+  return Segment(tail, head)*bisect;
+}
+#endif
+
+void rangle(const P& arg, const P& tail, const P& head)
+{
+  const P dir(head - tail);
+  const P loc(arg - ((arg - tail)%dir));
+
+  right_angle(loc, dir, J(dir));
+}
+
+const P q1(drop_perp(pt1, pt2, pt3));
+const P q2(drop_perp(pt2, pt3, pt1));
+const P q3(drop_perp(pt3, pt1, pt2));
+
+#ifdef BISECTORS
+const P r1(bisector(pt1, pt2, pt3));
+const P r2(bisector(pt2, pt3, pt1));
+const P r3(bisector(pt3, pt1, pt2));
+#endif
+
+int main()
+{
+  picture(P(-3,-3), P(3,3), "4x4in");
+
+  begin();
+  set_crop();
+
+  // sides
+  Segment side1(pt2, pt3);
+  Segment side2(pt3, pt1);
+  Segment side3(pt1, pt2);
+
+  // medians
+  Segment med1(pt1, side1.midpoint());
+  Segment med2(pt2, side2.midpoint());
+  Segment med3(pt3, side3.midpoint());
+
+  // altitudes
+  Segment alt1(pt1, q1);
+  Segment alt2(pt2, q2);
+  Segment alt3(pt3, q3);
+
+#ifdef BISECTORS
+  // bisectors
+  Segment bis1(pt1, r1);
+  Segment bis2(pt2, r2);
+  Segment bis3(pt3, r3);
+#endif
+
+  med1.draw();
+  med2.draw();
+  med3.draw();
+
+  bold();
+  side1.draw();
+  side2.draw();
+  side3.draw();
+  plain();
+
+  altitude_color();
+  alt1.draw();
+  alt2.draw();
+  alt3.draw();
+
+  rangle(q1, pt2, pt3);
+  rangle(q2, pt3, pt1);
+  rangle(q3, pt1, pt2);
+
+  circle(q1, q2, q3);
+
+  label(q1, P(-2,4), "$a_1$", t);
+  label(q2, P(-2,-4), "$a_2$", b);
+  label(q3, P(4,0), "$a_3$", r);
+
+#ifdef BISECTORS
+  bisector_color();
+  bis1.draw();
+  bis2.draw();
+  bis3.draw();
+
+  //  circle(r1, r2, r3);
+#endif
+
+  black();
+  font_size("footnotesize");
+  label(pt1, P(2,-2), "$p_1$", br);
+  label(pt2, P(2,2), "$p_2$", tr);
+  label(pt3, P(-4,-2), "$p_3$", l);
+
+  label(side1*med1, P(-4,2), "$m_1$", tl);
+  label(side2*med2, P(-2,-4), "$m_2$", b);
+  label(side3*med3, P(4,0), "$m_3$", r);
+
+  end();
+}

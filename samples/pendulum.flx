@@ -1,0 +1,62 @@
+/* -*-flix-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P F(double u, double v)
+{
+  return P(v, -Sin(u));
+}
+
+double theta0(-5*M_PI/6);
+double EPS(0.01); // to avoid singularity of f at theta0
+
+P posn0(theta0, 0);
+
+P pivot(0,5.5);
+double ell(3);
+
+double K(-Cos(theta0));
+
+double f(double t)
+{
+  return 1.0/sqrt(2*(K+Cos(t)));
+}
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix()=temp1/temp2;
+    }
+  picture(P(-6.5,-2.5), P(6.5, 8.5), "6.5 x 5.5in");
+
+  begin();
+
+  // calculate period, avoiding singularity at theta0
+  double period(4*(sqrt(2*EPS/(-Sin(theta0)))+Integral(f).eval(-theta0-EPS)));
+
+  border(Black(0.1), "1pt");
+
+  P posn(flow(F, posn0, period*tix(), 120*tix())); // phase position
+  double x_t(-Sin(posn.x1()));
+  double y_t( Cos(posn.x1()));
+
+  slope_field(F, P(-2*M_PI,-2), P(2*M_PI,2), 48, 12);
+
+  bold();
+  line(pivot, pivot-ell*P(x_t, y_t));
+
+  red();
+  ode_plot(F, posn0, period, 120);
+
+  blue();
+  box(posn);
+  box(pivot-ell*P(x_t, y_t));
+
+  end();
+}

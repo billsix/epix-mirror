@@ -1,0 +1,70 @@
+/* -*-ePiX-*- */
+// fake 3D by layering
+#include "epix.h"
+using namespace ePiX;
+
+// function to plot
+P F(double u, double v)
+{
+  return P(u, v, 0.25*(u+v)*(u-v));
+}
+
+P TF(double u, double v)
+{
+  return P(u, v);
+}
+
+int main()
+{
+  picture(P(-3,-2),P(3,2), "6x4in");
+
+  begin();
+  backing(Black());
+
+  label_color(White());
+  label(P(0, ymax()), P(0,-4),
+	"\\textbf{A quadratic saddle cut by a tangent plane}", b);
+
+  camera.at(P(6,12,8));
+  camera.look_at(P(0,0,-0.25));
+
+  domain R(P(-2,-2), P(2,2), mesh(24,24), mesh(48,48));
+
+  // clip to lower half space
+  clip_face(P(0,0,0), -E_3); // 2nd arg is inward normal vector
+
+  // draw shaded saddle
+  fill();
+  surface(F, R);
+
+  // and re-draw the wiremesh in color
+  bold();
+  green(); // change label color as well
+  plot(F, R);
+  label(F(0,2), P(0,-4), "$\\mathbf{z<0}$", b);
+
+  // (x,y)-plane
+  red();
+  plot(TF, R);
+  label(P(2,0,0), P(-4,-2), "$\\mathbf{z=0}$", bl);
+
+  clip_restore(); // remove old restriction
+  clip_face(P(0,0,0), E_3); // and set new one
+
+  fill(Blue()); // set pen and fill colors
+  surface(F, R);
+
+  // fake transparency: re-draw (x,y)-plane lightly
+  pen(Red(), 0.2);
+  plot(TF, R);
+
+  // and plot top half of wiremesh in color
+  bold(Blue());
+  plot(F, R);
+
+  rgb(0.5,0.5,1);
+  label(F(-2,0), P(4,4), "$\\mathbf{z>0}$", tr);
+
+  pst_format();
+  end();
+}

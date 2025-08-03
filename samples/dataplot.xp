@@ -1,0 +1,55 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P F(double x, double y)
+{
+  return P((x-y)*(x+y), 2*x*y);
+}
+
+int main()
+{
+  picture(P(-1,0),P(1,20), "6x6in");
+
+  begin();
+
+  // create a 2-column data file with 121 rows
+  data_file DF(Cos, Sin, 0, M_PI, 120);
+
+  legend L;
+  plain(Black());
+  fill(Blue(1.8));
+
+  // act on first two columns; result doubles angles
+  DF.transform(F);
+
+  data_bins db(-1.05, 1.05, 21); // bins centered on -1, -0.9, ..., 0.9, 1
+  db.read(DF.column(1));   // read col1
+  db.bar_chart(db.pop());  // and plot, scaling to population
+
+  L.fill_item("Population count"); // add a filled legend item
+
+  label_color(Blue(1.2));
+  v_axis_labels(P(xmin(), ymin()), P(xmin(), ymax()), 0.5*ysize(), P(-4,0), l);
+  // superimpose plot of raw data
+  screen raw(P(-1,-1), P(1,1));
+  activate(raw);
+  label_color(Red());
+  DF.plot(DDOT);            // scatter plot
+  L.mark_item(DDOT, "Data points");
+
+  nofill();
+  plain(Black(0.3));
+  grid(1,10);
+
+  v_axis_labels(P(1,-1), P(1,1), 4, P(4,0), r);
+
+  //  DF.write("circle.dat");  // write to a disk file
+  inset(P(-1,0), P(1,20));
+  deactivate(raw); // polite but unnecessary
+
+  L.draw(canvas().c(), P(0,0), c);
+
+  pst_format();
+  end();
+}

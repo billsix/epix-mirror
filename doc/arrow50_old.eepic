@@ -1,0 +1,22 @@
+%% Generated from arrows.xp on Mon Jul  2 20:38:34 EDT 2007 by
+%% ePiX-1.1.6
+%%
+%%   Cartesian bounding box: [-2,2] x [-1,1]
+%%   Actual size: 24 x 12pt
+%%   Figure offset: left by 0pt, down by 0pt
+%%
+\xdefinecolor{rgb_000000}{rgb}{0,0,0}
+\setlength{\unitlength}{1pt}
+\begin{picture}(24,12)(-0,-0)
+\path(0,6)(24,6)
+%%
+\path(17.8125,4.875)(16.7813,4.875)
+\path(19.875,5.25)(17.8125,5.25)
+\path(21.9375,5.625)(18.8438,5.625)
+\path(24,6)(19.875,6)
+\path(21.9375,6.375)(18.8438,6.375)
+\path(19.875,6.75)(17.8125,6.75)
+\path(17.8125,7.125)(16.7813,7.125)
+\path(19.875,6)(15.75,4.5)(24,6)(15.75,7.5)(19.875,6)
+%%
+\end{picture}

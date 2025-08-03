@@ -1,0 +1,91 @@
+ePiX-1.2 -- NEWS
+
+Last Change: September 12, 2007
+
+Please consult the following files as appropriate:
+
+INSTALL -- Detailed installation instructions
+NEWS (this file) -- Recent major changes (see ChangeLog for code changes)
+README -- General overview and information
+
+
+If you are new to ePiX, you may safely ignore this file.
+
+OVERVIEW
+
+ePiX 1.2.x has been written almost entirely from scratch.  The drawing
+model is unchanged, and some old files will compile as is, but there
+are a few changes of syntax. 
+
+
+SYNTAX CHANGES
+
+Generally, global variables have been deprecated or removed, and
+should be replaced by function calls in new files.
+
+* (Recommended) The global size variables x_min, x_max, y_min, y_max,
+  x_size, and y_size should be replaced by the function calls xmin(),
+  etc. (No underscores.)
+
+* (Mandatory) The global variable tix in a flix file must be
+  manipulated through the function tix().
+
+* (Suggested) The camera may be accessed through the function
+  the_camera().
+
+* (Mandatory) Camera orientation is controlled with functions named
+  tilt, pan, and roll; each rotates the camera about an axis through
+  the viewpoint, not through the target.
+
+* (Suggested) The size and bounding box may be given in one command,
+  such as picture(P(-1,0), P(1,1), "4x3in"). The old syntax will be
+  retained indefinitely.
+
+* (Mandatory) The command use_pstricks() is obsolete.
+
+* (Mandatory) Deprecated aliases no longer exist: triple (for the P
+  class), D (for Deriv), and I (for Integral). Lowercase trig function
+  names conflicted with the standard namespace and have been removed.
+
+* (Mandatory) The geometric object commands (circle, plane, segment,
+  sphere) which used to create class objects now perform drawing. The
+  classes are available with capitalized names (Circle, Plane,
+  Segment, Sphere).
+
+
+NEW FEATURES
+
+* Output is cleanly separated from the internal representation.
+  Figures may be written with a choice of macros---PSTricks, tikz, and
+  eepic at present---and new output types are easily coded so long as
+  the format supports arbitrary line segments, color, and the ability
+  to place a LaTeX box at a specified location.
+
+* Colors are a manipulable data type, available in RGB, CMY, CMYK, and
+  Gray models. xcolor-style operations, such as color model
+  conversion, blending, superposition, and inversion are provided.
+
+  The camera has a filter which affects the colors of all scene
+  elements. Filters performing CMYK separation are provided.
+
+* Color filling is controlled with declarations, similarly to line
+  colors in ePiX 1.0.x.  Arrows and markers of type spot, dot, ddot,
+  and~circ are now colored like other markers.  Shaded surfaces may be
+  colored with position-dependent functions.
+
+  If a figure contains many shaded elements, a color-capable output
+  format (PSTricks or tikz) should be used for efficiency.  Filled
+  regions are implemented as fine hatching in eepic.
+
+* An axis class provides coordinate axes with labels in a variety of
+  styles: decimals or scientific notation of specified precision,
+  fractions, trig fractions, logarithmic labels in arbitrary (integer)
+  base, and user-supplied styles.
+
+* ePiX 1.2.x performs page layout. Sub-figures may be manipulated
+  flexibly. The sample files give several applications.
+
+* Non-member intersection operators for Circles, Planes, Segments, and
+  Spheres are provided.  A ``non-generic'' intersection does not
+  throw an exception, but instead returns an undrawable ``malformed''
+  object.

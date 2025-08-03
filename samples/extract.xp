@@ -1,0 +1,109 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// a benign function
+double phi(double x)
+{
+  return x*x;
+}
+
+// and its derivative
+Deriv dphi(phi);
+
+// parameters defining an arbitrary line ell
+const double slope(-2);
+const double beta(0.5);
+
+const double ht(phi(beta));
+const double alpha(slope-dphi.eval(beta));
+
+const double eps(0.02); // size of extraction
+
+// a small perturbation to adjust the derivative
+double f(double x)
+{
+  return x/(1+16384*x*x);
+}
+
+double gn(double x)
+{
+  return f(alpha*(x-beta));
+}
+
+// phi's Evil Twin
+double psi(double x)
+{
+  return phi(x) + gn(x);
+}
+
+// inset parameters
+const P mag_ctr(P(0.75, 0.2));
+const double mag_sz(0.125);
+
+int main()
+{
+  picture(P(0,0), P(1,0.75), "4x3in");
+
+  begin();
+  set_crop();
+
+  // two nearly-equal graphs, and the tangent to one of them
+  plain(Blue());
+  plot(psi, xmin(), beta-eps, 60);
+  plot(psi, beta+eps, xmax(), 60);
+  plot(psi, beta-eps, beta+eps, 60);
+
+  pen(Green(0.6));
+  Line(P(beta,phi(beta)), slope);
+
+  bold(Red());
+  plot(phi, xmin(), xmax(), 60);
+  plain();
+
+  // cut out a small neighborhood and magnify it
+  screen mag(canvas().extract_ellipse(P(beta-eps, psi(beta)-eps),
+				      P(beta+eps, psi(beta)+eps)));
+  mag.backing(Yellow(0.05));
+  mag.border(Black(), "0.4pt");
+
+  inset(mag, mag_ctr - mag_sz*P(1,1), mag_ctr + mag_sz*P(1,1));
+
+  pen(Black());
+  // axes
+  line(P(xmin(),0), P(xmax(),0));
+  line(P(0,ymin()), P(0,ymax()));
+
+  // indicators
+  line(P(beta,0), P(beta,phi(beta)), -20); // shorten slightly
+  line(P(0,phi(beta)), P(beta,phi(beta)), -10);
+
+  // zoom lines
+  line(P(beta, phi(beta)), mag_ctr + polar(mag_sz, 2*M_PI/3), -20);
+  line(P(beta, phi(beta)), mag_ctr + polar(mag_sz, 5*M_PI_4), -20);
+
+  font_size("footnotesize");
+  label(P(beta,0), P(0,-4), "$\\beta$", b);
+  label(P(0,phi(beta)), P(-4,0), "$b$", l);
+
+  // use mag_ctr to place inset labels
+  red();
+  label(P(beta+0.1,phi(beta+0.1)), P(-2,2), "$\\varphi$",tl);
+  label(mag_ctr, P(0,6), "$\\varphi$",tr);
+
+  blue();
+  label(P(beta+0.1,psi(beta+0.1)), P(2,-2), "$\\psi$",br);
+  label(mag_ctr, P(8,-2), "$\\psi$",br);
+
+  green(0.6);
+  label(P(beta-0.1,ht-0.1*slope), P(2,2), "$\\ell$",tr);
+  label(mag_ctr, P(-12,20), "$\\ell$", bl);
+
+  black();
+  // a large label
+  label_border(Blue(), "0.2pt");
+  masklabel(P(0.5*(xmin()+xmax()), ymax()), P(0,0),
+	    "\\begin{minipage}{2.25in}A graph with unexpected tangent line\\end{minipage}", b);
+
+  end();
+}

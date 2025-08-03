@@ -1,0 +1,26 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double f(double x)
+{
+  return 0.75*Sin(x) - 0.25*Sin(2*x);
+}
+
+int main()
+{
+  picture(P(-2,-1),P(2,1), "5x1in");
+
+  begin();
+
+  h_axis(16);
+  v_axis(4);
+
+  h_axis_labels(4, P(0,-4), b); // shift labels down 4pt, align below
+
+  revolutions(); // set angle units
+  red();
+  plot(f, xmin(), xmax(), 120); // use 120 intervals
+
+  end();
+}

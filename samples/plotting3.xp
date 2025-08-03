@@ -1,0 +1,43 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P sin_n(double x, double n)     // Taylor polynomial of sin x
+{
+  const int N((int) floor(n));  // convert y to an index bound
+  const double sqx(-pow(x, 2)); // store -x^2 for efficiency
+  double val(x), summand(x);    // places to store results of evaluation
+
+  // step through odd numbers from 1 to 2N+1
+  for (int i=1; i <= 2*N+1; i += 2)
+    {
+      summand *= (sqx/((i+1)*(i+2))); // (-1)^i x^{2i+1}/(2i+1)!
+      val += summand;
+    }
+
+  return P(x, val);
+}
+
+int main()
+{
+  picture(P(0,-1), P(6*M_PI, 1), "5x1in");
+
+  begin();
+
+  set_crop();
+  h_axis(4);
+  v_axis(1);
+
+  bold();
+  green();
+  plot(Sin, 0, xmax(), 120);
+
+  domain R(P(0,1), P(6*M_PI, 41), mesh(60, 40), mesh(120, 40));
+  for (int i=0; i<4; ++i)
+    {
+      pen(RGB(0.25*i, 0, 1-0.25*i));
+      plot(sin_n, R.slice2(5*i+1)); // plot with 2nd var = 5i+1
+    }
+
+  end();
+}

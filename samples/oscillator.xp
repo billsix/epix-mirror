@@ -1,0 +1,89 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double f(double t, double a) { return 2*exp(-0.5*t)*Sin(a*t); }
+
+// Completely fabricated data
+// "Predicted"
+double f1(double t)
+{
+  return f(t,2);
+}
+
+// "Observed"
+double f2(double t)
+{
+  return f1(t)+0.1*Cos(3*t);
+}
+
+//"error"
+double err(double t)
+{
+  return 0.125*(1+fabs(f1(t)));
+}
+
+// Number of error bars
+const int samples(8);
+
+// Half-size of bounding box
+const int N(2);
+
+int main()
+{
+  picture(P(0,-N),P(2*N,N), "2.5 x 2.5in");
+
+  begin();
+
+  // displacement for miscellaneous labels/objects
+  const double delta(0.0625*xsize());
+
+  // graph paper
+  pen(Black(0.25));
+  grid(5*N*(int)xsize(),5*N*ysize());
+
+  pen(Black());
+  grid(N*(int)xsize(), N*(int)ysize());
+
+  // axes, names, and labels
+  bold();
+  dart(P(xmin(),0), P(xmax()+delta,0));
+  dart(P(0,ymin()), P(0,ymax()+delta));
+
+  font_size("scriptsize");
+  h_axis_masklabels(P(xmin()+1,0), P(xmax(),0), xsize()-1, P(0,2), c);
+  v_axis_labels(P(0,ymin()), P(0,ymax()), ysize(), P(-2, 0), l);
+
+  font_size("footnotesize");
+  label(P(xmax()+delta,0), P(2,0), "Time (sec)", r);
+  label_angle(M_PI_2);
+  label(P(0,0), P(-8,0), "Displacement (cm)",l);
+  label_angle(0);
+
+  legend L;
+  L.item_border(0);
+
+  // "Predicted" curve
+  pen(RGB(0.2, 0.7, 0.8));
+  plot(f1, xmin(), xmax(), 120);
+  L.path_item("Predicted");
+
+  // "error bars"
+  red();
+  L.mark_item(CIRC, "Measured");
+
+  for (int i=1; i < samples; ++i)
+    {
+      double t(xmin() + i*xsize()/samples);
+      v_error_bar(P(t, f2(t)), err(t), CIRC, 4); // 4 pt wide
+    }
+
+  black();
+  L.draw(canvas().br(), P(-2,2), tl);
+
+  font_face("sc");
+  label(P(0.5*(xmin()+xmax()), ymax()), P(0,2),
+	"A damped harmonic oscillator", t);
+
+  end();
+}

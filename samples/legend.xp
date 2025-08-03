@@ -1,0 +1,72 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P sin_n(double x, double n)     // Taylor polynomial of sin x
+{
+  const int N((int) floor(n));  // convert y to an index bound
+  const double sqx(-pow(x, 2)); // store -x^2 for efficiency
+  double val(x), summand(x);    // places to store results of evaluation
+
+  // step through odd numbers from 1 to 2N+1
+  for (int i=1; i <= 2*N+1; i += 2)
+    {
+      summand *= (sqx/((i+1)*(i+2))); // (-1)^i x^{2i+1}/(2i+1)!
+      val += summand;
+    }
+
+  return P(x, val);
+}
+
+int main()
+{
+  picture(P(0,-2.5),P(6*M_PI, 1), "5x3.5in");
+
+  begin();
+
+  camera.filter(CMY_Neutral());
+  set_crop();
+  plain(Black(0.5));
+  grid(12, 7);
+
+  // coordinate axis
+  axis Ax(P(0,0), P(6*M_PI,0), 12, P(0,-4), b);
+  Ax.trig().subdivide(4);
+
+  axis Ay(P(0,ymin()), P(0,ymax()), 7, P(-4,0), l);
+  Ay.frac().draw_labels();
+
+  // define a legend and set global attributes
+  legend L;
+  L.backing(Yellow(0.1)).border(Blue(), 1).item_border(0);
+
+  bbold(Green());
+  plot(Sin, 0, xmax(), 120);
+
+  // add a legend item
+  L.path_item("$y=\\sin x$");
+
+  domain R(P(0,1), P(6*M_PI, 41), mesh(60, 40), mesh(240, 40));
+
+  // print in descending degree so paths overlap better
+  for (int i=3; 0 <= i; --i)
+    {
+      pen(RGB(0.25*i, 0, 1-0.25*i));
+      plot(sin_n, R.slice2(5*i+1));
+
+      // add a legend item; key set automatically
+      std::stringstream buf;
+      buf << "$y=p_{" << 10*i+5 << "}(x)$";
+      L.path_item(buf.str());
+    }
+
+  plain(Black());
+  label_mask(White());
+  Ax.draw();
+
+  // place at bottom left
+  L.draw(canvas().bl(), P(2,2), tr);
+
+  pst_format();
+  end();
+}

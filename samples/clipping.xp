@@ -1,0 +1,233 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+/*
+ * This file, a monkey saddle sliced by two vertical planes showing
+ * the definition and geometric meaning of partial derivatives,
+ * contains a high degree of manual object ordering. Coordinate grids
+ * in the back come first. The surface itself is broken into pieces
+ * interspersed with axes and cutting planes. Figure parameters
+ * (color, the size and fineness of the domain, locations of cutting
+ * planes, and camera location) are defined in the preamble. The
+ * figure's appearance can then be adjusted visually at leisure to
+ * obtain the desired effect.
+ *
+ * Compile with
+ *
+ *   epix -DDISSECT clipping.xp
+ *
+ * to create frames showing stages of the construction.
+ */
+
+// Style parameters
+// camera location (in spherical coordinates); must be in first orthant
+const P VIEWPT(sph(4, M_PI/6, M_PI/6));
+
+// colors
+void color_coord()
+{
+  //  fill(RGB(1, 0.9, 0.5));
+  //  plain(RGB(1, 0.5, 0.2));
+  plain(RGB(1, 0.9, 0.7));
+}
+
+void color_axis()
+{
+  rgb(0.8, 0.2, 0.9);
+} 
+
+// graph and mesh
+void color_surf()
+{
+  plain(RGB(1, 0.5, 0));
+  fill(RGB(1, 0.8, 0.2));
+}
+
+// slicing plane and border
+void color_xslice()
+{
+  red();
+}
+
+void fill_xslice()
+{
+  //  black(0.1);
+  rgb(0.8, 0.5, 0.1);
+}
+
+void color_yslice()
+{
+  blue();
+}
+
+void fill_yslice()
+{
+  //  black(0.3);
+  rgb(0.6, 0.3,0);
+}
+
+const int MESH(12); // number of coordinate grid squares
+
+// location of tangency point
+const double x_0(7.0/MESH);
+const double y_0(6.0/MESH);
+const double z_0(0.25); // height of top of slicing planes
+
+const int MAX(1); // maximum coordinate
+
+const double sqrt3(sqrt(3));
+
+// function to be graphed
+P f(double x, double y)
+{
+  return P(x, y, 0.75*y*(y-sqrt3*x)*(y+sqrt3*x));
+}
+
+int main()
+{
+  picture(P(-2,-2), P(2,1.5), "6 x 5.25in");
+
+  begin();
+
+  // "legend"
+  masklabel(P(xmax(), ymax()), P(-2,-2), 
+	"$z=\\displaystyle\\frac{1}{2}(y^3-3x^2y)$", bl);
+
+  font_size("scriptsize");
+  camera.at(VIEWPT);
+  border(Green(0.6), "1pt");
+
+  domain R(P(-MAX,-MAX), P(MAX,MAX),
+	   mesh(4*MESH, 4*MESH), mesh(8*MESH, 8*MESH));
+
+  // coordinate grids
+  color_coord();
+  grid(P(-MAX,-MAX,-MAX), P(-MAX, MAX, MAX), MESH, MESH);
+  grid(P(-MAX,-MAX,-MAX), P( MAX,-MAX, MAX), MESH, MESH);
+  grid(P(-MAX,-MAX,-MAX), P( MAX, MAX,-MAX), MESH, MESH);
+
+#ifdef DISSECT
+  print_pst("clipping01.eepic");
+#endif
+
+  clip_box(P(-2, -2, -1), P(2, 2, 1));
+
+  // back half and front left quarter
+  color_surf();
+  surface(f, R.resize1(-MAX,0));
+#ifdef DISSECT
+  print_pst("clipping02.eepic");
+#endif
+
+  surface(f, R.resize1(0,MAX).resize2(-MAX,0));
+#ifdef DISSECT
+  print_pst("clipping03.eepic");
+#endif
+
+  // coordinate axes
+  color_axis();
+  bold();
+
+  clip_box(P(-2, -2, -1), P(2, 2, 2));
+
+  dart(P(-MAX,0,0), P(0.25+MAX,0,0));
+  dart(P(0,-MAX,0), P(0,0.25+MAX,0));
+  dart(P(0,0,0), P(0,0,0.25+MAX));
+
+  label(P(0.25+MAX,0,0), P(-2,-2), "$x$", bl);
+  label(P(0,0.25+MAX,0), P( 4,-2), "$y$", r);
+  label(P(0,0,0.25+MAX), P( 0, 4), "$z$", t);
+
+#ifdef DISSECT
+  print_pst("clipping04.eepic");
+#endif
+
+  // front quarter of surface; chop into four pieces
+  color_surf();
+  surface(f, R.resize1(0, x_0).resize2(0,y_0)); // behind both planes
+
+#ifdef DISSECT
+  print_pst("clipping05.eepic");
+#endif
+
+  fill_xslice();
+  rect(P(x_0, 0, -MAX), P(x_0, y_0, z_0)); // left part of plane x = x_0
+
+#ifdef DISSECT
+  print_pst("clipping06.eepic");
+#endif
+
+  pen(3);
+  color_xslice();
+  plot(f, R.slice1(x_0).resize2(0, y_0));
+
+#ifdef DISSECT
+  print_pst("clipping07.eepic");
+#endif
+
+  color_surf();
+  surface(f, R.resize1(x_0, MAX).resize2(0,y_0)); // back right piece
+
+#ifdef DISSECT
+  print_pst("clipping08.eepic");
+#endif
+
+  fill_yslice();
+  rect(P(0, y_0, -MAX), P(MAX, y_0, z_0)); // plane y = y_0
+
+#ifdef DISSECT
+  print_pst("clipping09.eepic");
+#endif
+
+  pen(3);
+  color_yslice();
+  plot(f, R.slice2(y_0).resize1(0, MAX));
+
+#ifdef DISSECT
+  print_pst("clipping11.eepic");
+#endif
+
+  color_surf();
+  surface(f, R.resize1(0, x_0).resize2(y_0, MAX)); // front left piece
+
+#ifdef DISSECT
+  print_pst("clipping12.eepic");
+#endif
+
+  fill_xslice();
+  rect(P(x_0, y_0, -MAX), P(x_0, MAX, z_0)); // right part of plane x = x_0
+
+#ifdef DISSECT
+  print_pst("clipping13.eepic");
+#endif
+
+  pen(3);
+  color_xslice();
+  plot(f, R.slice1(x_0).resize2(y_0, MAX));
+
+#ifdef DISSECT
+  print_pst("clipping14.eepic");
+#endif
+
+  color_surf();
+  surface(f, R.resize1(x_0, MAX).resize2(y_0, MAX)); // front right piece
+
+  clip_box(P(-MAX,-MAX,-2), P(MAX,MAX,2));
+
+  // labels and graph slices
+  color_yslice();
+  label(f(MAX, y_0), P(-4,0), 
+	"$\\displaystyle\\frac{\\partial f}{\\partial x}$: $y$ constant", l);
+
+  color_xslice();
+  label(f(x_0, MAX), P(4,0), 
+	"$\\displaystyle\\frac{\\partial f}{\\partial y}$: $x$ constant", br);
+
+#ifdef DISSECT
+  print_pst("clipping15.eepic");
+#endif
+
+  pst_format();
+  end();
+}
+

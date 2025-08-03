@@ -1,0 +1,53 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+int main() 
+{
+  picture(P(-2,-2),P(2,2), "3 x 3in");
+
+  begin();
+  set_crop();
+
+  P V(2,-0.25),   W(3,1);
+  P P1(-1.5,-1),  P2(P1 + V),       P3(P1 + 1.5*V);    // points
+  P Q1(-1,1),     Q2(Q1 + 0.5*W),   Q3(Q1 + W);
+
+  Segment L12(P1, Q2),   L13(P1, Q3);
+  Segment L21(P2, Q1),   L23(P2, Q3);
+  Segment L31(P3, Q1),   L32(P3, Q2);
+
+  // points of intersection
+  P R1(L12*L21), R2(L13*L31), R3(L32*L23);
+
+  dot(P1, P(0,-2), "$P_1$", b);
+  dot(P2, P(0,-2), "$P_2$", b);
+  dot(P3, P(0,-2), "$P_3$", b);
+
+  dot(Q1, P(0,2), "$Q_1$", t);
+  dot(Q2, P(0,2), "$Q_2$", t);
+  dot(Q3, P(0,2), "$Q_3$", t);
+
+  red();
+  L12.draw();
+  L21.draw();
+  L13.draw();
+
+  L31.draw();
+  L32.draw();
+  L23.draw();
+
+  green();
+  Line(P1,P3);
+  Line(Q1,Q3);
+
+  blue();
+  dot(R1, P(4,2), "$p_1$", r);
+  dot(R2, P(4,2), "$p_2$", r);
+  dot(R3, P(4,2), "$p_3$", r);
+
+  dashed();
+  Line(R1,R3);
+
+  end();
+}

@@ -1,0 +1,104 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double P_n(double z)
+{
+#ifdef Y20
+  return 0.5*(3*z*z - 1);
+#else
+  // Y_3^0
+  return 0.5*z*(5*z*z - 3);
+#endif
+}
+
+double rho(double th, double phi)
+{
+  return P_n(Sin(phi));
+}
+
+P color(double x, double y)
+{
+  return P(rho(x,y), 0, -rho(x,y));
+}
+
+P orbital(double u, double v)
+{
+  return sph(fabs(rho(u,v)), u, v);
+}
+
+int main()
+{
+  picture(P(-1,-1), P(1,1.5), "4x5in");
+
+  begin();
+
+  backing(Black());
+
+  set_crop();
+  revolutions();
+  fill();
+
+  // back 3/4
+  domain Bk(P(0.25, -0.25), P(1, 0.25), mesh(24,96), mesh(48,96));
+
+  plain(RGB(1, 0.8, 0.2) *= 0.8);
+
+  camera.at(sph(10, 0.06, 0.05));
+
+  // color-shaded surface
+  surface(orbital, Bk, color);
+
+  // draw boundary with "tube-like" green pen
+  nofill();
+  plain(Green(1.6));
+  base(Green(0.6), "2pt");
+  plot(orbital, Bk.slice1(0.25));
+  plot(orbital, Bk.slice1(1));
+
+  // set color for axes and labels
+  rgb(0.9,0.7,1);
+  base(RGB(0.8, 0, 1), "1pt");
+
+  arrow(P(0,0,0), P(1,0,0));
+  arrow(P(0,0,0), P(0,0.75,0));
+  arrow(P(0,0,0), P(0,0,1.25));
+
+  label(P(1,0,0), P(-2,-2), "$x$", bl);
+  label(P(0,0.75,0), P(4,-2), "$y$", r);
+  label(P(0,0,1.25), P(0,4), "$z$", t);
+
+  // "unset" base pen
+  base(Neutral());
+
+  // inset graph of Legendre polynomial
+  screen graph(P(-1,-1), P(1,1));
+  activate(graph);
+
+  camera.at(P(0,0,10000));
+  plain(Green(0.6));
+  grid(P(-1,-1), P(1,1), 8, 8);
+  bold(Yellow());
+  h_axis(8);
+  v_axis(8);
+
+  bold(Green());
+  plot(P_n, -1, 1, 60);
+
+  font_size("footnotesize");
+  label_color(Green(0.6));
+  label_mask(RGB(1, 0.8,0.2));
+
+#ifdef Y20
+  label(P(0,-1), P(0,-4), "$P(z)=\\frac{1}{2}(3z^2-1)$", b);
+#else
+  // Y30
+  label(P(0,-1), P(0,-4), "$P(z)=\\frac{1}{2}(5z^2-3)$", b);
+#endif
+
+  inset(P(-1,0.875), P(-0.375,1.5));
+  deactivate(graph); // a good habit, but not strictly necessary
+
+  tikz_format();
+  end();
+}

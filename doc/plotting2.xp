@@ -1,0 +1,29 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P f(double r, double th)
+{
+  return P(r*Cos(th), r*Sin(th), pow(r, 3)*Cos(3*th));
+}
+
+int main()
+{
+  picture(P(-1,-1),P(1,1), "2x1in");
+
+  begin();
+
+  domain R(P(0,0), P(1, 2*M_PI), mesh(8,40), mesh(8,80));
+
+  camera.at(3,1,2); // set the viewpoint
+
+  arrow(P(0,0,0), P(1.25,0,0));
+  arrow(P(0,0,0), P(0,1.25,0));
+
+  plain(Blue(1.2));
+  fill(Yellow()); // shade
+  surface(f, R);
+
+  pst_format();
+  end();
+}

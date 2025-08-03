@@ -1,0 +1,44 @@
+/* -*-ePiX-*- */
+#include <epix.h>
+using namespace ePiX;
+
+const int MAX(18);
+
+// basic circular wave
+double ripple(double u, double v)
+{
+  return pow(Cos(0.5*sqrt(u*u+v*v)),2);
+}
+
+// superposition
+double f(double u, double v)
+{
+  return 0.25*(1+ripple(u, v-10) + ripple(u, v+10));
+}
+
+// f as a parametric surface
+P F(double u, double v)
+{
+  return P(u, v, f(u,v));
+}
+
+// height-dependent coloring
+P color(double u, double v, double w)
+{
+  return P(0.2+0.8*w, 0.3, 0.8 - 0.6*w);
+}
+
+domain R(P(-MAX,-MAX), P(MAX,MAX), mesh(2*MAX, 2*MAX));
+
+int main()
+{
+  picture(P(-MAX,-MAX), P(MAX,MAX), "3x3in");
+
+  begin();
+
+  pen(Magenta(1.4), 0.2);
+  surface(F, R, color);
+
+  pst_format();
+  end(); 
+}

@@ -1,0 +1,42 @@
+/* -*-ePiX-*- */
+/* layout.xp -- June 27, 2007 */
+#include "epix.h"
+using namespace ePiX;
+
+P F(double s, double t)
+{
+  return P(0.1*s, 0.025*t) + (1/(0.01+s*s+t*t))*P(-t, s);
+}
+
+int main()
+{
+  picture(P(0,0), P(2,3), "5x7in");
+
+  begin();
+
+  for (int k=0; k<3; ++k)
+    for (int j=0; j<2; ++j)
+      {
+        screen my(P(-4, -3), P(2,2));
+        activate(my);
+
+        border(Red(0.6), "1pt");
+        set_crop();
+        plain(Blue(1.8));
+        dart_field(F, P(-4, -3), P(2, 2), 12, 10);
+
+        bold();
+        for (int i=0; i<7; ++i)
+          {
+            pen(RGB(0.05*(7-i), 1 - 0.1*i, 0.15*i));
+            ode_plot(F, P(-0.9-0.025*i,0), 4*(3*j+k+0.5), 30*(3*j+k+0.5));
+          }
+
+        inset(P(j+0.05,1.05-k), P(j+0.95,1.95-k));
+
+	deactivate(my);
+      }
+
+  end();
+}
+

@@ -1,0 +1,38 @@
+/* -*-ePiX-*- */
+/* koch.c -- May 29, 2002 */
+#include "epix.h"
+using namespace ePiX;
+
+const int koch_seed[] = {6, 4, 0, 1, -1, 0};
+
+int main() 
+{
+  picture(P(0,0), P(4, 1), "6 x 1.5in");
+
+  begin();
+  degrees();
+
+  for (int i=1; i <= 4; ++i)
+    {
+      // draw von Koch curve at "depth" i
+      screen tmp(P(-1,-1), P(1,1));
+      activate(tmp);
+
+      if (i==1)
+        {
+          bold(Red());
+          fractal(cis(150), cis(30), i, koch_seed);
+          plain(Black());
+        }
+      else
+	fractal(cis(150), cis( 30), i, koch_seed);
+
+      fractal(cis( 30), cis(-90), i, koch_seed);
+      fractal(cis(-90), cis(150), i, koch_seed);
+
+      inset(tmp, P(i-1,0), P(i,1));
+      deactivate(tmp);
+    }
+  end();
+}
+

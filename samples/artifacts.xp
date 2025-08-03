@@ -1,0 +1,51 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double MAX(1);
+
+P F(double u, double v)
+{
+  return sph(1, u, v);
+}
+
+int main()
+{
+  picture(P(0,0),P(5,1), "5 x 1in");
+
+  begin();
+
+  pst_format();
+  domain coarse(P(0,0), P(0.5, 1), mesh(6,12), mesh(60,60));
+  domain fine(P(0,0), P(0.5, 1), mesh(15,30), mesh(60,60));
+
+  revolutions();
+  camera.at(P(5, 4, 3));
+
+  fill(White());
+
+  nofill(); // fill color set -> flat shading
+  screen scr1(P(-1,-1), P(1,1));
+  activate(scr1);
+  surface(F, coarse);
+
+  screen scr2(P(-1,-1), P(1,1));
+  activate(scr2);
+  surface(F, fine);
+
+  fill();
+  screen scr3(P(-1,-1), P(1,1));
+  activate(scr3);
+  surface(F, coarse);
+
+  screen scr4(P(-1,-1), P(1,1));
+  activate(scr4);
+  surface(F, fine);
+
+  inset(scr1, P(0,0), P(1,1));
+  inset(scr2, P(1.25,0), P(2.25,1));
+  inset(scr3, P(2.5,0), P(3.5,1));
+  inset(scr4, P(3.75,0), P(4.75,1));
+
+  end();
+}

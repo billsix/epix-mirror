@@ -1,0 +1,72 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// Style parameters
+const int MAX(1); // maximum coordinate
+
+domain R(P(-MAX,-MAX), P(MAX, MAX), (24, 24), mesh(72,72));
+
+const double sqrt3(sqrt(3));
+
+// function to be graphed
+P f(double x, double y)
+{
+  return P(x, y, 0.75*y*(y-sqrt3*x)*(y+sqrt3*x));
+}
+
+P color(double u, double v, double w)
+{
+  return P(-0.5*w, 0.25*w, 0.95*w);
+}
+
+int main()
+{
+  picture(P(-2*MAX,-2*MAX), P(2*MAX,2*MAX), "6 x 6in");
+
+  begin();
+
+  border(Green(0.6), "1pt");
+  backing(Black());
+
+  camera.at(sph(4*MAX, M_PI/6, M_PI/6));
+
+  // positioned for viewpt in first orthant
+  yellow();
+  grid(P(-MAX,-MAX,-MAX), P(MAX,MAX,-MAX), 4, 4);
+  grid(P(-MAX,-MAX,-MAX), P(MAX,-MAX,MAX), 4, 4);
+  grid(P(-MAX,-MAX,-MAX), P(-MAX,MAX,MAX), 4, 4);
+
+  axis Ax(P(-MAX,-MAX,MAX), P(MAX,-MAX,MAX), 4, P(0,6), t);
+  axis Ay(P(MAX,-MAX,-MAX), P(MAX,MAX,-MAX), 4, P(-2,-2), bl);
+  axis Az(P(MAX,-MAX,-MAX), P(MAX,-MAX,MAX), 4, P(-2,-2), bl);
+
+  Ax.frac().draw();
+  Ay.frac().draw();
+  Az.frac().draw();
+
+  clip_box(P(MAX,MAX,MAX));
+
+  // wire mesh surface
+  plain(Green());
+  plot(f, R);
+
+  // level bands
+  plain(Red());
+
+  for (int i=-5; i <=5; ++i)
+    {
+      clip_slice(P(0,0,0.2*i), P(0,0,1), 0.1);
+#ifdef FLATFILL
+      fill(RGB(0.25+0.1*i, 0, -0.1*i)); // index-dependent coloring
+      surface(f, R);
+#else
+      surface(f, R, color); // domain- or position-dependent coloring
+#endif
+      clip_restore(); // remove temporary slicing planes, keep clip box
+    }
+
+  pst_format();
+  end();
+}
+

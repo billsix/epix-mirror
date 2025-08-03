@@ -1,0 +1,35 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double f(double t) { return 2*t*(1-t)*(1-t); }
+double g(double t) { return 1/(1-t*t); }
+
+int main()
+{
+  picture(P(-2,-4), P(2,4), "200x200pt");
+
+  begin();
+
+  set_crop();
+  // Vertical asymptotes
+  dashed();
+  line(P(-1, ymin()), P(-1, ymax()));
+  line(P( 1, ymin()), P( 1, ymax()));
+  solid();
+
+  // Axes
+  h_axis(8);
+  v_axis(8);
+
+  h_axis_labels(4, P(-1, 2), tl); // align top-left
+  v_axis_labels(4, P(-1, 2), tl);
+
+  // Graphs
+  plot(f, xmin(), xmax(), 80);
+
+  bold();
+  plot(g, xmin(), xmax(), 80); // N.B. poles are sample points
+
+  end();
+}

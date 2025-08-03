@@ -1,0 +1,69 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double mult(1.0/sqrt(M_PI));
+
+double f(double x)
+{
+  return 0.4*exp(-mult*x*x);
+}
+
+double g(double x)
+{
+  return f(x-3);
+}
+
+double PAD_X(0.4), PAD_Y(0.01);
+
+int main() {
+  picture(P(-3-PAD_X, -PAD_Y), P(8+PAD_X, 0.4+PAD_Y), "5 x 3.5in");
+
+  begin();
+  border();
+
+  legend L;
+  L.border(0);
+
+  fill(Black(0.2));
+  shadeplot(g, 1.96, xmax(), 120);
+  L.fill_item("$P(|Z|>1.96, H_1) = 0.85$");
+
+  fill(Black(0.8));
+  shadeplot(f, xmin(), -1.96, 20);
+  shadeplot(f, 1.96, 4, 40);
+  L.fill_item("$P(|Z|>1.96, H_0) = 0.05$");
+
+  plot(f, xmin(), xmax(), 240);
+  plot(g, xmin(), xmax(), 240);
+
+  font_size("scriptsize");
+  L.draw(P(4,0.35), P(0,0), tr);
+
+  label(P(0, 0.15), P(0,2), "$H_0$: $\\mu_1=\\mu_2$", t);
+  label(P(2, 0.15), P(2,2), "$H_1$: $\\mu_1=\\mu_2+\\delta$", tr);
+
+  font_size("footnotesize");
+  axis Ax(P(-2, ymin()), P(8, ymin()), 5, P(0,-8), b);
+  Ax.align(b).draw();
+
+  label(P(2, ymin()), P(0,-18),
+	"$Z=\\displaystyle\\frac{\\mu_1-\\mu_2}{\\sigma/\\sqrt{\\pi}}$", b);
+
+  degrees();
+  label_angle(90);
+
+#ifdef OLD_GCC
+  axis Ay(P(-3.4, 0), P(xmin(), 0.4), 4, P(-8,0), l);
+#else
+  // may not compile under gcc <= 3.3
+  axis Ay(P(xmin(), 0), P(xmin(), 0.4), 4, P(-8,0), l);
+#endif
+
+  Ay.align(l).draw();
+
+  label(P(xmin(), 0.2), P(-18,0), "Density", l);
+
+  pst_format();
+  end();
+}

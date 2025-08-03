@@ -1,0 +1,70 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// ODE parameters
+const double A1(10);
+const double A2(28);
+const double A3(2.6666);
+
+// parameter box
+const double MAX(30);
+
+// bounding box (set in screens)
+const double XMAX(50);
+
+// flow time
+const double TMAX(2000);
+
+P F(double x, double y, double z)
+{
+  return 0.01*P(A1*(y-x), x*(A2-z)-y, x*y-A3*z);
+}
+
+domain R(P(-MAX,-MAX,0), P(MAX,MAX,2*MAX), mesh(6, 6, 6));
+
+void draw_frame()
+{
+  dart_field(F, R.resize1(0,MAX), 0.5);
+
+  bold(Red());
+  ode_plot(F, P(10,0,0), 0, TMAX, TMAX);
+
+  pen(Blue());
+  // nearby start points, but trajectories not close
+  ode_plot(F, P(10.5,0,0), 0, TMAX, TMAX);
+
+  plain(Black());
+  dart_field(F, R.resize1(-MAX,0), 0.5);
+}
+
+// initialize the camera
+void init_cam(const P& arg)
+{
+  camera.at(arg);
+  camera.look_at(P(0,0,MAX));
+  camera.range(500);
+}
+
+int main()
+{
+  picture(P(-1,0), P(1,1), "6x3in");
+
+  begin();
+
+  screen  left_eye(P(-XMAX,-XMAX), P(XMAX,XMAX));
+  activate(left_eye);
+  init_cam(P(-100, 90, 63));
+  draw_frame();
+
+  screen right_eye(P(-XMAX,-XMAX), P(XMAX,XMAX));
+  activate(right_eye);
+  init_cam(P(-100, 80, 63));
+  draw_frame();
+
+  // page layout
+  inset(left_eye, P(0,0), P(1,1));
+  inset(right_eye, P(-1,0), P(0,1));
+
+  end();
+}

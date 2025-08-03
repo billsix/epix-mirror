@@ -1,0 +1,56 @@
+%% Generated from scaling.xp on Sat Sep  1 14:17:35 EDT 2007 by
+%% ePiX-1.1.15
+%% 
+%%   Cartesian bounding box: [0,4] x [0,1]
+%%   Actual size: 4 x 0.75in
+%%   Figure offset: left by 0in, down by 0in
+%% 
+%% usepackages epic,eepic,xcolor
+%% 
+\xdefinecolor{rgb_000000}{rgb}{0,0,0}%
+\setlength{\unitlength}{1in}%
+\begin{picture}(4,0.75)(0,0)%
+\path(1.75,0.375)(2.75,0.375)
+\path(2.63584,0.359433)(2.66438,0.359433)
+\path(2.63584,0.364622)(2.69292,0.364622)
+\path(2.63584,0.369811)(2.72146,0.369811)
+\path(2.63584,0.375)(2.75,0.375)
+\path(2.63584,0.380189)(2.72146,0.380189)
+\path(2.63584,0.385378)(2.69292,0.385378)
+\path(2.63584,0.390567)(2.66438,0.390567)
+\path(2.74456,0.374012)(2.74456,0.375988)
+\path(2.73913,0.373023)(2.73913,0.376977)
+\path(2.73369,0.372035)(2.73369,0.377965)
+\path(2.72826,0.371047)(2.72826,0.378953)
+\path(2.72282,0.370058)(2.72282,0.379942)
+\path(2.71738,0.36907)(2.71738,0.38093)
+\path(2.71195,0.368081)(2.71195,0.381919)
+\path(2.70651,0.367093)(2.70651,0.382907)
+\path(2.70108,0.366105)(2.70108,0.383895)
+\path(2.69564,0.365116)(2.69564,0.384884)
+\path(2.6902,0.364128)(2.6902,0.385872)
+\path(2.68477,0.36314)(2.68477,0.38686)
+\path(2.67933,0.362151)(2.67933,0.387849)
+\path(2.6739,0.361163)(2.6739,0.388837)
+\path(2.66846,0.360175)(2.66846,0.389825)
+\path(2.66302,0.359186)(2.66302,0.390814)
+\path(2.65759,0.358198)(2.65759,0.391802)
+\path(2.65215,0.35721)(2.65215,0.39279)
+\path(2.64672,0.356221)(2.64672,0.393779)
+\path(2.64128,0.355233)(2.64128,0.394767)
+\path(2.63584,0.354244)(2.63584,0.395756)
+\path(2.63584,0.375)(2.63584,0.354244)(2.75,0.375)
+  (2.63584,0.395756)(2.63584,0.375)
+\put(0.027674,0.121424){\makebox(0,0)[bl]{\hbox{\color{rgb_000000}\scriptsize \hbox{\color{rgb_000000}\scriptsize $(x_\mathrm{min},y_\mathrm{min})$}}}}
+\put(0,0.09375){\makebox(0,0){\hbox{\color{rgb_000000}\scriptsize $\circle{0.0069185}\circle{0.013837}\circle{0.0207555}\circle{0.027674}$}}}
+\put(1.47233,0.722326){\makebox(0,0)[tr]{\hbox{\color{rgb_000000}\scriptsize \hbox{\color{rgb_000000}\scriptsize $(x_\mathrm{max},y_\mathrm{max})$}}}}
+\put(1.5,0.75){\makebox(0,0){\hbox{\color{rgb_000000}\scriptsize $\circle{0.0069185}\circle{0.013837}\circle{0.0207555}\circle{0.027674}$}}}
+\put(0.75,0.038402){\makebox(0,0)[t]{\hbox{\color{rgb_000000}\scriptsize \hbox{\color{rgb_000000}\scriptsize Canvas (virtual)}}}}
+\path(1.5,0.09375)(1.5,0.75)(0,0.75)(0,0.09375)(1.5,0.09375)
+\put(3.02767,0.121424){\makebox(0,0)[bl]{\hbox{\color{rgb_000000}\scriptsize \hbox{\color{rgb_000000}\scriptsize $(0,0)$}}}}
+\put(3,0.09375){\makebox(0,0){\hbox{\color{rgb_000000}\scriptsize $\circle{0.0069185}\circle{0.013837}\circle{0.0207555}\circle{0.027674}$}}}
+\put(3.97233,0.628576){\makebox(0,0)[tr]{\hbox{\color{rgb_000000}\scriptsize \hbox{\color{rgb_000000}\scriptsize $(h_\mathrm{size}, v_\mathrm{size})$}}}}
+\put(4,0.65625){\makebox(0,0){\hbox{\color{rgb_000000}\scriptsize $\circle{0.0069185}\circle{0.013837}\circle{0.0207555}\circle{0.027674}$}}}
+\put(3.5,0.038402){\makebox(0,0)[t]{\hbox{\color{rgb_000000}\scriptsize \hbox{\color{rgb_000000}\scriptsize Page (actual)}}}}
+\path(4,0.09375)(4,0.65625)(3,0.65625)(3,0.09375)(4,0.09375)
+\end{picture}%

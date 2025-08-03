@@ -1,0 +1,261 @@
+ePiX -- samples/README
+
+Last Change: October 23, 2007
+
+This directory contains sample files. Files with extension ".flx" may
+be compiled like xp files with epix or elaps, or converted to gif or
+mng animations with flix.
+
+
+artifacts.xp
+  Interaction between coarse and fine meshes in shade surface plotting.
+
+binom.cc:
+  Generates pseudo-random data for histogram.xp
+
+bowl.xp:
+  Quasi-realistic colored surface shading.
+
+butterfly.xp:
+  A Thom catastrophe graph.
+
+calculus.xp:
+  Plotting derivatives and definite integrals.
+
+clipping.xp:
+  Clipping, shaded surfaces, and fake transparency.
+
+color_sep.xp:
+  Color separation.
+
+conic.xp:
+  Envelopes and tangent lines; projective equivalence of a parabola
+  with a circle.
+
+contour.xp:
+  Building a path from sub-paths.
+
+coord_tricks.xp:
+  Using page layout to achieve broken axes.
+
+cropplot.xp
+  Graphing functions with singularities.
+
+cube.flx:
+  Stereoscopic (3-D glasses) movie of a rotating cube.
+
+dataplot.xp:
+  Scatter plots, histograms, and page layout.
+
+decorate.xp:
+  Decorated shaded surface (see file for compiling).
+
+demoivre.xp:
+  Loops; a geometric proof of deMoivre's formula.
+
+densityplot.xp:
+  A gray-shaded interference pattern.
+
+dipole.xp:
+  Plotting flow lines and isobars.
+
+denom.xp:
+  Loops and gcd; Thomae's function with discontinuity set Q.
+
+extract.xp:
+  A magnified inset using screen::extract; an unexpected tangent line.
+
+geomsum.xp:
+  Loops and color filling.
+
+golden_rect.xp:
+  Simple use of variables; constructing a golden rectangle.
+
+helicoid.flx:
+  Isometric deformation of a catenoid to a helicoid.
+
+hello.xp:
+  My First Figure, from the manual.
+
+histogram.xp:
+  Histograms of simulated coin tosses (data from binom.cc).
+
+house.flx:
+  Color semantics; sun setting on a simple house.
+
+hyperboloid.xp:
+  Clipping, shaded surfaces; two families of rulings on a hyperboloid.
+
+inverse.xp:
+  Screen affine operations; inverse functions.
+
+koch.xp:
+  The von Koch snowflake fractal.
+
+label_debug.xp:
+  Format debugging tests for labels, draws 32 attribute combinations.
+
+layout2.xp:
+  Page layout; flow lines of a planar vector field.
+  
+layout.xp:
+  Page layout; six views of the square root Riemann surface.
+
+legend.xp:
+  Axes and legends; Taylor polynomials of sin x.
+
+levelset.xp:
+  Clipping and plotting; manual level curves on a saddle.
+
+levelset2.xp:
+  "Advanced" clipping; level bands on a monkey saddle.
+
+levelset3.xp:
+  Clipping and legends; flat-shaded level bands wth matching legend.
+
+lissajous.xp:
+  A Lissajous figure with arrows.
+
+lighting.h: Classes for lighting effects and color-shaded surfaces.
+  (lighting.flx illustrates use.)
+
+line_debug.xp:
+  Format debugging tests for paths, draws 32 attribute combinations.
+
+log.xp:
+  Object hiding with paths and surfaces; the Riemann surface of log.
+
+lorenz.xp:
+  Page layout, ode_plot; the Lorenz attractor and its 3-D vector field.
+
+medians.xp:
+  Euclidean geometry; medians and altitudes of a triangle.
+
+minkowski.xp:
+  A longitudinal slice of Minkowski space R^{2,1}.
+
+mirrorball.flx:
+  The circle class and intersections; 3-D stereographic movie.
+
+newton.xp:
+  Loops; root location by Newton's method.
+
+objects.xp:
+  Simple geometric objects; 2-D landscape.
+
+oscillator.xp:
+  Graphing, user-defined elements, and page layout.
+
+parabola.xp:
+  A basic plot.
+
+pascal.xp:
+  Intersection operators; Pascal's theorem in projective geometry.
+
+pendulum.flx:
+  Phase diagram of an undamped pendulum.
+
+planes.xp:
+  Manipulating objects, clipping; a stack of plane sections of a cube.
+
+plotting2.xp:
+  Surface plotting in PSTricks; from the manual.
+
+plotting3.xp:
+  Loops and color control; from the manual.
+
+plotting.xp:
+  A basic plot; from the manual.
+
+polar.xp:
+  Polar plotting.
+
+pole.xp:
+  Clipping a plot; the real part of a first-order pole.
+
+polyhedra.xp:
+  Spherical regular polyhedra. Compilation controlled with
+  pre-processor flags, e.g., "epix -DCOLOR -DDODECA polyhedra.xp".
+
+R_demo.xp:
+  Gaussians from the R demo.
+
+riemann.flx:
+  Rotating the Riemann surface of sqrt(z) in R^4.
+
+S2_harmonics.xp:
+  Domain-dependent surface shading (color function depends on two
+  variables), page layout; the spherical harmonic Y_3^0. (Compile with
+  "epix -DY20 S2_harmonics.xp" for Y_2^0.)
+
+saddle.xp:
+  A quadratic saddle using "surface" capabilities.
+
+semicirc.xp:
+  A simple figure using variables and a function for organization.
+
+shadeplot.xp:
+  Shading regions enclosed by graphs; the fundamental theorem of calculus.
+
+slopefield.xp:
+  A slope field and flow lines.
+
+sphere.xp:
+  Plotting curves and latitudes/longitudes; loxodromes.
+
+spherical.xp:
+  Scenery (multiple shaded surfaces); spherical coordinates.
+
+sqrt.xp:
+  Domains and selective plotting; the Riemann surface of sqrt(z).
+
+sqrt2.xp:
+  Domains, selective plotting, and change of style in a single plot.
+
+std_F.cc, std_F.h:
+  Extensively-commented library code for depicting 2-D affine maps.
+
+std_F.xp:
+  Sample file illustrating the use of external libraries. Contains
+  instructions on building a library from std_F.cc.
+
+steiner.flx:
+  Steiner's Roman surface, rotating.
+
+steiner2.flx:
+  Steiner's Roman surface sliced, with slice direction rotating.
+
+stereo_proj.flx:
+  The image of a rotating half-sphere under stereographic projection.
+
+surface_shade.xp:
+  Position-dependent surface shading. (Color function depends on three
+  variables.)
+
+symmetries.xp:
+  Affine maps and layout; the symmetry group S_3 acting on a regular
+  hexagon.
+
+tori.xp:
+  Clipping and cropping, page layout.
+
+torus.xp:
+  Domains and selective plotting.
+
+trig.flx:
+  Trigonometric functions.
+
+twisted_cubic.xp:
+  Page layout; a crossed-eyes stereogram of the twisted cubic.
+
+uppersum.xp:
+  Riemann sums.
+
+vfield.xp:
+  3-D vector field plotting.
+
+weierstrass.xp:
+  Loops; a Weierstrass nowhere-differentiable function.
+
+wheel.xp:
+  Page layout; a cycloid at successive times.

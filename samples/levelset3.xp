@@ -1,0 +1,89 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// Style parameters
+const int MESH(12); // number of coordinate grid squares
+const int MAX(3); // maximum coordinate
+
+// camera location (in spherical coordinates); must be in first orthant
+const P VIEWPT(sph(4*MAX, M_PI/6, M_PI/6));
+
+const double sqrt3(sqrt(3));
+
+// function to be graphed
+P f(double x, double y)
+{
+  //  return P(x, y, 0.75*y*(y-sqrt3*x)*(y+sqrt3*x));
+  return P(x,y, 0.9*MAX*exp(-0.5*(x*x+y*y))*x*y);
+  //  return P(x, y, 0.25*(x-y*y)*(x-3*y*y));
+}
+
+P color(double u, double v, double w)
+{
+  return P(-0.5*w, 0.25*w, 0.5*w);
+}
+
+Color Bk(Green(0.7));
+
+int main()
+{
+  // picture(P(-2*MAX,-2*MAX), P(2*MAX,2*MAX), "6 x 6in");
+  picture(P(-MAX,-MAX), P(MAX,MAX), "6 x 6in");
+
+  begin();
+  backing(Bk);
+
+  camera.at(0,-10,4);
+
+  border(Green(0.6), "1pt");
+
+  clip_box(P(MAX,MAX,MAX));
+
+  domain R(P(-MAX,-MAX), P(MAX, MAX), (6*MESH, 6*MESH), mesh(6*MESH, 6*MESH));
+
+  legend L1, L2, L3;
+  L1.backing(Bk);
+  L2.backing(Bk);
+  L3.backing(Bk);
+
+  //  pen(RGB(1, 0.8, 0.2), 0.1);
+  for (int i=-10; i <=10; ++i)
+    {
+      clip_slice(P(0,0,0.1*i), P(0,0,1), 0.1);
+      // fill(RGB(0.25+0.1*i, 0, -0.1*i));
+      rgb(0.25+0.1*i, 0, -0.1*i);
+
+      std::stringstream buf;
+      buf << "$" << 0.1*i - 0.05
+	  << "\\leq z \\leq " << 0.1*i + 0.05 << "$";
+
+      if (i <-3)
+	L1.fill_item(buf.str());
+
+      else if(i<4)
+	L2.fill_item(buf.str());
+
+      else
+	L3.fill_item(buf.str());
+
+      nofill();
+      surface(f, R);
+      clip_restore();
+    }
+
+  camera.at(0,0,1000);
+  font_size("scriptsize");
+  label_color(Black());
+  L1.border(0);
+  L2.border(0);
+  L3.border(0);
+
+  L1.draw(canvas().bl(), P(2,2), tr);
+  L2.draw(canvas().bl()+P(2,0), P(2,2), tr);
+  L3.draw(canvas().bl()+P(4,0), P(2,2), tr);
+
+  pst_format();
+  end();
+}
+

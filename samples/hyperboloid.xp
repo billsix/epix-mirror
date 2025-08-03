@@ -1,0 +1,63 @@
+/* -*-ePiX-*- */
+// A circular hyperboloid of one sheet and its two families of rulings
+#include "epix.h"
+using namespace ePiX;
+
+const int NUM_LINES(64);
+const double dt(1.0/NUM_LINES);
+
+int main()
+{
+  picture(P(-3, -3), P(3, 3), "6x6in");
+
+  begin();
+  revolutions();
+
+  cam().at(20, 0, 5);
+
+  clip_box(P(4, 4, 2));
+
+  fill(Black(0.8));
+
+  // hyperboloid
+  surface_rev(sinh, cosh, domain(P(-2,0), P(2,1), mesh(24,36)),
+	      frame(E_3, E_2, E_1));
+
+  // clip to {x>0}
+  clip_box(P(0, -4, -2), P(4, 4, 2));
+
+  // rulings
+  for (int i=-0.5*NUM_LINES; i <= 0.5*NUM_LINES; ++i)
+    {
+      const double t(i*dt);
+      rgb(0,0.5,1);
+      Line(P(Cos(t), Sin(t), 0),  P(Cos(t) + Sin(t), Sin(t) - Cos(t), 1));
+
+      red();
+      Line(P(Cos(t), Sin(t), 0),  P(Cos(t) - Sin(t), Sin(t) + Cos(t), 1));
+    }
+
+  // emphatic rulings
+  bbold(RGB(0.1,0.6,0.9));
+  Line(P(1,0,0), P(1,-1,1));
+
+  pen(Red(1.2));
+  Line(P(1,0,0), P(1,1,1));
+  Line(P(0,1,0), P(-1,1,1));
+
+  clip_box();
+  //  font_size("footnotesize");
+  black();
+  label(P(1,0,0)-P(0,-2,2), P(2,-2), "$\\ell_0^-$", br);
+  label(P(1,0,0)+P(0, 2,2), P(18,2), "$\\ell_0^+$", t);
+  label(P(0,1,0)-P(-2,0,2), P(0,-4), "$\\ell_{\\pi/2}^+$",b);
+
+  label(P(0,0,-3), P(0,-24), 
+	"$\\ell_\\theta^-(t)=(\\cos\\theta, \\sin\\theta, 0) + t(\\sin\\theta, -\\cos\\theta, 1)$", b);
+
+  label(P(0,0,-3), P(0,-12), 
+	"$\\ell_\\theta^+(t)=(\\cos\\theta, \\sin\\theta, 0) + t(-\\sin\\theta, \\cos\\theta, 1)$", b);
+
+  pst_format();
+  end();
+}

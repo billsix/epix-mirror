@@ -1,0 +1,24 @@
+ePiX-1.2 -- BUGS
+
+Last Change: September 19, 2007
+
+This file lists known idiosyncrasies ("features, not bugs") whose
+behavior may be unexpected. Some are too minor and/or messy to fix,
+some are outside the author's control.
+
+* The build-time script elaps-local calls epix, not epix-local.
+
+* Polygons are not shaded with simulated ambient light. The "fill"
+  attribute controls whether or not to color fill.
+
+* Surface mesh elements are always color-filled. The fill attribute
+  controls whether to use cos^2 (on) or flat (off) shading.
+
+* Dot-like markers may be slightly larger in tikz than in pst/eepic.
+
+* Line underlayer widths may be larger in pst than in eepic/tikz.
+
+* Line caps are round in eepic, square (butt) in pst/tikz.
+
+* Affine maps have no effect on label alignment, only on the offset.
+  (N.B. Non-invertible affine maps may cause NaN label positions.)

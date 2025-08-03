@@ -1,0 +1,5053 @@
+%% Version 1.2.17
+\documentclass[12pt,letterpaper]{book}
+\usepackage{amsmath,amssymb,epic,eepic,pstricks,xcolor,comment}
+\usepackage[body={6in,8.5in}]{geometry}
+%\usepackage{makeidx}
+\usepackage{index}
+%\newindex{xfcns}{fdx}{fnd}{Index of Functions}
+\makeindex
+
+\usepackage{ifpdf}
+
+\usepackage[
+  \ifpdf pdftex, \else dvips, \fi
+  hyperfootnotes=false,
+  pdftitle={ePiX Tutorial and Reference Manual},
+  pdfauthor={Andrew D. Hwang},
+  pdfkeywords={LaTeX, Mathematical Figures, Plotting},
+  pdfstartview=FitH,
+  bookmarks=true,
+  colorlinks=true,
+  linkcolor=black]{hyperref}
+
+\setlength{\emergencystretch}{1.25em}
+\renewcommand{\thefigure}{\arabic{chapter}.\arabic{figure}}
+
+\newcommand{\code}[1]{\texttt{#1}}
+\newcommand{\filename}[1]{\texttt{#1}}
+\newcommand{\Key}[1]{\texttt{#1}}
+\newcommand{\URL}[1]{\texttt{#1}}
+
+%% \setlength{\topmargin}{0.5in}
+\newcommand{\ePiX}{\code{ePiX}}
+\newcommand{\ext}{\code{ePiX\_ext}}
+\newcommand{\epix}{\code{epix}}
+\newcommand{\eepic}{\code{eepic}}
+\newcommand{\C}{\code{C}}
+\newcommand{\CXX}{\code{C++}}
+\newcommand{\pyepix}{\code{Pyepix}}
+
+\DeclareMathOperator{\clip}{clip}
+
+\newcommand{\Header}[1]{\smallskip\noindent\texttt{#1}\quad}%
+
+%% Substitution commands easily removable by sed for texinfo:
+%% Remove recalcitrant chunks,
+\newcommand{\texicomment}{}
+\newcommand{\texicommentend}{}
+
+%% mark simple math,
+\newcommand{\teximath}[1]{$#1$}
+%% make function index entries,
+%\newcommand{\findex}[1]{\index[xfcns]{#1}}
+\newcommand{\findex}[1]{\ignorespaces}
+
+%% top-level division (first argument for texinfo node name)
+\newcommand{\texinfochapter}[2]{\chapter{#2}}
+\newcommand{\texinfoappendix}[2]{\chapter{#2}}
+%%\renewcommand{\subsection*}[1]{\subsection{#1}}
+
+\title{ \ePiX\ Tutorial and  \\ Reference Manual}
+\author{Andrew D. Hwang \\ 
+  Department\ of Math and CS \\ 
+  College of the Holy Cross}
+\date{Version 1.2.17, July, 2017}
+
+\begin{document}
+
+\maketitle
+
+\tableofcontents
+
+\texinfochapter{1}{Introduction}
+
+\ePiX, a collection of batch utilities, creates mathematically
+accurate figures, plots, and animations containing \LaTeX\ typography.
+The input syntax is easy to learn, and the user interface resembles
+that of \LaTeX\ itself: You prepare a scene description in a text
+editor, then ``compile'' the input file into a picture. \LaTeX- and
+web-compatible output types include a \LaTeX\ picture-like environment
+written with \code{PSTricks}, \code{tikz}, or \code{eepic} macros;
+vector images (\code{eps}, \code{ps}, and~\code{pdf}); and bitmapped
+images and movies (\code{png}, \code{mng}, and~\code{gif}).
+
+\ePiX's strengths include:
+ 
+\begin{itemize}
+\item Quality of output: \ePiX\ creates accurate, publication-quality
+  figures whose appearance matches that of \LaTeX.  Typography may be
+  put in a figure as easily as in an ordinary \LaTeX\ document.
+  
+\item Ease of use: Figure objects and their attributes are specified
+  by simple, descriptive commands.
+  
+\item Flexibility: Objects are described by attributes and Cartesian
+  location; as in \LaTeX, printed appearance is determined when the
+  figure is compiled. A well-designed figure can be altered
+  dramatically, yet precisely, with command-line switches or minor
+  changes to the input file.
+  
+\item Power and extendibility: \ePiX\ inherits the power of \CXX\ as a
+  programming language; variables, data structures, loops, and
+  recursion can be used to draw complicated plots and figures with
+  just a few lines of input. External code can be incorporated in a
+  figure with a command line option or by using a Makefile.
+  
+\item Economy of storage and transmission: For a document containing
+  many figures, a compressed tar file of the \LaTeX\ sources and
+  \ePiX\ files is typically a few percent the size of the compressed
+  PostScript file.
+  
+\item License: \ePiX\ is \emph{free software}.
+  \index{Free software}
+  You are granted the right to use the program for whatever purpose,
+  and to inspect, modify, and re-distribute the source code, so long
+  as you do not restrict the rights of others to do the same. In
+  short, the license is similar to the terms under which theorems are
+  published.
+
+\end{itemize}
+
+
+\ePiX\ facilitates logical structuring of mathematical figures, as
+opposed to visual structuring (or WYSIWYG), analogous to the
+relationship between \LaTeX\ and a word processor. Stylistic
+defaults streamline the creation of simple figures, but there are few
+internal restrictions on the contents or appearance of a figure;
+aesthetic and practical decisions are left to you.
+
+If you are a:
+
+\begin{itemize}
+
+\item Potential user, you may wish to skip immediately to ``Software
+  Dependencies'' before investing additional time.
+
+\item New user, proceed from here until you have enough understanding
+  to run the software, then experiment with the samples files while
+  reading Chapter~\ref{chapter-started}, or return to the manual as
+  needed.
+
+\item More advanced user, browse at will, probably starting with
+  Chapter~\ref{chapter-ref-man}.
+
+\end{itemize}
+
+This manual is relatively conversational, and occasionally redundant,
+especially between portions meant for readers at different levels of
+familiarity. Throughout, you are assumed to be familiar with \LaTeX\
+and basic linear algebra: the description of points, vectors, lines,
+and planes in three-dimensional space. Other material, such as \CXX\
+syntax, is introduced as needed.
+
+
+\section{Software Dependencies}
+\label{section-software_deps}
+
+\index{Installation|(}
+\index{Mac OS X}
+
+If you run GNU/Linux, a BSD, or Solaris, you probably have (and can
+surely install) all the external software needed to use \ePiX.  On Mac
+OS~X, you will need the Apple developer tools and an X~server (such as
+XQuartz), and the free~\code{fink} package manager to build a GNU
+environment.  For Windows, you'll need to install Cygwin and several
+packages. Detailed instructions are given below.
+
+``Under the hood'', an input file is successively converted to a
+\LaTeX\ picture; \code{dvi}; PostScript, \code{pdf}~or \code{eps}; and
+if desired, to a bitmapped image or movie.  Four shell
+scripts---\epix, \code{laps}, \code{elaps}, and~\code{flix}---automate
+the various file format conversions.
+
+\ePiX\ consists of a \CXX\ library, header, and shell scripts, and
+requires GNU \code{bash} and a compiler \emph{for normal use}.  For
+complete functionality, you need \code{g++} (Version~3.2 or later),
+\code{bash}, a text editor (\ePiX\ works particularly well with
+\code{emacs}), a \LaTeX\ distribution, \code{Ghostscript}, \code{gv}
+(or your favorite PS/PDF previewer), and \code{GraphicsMagick}. GNU
+\code{grep} and \code{sed} are good to have.  You may need additional
+``developer packages'' (\code{binutils}, \code{make}) in order to
+build \ePiX.  The more up to date your software is, the better your
+experience is likely to be, but bleeding edge versions are not
+necessary, or even always desirable.
+
+Aside from their reliance on specific programs, \ePiX's shell scripts
+are written using Unix-style pathnames. Thus, the most straightforward
+way to use \ePiX\ is to install a GNU environment.
+
+Jay Belanger's \code{emacs} mode allows you to write, compile, and
+view \ePiX\ figures without leaving \code{emacs}. If you use another
+editor, you'll want to create template source files so you don't have
+to type boilerplate code each time you write a new figure.
+\index{Emacs@\code{emacs}}
+
+
+\subsection{Setting up an Environment Under  Windows}
+
+\index{Windows operating system|(}
+\begin{comment}
+Version~1.0.4 of \ePiX\ has been implemented in Python~2.2 by Andrew
+Sterian, making \ePiX\ available on any platform that supports Python,
+and without requiring a \CXX~compiler or~\code{bash}.  Python is a
+GPL-ed scripting language, and is available with a Windows installer
+and detailed instructions.  The easiest alternative for Windows users
+is probably to install Python~2.2 or later (if necessary) and
+\code{Pyepix}. The \code{pyepix} project home page is:
+\URL{claymore.engineer.gvsu.edu/~steriana/Python/index.html}
+\end{comment}
+
+Cygwin can be used to run \ePiX\ under Windows. Download
+\filename{setup.exe} from \URL{www.cygwin.com}, then install the
+packages you need. The following are recommended, and sufficient for
+the actions described in this manual.
+\begin{verbatim}
+(Archive)    bzip2, tar
+(Devel)      binutils, coreutils, gcc, gcc-g++, make, sed
+(Editors)    emacs, emacs-X11, vim
+(Graphics)   GraphicsMagick, ghostscript-base, ghostscript-x11, gv
+(Publishing) tetex (all)
+(Shells)     bash, bash-completion
+(X11)        X-start-menu-icons, X-startup-scripts,
+             XFree86-lib-compat, xorg-x11-fscl, xorg-x11-fsrv
+\end{verbatim}
+\index{Windows operating system|)}
+
+
+\section{Installation}
+
+\ePiX\ is distributed over the World-Wide Web as source code. Packages
+may be found at \URL{mathcs.holycross.edu/\~{}ahwang/epix/ePiX.html}
+The latest stable release is also on the CTAN mirrors, in the
+\code{graphics} directory.  (Some users of Red Hat have reported file
+permission problems when unpacking the CTAN tarballs. If you encounter
+this difficulty, please try downloading the sources from the project
+main page.)  Unpack the compressed tar file with the appropriate
+command:
+\begin{verbatim}
+  tar -zxvf epix-x.y.z.tar.gz
+  tar -jxvf epix-x.y.z.tar.bz2
+\end{verbatim}
+(\code{x.y.z}~is the version number) or, if your \code{tar}
+doesn't do decompression,
+\begin{verbatim}
+  gunzip -c epix-x.y.z.tar.gz | tar -xvf -
+  bzcat epix-x.y.z.tar.bz2 | tar -xvf -
+\end{verbatim}
+\code{cd} to the source directory, \filename{epix-x.y.z}.  The
+\filename{INSTALL} file contains detailed installation instructions.
+If you're impatient, the short of it is \code{./configure [--options];
+  make; make install}.  Run \code{./configure --help} for a list of
+options.
+
+By default, \ePiX\ installs in subdirectories of
+\filename{/usr/local}; if you want to install elsewhere, supply
+\code{./configure} with the appropriate \code{--prefix}. You may also
+want to consult \filename{POST-INSTALL} for information on setting
+your \code{PATH} variable so your shell can find \ePiX.  The manual
+and sample files are in \filename{/usr/local/share/doc/epix}.
+\index{Installation|)}
+
+
+\subsection{Development}
+
+There are two mailing lists, one for user questions, one for
+development discussion. Please visit
+\URL{savannah.nongnu.org/mail/?group=epix} to subscribe.
+
+
+\texinfochapter{2}{Getting Started}
+\label{chapter-started}
+
+This chapter describes the basics of creating figures in \ePiX\ for
+readers familiar with \LaTeX\ but completely new to~\CXX. No detailed
+knowledge of~\CXX\ is needed to use \ePiX, only a bit of grammar that
+is easily absorbed by example.
+
+Section~\ref{section-running} describes the commands (shell scripts)
+comprising \ePiX, and explains how to set up a graphical environment
+using standard *nix programs. Section~\ref{section-overview} briefly
+describes figure creation. Section~\ref{section-tutorial} presents a
+few files side-by-side with their output, and should be read at a
+computer so you can run the exercises.
+
+
+\section{Running \ePiX}
+\label{section-running}
+
+An ``input file'' is a human-written figure specification containing
+\ePiX\ commands; an ``output file'' is either a \LaTeX\ picture-like
+environment or a stand-alone vector graphic.  Conversion
+(``compiling'' a figure) is accomplished with four shell scripts,
+\code{laps}, \code{epix}, \code{elaps}, and \code{flix}.  Each script
+has a preferred extension for its input files, and is invoked with a
+command of the form
+\begin{verbatim}
+  <script> [options] <input file(s)>
+\end{verbatim}
+Often, no options are necessary.  \code{<script> --help}
+describes \code{<script>}'s options.
+\texicomment
+Figure~\ref{fig-programs} (page~\pageref{fig-programs}) diagrams the
+shell scripts and the file types they process.
+\texicommentend
+
+By default, output file names are constructed by replacing the input
+extension with the (preferred) output extension. For brevity,
+extensions may be omitted. If the script has doubts about your intent,
+it proceeds with default behavior and prints a warning message.
+
+The author is a great fan of \Key{TAB} completion, under which a
+shell, based on what has been typed so far, automatically fills in a
+command when the \Key{TAB} key is pressed.  \ePiX\ comes with code
+snippets that complete intelligently when the first part of a command
+is one of the shell scripts. For example, if command completion is
+active, typing \code{epix} \Key{TAB} prints only names of \code{epix}
+input files. To use this feature, you must install Ian MacDonald's
+\code{bash completion} package. The \filename{INSTALL} and
+\filename{POST\_INSTALL} files contain details.
+
+
+\subsection*{Shell Scripts}
+
+\subsubsection*{\code{laps}}
+
+\code{laps} performs \LaTeX\ to PostScript/PDF conversion, and is
+independent of the rest of \ePiX. By default, \code{laps} invokes
+\LaTeX~and \code{dvips}. The option \code{--pdf} creates a PDF~file by
+post-processing the PostScript with~\code{ps2pdf}.  Other \TeX-family
+processors (\code{pslatex}, \code{pdftex}, etc.) may be used instead
+of~\LaTeX\ by invoking \code{laps} with an appropriate option.
+
+
+\subsubsection*{\code{epix}}
+
+\code{epix} compiles an input file into a \LaTeX\ picture.  The input
+file should have extension \filename{xp} (for eXtended Picture).  Jay
+Belanger's \code{emacs} mode is Highly Recommended; the installation
+procedure can be found in the \filename{POST\_INSTALL} file. When this
+mode is active, \code{emacs} automatically inserts a preamble template
+when a new \filename{xp} file is created. In addition, you can peruse
+\ePiX's info file, or format, compile, and preview files, all from
+within \code{emacs}.
+\index{Emacs@\code{emacs}}
+
+Output files from the script \code{epix} have extension
+\filename{eepic}, after Conrad Kwok's enhancements to the \LaTeX\
+picture environment. In Version~1.2, however, an output file may
+contain \code{PSTricks} or \code{tikz} macros instead of \code{eepic}
+macros.  A command such as \verb+\input{myfile.eepic}+ incorporates an
+output file into a \LaTeX\ document. The preamble must contain
+\code{usepackage} lines appropriate to the output format.
+\texicomment
+\begin{center}
+  \begin{tabular}{cc}
+    Format & Required Package(s) \\
+    \hline
+    \code{eepic} & \code{epic,eepic,xcolor,rotating} \\
+    \code{pst}   & \code{pstricks,rotating} \\
+    \code{tikz}  & \code{tikz,rotating}
+  \end{tabular}
+\end{center}
+\texicommentend
+
+
+\subsubsection*{\code{elaps}}
+
+\code{elaps} creates stand-alone vector images (\filename{eps}~or
+\filename{pdf}) from \code{epix} input files or \filename{eepic}
+figures, even those not produced with \code{epix}.  \code{elaps}
+automatically loads the \LaTeX\ packages needed for features described
+in this manual. Additional \LaTeX\ packages and \code{dvips} options
+may be specified on the command line.  An \code{elaps} output file is
+placed in a \LaTeX\ document with an \verb+\includegraphics+ command;
+the preamble must contain \verb+\usepackage{graphicx}+ [sic].
+
+
+\subsubsection*{\code{flix}}
+
+\code{flix} creates bitmapped images and movies,
+Section~\ref{section-animation}. Input files should have extension
+\filename{flx}, and must contain a valid \code{epix} header as well as
+additional code. Jay Belanger's \code{emacs} mode facilitates creation
+of \code{flix} files.
+
+
+\section{The Drawing Model}
+\label{section-overview}
+
+To draw a figure manually, you select a sheet of paper of appropriate
+size and add paths, markers, and labels. These scene elements have
+attributes (line color, line width, fill color, font size, etc.)\
+affecting their appearance. 
+
+\index{canvas}%
+\ePiX's drawing model behaves similarly.  A \code{picture} command
+sets the \emph{canvas} (or logical drawing area, a Cartesian
+rectangle) and the true size of the final figure. A \code{begin}
+command initializes the ``virtual paper'' for drawing. Subsequent
+\emph{drawing commands} add objects to the scene: lines, curves,
+function plots, labels, and the like. The printed appearance of scene
+elements is determined by the current ``attribute state'' and
+controlled by \emph{style declaration} which remain in effect until
+superseded. Finally, an \code{end} command closes the figure and
+prints it to the output file.
+
+In this manual, command descriptions follow a few
+conventions. Optional arguments are enclosed in square brackets. A
+\code{len} argument is either a number (representing a length in
+\code{pt}) or a double-quoted string containing a number and a
+two-letter \LaTeX\ length unit, such as \code{"1.5pt"} or
+\code{"6cm"}.  A \code{color} argument is a named primary
+(\code{Red()}, \code{Cyan()}, \code{White()}, etc.), or a \code{Color}
+specified by densities (\code{RGB(r,g,b)}, \code{CMY(c,m,y)}, etc.)
+
+\begin{itemize}
+
+\item Fill color: \code{fill(color)}, \code{nofill()}.
+
+\item Line color and width: \code{plain([color])},
+  \code{bold([color])}.
+
+\item Text size: \code{font\_size([size])}, returns to
+  \code{normalsize} if no argument is given.
+
+\end{itemize}
+
+\noindent A complete list of style commands is found in
+Section~\ref{section-quickref}, starting on
+page~\pageref{section-quickref}.
+
+To handle three-dimensional scenes, a \code{camera} performs point
+projection from a selected spatial location to the canvas. As a user,
+you'll need to control relatively few of the \code{camera}'s
+parameters. Keep in mind, however, that elements are added to a scene
+in the same order their commands appear in the output file, and that
+later elements generally cover earlier ones. Some three-dimensional
+scenes require manual ordering of the input file; such ordering is
+dependent on the \code{camera}'s location.
+
+By default, \ePiX\ draws thin, solid, black lines, performs no filling
+of regions, prints text in a 12~pt Roman font, and looks down the
+\teximath{z}~axis from a large distance, giving orthogonal projection
+on the \teximath{(x,y)}~plane. When the \code{camera} is moved, the
+\teximath{z}~axis points vertically up on the page.
+
+
+\section{Tutorial}
+\label{section-tutorial}
+
+This section presents sample input files side-by-side with their
+output so you can compare what you write with what you'll see on the
+screen or page.  \ePiX\ provides standard drawing capabilities, but
+like all software has its own idioms and personality. The basic
+syntax, which comes from \code{C}/\CXX, should be mostly
+self-explanatory. One-line comments begin with the
+string~``\verb+//+''.
+
+
+%%\index{Emacs@\code{emacs}}
+\index{Graphical interface}
+To use the sample files interactively, you'll need working software:
+\filename{bash}, \filename{emacs}, \ePiX, \filename{g++},
+\filename{gv}, and a running X~server. To complete your ``GUI'',
+start~\filename{gv} and select ``Watch file'' from the ``State''
+menu. The loaded file will update automatically when it changes.
+
+Create a ``scratch'' directory, \code{cd} into it, and run the command
+\begin{verbatim}
+  tar -zxf /usr/local/share/doc/epix/sample_src.tar.gz
+\end{verbatim}
+(Change the path as appropriate for your installation.)  This unpacks
+copies of the sample files into your scratch directory, including all
+the files mentioned in this manual. The \filename{README} file serves
+as a table of contents.
+
+Open a sample file in \filename{emacs}, compile it from the drop-down
+menu (or with the keyboard command), then open the \filename{EPS} file
+in~\filename{gv}. Now you're ready to follow the tutorial
+interactively. A few suggested exercises are included with each
+file. Naturally, as you study more files, you'll be able to make more
+interesting changes on your own.
+
+
+\subsection*{Basic Drawing}
+
+The first sample, \filename{hello.xp}, contains code needed to specify
+the figure's size, followed by the classic greeting. The \code{border}
+command draws a box around the figure in the specified color and
+width, and serves here merely to delimit the output from the
+surrounding page.
+\begin{verbatim}
+/* -*-ePiX-*- */
+#include "epix.h"      // These lines are analogous
+using namespace ePiX;  // to a usepackage command.
+
+int main()
+{
+  picture(P(-1,-1), P(1,1), "2 x 1in"); // corners, true size
+
+  begin(); // ---- Figure body starts here ----
+
+  border(Black(), "1pt"); // color, line width
+
+  font_size("Huge");  // May be any font size, e.g. "scriptsize"
+  label(P(0,0), "Hello, world!");
+
+  end();   // ---- End figure; write output file ----
+}
+\end{verbatim}
+
+\begin{center}
+  \input{hello.eepic}
+\end{center}
+
+\begin{itemize}
+
+\item Change the color and width of the
+  border. (\code{RGB(r,g,b);} creates an RGB color, CMY colors are
+  analogous. Named primaries are available. The densities should be
+  between \teximath{0}~and \teximath{1} for ``expected'' behavior.)
+
+\item Add \code{backing(Cyan());} after the \code{border} command. 
+
+\item Put the command \code{crop\_ellipse();} before the \code{border}
+  command. Permute the \code{crop\_ellipse} command with the
+  \code{border} and \code{backing} lines, and note how the attribute
+  (\code{crop}) affects objects (\code{border}, \code{backing}).
+
+\end{itemize}
+
+
+\subsubsection*{Geometric Objects}
+
+Our next file uses simple objects to draw a 2-D house-and-sun scene.
+
+\begin{verbatim}
+int main()
+{
+  picture(P(0,0), P(5,2), "3.75 x 1.5in");
+
+  begin();
+
+  triangle(P(0.9, 1), P(3.1, 1), P(2, 1.5)); // vertices
+  circle(P(4,1.5), 0.25); // center and radius
+
+  rect(P(1,0), P(3,1)); // opposite corners
+
+  fill(Black(0.1));     // light gray
+  rect(P(2.3,0), P(2.7,0.8)); // the door
+  nofill();
+
+  bold();               // draw thicker lines
+  grid(P(1.4, 0.2), P(2, 0.6), 2, 2); // corners, number of squares
+
+  line(P(xmin(), 0), P(xmax(), 0));   // endpoints
+
+  end();
+}
+\end{verbatim}
+
+\begin{center}
+  \input{objects.eepic}
+\end{center}
+
+\begin{itemize}
+
+\item Add declarations such as \code{bold(RGB(1,0.9,0.5))} or
+  \code{fill(Yellow())} to color the scene. (Color and filling are
+  orthogonal attributes.)
+\end{itemize}
+
+\noindent The sample file \filename{house.flx} uses loops to draw
+gradient fills of the lawn, sky, and sun, and animates a sunset.
+
+
+\subsubsection*{Function Plotting}
+
+Plotted functions must be defined in the ``preamble'', before
+\code{main}. ``High-level'' elements---coordinate axes and grids, axis
+labels, and graphs---are drawn with mnemonically-named commands.
+\begin{verbatim}
+// double = double-precision floating point
+double f(double x) { return 0.75*Sin(x) - 0.25*Sin(2*x); }
+
+int main()
+{
+  picture(P(-2,-1), P(2,1), "5 x 1in"); // [-2,2] x [-1,1]
+
+  begin();
+  revolutions(); // set angle units, [0,1] = one turn
+
+  h_axis(16); // axes w/default endpts
+  v_axis(4);
+  h_axis_labels(4, P(0,-4), b); // shift down 4pt, align below
+
+  plain(Red());
+  plot(f, xmin(), xmax(), 120); // use 120 intervals
+
+  end();
+}
+\end{verbatim}
+
+\begin{center}
+  \input{plotting.eepic}
+\end{center}
+
+\begin{itemize}
+
+\item Define and plot some different functions; adjust the bounding
+  box as necessary. (Use repeated multiplication for polynomials.
+  The \code{polarplot} command graphs \teximath{r=f(\theta)}.)
+
+\item Change the arguments to \code{h\_axis\_labels}. The first
+  specifies the number of intervals to label; the second gives the
+  label offset in~\code{pt}. The last puts each label below~(\code{b})
+  its Cartesian location.
+
+\end{itemize}
+
+
+\subsubsection*{Multivariable Plotting}
+
+Functions of two or three variables are defined just like functions of
+one variable, but for plotting the return type must be a
+point~(\code{P}), not a real number~(\code{double}). The \code{domain}
+class specifies the set of inputs to plot.
+
+\begin{verbatim}
+P f(double r, double th)
+{
+  return P(r*Cos(th), r*Sin(th), pow(r, 3)*Cos(3*th));
+}
+
+int main()
+{
+  picture(P(-1,-1), P(1, 1), "2 x 1in");
+  begin();
+  pst_format();     // use PSTricks macros for output
+
+  // corners ([0,1] x [0,2\pi]) and fineness
+  // (8x40 rectangles, plotted at 16x120 resolution)
+  domain R(P(0,0), P(1, 2*M_PI), mesh(8,40), mesh(16,120));
+
+  camera.at(P(3,1,2)); // set the viewpoint
+  arrow(P(0,0,0), P(1.25,0,0)); // coordinate axes
+  arrow(P(0,0,0), P(0,1.25,0));
+
+  plain(Blue(1.2)); // line color and width
+  fill(Yellow());   // shading color
+  surface(f, R);
+
+  end();
+}
+\end{verbatim}
+
+\begin{center}
+  \input{plotting2.eepic}
+\end{center}
+
+
+\subsubsection*{Loops and Control Structures}
+\label{taylor_poly}
+
+A function can be defined by an arbitrary algorithm, and a
+\code{domain} may be used to plot a family of functions for several
+values of one variable.
+
+\begin{footnotesize}
+\begin{verbatim}
+P sin_n(double x, double n)     // Taylor polynomial of sin x
+{
+  const int N((int) floor(n));  // convert n to an index bound
+  const double sqx(-pow(x, 2)); // -x^2
+  double val(x), summand(x);
+
+  for (int i=1; i <= 2*N+1; i += 2)
+    {
+      summand *= (sqx/((i+1)*(i+2)));   // (-1)^i x^{2i+1}/(2i+1)!
+      val += summand;
+    }
+
+  return P(x, val);    // return (x, y)
+}
+
+int main()
+{
+  picture(P(0, -1), P(6*M_PI, 1), "5 x 1in");
+
+  begin();
+
+  set_crop();
+  bold(Green());
+  plot(Sin, 0, xmax(), 120);
+
+  domain R(P(0,1), P(6*M_PI, 41), mesh(60, 40), mesh(120, 40));
+  for (int i=3; 0 <= i; --i)  // print in descending degree
+    {
+      bold(RGB(0.25*i, 0, 1-0.25*i)); // degree-dependent color
+      plot(sin_n, R.slice2(5*i+1));   // plot for n = 5i+1
+    }
+  end();
+}
+\end{verbatim}
+\end{footnotesize}
+
+\begin{center}
+  \input{plotting3.eepic}
+\end{center}
+
+
+\subsubsection*{Page Layout}
+
+Page layout can be composed from sub-pages with \code{screen} objects.
+In the loop body below, objects are added to the ``active''
+\code{screen}, then \code{inset} into the ``canvas'', the screen
+representing the entire figure.
+
+\begin{verbatim}
+P f(double u, double v)
+{
+  return P((u-v)*(u+v), 2*u*v, u);
+}
+
+int main()
+{
+  picture(P(0,0), P(2,3), "5x7.5in"); // overall size
+
+  begin();
+
+  domain R(P(-1,-1), P(1,1), mesh(12,12), mesh(24,24));
+
+  for (int i=0; i<2; ++i)
+    for (int j=0; j<3; ++j)
+      {
+        screen my(P(-3,-3), P(3,3));
+        activate(my);
+        border(Red(0.6), "1pt");
+        // frame-dependent viewpoint
+        camera.at(sph(10, (2*j+i+1)*M_PI/8, M_PI/6));
+
+        plot(f, R);
+        arrow(P(0,0,0), 2*E_1);
+        arrow(P(0,0,0), 2*E_2);
+        // SW corner at (i, 2-j), padded by 0.05 on all sides
+        inset(P(i+0.05,2.05-j), P(i+0.95,2.95-j));
+      }
+
+  end();
+}
+\end{verbatim}
+
+\begin{center}
+  \input{layout.eepic}
+\end{center}
+
+
+\section{\CXX\ Basics}
+
+\index{Cplusplus@\CXX|(}
+An \ePiX\ source file is a \CXX~program. If you've successfully
+modified and compiled the sample files, you know enough~\CXX\ to use
+\ePiX. In the author's experience, \code{C}~grammar suffices for most
+applications.  An excellent introduction to definitions of functions
+and variables, control statements, and overall program structure is
+Kernighan~and Ritchie's \emph{The \code{C} Programming Language},
+second edition~\cite{KnR}.
+
+
+\subsection{File Format}
+
+\index{Emacs@\code{emacs}}
+Jay Belanger's \code{emacs} mode for \code{ePiX} inserts a file
+template when an empty buffer is opened with the extension~\code{xp}.
+This section explains the purposes served by the template. A few
+additional remarks may help you avoid basic syntax pitfalls.
+
+A \CXX\ file consists of ``statements'', analogous to ordinary
+sentences. Common types include \emph{declarations} (which
+``register'' a function, variable, or type name with the compiler),
+\emph{definitions} (which assign meaning to declared names), and
+\emph{function calls} (which cause a named function to execute).  Most
+statements in an \ePiX\ input file are function calls (``commands'').
+Plain declarations are relatively rare in user files, since a
+definition serves to declare any new names that it contains.
+
+Every statement ends with a semicolon, and conventionally a file
+contains at most one statement per line.  The compiler ignores
+nearly all whitespace (spaces, tabs, and newlines), which should be
+used freely to make files easy to read.  Other punctuation
+(periods, commas, (semi)colons, parentheses, braces, and quotes)
+dictates file parsing, and must adhere stringently to grammar.
+
+An \ePiX\ file always begins with the lines
+\findex{include}
+\begin{verbatim}
+#include "epix.h" // N.B. pre-processor directive, no semicolon
+using namespace ePiX;
+\end{verbatim}
+The first line is analogous to a \LaTeX\ \code{usepackage} command: It
+loads the contents of the ``header'' file \filename{epix.h}, importing
+the names of commands provided by~\ePiX.  To avoid name conflicts,
+\ePiX's commands are enclosed in a ``namespace''. For example, the
+\code{label} command is actually known to the compiler as
+\code{ePiX::label}. The second line above tells the compiler to apply
+the prefix tacitly.
+
+
+\subsection{Variables and Functions}
+%% \index{Variable}\index{Variable!names}
+%% \index{Function}\index{Function!names} 
+
+Definitions of variables and functions play the same role in a figure
+that macro definitions play in a \LaTeX\ document: gathering and
+organizing information on which the figure depends. A variable is
+defined by supplying its type, name, and initial value. By far the
+most common data types in~\ePiX\ are \code{double} (double-precision
+floating point number), \code{P}, and \code{int}. The name of a
+variable may only consist of letters (including the underscore
+character) and digits, and must begin with a letter:
+\begin{verbatim}
+my_var, var2,    MY_var, aLongVariableName;  // valid
+my-var, 2var, \v@riable, $x, ${MY_VARIABLE}; // not valid
+\end{verbatim}
+Variable names are case-sensitive, and numerous (non-universal)
+conventions govern the significance of capitalization. Generally, make
+names descriptive but not unwieldy, and avoid language keywords (such
+as \code{const}, \code{true}, \code{double}, \code{class}, or
+\code{public}) and names that begin with an underscore.
+
+A function accepts ``arguments'' and ``returns a value''. To define a
+function in~\CXX, specify the return type, the name of the function,
+the types of the arguments, and the algorithm by which the value is
+computed from the inputs.  The code block
+\begin{verbatim}
+double f(double x) 
+{ 
+  return sqrt(1-x*x); 
+}
+\end{verbatim}
+defines the \code{double}-valued function~\teximath{f} of one \code{double}
+variable defined by the formula \teximath{f(x)=\sqrt{1-x^2}}.
+
+
+\subsection{Comments}
+
+\CXX\ has two types of comments. \code{C}-style comments, which may
+span several lines, are delimited by the strings \code{/*}~and
+\code{*/}. One-line comments, analogous to the \LaTeX~\code{\%}, are
+begun with \code{//}. A one-line comment may appear within a multi-line
+comment, but a \code{C}-style comment may not; the compiler will
+mistake the first~\code{*/} it encounters as the end of the current
+multi-line comment.
+
+
+\subsection{Program Execution}
+
+All the ``action'' in a \CXX\ program occurs inside the special
+function~\code{main}. Running a compiled \CXX~program is viewed by the
+operating system as calling the program's \code{main} function. The
+return value (an \code{int}) is the program's exit status.  The
+contents of the output file start with \code{begin()} and terminate
+with \code{end()}.  Intervening statements constitute the \emph{body}
+of the file.
+
+In \CXX, a function may not be defined inside another function. 
+Variables may be defined inside \code{main}, but functions cannot be.
+
+
+\subsection{Strings and Raw Output} 
+
+\index{string}%
+\index{Backslash character}%
+In \CXX, a \code{string} is a sequence of characters. Most
+\code{string}s in \ePiX\ input files are \emph{literals},
+double-quoted \code{string}s whose value is read from the input. In a
+string literal, backslash is an escape character; a single backslash
+is produced by a double backslash in the input file.  Certain letters
+have special meanings when backslash-escaped, including ``\verb+\n+''
+(newline) and ``\verb+\t+'' (\Key{TAB}).  Unlike~\LaTeX, \CXX~does not
+require a space to separate an escape sequence from following text;
+the string ``\verb+\\textwidth+'' literally represents a \LaTeX\
+command, while ``\verb+\textwidth+'' is read ``\code{TABextwidth}'' by
+the compiler.
+
+\index{Self-contained figure}%
+\index{Writing directly to output file}%
+\index{Output file!writing directly to}%
+Though not commonly needed, raw text can be printed to the output
+file. The functions \code{write}, \code{pre\_write}, and
+\code{post\_write} accept \code{string} arguments. \code{write} prints
+its argument where the call appears in the input file. The other
+functions print their arguments before or after the completed picture,
+respectively. These commands must be in the file body.  As an
+application, a complete \LaTeX\ \code{figure} environment (with
+caption and label) can be produced by an \ePiX\ file,
+Figure~\ref{fig-captioned}.
+
+\findex{pre\_write}
+\findex{post\_write}
+\findex{write}
+\begin{figure}
+\begin{footnotesize}
+\begin{verbatim}
+#include "epix.h"
+using namespace ePiX;
+
+int main()
+{
+  picture(P(-1,-1), P(1,1), "10cm x 3in);
+  begin();
+  pre_write("\\begin{figure}[hbt]"); // comes before the picture
+
+  post_write("\\caption{A \\LaTeX\\ figure.}"); // and after
+  post_write("\\end{figure}");
+
+  < ... other ePiX commands ... >
+  write("%% A comment near the end, but inside the picture.");
+  end();
+} // End of main()
+\end{verbatim}
+\end{footnotesize}
+\caption{Generating a self-contained figure in \ePiX.}
+\label{fig-captioned}
+\end{figure}
+
+
+\subsection{Conditionals and Loops}
+
+An algorithm's behavior usually depends on internal state. A
+\emph{conditional statement} causes blocks of code to be executed
+according to criteria. A \emph{loop} repeatedly executes a code
+block, usually changing the values of variables in a predictable way,
+so that the loop exits after finitely many traversals.
+
+\texicomment
+Figure~\ref{fig-gcd} illustrates conditionals and loops with
+Euclid's algorithm for the greatest common divisor. Three pieces of
+notation require explanation: \code{j\%i} means~``\teximath{j\pmod i}'',
+\code{||} is logical~``or'', and \code{==} is ``test for equality''.
+(A single~``\code{=}'' is the assignment operator.)
+
+\index{Function!Euclidean algorithm}
+\begin{figure}[hbt]
+\begin{footnotesize}
+\begin{verbatim}
+int gcd (int i, int j)
+{
+  int temp(i);  // initialization syntax
+    if (i==0 || j==0)
+        return i+j;    // define gcd(k,0) = k
+
+    else {
+        if (j < i)     // swap them
+            {
+                temp = j;
+                j = i;
+                i = temp;
+            }
+        // the work is done here...
+        while (0 != (temp = j%i)) // assign temp, test for zero
+            {
+                j = i;
+                i = temp;
+            }
+        return i;
+    }
+}
+\end{verbatim}
+\end{footnotesize}
+\caption{Euclid's division algorithm in~\CXX.}
+\label{fig-gcd}
+\end{figure}
+\texicommentend
+
+%% \noindent For details on conditionals, or for more advanced techniques
+%% of \CXX\ programming, please consult a textbook or online tutorial.
+\index{Cplusplus@\CXX|)}
+
+%% Force previous two figures onto the same page
+%%\clearpage
+
+\section{Animation}
+\label{section-animation}
+
+\index{Animation|(} 
+\ePiX\ is well-suited to the creation of mathematically accurate
+animations: If a figure depends suitably upon a ``time'' parameter,
+then a loop can be used to draw the entire figure for multiple time
+values, yielding successive ``snapshots'' of the figure as time
+progresses. The shell script~\code{flix} automates the process of
+compiling a suitable input file into a collection of \filename{png}s
+and assembling these frames into a \filename{mng}~or \filename{gif}
+animation. GraphicsMagick is the image-handling engine.
+
+A \code{flix} file is an \code{epix} file with two restrictions:
+\begin{itemize}
+  \item The \code{double} variable \code{tix()} is used as
+  ``clock''.
+
+  \item \code{main} accepts two command line arguments and sets
+  \code{tix()} accordingly.
+\end{itemize}
+\index{Emacs@\code{emacs}}
+Jay Belanger's \code{emacs} mode recognizes the file
+extension~\filename{.flx} and inserts template code if an empty buffer
+is opened. Creation of \code{flix} files is as easy as creation of
+\code{epix} files.  The \filename{samples} directory contains a
+handful of \code{flix} files that may be consulted for ideas.
+
+By default, \code{flix} creates movies with 24~frames, in which
+\code{tix()} runs from~0 to~1, and animates at
+\teximath{0.08}~sec/frame.  These and other parameters can be changed
+with command-line options.
+
+A ``typical'' \code{.flx} file may take 30~seconds to a few minutes to
+compile, depending on the number of frames and the complexity of each
+frame. To facilitate debugging, \code{elaps} can be run on a
+\code{flix} file. \code{elaps} runs in a fraction of the time, and if
+\code{elaps} can't produce a viewable image, \code{flix} will surely
+fail.
+\index{Animation|)}
+
+
+\section{Layout Tricks}
+\label{section-layout}
+\index{Layout}
+
+\subsection{Stereograms}
+\index{Stereograms}
+Stereograms are created by drawing a single scene twice from slightly
+different points of view. To create a stereogram with \ePiX, write a
+``scene'' function containing the necessary drawing commands, then set
+the camera appropriately and call the scene function twice, once for
+each frame. 
+
+\subsubsection*{Crossed-Eyes Stereograms}
+
+The sample files \filename{lorenz.xp}~and \filename{twisted\_cubic.xp}
+use page layout to draw crossed-eyes stereograms. For each frame,
+create and activate a \code{screen}, set the camera, and call the
+scene function. The frames are inset side by side in the final
+picture. For a crossed-eyes stereogram, the frame from the
+``rightmost'' camera position is placed on the left.
+
+\subsubsection*{Bi-Color Stereograms}
+
+The sample files \filename{cube.flx}~and \filename{mirrorball.flx}
+contain animated red-cyan stereograms, suitable for viewing with 3-D
+glasses. The technique works best with black-and-white line drawings,
+but the basic approach is the same as for crossed-eyes stereograms:
+Create a scene function and call it twice, setting the camera
+appropriately. Layout is unnecessary since the frames are superposed.
+Pen colors should be close to red and cyan, but ``optimal'' choices
+depend on one's eyes and 3-D glasses.
+
+\subsubsection*{Stereographic Movies}
+
+Either form of stereogram can be animated in a \code{.flx} file, but
+keeping one's eyes properly crossed requires practice while most
+people can instantly see depth with 3-D glasses. As always when using
+\code{flix}, debug the scene with \code{elaps} before compiling a
+movie. If a stereoscopic effect is difficult to see in a still image,
+it will be even harder to perceive in a movie.
+
+
+\subsection{Inset Images}
+
+\ePiX\ can place external images into a figure, similarly to
+Rolf Niepraschk's \code{overpic} package. You provide the Cartesian
+center point, the file name, and optionally the true height and/or
+width of the image:
+\findex{label}
+\begin{verbatim}
+  label(P(a,b), "\\includegraphics[width=w,height=h]{file}");
+\end{verbatim}
+This effect requires the \filename{graphicx} package. When compiling a
+stand-alone graphic containing an external image, you must specify the
+\filename{graphicx} package on the command line: \code{elaps -p
+graphicx <file>}
+
+\texicomment
+\begin{figure}[hbt]
+  \begin{center}
+    \input{ePiX.eepic}
+  \end{center}
+  \caption{Visual guide to \ePiX's shell scripts}
+  \label{fig-programs}
+\end{figure}
+\texicommentend
+
+
+\texinfochapter{3}{Reference Manual}
+\label{chapter-ref-man}
+
+This chapter details \ePiX's capabilities, discussing attributes and
+data types, and listing available commands in the form
+\begin{verbatim}
+  label(P posn, [P offset], string text, [align]);
+  circle(P ctr, double rad=1, normal=P(0,0,1));
+\end{verbatim}
+As in Chapter~\ref{chapter-started}, function arguments are given by
+type (\code{P}, \code{double}, \code{string}, etc.)\ and name, or by
+name alone if the type is clear. Optional arguments are enclosed in
+square brackets. A few argument types, such as \code{[align]} above,
+admit only a small number of values; these cases are explained when
+the corresponding command is first introduced.
+
+A name followed by an equals sign and a value indicates a default
+argument; if omitted in an input file, the compiler substitutes the
+default value. Only trailing arguments may be specified this way.  For
+example, if the \code{rad} argument of the \code{circle} command is
+omitted, the \code{normal} argument \emph{must} be omitted as well.
+
+In an input file, only an argument's value is given, not the type:
+\begin{verbatim}
+  label(P(0,0), P(0,-4), "Hello world", b);
+  circle(P(0,-0.25), sqrt(2)); // use default normal
+\end{verbatim}
+
+\index{Length}%
+\index{Color}%
+Generally, \code{len} signifies either a number (representing a length
+in \code{pt}) or a double-quoted string containing a number and a
+two-letter \LaTeX\ length unit, such as \code{"1.5pt"} or
+\code{"6cm"}. \code{color} represents a \code{Color} object
+constructed from a named primary (\code{Blue()}, \code{Magenta(0.7)},
+etc.), a color specification (\code{RGB(r,g,b)}, \code{CMY(c,m,y)},
+etc.), or an operator applied to an existing \code{Color}.
+
+
+\section{File Structure}
+
+An \ePiX\ input file constitutes a short \CXX\ program. When this
+program is compiled and run by one of the shell scripts, it creates a
+figure file suitable for inclusion in \LaTeX.
+
+\index{Preamble}
+Like a \LaTeX\ document, an \ePiX\ file contains a \emph{preamble},
+which sets up a drawing environment, and a \emph{body}, which contains
+actual figure-generating commands.  The minimal file has the form
+\findex{picture}
+\findex{begin}
+\findex{end}
+\begin{verbatim}
+#include "epix.h"  // N.B. no semicolon
+using namespace ePiX;
+
+int main() {
+  picture(P(a1,b1), P(a2,b2), "n1 [unit1] x n2 unit2");
+  begin(); // end of preamble, start of body
+  end();   // end of body
+}
+\end{verbatim}
+\ePiX\ commands are of four general types: drawing, attribute setting,
+definitions (of data and functions), and operations on existing
+objects. Except as noted below, drawing and attribute commands must
+appear in the body, between \code{begin()}~and \code{end()}. Function
+definitions must come in the preamble, before \code{main()}. Data
+definitions may appear in the preamble or body.
+
+
+\subsection*{Output Format}
+\index{Output format}
+
+The \code{end()} command writes the output file to \code{stdout},
+using \code{eepic} macros by default. The shell scripts redirect
+\code{stdout} to an appropriate disk file.
+
+The attribute-setting command \code{pst\_format()} causes the output
+file to be written using \code{PSTricks} macros when \code{end} is
+called. Similarly, \code{tikz\_format()} causes the file to be written
+using \code{tikz} macros, and \code{eepic\_format()} causes the file
+to be written using \code{eepic} macros. These commands may appear
+anywhere in the figure body. There is no reason for a file to contain
+more than one such command.
+
+The output format may be selected on the command line, overriding any
+explicit request in the input file. Supplying \code{epix},
+\code{elaps}, or \code{flix} with one of the options \code{--pst},
+\code{--tikz}, or \code{--eepic} is tantamount to issuing a
+\code{pst\_format()} (etc.)\ command just before the end of the
+file. These options are listed in decreasing precedence. If more than
+one is given, the ``strongest'' applies, regardless of the command
+line order.
+
+A figure may be written directly to a specified disk file, in a format
+unaffected by the command line flags above. The command
+\begin{verbatim}
+  print_eepic("file.tex");
+\end{verbatim}
+writes the figure to the named file using \code{eepic}
+macros. Analogous commands exist for the formats \code{pst}~and
+\code{tikz}. These commands perform an immediate action. Consequently,
+the command's location in the input file is significant, and multiple
+commands may appear in a single file, so long as distinct file name
+arguments are provided. Applications include writing the same figure
+in multiple formats, or creating successive ``snapshots'' of a lengthy
+computation.
+
+
+\section{Picture Size and Aspect Ratio}
+
+\index{Picture!size}%
+\index{Picture!offset}%
+\index{Aspect ratio}%
+The \code{picture} command specifies a figure's logical and true
+sizes. In the ``minimal file'' snippet above, the \emph{canvas} is the
+Cartesian rectangle \teximath{[a_1,a_2]\times[b_1,b_2]} whose corners
+are given. Either pair of opposite corners is acceptable, but
+confusion is less likely when the SW~and NE corners are given, in this
+order.
+
+\index{Length}%
+The true (printed) width and height are read from \code{picture}'s
+third argument, a ``size \code{string}'' such as \verb+"4cm x 1in"+,
+containing a number and optional \LaTeX\ length unit, an~\code{x},
+another number, and a mandatory length unit. Spaces may be used for
+legibility.  The mandatory length unit becomes the \LaTeX\
+\code{unitlength}.  The argument \verb+"4cm x 1in"+ creates a picture
+4~cm wide and 1~in high, but internally converts 4~cm to inches.  
+Recognized length units are \code{pt} (points, the default), \code{cm}
+(centimeters), \code{in} (inches), \code{mm} (millimeters), \code{pc}
+(picas), and \code{bp} (big points).  
+(\code{1in = 2.54cm = 72bp = 72.27pt}, \code{1pc = 12pt}.)
+
+The logical and true sizes may be defined separately with the commands
+\findex{bounding\_box}
+\findex{picture}
+\findex{unitlength}
+\begin{verbatim}
+  bounding_box(P(a1,b1), P(a2,b2));
+  picture(n1, n2);
+  unitlength(len); // len a length string, not a double
+\end{verbatim}
+One way or another, the logical and true dimensions \emph{must} have
+positive values when the \code{begin()} command is issued.
+
+\LaTeX\ treats the contents of a picture environment as a single box,
+aligned by default on its lower left corner. An \code{offset} command
+accepts two \code{double} arguments or a size \code{string} and shifts
+the page location accordingly. The command
+\code{offset("0.25 x -0.5cm")} shifts the picture right
+\teximath{0.25}~cm and down \teximath{0.5}~cm.  If the
+\code{unitlength} is 1~cm, the command \code{offset(0.25, -0.5)} has
+the same effect.
+
+A non-zero \code{offset} causes a picture's contents to appear in a
+location where \LaTeX\ does not expect them. This can be useful in a
+\LaTeX\ document, but should be avoided when compiling a stand-alone
+image, since \code{dvips} may crop according to rules of its own.
+
+
+\index{Picture!aspect ratio}
+\index{Picture!bounding box}
+The canvas's corners are \code{(xmin(),ymin())} and
+\code{(xmax(),ymax())}, while its width and height are
+\code{xsize()}~and \code{ysize()}. The canvas is a virtual, advisory
+data structure; its dimensions are not directly related to the
+figure's printed size, and picture elements may lie outside the
+canvas. Affine scaling maps the canvas to the page when the output
+file is written.
+\begin{center}
+\input{scaling.eepic}
+\end{center}
+\label{page-scaling}
+The figure's aspect ratio is controlled by sizing the canvas.  The
+aspect ratio is ``true'' if the canvas and page rectangles are
+geometrically similar, e.g., if both boxes are 1.5~times as wide as
+they are tall.
+
+
+\section{Color}
+\label{section-color}
+
+\index{Color|(} 
+\ePiX\ provides a \code{Color} data type. Four models are implemented:
+\code{RGB}, \code{CMY}, \code{CMYK}, and \code{Gray}.  A \code{Color}
+holds primary color ``channels'', each carrying an intensity between
+0~(no color) and~1 (full saturation).  ``No color'' means black in
+\code{RGB} and \code{Gray}, white in \code{CMY(K)}.  \code{RGB},
+\code{CMY}, and~\code{CMYK} colors are written to the output file as
+commands in the corresponding model. \code{Gray} shades are written
+in~\code{RGB}.
+
+Operations on red-green-blue colors are described below. Functionally,
+colors are converted to~\code{RGB}, operated upon, then converted back
+to the original model. Conversions are as described in Uwe Kern's
+\filename{xcolor} manual~\cite{xcolor}.
+
+
+\subsection{Constructors}
+
+Each color model has a ``constructor'' creating a color of specified
+densities. The \code{RGB}~and \code{CMY} models have named ``primary''
+constructors; the density argument is optional and defaults to~1.
+\findex{RGB}
+\findex{Red}
+\findex{Green}
+\findex{Blue}
+\findex{White}
+\findex{Black}
+\index{Color!primitive}
+\begin{verbatim}
+  // red-green-blue colors
+  RGB(double r=0, double g=0, double b=0);
+  Red(d=1);   Green(d=1);   Blue(d=1);
+  White(d=1);   Black(d=1);
+\end{verbatim}
+\findex{CMY}
+\findex{Cyan}
+\findex{Magenta}
+\findex{Yellow}
+\findex{CMY\_White}
+\findex{CMY\_Black}
+\findex{CMYK}
+\findex{Gray}
+\begin{verbatim}
+  // cyan-magenta-yellow colors
+  CMY(double c=0, double m=0, double y=0);
+  Cyan(d=1);   Magenta(d=1);   Yellow(d=1);
+  CMY_White(d=1);   CMY_Black(d=1);
+
+  // gray
+  Gray(double d=0); // equivalent to RGB(d, d, d)
+\end{verbatim}
+Each \code{CMY} constructor has a corresponding \code{CMYK} function,
+e.g.\ \code{CyanK()}~or \code{CMYK\_White()}.
+
+\index{Color!density|(}%
+Though color densities lie between 0~and 1, \ePiX's primary color
+constructors take arguments mod~4, viewed as elements
+of~\teximath{[-2,2]}. Consider \code{Red(d)}, ``red with
+density~\teximath{d}''. For integer values of~\teximath{d}, the
+constructor has the following meanings: \code{Red(0)}~is black,
+\code{Red(1)}~is red, \code{Red(2)}=\code{Red(-2)}~is white, and
+\code{Red(-1)}~is anti-red, or cyan. For non-integer~\teximath{d}, the
+constructor interpolates between the bracketing integer values,
+Figure~\ref{fig-densities}. Other primary constructors work
+analogously.
+
+\begin{figure}[hbt]
+  \begin{center}
+    \input{color_density.eepic}
+  \end{center}
+  \caption{The red primary constructor.}
+\label{fig-densities}
+\end{figure}
+
+Let \teximath{\delta:[-2,2]\to[0,1]} be the piecewise-linear function
+that converts real numbers to primary color densities,
+\teximath{\clip:\mathbf{R}\to[0,1]} the clipping function.  The
+non-primary constructor \code{RGB(r, g, b)} computes the density of
+the red channel as
+\teximath{\clip\bigl(\delta(r)+\delta(-g)+\delta(-b)\bigr)}; the green
+and blue channel densities are computed similarly. Every color can be
+created with arguments between 0~and 1, but the constructor accepts
+arbitrary real arguments and returns colors varying ``continuously and
+periodically''.
+\index{Color!density|)}%
+
+\index{Color!transparency} 
+Colors possess an ``alpha-channel'' for transparency. Except as
+supported by the output format, this feature is a stub.
+
+
+\subsection{Color Operations}
+
+\index{Color!blencing}%
+Colors can be scaled, inverted, blended, superposed, and filtered. In
+the code below, \code{tint}~is a \code{Color}. The effect of each
+operation is described in the \code{rgb} model; the visual result is
+the same in all models.
+\findex{Color.invert}
+\findex{Color.blend}
+\findex{Color.superpose}
+\findex{Color.alpha}
+\findex{Color.filter}
+\begin{verbatim}
+  tint *= double c; // multiply channels by c, rebuild
+  tint.invert();    // (r, g, b) -> (1-r, 1-g, 1-b)
+  tint.blend(Color col, double t);  // (1-t)*tint + t*col
+  tint.superpose(col); // add channels, then clip to [0,1]
+  tint.alpha(double d); // set alpha channel to clip(d)
+
+  tint.filter(col); // return min density in each channel
+\end{verbatim}
+Except for \code{filter}, these operators modify their object. 
+\code{filter} simulates the effect of viewing \code{col}
+through a transparent sheet of \code{tint}, and returns a new
+\code{Color} object having the same model as \code{tint} without
+modifying \code{tint} itself.
+
+
+\section{Scene Attributes}
+
+Objects in a scene sit in 3-dimensional space. A \emph{camera}
+maps objects to the \emph{active screen}. The active \code{screen}
+may, in turn crop its contents. Each drawing command creates an
+object, ``photographs'' it, and adds the image to the active
+\code{screen}. This section describes the \code{Camera} and
+\code{screen} classes and a few associated concepts.
+
+
+\subsection{Angular Mode}
+\index{Angle!units}
+
+By default, angles are measured in \code{radian}s. Two other angular
+modes are available: \code{degrees}~and \code{revolutions}. The
+angular mode is set with a named command, \code{radians()},
+\code{degrees()}, or \code{revolutions()}. The current angular mode
+affects all trigonometric functions and operations.
+
+
+\subsection{The Camera}
+\index{Camera|(emph}
+\index{Screen|(}
+
+Three-dimensional scenes are drawn on flat paper by applying a
+mathematical transformation. By default, \ePiX\ uses \emph{point
+projection}, the technique used by art students when they trace on a
+window with grease pencil, Figure~\ref{fig-camera}.
+
+\begin{figure}[hbt]
+  \begin{center}
+    \input{camera.eepic}
+  \end{center}
+  \vspace*{-0.25in}
+  \caption{Point projection.}
+  \label{fig-camera}
+\end{figure}
+
+\index{Camera!viewpoint}
+\index{Viewpoint}
+\ePiX\ depicts a Cartesian world by projecting mathematically to a
+screen plane, then affinely scaling to a printed page. The camera,
+which maps the world to the screen, consists of a \emph{body} (data
+that determines the position and orientation of the camera), a
+\emph{lens} (the actual mapping to the screen plane), and a
+\emph{filter} (a color through which the scene is viewed).
+
+
+\subsubsection*{Body}
+
+The camera's spatial orientation is described by a triple of mutually
+perpendicular unit vectors.  In memory of happy days at the beach,
+these vectors are called \emph{sea}, \emph{sky}, and~\emph{eye}. The
+screen plane is parallel to the sea-sky plane; the sea vector points
+horizontally to the right, sky points vertically upward. The eye is
+their cross product, which points directly at the viewer.
+
+The sea-sky-eye basis is located at the \emph{viewpoint}, the camera's
+spatial location. The \emph{target}, the origin of the screen plane,
+lies on the line through the viewpoint in the direction opposite the
+eye vector.  The distance from the viewpoint to the target is the
+\emph{range}.  The \emph{camera sphere} is centered at the viewpoint
+and passes through the target.  The orientation, viewpoint, target,
+and range completely (and redundantly) determine the camera's
+geometric situation in the world.
+
+
+\subsubsection*{The Lens}
+\index{Camera!lens}
+
+A \emph{lens} maps the world to the screen.  \ePiX\ comes with four
+lenses: \emph{shadow} (the default), \emph{orthogonal},
+\emph{fisheye}, and \emph{bubble}. Each lens simulates the appearance
+of world objects as seen by an observer at the viewpoint. The shadow
+lens is point projection from the viewpoint to the screen plane. The
+orthogonal lens projects from infinite distance.  Each of the other
+lenses performs radial projection to the camera sphere, then maps the
+sphere to the screen plane; the fisheye lens does orthogonal
+projection (so the entire image lies inside the disk centered at the
+target whose radius is the range) while the bubble lens does
+stereographic projection from the target's antipode.
+\index{Screen|)}
+
+
+\index{Camera!manipulation|(}
+An input file normally uses a single camera, so a global object named
+\code{camera} is defined automatically. At the start of a figure, the
+\code{camera} looks down on the \teximath{(x_1,x_2)}-plane from a
+distant point on the \teximath{x_3}-axis. The resulting view,
+essentially projection along the axis, is suitable for 2-dimensional
+figures.
+
+The \code{camera} is manipulated similarly to a real camera:
+\findex{Camera.at}
+\findex{Camera.look\_at}
+\findex{Camera.range}
+\findex{Camera.focus}
+\findex{Camera.tilt}
+\findex{Camera.pan}
+\findex{Camera.roll}
+\findex{Camera.clip\_range}
+\begin{verbatim}
+  camera.at(P posn);          // set viewpoint to posn
+  camera.look_at(P targ);     // set target to targ
+  camera.range(double dist);  // fix target, move viewpoint
+  camera.focus(double dist);  // fix viewpoint, move target
+  camera.tilt(double angle);  // rotate about the sea axis
+  camera.pan(double angle);   // rotate about the sky axis
+  camera.roll(double angle);  // rotate about the eye axis
+  camera.clip_range(dist);    // cull scenery closer than dist
+\end{verbatim}
+Explicitly setting the viewpoint or target makes the sky vector
+parallel to the projection of the \teximath{x_3}~axis when possible;
+otherwise the \teximath{x_2}-axis is used. Setting the range or focus
+moves the \code{camera} parallel along the eye line. Each command
+re-sizes the image; note that increasing the focus \emph{enlarges} the
+image. The three rotation operations fix the viewpoint, but only roll
+fixes the target.
+
+
+\subsubsection*{Filtering and Color Separation}
+\index{Color!separation}
+\index{Camera!color separation}
+
+The \code{camera} has a \emph{filter} through which all scene
+\code{Color}s pass. For uniformity, the filter should only be set at
+the start of the file body, before any visible elements have been
+placed in the scene.  The filter has two primary uses---model
+conversion and color separation---but can also be used for special
+effects.
+
+There is a \code{Neutral} color, for which filtering has no effect at
+all. The \code{camera}'s default filter is \code{Neutral}. In
+addition, each color model has a \emph{neutral} representative,
+\code{RGB\_Neutral}, etc. Passing \code{Color}s through a neutral
+filter preserves their appearance but converts them to the neutral
+\code{Color}'s model.
+
+Filtering can be used to ``split'' a \code{Color} into primary
+constituents. For \code{RGB} channels, the primaries themselves are
+suitable filters. For \code{CMYK} channels, there are special
+\emph{process} filters, named \verb+C_Process+, etc.
+\begin{verbatim}
+  camera.filter(CMY_Neutral());  // convert all colors to CMY
+  camera.filter(Gray_Neutral()); // black and white photography
+  camera.filter(Green());        // the green channel
+  camera.filter(M_Process());    // the magenta channel
+  camera.filter(Red(1.4));       // la vie en rose?
+\end{verbatim}
+\index{Camera!manipulation|)}
+\index{Camera|)}
+
+
+\subsection{Clipping}
+
+\index{Clipping|(}%
+Two operations handle elements lying far from the target.
+\emph{Cropping} culls elements based on their screen location, and is
+described later. \emph{Clipping} removes objects whose spatial
+location lies outside the ``clip region''.
+
+Initially, the clip region is a very large box centered at the
+origin. Commands are provided to resize this box, keeping the faces
+parallel to coordinate planes.
+\findex{clip\_box}
+\findex{clip\_to}
+\begin{verbatim}
+  clip_box(P pt1, P pt2); // opposite corners
+  clip_box(P pt);         // opposite corners pt and -pt
+  clip_to (P pt);         //                  pt and P(0,0,0)
+  clip_box();             // very large box
+\end{verbatim}
+Additional ``clippers'' may be added manually. Individual clipping
+planes are specified by a point and inward-pointing normal vector.
+Parallel planes cutting a ``slice'' or ``slab'' are described by a
+location, direction, and a distance. The location lies halfway between
+the clipping planes, and the planes' normals point toward the location.
+\findex{clip\_face}
+\findex{clip\_slice}
+\findex{clip\_restore}
+\begin{verbatim}
+  clip_face(P loc, P perp); // perp points inward
+  clip_slice(loc, perp);    // very close parallel planes
+  clip_slice(loc, perp, dist); // planes separated by dist
+  clip_restore();  // remove manually-added clip planes
+\end{verbatim}
+Like \code{clip\_restore}, the \code{clip\_box} and \code{clip\_to}
+commands remove all user-specified half spaces. 
+\index{Clipping|)}
+
+
+\subsection{Screens and Page Layout}
+\index{Screen|(}
+\index{Screen!active}
+\index{Layout}
+
+By default, drawing occurs in the Cartesian coordinate system of the
+\code{canvas}. However, insets and subfigures are most naturally
+composed in ``local'' coordinates, then placed into their final
+location as a unit, a process called \emph{layout}. \ePiX\ implements
+layout with the \code{screen} class.
+
+
+\subsubsection*{Screens}
+\index{Bounding box}
+
+A \code{screen} is a Cartesian plane containing a distinguished
+coordinate rectangle, its \emph{bounding box}. The \code{canvas} of a
+figure is a \code{screen}, as is the internal representation of the
+printed page.  At any point of a file body, some \code{screen} is
+\emph{active}, or ``open for drawing''. A new \code{screen} is created
+from a pair of opposite corners, but is not used until explicitly
+activated. 
+\findex{activate}
+\findex{deactivate}
+\begin{verbatim}
+  screen subfig(P(a1,b1), P(a2,b2)); // [a1, a2] x [b1, b2]
+  activate(subfig);   // open subfig for drawing
+  // commands to draw in subfig
+  deactivate(subfig); // re-activate the previous screen
+\end{verbatim}
+
+The \code{canvas} is automatically drawn at the \code{end} of the
+input file. The contents of other \code{screen}s must be incorporated
+into the \code{canvas} explicitly with an \code{import}~or
+\code{inset} command. \code{import} affinely scales the bounding box
+of the ``child'' \code{screen} to the \code{canvas}. \code{inset}
+specifies corners in the ``parent'' where the child is
+placed.
+\findex{import}
+\findex{inset}
+\begin{verbatim}
+  import();           // active screen to canvas
+  import(subfig);     // subfig to canvas
+  inset(P sw, P ne);  // active screen to specified rectangle
+  inset(subfig, sw, ne); // subfig to specified rectangle
+  inset(subfig);      // inset to subfig's corners
+\end{verbatim}
+
+
+\subsubsection*{Extracting}
+
+The portion of a \code{screen} enclosed by a specified rectangle can
+be \emph{extracted}. Each of the commands
+\findex{extract}
+\findex{canvas}
+\begin{verbatim}
+  subfig.extract(P sw, P ne);
+  canvas().extract(P sw, P ne);
+\end{verbatim}
+returns the \code{screen} having stated corners and containing part of
+\code{subfig} or the \code{canvas}, respectively. Elliptical and
+diamond-shaped portions of a \code{screen} may be extracted.  The
+contents occupy the ellipse or diamond inscribed in the given
+rectangle.
+\findex{extract\_diamond}
+\findex{extract\_ellipse}
+\begin{verbatim}
+  subfig.extract_ellipse(sw, ne);
+  canvas().extract_diamond(sw, ne);
+\end{verbatim}
+The \code{screen} returned by \code{extract} (or its variants) may be
+used just like a manually-constructed \code{screen}, for example to
+construct a magnified inset. 
+
+
+\subsubsection*{True-Size Drawing}
+\label{truesize}
+
+On occasion, it is necessary to draw at known page size, independently
+of the unit length. For 2-dimensional drawing in the
+\teximath{(x_1,x_2)}-plane with the \code{camera} in its default
+location, the coordinates (horizontal, vertical, or both) of a
+\code{screen} may be interpreted as true~pt offsets relative to a
+specified point rather than as Cartesian coordinates.
+\findex{inlay}
+\findex{inlay\_horizontal}
+\findex{inlay\_vertical}
+\begin{verbatim}
+  inlay(subfig, P loc);
+  inlay_horizontal(subfig, loc);
+  inlay_vertical(subfig, loc);
+\end{verbatim}
+Each command maps the origin of \code{subfig} to the specified
+location in the active \code{screen}. The first performs affine
+scaling so that one Cartesian unit in \code{subfig} maps to one
+true~pt on the page.  The second and third commands perform this
+scaling only in the named direction.
+
+\findex{pt\_to\_screen}
+The \code{inlay} functions are suitable only for 2-dimensional
+effects. For 3-dimensional true-size drawing, the function
+\code{pt\_to\_screen} converts a true length of 1~pt into Cartesian
+coordinates in the active \code{screen}. For example, the command
+\code{line(P(0,0), P(pt\_to\_screen(12),0))} draws a line segment
+12~pt long with its left endpoint at the Cartesian origin. True size
+drawing is unusual in an input file, but has definite uses in library
+code; \ePiX's right angle marker is a typical application.
+
+Either type of true-size drawing works as described when drawing in
+the \code{canvas}, and \emph{only} when drawing in a \code{screen}
+imported to the \code{canvas} at ``true Cartesian'' size (one
+\code{screen} unit maps to one Cartesian unit in the \code{canvas}).
+In other situations, the true size coordinate(s) will be scaled by
+additional affine transformation(s).
+
+
+\subsubsection*{Cropping and Decorations}
+
+\index{Cropping}
+A \code{screen} has a \emph{crop mask}: rectangular (default),
+elliptical, or diamond-shaped. If cropping is switched on in the
+active \code{screen}, added elements are cropped to the crop mask.
+For example, cropping by the default crop mask in the \code{canvas}
+ensures the figure lies inside the printed region allocated by
+\LaTeX.
+
+The \code{crop} commands below affect the active \code{screen}
+only. Cropping is not a ``global'' attribute, but must be set or unset
+explicitly for each \code{screen}. By default, cropping is switched
+off.
+\findex{crop}
+\findex{crop\_ellipse}
+\findex{crop\_diamond}
+\findex{set\_crop}
+\begin{verbatim}
+  set_crop();      // activate cropping
+  set_crop(false); // deactivate cropping
+  crop_diamond();  // <>-shaped mask, set crop state
+  crop_ellipse();  // etc...
+  crop();          // crop active screen's contents
+\end{verbatim}
+Normally the crop mask is inscribed in the \code{screen}'s bounding
+box. The commands \code{crop\_diamond} and \code{crop\_ellipse} also
+accept a pair of \code{P}~arguments, which are treated as corners of
+the crop box. 
+
+The active \code{screen} may be decorated with a \code{border}
+(outline of specified color and line width) and \code{backing} (solid
+fill color). The crop mask determines the shape of the \code{border}
+and \code{backing}.
+\findex{border}
+\findex{backing}
+\begin{verbatim}
+  border(color, len);
+  backing(color);
+\end{verbatim}
+Identically-named member functions can be applied to an arbitrary
+\code{screen} whether or not it is active:
+\begin{verbatim}
+  scr.crop_rectangle().backing(Blue(1.8));
+  canvas().crop();
+\end{verbatim}
+
+
+\subsubsection*{Affine Maps}
+\index{Affine map}
+
+A \emph{plane affine map} has the form \teximath{T(x) = Ax+b} for some
+invertible \teximath{2\times2} matrix~\teximath{A} and a constant
+vector~\teximath{b}. \ePiX's \code{affine} class allows affine maps to
+be built and applied to \code{screen}s' contents.
+
+An affine map is uniquely determined by the images of three
+non-collinear points.  The constructor returns the affine map sending
+the points \teximath{(1,0)}, \teximath{(0,1)}, and~\teximath{(0,0)} to
+\code{pt1}, \code{pt2}, and~\code{pt0}, respectively.
+\findex{affine}
+\begin{verbatim}
+  affine af(P pt1, P pt2, P pt0=P(0,0));
+\end{verbatim}
+To emphasize, the arguments are locations, not displacements, and the
+image of the origin comes last.  There is also a \code{void}
+constructor (taking no arguments) which returns the identity map.
+
+To facilitate construction of affine maps, an existing \code{affine}
+may be post-composed with a variety of ``elementary'' affine
+transformations. In the commands below, \code{th} is an angle (in
+current units), \code{sc} is a non-zero \code{double}, and \code{ctr}
+is a point fixed by the composing transformation. In each command,
+\code{ctr} defaults to \teximath{(0,0)}.
+\findex{shift}
+\findex{rotate}
+\findex{reflect}
+\findex{h\_scale}
+\findex{v\_scale}
+\findex{scale}
+\findex{h\_shear}
+\findex{v\_shear}
+\findex{postcomp}
+\begin{verbatim}
+  affine af; // the identity map
+  af.shift(P arg);    // translate by arg
+  af.rotate(th, [ctr]);  // counterclockwise rotation about ctr
+  af.reflect(th, [ctr]); // reflect across line through ctr
+
+  af.h_scale(sc, [ctr]); // horizontal scaling
+  af.v_scale(sc, [ctr]); // vertical scaling
+  af.scale(sc, [ctr]);   // dilatation
+
+  af.h_shear(sc, [ctr]); // shear preserving horizontals
+  af.v_shear(sc, [ctr]); // shear preserving verticals
+
+  af.invert();           // the inverse
+  af.postcomp(affine f); // post-compose with f
+  af(f);                 // pre-compose, af not modified
+\end{verbatim}
+A non-invertible \code{affine} can be created \emph{only} by shearing
+or scaling with an extremely large or extremely small argument, or by
+supplying three collinear points to the constructor.  Calling
+\code{invert} on a non-invertible map merely issues a warning and
+performs no action.
+
+An \code{affine} may be applied to a \code{screen}'s current contents.
+The \code{screen} class has eight member functions (\code{shift}
+through \code{shear}) with syntax identical to the affine map
+functions. In addition, an arbitrary \code{affine} may be applied to a
+\code{screen}:
+\findex{apply}
+\begin{verbatim}
+  scr.shift(arg); // shift scr's contents by arg; etc.
+  scr.apply(f);   // apply f to scr's contents
+\end{verbatim}
+To apply a composition of several maps to a \code{screen}, it's best
+to build an \code{affine} map by composition, then \code{apply} the
+map. Composing \code{affine}s is cheap; \code{apply}ing an
+\code{affine} is costly in proportion to the number of elements in the
+\code{screen}.
+
+Applying an \code{affine} to a \code{screen} has no effect on the
+bounding box, \code{border}, or \code{backing}, and may move elements
+outside the bounding box even if cropping is active. To ensure a
+\code{screen}'s contents lie inside the bounding box, \code{crop} the
+\code{screen} \emph{after} \code{apply}ing the \code{affine}(s).
+
+The sample file \filename{inverse.xp} uses \code{affine} maps to
+depict branches of inverse functions in one variable,
+\filename{symmetry.xp} depicts the permutation group~\teximath{S_3}
+by its action on a regular hexagon.
+\index{Screen|)}
+
+
+\section{Drawing Attributes}
+
+\ePiX\ maintains drawing states for filled regions, paths, and text
+objects.
+
+
+\subsection{Filled Regions}
+
+\index{Filling}
+\index{Path|(}
+\index{Path!filled}
+Filling is either on or off. When filling is active, closed paths are
+filled with the current \emph{fill color}.
+\findex{fill}
+\findex{nofill}
+\begin{verbatim}
+  fill();   // turn filling on
+  fill(color); // turn filling on, specify color
+  nofill(); // turn filling off, same as fill(false);
+\end{verbatim}
+
+
+\subsection{Paths}
+
+\index{Drawing style|(}
+\index{Line style|(}
+Paths and borders of filled regions are drawn with two \emph{pen}s,
+each described by color and line width. The \emph{line pen} draws
+all path-like objects. The \emph{base pen} does nothing unless it is
+wider then the line pen, in which case it draws an ``underlayer'' or
+``border'' on the line pen.
+\findex{pen}
+\begin{verbatim}
+  pen(len);          // set line pen width
+  pen(color);        // set line color, keep width
+  pen(color, len);   // set color and width
+\end{verbatim}
+As usual, \code{len} may be either a length string or a \code{double},
+interpreted as a width in~\code{pt}.  There are \code{base} functions
+with the same signatures and analogous meanings for the base pen.
+
+The line width can be set with named declarations; the optional
+argument sets the line color:
+\findex{plain}
+\findex{bold}
+\findex{bbold}
+\begin{verbatim}
+  plain([color]); // 0.4pt
+  bold([color]);  // 0.8pt
+  bbold([color]); // 1.6pt
+\end{verbatim}
+
+
+\subsubsection*{Path Style}
+
+\index{Path!style}
+By default, path-like objects are drawn with solid lines. Dashed,
+dotted, and free-form path style patterns are also available. (The
+\code{base} underlayer is always solid.) The page length of a pattern
+defaults to 12~pt, but can be set.
+\findex{line\_style}
+\findex{dash\_size}
+\begin{verbatim}
+  line_style(string);
+  dash_size(len=12); 
+\end{verbatim}
+The path style is set with a WYSIWYG string of dashes, spaces, and
+periods, representing a pattern of dashes, gaps, and dots. In the
+sample styles below, the repeating units have the same page size,
+12~pt. 
+\begin{center}
+  \input{pathstyle.eepic}
+\end{center}
+For brevity and uniformity, named commands are provided.
+\findex{solid}
+\findex{dashed}
+\findex{dotted}
+\begin{verbatim}
+  solid(); "-"     dashed(); "-  -"    dotted(); " . "
+\end{verbatim}
+A sequence of \teximath{n}~dashes, spaces, and dots corresponds to a
+dash/dot pattern in an interval divided into \teximath{n}~subintervals
+of equal length. If the \teximath{i}th character is a dash or space,
+the \teximath{i}th~subinterval is drawn solid or empty,
+respectively. If the \teximath{i}th~character is a period, a dot is
+placed at the midpoint of the \teximath{i}th~subinterval.
+
+This pattern is applied to a path-like object as follows. The page
+length of each edge is divided by the current \code{dash\_size} and
+the ceiling (next largest integer) taken. This many copies of the
+current path style are scaled onto the edge. The first and last
+characters are adjacent in repeated units.
+
+There are three inequivalent ways to adjust the dash length/dot
+spacing in a non-line path: Change the \code{dash\_length}, create a
+path with a different number of points, or use a longer, repetitive
+pattern.  For best results, the style string should not be longer than
+about a dozen characters.
+
+If you need several dashed/dotted line styles in multiple figures,
+it's best to define a custom header instead of hard-coding line
+styles. See Section~\ref{section-extensions} for guidance.
+\index{Drawing style|)}
+\index{Line style|)}
+\index{Path|)}
+
+
+\subsection{Text Objects}
+
+\index{Label|(emph}
+\index{Label!alignment}
+\index{Marker}
+Two types of textual element may appear in a file: \emph{labels} (text
+boxes) and \emph{markers} (\LaTeX\ symbols). A marker occupies a box
+of zero size, and is placed at a specified Cartesian location. A label
+has typographical size, and is usually offset from its Cartesian
+location. For placement, an \emph{alignment point} is attached to each
+label, and Cartesian coordinates position the alignment point.
+
+\subsubsection*{Labels}
+
+A label is printed as a \LaTeX\ box.  By default, the alignment point
+is its reference point, the intersection of the left edge and the
+baseline, which is used by \LaTeX\ to position the box on the
+page:\input{basepoint.eepic}
+
+\index{Label!alignment|(}
+The alignment point may be \emph{offset} manually by a specified
+number of \code{pt}. Additionally, a label's location with respect to
+the alignment point can be chosen with an optional \LaTeX-style
+alignment option. This scheme allows labels to be placed easily where
+they will not overlap other parts of the figure, and ensures labels
+stay properly positioned when the size or aspect ratio of a figure
+changes.
+\findex{label}
+\begin{verbatim}
+  label(P posn, P offset, string msg, [align]);
+  label(posn, msg);
+\end{verbatim}
+The first two components of the \code{offset} argument are numbers
+of~\code{pt} to shift the alignment point right and up.  The optional
+\code{align} argument may be one---or an appropriate pair---of
+\code{t}, \code{b}, \code{r}, or~\code{l} (top, bottom, right, left),
+or~\code{c} (center). These alignment options specify the position of
+the label \emph{relative to the Cartesian location}~\code{posn},
+namely they work \emph{opposite} to the way they work in \LaTeX.
+\begin{center}
+  \input{alignment_lr.eepic}\qquad
+  \input{alignment.eepic}
+\end{center}
+\index{Label!alignment|)}
+
+The \code{msg} argument is usually a snippet of \LaTeX\ code enclosed
+in double quotes. \CXX~treats ``\verb+\+'' as an escape character, so
+a double backslash is needed in the source to get a single backslash
+in the output. For example,
+\begin{verbatim}
+  label(P(0,0), P(2,-1), "$\\rho = \\sin\\theta$", br);
+\end{verbatim}
+positions an alignment point \code{2pt}~right and \code{1pt}~below the
+(Cartesian) origin, and typesets the equation
+\teximath{\rho=\sin\theta} below and to the right.
+
+\index{Label!rotated}
+\index{Angle!units}
+Labels can be rotated; the (counterclockwise) angle is set in current
+angle units with the command \code{label\_angle(theta)}. For example,
+a rotation angle of~90 degrees prints labels along a vertical
+axis. Though label rotation has legitimate uses, it can make labels
+more difficult to read, defeating their purpose. Do not use rotated
+labels merely because they are available. As a practical matter, if an
+output file contains rotated labels, the enclosing document must use
+the \code{rotating} package. \code{elaps} automatically loads this
+package.
+
+\index{Affine map!action on labels}
+An \code{affine} behaves moderately intelligently when acting on a
+marker or label. The mapping is applied to the label's location, and
+the ``linear part'' is used to adjust the offset and label angle. No
+attempt is made to treat alignment. For best results, if a
+\code{screen} will have an \code{affine} applied to it, label
+positions should be fine-tuned only with offsets, not alignment
+arguments.  In all situations, the font itself is unchanged; no
+attempt is made to print sheared, scaled, or reflected text. The
+sample file \filename{inverse.xp} illustrates the effect of affine
+maps on labels.
+
+
+\subsubsection*{Fonts and Type Size}
+
+\index{Fonts}
+\index{Label!fonts in}
+By default, the font in an \ePiX\ figure is that of the enclosing
+document. The font size and face are changed with
+``declaration-style'' commands such as
+\findex{font\_size}
+\findex{font\_face}
+\begin{verbatim}
+font_size("Large");
+font_face("sc");
+\end{verbatim}
+The argument of \verb+font_size+ is a valid \LaTeX\ size. If no
+argument is given, \code{normalsize} is understood. \verb+font_face+
+accepts a two-letter string, appended to the string ``\code{text}'' to
+give a \LaTeX\ font declaration command (``\code{textsc}'' above).
+Finer-grained control is accomplished by placing \LaTeX\ commands
+into the label text.
+
+
+\subsubsection*{Label Attributes and Masked Labels}
+
+\index{Label!masked}%
+Each label command has a corresponding ``mask'' version
+(\code{masklabel}) that draws an opaque rectangle under the label
+text. The mask size exceeds the label's size by an amount of
+\emph{padding}, and the mask is itself surrounded by a rectangular
+\emph{border}, of specified color and width.
+\findex{label\_color}
+\findex{label\_mask}
+\findex{label\_pad}
+\findex{label\_border}
+\findex{no\_label\_border}
+\begin{verbatim}
+  label_color(color);         // set label text color
+  label_mask(color=White());  // set mask color
+  label_pad(string len);
+
+  label_border(color, [len]); // set color (and line width)
+  label_border(len);          // set line width only
+  no_label_border();          // turn off label borders
+\end{verbatim}
+
+
+\subsubsection*{Markers}
+
+\index{Marker!types of|(}
+\ePiX\ markers are obtained with \verb+marker(P pt, <MARKER TYPE>);+
+(Table~\ref{table-marker}.)
+Several ``dot-like'' marker types are available by name: \input{dots.eepic}
+\findex{spot}
+\findex{dot}
+\findex{ddot}
+\findex{box}
+\findex{bbox}
+\findex{ring}
+\findex{circ}
+\begin{verbatim}
+  spot(P pt);  dot(P pt);   ddot(P pt);
+     ---       box(P pt);   bbox(P pt);  
+  ring(P pt);  circ(P pt);     ---
+\end{verbatim}
+A \code{circ} is filled with the current \code{mask\_color}, and a
+\code{ring} is ``hollow''.  Each dot-like marker can also be called
+with label syntax, generating a labeled marker with one command.
+\begin{verbatim}
+  dot(P posn, offset=P(0,0), msg="", align=none); // etc.
+\end{verbatim}
+
+\findex{dot\_size}
+By default, \code{spot}~and \code{ring} are 4~pt in diameter;
+\code{dot}, \code{box}, and~\code{circ} are 3~pt in diameter;
+\code{ddot}~and \code{bbox} are 2~pt in diameter. At arbitrary
+diameter, a \code{spot} is \teximath{4/3}~the diameter of a~\code{dot}
+and a~\code{ddot} is \teximath{2/3}~the diameter.  The command
+\code{dot\_size(diam=3)} sets the diameter of a \code{dot}, and hence
+the size of all dot-like markers.
+
+\begin{table}[tb]
+  \begin{center}
+    \input{marker.eepic}
+  \end{center}
+  \caption{\ePiX's \code{marker} types.}
+  \label{table-marker}
+\end{table}
+\index{Marker!types of|)}
+
+
+\subsubsection*{Reminders}
+
+\index{Label!offset}%
+When constructing and placing a label,
+\begin{itemize}
+\item Offsets are specified in \code{pt} (true length), not Cartesian
+  units: A label's location relative to its alignment point should not
+  depend on the logical or printed size of the figure.
+
+\item The label text is enclosed in double quotes (the single
+  character~\code{"}), and contains the \LaTeX\ code to generate the
+  label. Backslashes are doubled.
+  \index{Label!backslash in}
+  \index{Label!double quotes}
+\end{itemize}
+\index{Label|)}
+
+
+\subsection{Color Declarations}
+
+\index{Color!declaration}
+Old-style color declarations set the fill color, line color, and
+text color.
+\findex{rgb}
+\findex{cmyk}
+\begin{verbatim}
+  rgb(r, g, b);      cmyk(c, m, y, k);
+  rgb(P);            cmyk(P);  // for function-controlled colors
+  red(d);  // similarly for other primaries
+\end{verbatim}
+\index{Color|)}
+
+
+\section{Creating and Drawing Objects}
+
+Scene elements include geometric objects, coordinate grids, axis
+labels, and function plots. A few commands create an object (a point,
+line segment, circle, sphere, or plane) that can be used in subsequent
+computations, but most drawing commands automatically create, draw,
+and discard objects.
+
+
+\subsection{Geometric Data Structures}
+
+\subsubsection*{Points}
+\index{Point|(}
+The simplest object in the world, and by far the most common named
+data structure, is~\code{P}, an ordered triple of real numbers
+(double-precision floats). The function~\code{P(x1,x2,x3)} creates the
+point~\teximath{(x_1,x_2,x_3)}. If only two arguments are provided,
+\teximath{x_3=0} by default. This convention allows \ePiX\ to treat
+2-~and 3-dimensional figures uniformly. The standard basis is
+available: \code{E\_1=P(1,0,0)}, etc. 
+
+Depending on context, a \code{P} may represent either a
+\emph{location} (point) or a \emph{displacement} (vector). Almost all
+\ePiX\ functions treat a~\code{P} as a point. However, algebraic
+operators and commands that plot vector fields treat \code{P}
+arguments as displacements.
+
+Polar, cylindrical, and spherical coordinate \code{P}~constructors are
+sensitive to the current angular mode. 
+\index{Angle!mode}
+\findex{P}
+\findex{polar}
+\findex{cis}
+\findex{cyl}
+\findex{sph}
+\begin{verbatim}
+  P pt=polar(r,t);   // (r*Cos(t), r*Sin(t), 0)
+  P pt=cis(t);       // (Cos(t), Sin(t), 0) = polar(1, t)
+  P pt=cyl(r,t,z);   // (r*Cos(t), r*Sin(t), z)
+  P pt=sph(r,t,phi); // polar(r,t)*Cos(phi) + (0,0,r*Sin(phi))
+\end{verbatim}
+
+Algebraic operations---addition/subtraction, scalar multiplication;
+scalar, cross, and componentwise products; orthogonalization---can
+be performed on~\code{P}s.  In compound expressions, the binary
+operators below should be enclosed in parentheses, and scalars must be
+collected at left, \code{P}s at right.
+\findex{P.x1}
+\findex{P.x2}
+\findex{P.x3}
+\findex{J}
+\begin{verbatim}
+  double u=pt.x1();   // first coordinate of pt, etc.
+  P(a,b,c)|P(x,y,z);  // scalar product, ax+by+cz
+  P(a,b,c)&P(x,y,z);  // componentwise product (ax, by, cz)
+  P(a,b,c)*P(x,y,z);  // cross product (bz-cy, cx-az, ay-bx)
+  J(p);               // quarter turn about the x3-axis
+  p%q;                // orthogonalization, p (mod q)
+\end{verbatim}
+Explicitly, \code{p\%q}~is the unique vector \code{p+k*q}
+perpendicular to~\code{q}.
+
+\code{P}~operations express mathematical relationships, and therefore
+imbue a figure with logical structure, making the input file easier to
+read, modify, and maintain. Commonly, a file preamble will define a
+few named points with hard-coded coordinates, then define additional
+points of interest using \code{P}~operators.
+\index{Point|)}
+
+\subsubsection*{Complex Numbers}
+
+\index{Complex number|(}
+\index{Function!complex}
+The \code{Complex} class represents a complex number, specified by its
+real and imaginary parts. Arithmetic operators (addition, subtraction,
+multiplication, division) are provided, as well as exponential,
+logarithmic, circular, and hyperbolic functions (sensitive to angle
+units), the latter with \code{C} appended to their names. A complex
+number implicitly converts to a point with third coordinate zero. The
+sample file \filename{cubic\_cutaway.xp} illustrates usage, including
+how to define and plot functions and color-shade Riemann surfaces.
+\findex{Complex.re}
+\findex{Complex.im}
+\findex{Complex.conj}
+\findex{Arg}
+\findex{norm}
+\findex{expC}
+\findex{logC}
+\findex{sqrtC}
+\findex{rootC}
+\findex{powC}
+\findex{SinC}
+\findex{CosC}
+\findex{TanC}
+\findex{CotC}
+\findex{SecC}
+\findex{CscC}
+\findex{SinhC}
+\findex{CoshC}
+\findex{TanhC}
+\findex{CothC}
+\findex{SechC}
+\findex{CschC}
+\begin{verbatim}
+  Complex u, z(4,3);  // u = 0, z = 4 + 3i
+  double len(norm(z));// len = 5
+  double th(Arg(z));  // th = atan2(3, 4);
+  P pt(z);            // pt = (4, 3, 0)
+  Complex w(expC(z)); // w = e^{4 + 3i}
+  u = LogC(z,k=0);    // u = Log(z) + 2*pi*ki
+  u = sqrtC(z,k=0);   // sqrt(z)*expC(pi*ki)
+  u = rootC(z,n,k=0); // (z^{1/n})*expC(2*pi*ki/n)
+  u = powC(z,n);      // z^n
+\end{verbatim}
+\index{Complex number|)}
+
+
+\subsubsection*{Other Geometric Classes}
+
+In addition to~\code{P}, objects of type \code{Circle}, \code{Plane},
+\code{Segment}, and \code{Sphere} can be used for Euclidean geometry
+constructions. Simple affine operations are supplied for each type, as
+is a \code{draw()} function, which represents the object as a path in
+the screen.
+\findex{shift}
+\findex{move\_to}
+\findex{scale}
+\findex{draw}
+\begin{verbatim}
+  obj.shift(P arg);    // translate by arg
+  obj.move_to(P arg);  // move center to arg
+  obj.scale(double c); // scale about center by c
+  obj.draw();
+\end{verbatim}
+A \code{Segment}'s ``center'' is its midpoint. A \code{Plane} has no
+center; \code{move\_to} translates the \code{Plane} to pass through
+\code{arg}, and \code{scale} has no effect.
+
+\index{Circle}
+A \code{Circle} data structure consists of a center, radius, and a
+perpendicular unit vector. Three constructors are provided:
+\findex{Circle}
+\begin{verbatim}
+  Circle(center=P(0,0,0), double rad=1, normal=E_3);
+  Circle(P center, P point);
+  Circle(P p1, P p2, P p3);
+\end{verbatim}
+The second constructor creates the \code{Circle} parallel to the
+\teximath{(x_1,x_2)}~plane, with given center, and radius equal to the distance
+between the arguments. (A warning is printed if the second argument
+does not lie on the circle, namely, if the arguments do not lie in a
+plane parallel to the \teximath{(x_1,x_2)}~plane.) The third returns the
+\code{Circle} passing through the given points; the points must not be
+collinear.
+
+The data defining a \code{Circle} are recovered with member functions
+named \code{center()}, \code{radius()}, and \code{perp()}.
+
+\index{Plane}
+\findex{Plane}
+A \code{Plane} is specified by a point and normal vector, or by three
+non-collinear points. The \code{draw()} function clips the plane and
+draws the resulting polygon. Unless the clip box has been set
+manually, the clipped polygon's vertices will have large coordinates.
+
+\index{Segment}
+\findex{Segment}
+A \code{Segment} is constructed from its endpoints. The member
+function \code{midpoint()} returns the center.
+
+\index{Sphere}
+\findex{Sphere}
+A \code{Sphere} is specified by a point and a radius---by default the
+origin and unity, or by the center and a point on the sphere. Member
+functions \code{center()}~and \code{radius()} return the defining
+data.  Capabilities specific to geography and spherical geometry are
+described below, pp.~\pageref{non-eucl}ff.
+
+The \code{draw()} function of a \code{Sphere} draws the horizon
+visible from the current viewpoint. While this horizon is a circle in
+object space, its image in the screen is generally an ellipse.
+Antipodal points are not generally mapped to points symmetrically
+placed with respect to the center of this ellipse. These effects are
+most pronounced when the viewpoint is close to the \code{Sphere} and
+the center is not close to the \code{target}.
+
+
+\subsubsection*{Intersection}
+
+\index{Intersection}
+
+To facilitate geometric computation, \ePiX's \code{Circle},
+\code{Plane}, \code{Segment}, and \code{Sphere} classes can be
+intersected with the \code{*}~operator.
+\texicomment
+Table~\ref{table-intersect}
+lists the return types for each pair of arguments.  Intersection is
+commutative, so only the top half of the table is shown. For purposes
+of intersection, a \code{Segment} is extended into a line.
+The sample file \filename{pascal.xp} gives typical applications of
+objects and intersection.
+\findex{intersection}
+\begin{table}[hbt]
+\begin{center}
+  \begin{tabular}{c|cccc}
+    \code{*} & 
+    \code{Segment} & \code{Circle} & \code{Plane} & \code{Sphere} \\
+    \hline
+    \code{Segment} & \code{P} & \code{Segment} & \code{P} & \code{Segment} \\
+    \code{Circle}  &    & \code{Segment} & \code{Segment} & \code{Segment} \\
+    \code{Plane}   &    &    &   \code{Segment} & \code{Circle} \\
+    \code{Sphere}  &    &    &    & \code{Circle}
+  \end{tabular}
+  \caption{Object intersection types.}
+  \label{table-intersect}
+\end{center}
+\end{table}
+\texicommentend
+
+A \code{Circle} has a center, radius, and unit normal; a \code{Plane}
+has a distinguished point and unit normal; a \code{Segment} has two
+endpoints; a \code{Sphere} has a center and radius. An object is
+\emph{malformed} if these conditions are not met.  The constructors
+return well-formed objects with two exceptions: \code{Circle} and
+\code{Plane} create malformed objects if called with three collinear
+points.  The operator~\code{*} returns a malformed object if either
+argument is malformed, or if the operands are disjoint, tangent, or
+coincident.  Malformedness is benign: Calling \code{draw()} on a
+malformed object does nothing.
+
+
+\subsubsection*{Orthonormal Frames}
+
+A \code{frame} comprises three mutually perpendicular unit
+vectors. The constructor takes three vectors. The \code{frame}'s third
+vector~\teximath{e_3} is positively proportional to~\code{v3}, the
+second vector~\teximath{e_2} is positively proportional to
+\code{v2\%v3}, and the first is the cross product,
+\teximath{e_1=e_2\times e_3}. Thus, a \code{frame} is right-handed,
+and does not depend on~\code{v1}. 
+
+The elements of a \code{frame} are named \code{sea}, \code{sky}, and
+\code{eye}, just as for the \code{camera}. A \code{frame} can be
+rotated through an arbitrary angle about any of its elements.
+\findex{frame}
+\begin{verbatim}
+  frame();        // the standard basis {E_1, E_2, E_3}
+  frame fr(v1, v2, v3); // orthonormalize {v1, v2, v3}
+  fr.sea();       // the first element of fr, etc.
+  fr.rot1(theta); // rotate fr through theta about sea, etc.
+\end{verbatim}
+
+
+\subsection{Path-Like Elements}
+
+Basic path-like objects are drawn with named commands. Arguments of
+polygon commands are endpoints/vertices. Except for \code{line}~and
+\code{Line}, the following are subject to filling.
+\findex{line}
+\findex{Line}
+\findex{triangle}
+\findex{rect}
+\findex{quad}
+\findex{circle}
+\begin{verbatim}
+  line(P p1, P p2, [double expand]);
+  Line(p1, p2);  // draw line through p1, p2 (crop required)
+  triangle(P p1, P p2, P p3);
+  rect(P p1, P p2);
+  quad(P p1, P p2, P p3, P p4); // quadrilateral
+  circle(ctr=P(0,0,0), rad=1, normal=E_3);
+  circle(ctr, pt);
+  circle(pt1, pt2, pt3);
+\end{verbatim}
+The optional \code{line} argument is an expansion parameter:
+\code{line(p1,p2,t);} draws a segment centered at the midpoint of
+\code{p1}~and \code{p2}, with length scaled
+by~\teximath{2^{t/100}}. (Setting \teximath{t=100} doubles the length,
+while \teximath{t=-100} halves the length.) The arguments of
+\code{rect()} must lie in a plane parallel to a coordinate plane. The
+arguments to \code{circle} commands are the same as for \code{Circle}
+constructors.
+
+Quadratic and cubic splines are described by their control points.  A
+list of~\code{P} is drawn as a ``natural'' spline (the \teximath{C^2}
+piecewise cubic curve with vanishing second derivatives at the
+endpoints); the number of points per cubic segment must be specified.
+Circular and elliptical arcs are given by center, a basis, angular
+range, and an optional number of intervals.
+\findex{spline}
+\findex{arc}
+\findex{ellipse}
+\begin{verbatim}
+  spline(P p1, P p2, P p3, [int n]);       // quadratic
+  spline(P p1, P p2, P p3, P p4, [int n]); // cubic
+  spline(vector<P>, int n);                // natural spline
+
+  arc(P ctr, rad, t_min, t_max);  // parallel to (x1,x2)-plane
+  ellipse(P ctr, P v1, P v2);     // in plane spanned by v1, v2
+  ellipse(P ctr, P v1, P v2, t_min, t_max, [int n]);
+\end{verbatim}
+\texicomment
+Mathematically, these commands draw parametric paths
+\begin{align*}
+  \text{Spline:}\quad&(1-t)^2 p_1 + 2(1-t)t p_2 + t^2 p_3,
+    && t\in[0,1] \\
+  \text{Spline:}\quad&(1-t)^3 p_1 + 3(1-t)^2t p_2 + 3(1-t)t^2 p_3 + t^3p_4,
+    && t\in[0,1] \\
+  \text{Arc:}\quad&\mathrm{ctr} + (\cos t)(\mathrm{rad},0,0)
+                + (\sin t)(0,\mathrm{rad},0),
+    && t\in[t_\mathrm{min}, t_\mathrm{max}] \\
+  \text{Ellipse:}\quad&\mathrm{ctr} + (\cos t)v_1 + (\sin t)v_2, 
+    && t\in[t_\mathrm{min}, t_\mathrm{max}].
+\end{align*}
+\texicommentend
+If parameter bounds are omitted in an \code{ellipse} command, the
+entire ellipse is drawn.  When the angular range subtends one or more
+full turns in an \code{arc}~or \code{ellipse} the curve is subject to
+filling.
+
+Commands for planar (half-)ellipses remain from \ePiX's early days:
+\findex{ellipse}
+\findex{ellipse\_left}
+\findex{ellipse\_right}
+\findex{ellipse\_top}
+\findex{ellipse\_bottom}
+\begin{verbatim}
+  ellipse(P ctr, P radius);
+  ellipse_left(P ctr, P radius);
+  ellipse_right(P ctr, P radius);
+  ellipse_top(P ctr, P radius);
+  ellipse_bottom(P ctr, P radius);
+\end{verbatim}
+If \code{radius} is \code{P(a,b)}, these commands draw all or half of
+the ellipse with given center in the \teximath{(x_1,x_2)} plane, axes
+parallel to the coordinate axes, and axis lengths \teximath{2a}~and
+\teximath{2b}.
+
+Two commands are available to mark off right angles or a subtended
+angle. Each accepts a spatial location and two non-zero directions,
+and draws a scene element in the plane spanned by the vectors.
+\findex{right\_angle}
+\findex{arc\_measure}
+\begin{verbatim}
+  right_angle(P loc, P v1, P v2, scale=8);
+  arc_measure(P loc, P v1, P v2, scale=8);
+  arc_measure(P loc, P v1, P v2, offset, text, align, scale=8);
+\end{verbatim}
+The \code{right\_angle} command does not check its arguments for
+perpendicularity. The \code{arc\_measure} commands mark the
+\emph{small} angle subtended by the directions; the label form places
+a label at the midpoint of the arc. The (optional) \code{scale}
+argument is the true size in~\code{pt} of the marker.
+
+
+\begin{comment}
+\subsubsection*{Recursive Fractal Curves}  
+
+\index{Path!fractal}
+Consider a path made up of equal-length segments that can point at any
+angle of the form~\teximath{2\pi k/n} radians, for \teximath{0\leq
+k<n}, like spokes on a wheel. A path is specified by a finite sequence
+of integers, taken modulo~\teximath{n}. For example, if
+\teximath{n=6}, then the sequence \teximath{0, 1, -1, 0} corresponds
+to the ASCII path \verb+_/\_+.  \ePiX's fractal approximation starts
+with such a ``seed'' then recursively (up to a specified depth)
+replaces each segment with a scaled and rotated copy of the seed,
+Figure~\ref{fig-fractal}. The seed above generates the standard
+von~Koch snowflake fractal. In code: 
+\findex{fractal}
+\begin{verbatim}
+  const int seed[] = {6, 4, 0, 1, -1, 0};
+  fractal(P(a,b), P(c,d), depth, seed);
+\end{verbatim}
+The first entry of \code{seed[]} (here~6) is the number of
+``spokes''~\teximath{n}, the second~(4) is the number of terms in the
+seed, and the remaining entries are the seed proper. The final path
+joins \teximath{(a,b)}~to \teximath{(c,d)}. The number of segments in
+the final path grows exponentially in the depth, so depths larger than
+5~or 6 are likely to exceed the capabilities of \LaTeX\ and/or
+PostScript.
+\begin{figure}[hbt]
+  \begin{center}
+  \input{koch.eepic}
+  \end{center}
+  \caption{Successive iterations of \{\code{4,8,0,1,0,3,3,0,1,0}\}}
+  \label{fig-fractal}
+\end{figure}
+\end{comment}
+
+
+\subsubsection*{Arrows}
+
+\index{Arrow}
+Line segments, splines, and arcs can be drawn with arrowheads at one
+end.  In profile, an arrowhead's width is \code{3pt}, and its height
+is 5.5~times the width.  The actual printed height depends on the
+head's orientation with respect to the camera.  By default, an
+arrowhead is a filled triangle. The shape and size are adjusted with
+declarations:
+\findex{arrow\_width}
+\findex{arrow\_ratio}
+\findex{arrow\_inset}
+\begin{verbatim}
+  arrow_width(w=3);   // width in pt
+  arrow_ratio(r=5.5); // height-to-width
+  arrow_inset(c=0);   // base indent as frac of ht
+\end{verbatim}
+\input{arrow.eepic} Inset\teximath{=0}\qquad
+\input{arrow25.eepic} Inset\teximath{=0.25}\qquad
+\input{arrow50.eepic} Inset\teximath{=0.5} \\
+The \code{inset} must be between \teximath{-1}~and \teximath{1}. Each
+\code{arrow} command accepts an optional \code{scale} argument, which
+scales the arrowhead.
+\findex{arrow}
+\begin{verbatim}
+  arrow(P tail, P tip, [scale]);
+  arrow(P p1, P p2, P p3, [scale]);   // spline arrows
+  arrow(P p1, P p2, P p3, P p4, [scale]);
+  arrow(P ctr, P v1, P v2, t_min, t_max, [scale]); // ellipse
+\end{verbatim}
+A few ``special-purpose'' commands are supplied:
+\findex{dart}
+\findex{aarrow}
+\findex{arc\_arrow}
+\begin{verbatim}
+  dart (P p1, P p2);  // same as arrow(p1, p2, 0.5);
+  aarrow(P p1, P p2); // double-headed arrow <--->
+  arc_arrow(ctr, rad, t_min, t_max, [scale]);
+\end{verbatim}
+If an \code{arc\_arrow} is too short, nothing is drawn.
+
+
+\subsection{Coordinate Axes and Labels} 
+
+\index{Label!axis|(}
+\index{Axes!labeling}
+\index{Axes|(}
+\ePiX\ provides an \code{axis} class for coordinate axes. Labels are
+generated automatically in a variety of styles: decimal, scientific
+notation, fraction, and trigonometric fraction. Logarithmic axes and
+labels are available. Axis and labeling commands from Version~1.0 have
+been retained.
+
+
+\subsubsection*{The \code{axis} Class}
+
+An \code{axis} consists of a line segment divided into a specified
+number of equal-length subintervals by ``major'' (long) tick marks.
+Each subinterval may be divided further by ``minor'' (short) tick
+marks.  Minor ticks may be equally-spaced (``Cartesian'') or
+logarithmically placed. Finally, a label is written at each major tick
+mark with specified offset and alignment. Labels are generated
+automatically from the endpoints, so the line should be parallel to a
+coordinate axis. Label attributes (masking, borders, font size and
+face, rotation angle) are determined by the current label style, not
+by the \code{axis}.
+
+The command
+\findex{axis}
+\begin{verbatim}
+  axis(P tail, P head, int n, P offset=P(0,0), [align = none]);
+\end{verbatim}
+creates an axis joining \code{tail} to \code{head}, divided into
+\code{n}~segments of equal length, with a major tick mark and label at
+each division point and endpoint. The \code{offset} and \code{align}
+arguments have the same meaning as for ordinary labels.
+
+The number and length of minor ticks, and the alignment of ticks, are
+controlled with member functions:
+\findex{axis.subdivide}
+\findex{axis.tick\_ratio}
+\findex{axis.align}
+\begin{verbatim}
+  axis Ax(P(a,c), P(b,c), n);
+  Ax.subdivide(n);  // put n-1 minor ticks in each axis segment
+  Ax.tick_ratio(r); // minor length = r*major length
+  Ax.align(AL=c);   // align all ticks; AL = t, b, l, r, or c
+\end{verbatim}
+By default, major ticks are \code{6pt}~long and twice the length of
+minor ticks. The global declaration \code{tick\_size(len)} sets the
+major length, subject to ``reasonable stylistic limits''. For visual
+consistency, tick lengths should not be changed casually. 
+
+\index{Axes!labeling}
+Labels on an \code{axis} may be drawn in several styles, selected with
+member functions:
+\findex{axis.dec}
+\findex{axis.frac}
+\findex{axis.trig}
+\findex{axis.sci}
+\findex{axis.unmark}
+\findex{axis.precision}
+\findex{axis.align\_labels}
+\begin{verbatim}
+  Ax.dec();  // decimals (default)
+  Ax.frac(); // fractions, e.g. 0.5 -> \frac{1}{2}
+  Ax.trig(); // fractional multiples of \pi
+  Ax.sci();  // scientific notation, k\times base^N
+
+  Ax.unmark(double); // remove label at selected location
+  Ax.precision(p);   // set number of digits for decimal labels
+  Ax.align_labels(AL); // re-align labels
+\end{verbatim}
+Arbitrary textual labels depending on one coordinate are obtained by
+writing a \code{string}-valued function of~\code{double} and
+``registering'' it:
+\findex{axis.label\_rep}
+\begin{verbatim}
+  // f represents x as a string in given precision and base
+  std::string f(double x, unsigned int prec, unsigned int base);
+  Ax.label_rep(f);
+\end{verbatim}
+For example, textual tags can be printed instead of numeric labels.
+
+By default, an \code{axis} is Cartesian. The member function
+\code{log(int b=10)} converts an \code{axis} to ``log mode'' with
+specified base; this affects both tick marks and labeling. If \code{b}
+is at least~3, minor tick marks appropriate for a logarithmic axis
+base~\code{b} are drawn. Second, labels are written in decimal or
+scientific notation appropriately for a logarithmic axis; that is,
+``\teximath{k\times b^N}'' (or its decimal value) is written at
+location \teximath{N+\log_b k}.
+
+Minor ticks of a log \code{axis} may be labeled individually; again,
+this is controlled with member functions:
+\findex{axis.tag}
+\findex{axis.tag235}
+\findex{axis.tags}
+\findex{axis.untag}
+\begin{verbatim}
+  Ax.tag(d);   // labels at N+log_b(d)
+  Ax.tag235(); // tag 2, 3, and 5 if b=10
+  Ax.tags();   // tag 1, ..., b-1
+  Ax.untag();  // remove all tags, including 1
+  Ax.untag(double);  // remove one tag, e.g. Ax.untag(9);
+\end{verbatim}
+
+For convenience, an \code{axis} object along an edge of the active
+\code{screen} can be created with a named command:
+\findex{top\_axis}
+\findex{bottom\_axis}
+\findex{left\_axis}
+\findex{right\_axis}
+\begin{verbatim}
+  top_axis(n, offset, align);
+  bottom_axis(n, offset, align);
+  left_axis(n, offset, align);
+  right_axis(n, offset, align);
+\end{verbatim}
+The ticks automatically point into the bounding box.
+
+The functions above create objects or set \code{axis} attributes, but
+write no output. Tick marks and labels can be printed separately, or
+at once:
+\findex{axis.draw}
+\findex{axis.draw\_ticks}
+\findex{axis.draw\_labels}
+\begin{verbatim}
+  Ax.draw();        // axis, tick marks, and labels
+  Ax.draw_ticks();  // axis and ticks only
+  Ax.draw_labels();
+\end{verbatim}
+
+
+\subsubsection*{Other Axis-Drawing Commands}
+
+\index{Axes!logarithmic}
+\ePiX\ formerly supplied commands for drawing simple axes and their
+labels. These commands have been kept for compatibility.  Horizontal
+axes are generated with
+\findex{h\_axis}
+\findex{h\_log\_axis}
+\findex{v\_axis}
+\findex{v\_log\_axis}
+\begin{verbatim}
+  h_axis(p1, p2, n, align=c);    // n subintervals (n+1 ticks)
+  h_log_axis(p1, p2, n, align=c, base=10);
+\end{verbatim}
+For vertical axes, use \code{v\_axis}.  The style of tick mark is
+appropriate for an axis of the given type.  Horizontal axis tick marks
+may be aligned \code{t}~(above the axis) or~\code{b}
+(below). Similarly, vertical axis ticks may be aligned \code{r}~or
+\code{l}.
+
+The endpoint arguments of a coordinate axis may be omitted, in which
+case they default to \teximath{p_1=(x_\mathrm{min},0)} and
+\teximath{p_2=(x_\mathrm{max},0)} for a horizontal axis, or to
+\teximath{p_1=(0,y_\mathrm{min})} and
+\teximath{p_2=(0,y_\mathrm{max})} for a vertical axis. If the bounding
+box has integer width and/or height, omitting the number of points
+draws tick marks one unit apart.
+
+Labels for a horizontal Cartesian or logarithmic axis are generated
+with the commands
+\findex{h\_axis\_labels}
+\findex{h\_axis\_masklabels}
+\findex{h\_axis\_log\_labels}
+\findex{h\_axis\_log\_masklabels}
+\findex{v\_axis\_labels}
+\findex{v\_axis\_masklabels}
+\findex{v\_axis\_log\_labels}
+\findex{v\_axis\_log\_masklabels}
+\begin{verbatim}
+  h_axis_labels(P p1, P p2, int n, P offset, [align]);
+  h_axis_masklabels(p1, p2, n, offset, [align]);
+  h_axis_log_labels(p1, p2, [n], offset, [align], base=10);
+  h_axis_log_masklabels(p1, p2, [n], offset, [align], base=10);
+\end{verbatim}
+Labels for a vertical axis are generated with \code{v\_axis\_labels},
+etc. The labels are automatically generated to match their horizontal
+location.  The first puts \teximath{(n+1)}~evenly-spaced labels on the segment
+joining \code{p1}~and \code{p2}. As with ordinary labels, the
+\code{offset} is in~\code{pt}, and the optional \LaTeX-style alignment
+option positions the labels using their corners.  The second command
+draws masked labels according to the current label masking
+attributes. The third writes labels in exponential notation, using the
+Cartesian coordinate as exponent.
+
+As for coordinate axes, the initial and final points may be omitted in
+an \code{axis\_[mask]labels} command, with the same defaults.  The
+\code{offset} and number of labels must always be specified.
+\index{Label!axis|)}
+
+
+\subsubsection*{Broken Axes}
+\index{Axes!broken}
+
+Broken axes are best drawn using page layout, especially if axis
+labels are to be drawn. To accomplish the task, create a screen for
+each piece of axis, using appropriate Cartesian coordinates for the
+corners, then \code{inset} the screens so the axis pieces are nearly
+end to end. A zig-zag glyph signifies the break:
+\findex{axis\_break}
+\begin{verbatim}
+  axis_break(P, P, scale=12);
+\end{verbatim}
+The \code{P} arguments are the screen coordinates of the ends to be
+joined; the optional third argument is the true height and width
+in~\code{pt} of the glyph. The sample file \filename{coord\_tricks.xp}
+uses layout and axis breaks.
+
+
+\subsubsection*{Coordinate Grids}
+
+Cartesian grids fill a coordinate rectangle, and have a specified
+number of lines in each direction. A polar grid has specified radius,
+and numbers of rings and sectors.
+\findex{grid}
+\findex{polar\_grid}
+\begin{verbatim}
+  grid(n1, n2);         // fills the bounding box
+  grid(p1, p2, n1, n2); // fills the box with corners p1, p2
+  polar_grid(r, n1, n2);
+\end{verbatim}
+
+Log and semi-log grids are drawn with analogous syntax:
+\findex{log\_grid}
+\findex{log1\_grid}
+\findex{log2\_grid}
+\begin{verbatim}
+  log_grid (p1, p2, n1, n2, [base1], [base2]); // log-log
+  log1_grid(p1, p2, n1, n2, [base]);           // log-lin
+  log2_grid(p1, p2, n1, n2, [base]);           // lin-log
+\end{verbatim}
+The~\teximath{n_i} arguments dictate the number of squares, namely the number
+of orders of magnitude spanned in the logarithmic direction(s).  The
+(optional) base arguments default to~10, and control the number of
+lines drawn per order of magnitude. As with Cartesian grids, the
+corners are optional; if omitted, the grid fills the bounding box.
+
+\index{Graph paper}
+Graph paper may be created by superimposing grids:
+\texicomment
+\begin{center}
+  \begin{minipage}[b]{2.5in}
+    \begin{footnotesize}
+\texicommentend
+\findex{pen}
+\findex{grid}
+\begin{verbatim}
+  pen(0.25);
+  grid(10*xsize(), 10*ysize());
+  pen(0.5);
+  grid(2*xsize(), 2*ysize());
+  pen(1);
+  grid(xsize(), ysize());
+\end{verbatim}
+\texicomment
+    \end{footnotesize}
+  \end{minipage}
+  \qquad
+  \input{graphpaper.eepic}
+\end{center}
+\index{Axes|)}
+\texicommentend
+
+\subsection{The Path Class}
+
+\index{Path!class}
+A \code{path} data structure is an ordered list of points that can be
+cropped, clipped, mapped, concatenated, and drawn.  The first four
+constructors mirror polygon-drawing commands above.  Function graphs
+and parametric paths are built from a real- or \code{P}-valued
+function~\code{f} of one variable.
+\findex{path}
+\begin{verbatim}
+  path(p1, p2, expand=0);     // line (endpoints)
+  path(p1, p2, p3, [n]);      // quadratic spline
+  path(p1, p2, p3, p4, [n]);  // cubic spline
+  path(p1, v1, v2, t_min, t_max, [n]); // ellipse
+  path(f, t_min, t_max, [n]);
+\end{verbatim}
+
+The member function \code{pt()} accepts a~\code{P} or three (or two)
+doubles and appends the specified point to a \code{path}.  This
+snippet creates a regular \teximath{n}-gon:
+\begin{verbatim}
+  path ngon; // declare new path
+  for (int i=0; i<=n; ++i)
+    ngon.pt(cis(i*full_turn()/n)); // works in all angle modes
+\end{verbatim}
+Compound paths may be built by concatenation.  If \code{path1}~and
+\code{path2} share an endpoint, the commands
+\begin{verbatim}
+  path1 += path2;
+  path1 -= path2;
+\end{verbatim}
+replace \code{path1} with the result of traversing \code{path1}
+``forward'', then following \code{path2} in the forward or reverse
+direction (respectively). For expected results, the first
+(or last) point on~\code{path2} should be the last point
+of~\code{path1}. The notation suggests 1-dimensional homology
+chains. The sample file \filename{contour.xp} illustrates path
+creation and manipulation.
+
+A \code{path} is a data structure, and must be drawn explicitly to
+create visible output. By default a \code{path} is not a closed loop
+(even if the first and last points are the same), and is not filled
+when drawn. Member functions perform these tasks. Continuing the
+\teximath{n}-gon snippet above,
+\findex{path.close}
+\findex{path.fill}
+\findex{path.draw}
+\begin{verbatim}
+  ngon.close(); // mark path as closed
+  ngon.fill();  // draw filled region if filling is active
+  ngon.draw();  // print to the screen
+\end{verbatim}
+\code{path::close()} adds a closing edge if necessary. Once a
+\code{path} is closed, no more points can be added. A closed path
+clips and crops differently than an open \code{path} with the same
+data. \code{path::fill()} has no effect on an unclosed \code{path}.
+
+
+\subsection{Function Plotting}
+
+\index{Plotting|(}
+The noun ``map'' refers to a \CXX\ function that accepts one or
+more \code{double} arguments and returns a \code{double}~or
+a~\code{P}. Mathematically, a map can be depicted in two ways: as a
+graph (which retains information about the domain), or as a
+parametrized curve or surface (which discards domain
+information). \ePiX\ assumes that \code{double}-valued maps are
+graphed and \code{P}-valued maps are drawn parametrically. Either sort
+of depiction is called a ``plot''.  \ePiX\ plots are either ``wire
+mesh'', produced by a \code{plot} command, or ``shaded'', produced by
+a \code{surface} command.
+
+
+\subsubsection*{Basic Plotting}
+
+For the moment, ``function'' means ``function of one variable''
+(precisely, a \code{double}-valued function of a \code{double}
+variable). A function graph depends on the domain and the number of
+points to use. Each of the commands
+\findex{plot}
+\findex{polarplot}
+\findex{shadeplot}
+\begin{verbatim}
+  plot(f, t_min, t_max, n);
+  polarplot(f, t_min, t_max, n);
+  shadeplot(f, t_min, t_max, n);
+\end{verbatim}
+graphs the function~\code{f} on the interval \code{[t\_min, t\_max]}
+by dividing the interval into \code{n}~subintervals of equal length.
+The first gives a Cartesian plot, the second a polar plot with bounds
+in current angular units, the third shades the region between the
+graph and the horizontal axis. If two functions are given to
+\code{shadeplot}, the region between their graphs is shaded.
+
+
+\subsubsection*{Domains and Wiremesh Plots}
+
+\index{Domain|(}
+An \ePiX\ \code{domain} is a coordinate box of dimension one, two, or
+three, specified by a pair of opposite corners and two \emph{meshes}
+(``coarse'' and ``fine'', respectively) which specify the amount of
+data to be plotted. Plotting is explained in detail below.
+\findex{domain}
+\begin{verbatim}
+  // [a1,a2] x [b1,b2]: n1 x n2 rectangles, m1 x m2 intervals
+  domain R2(P(a1,b1), P(a2,b2), mesh(n1,n2), [mesh(m1,m2)]);
+
+  // [a1,a2] x [b1,b2] x [c1,c2] divided analogously
+  domain R3(P(a1,b1,c1), P(a2,b2,c2),
+            mesh(n1,n2,n3), [mesh(m1,m2,m3)]);
+\end{verbatim}
+If unspecified, the fine mesh is the same as the coarse mesh. For
+expected behavior, the coarse mesh should ``divide'' the fine mesh, in
+that \teximath{m_i}~should be a (usually small) integer multiple
+of~\teximath{n_i} for each~\teximath{i}.
+
+A \code{domain} may be \emph{resized} in any coordinate for which the
+thickness is positive, and can be \emph{sliced} by setting one
+variable to a constant. The result of slicing is a \code{domain} whose
+dimension is one smaller than the original.  Finally,
+``\code{slices}'' operators return the list of \code{domain}s obtained
+by setting one variable to evenly-spaced constants.  By default, the
+number of slices is specified by the coarse mesh. An optional argument
+specifies the number of slices. This argument need not be related to
+the coarse mesh.
+\findex{domain.resize}
+\findex{domain.slice}
+\findex{domain.slices}
+\begin{verbatim}
+  R2.resize2(a,b); // [a1,b1] x [a,b]
+  R2.slice1(t);    // set x1 = t
+  R3.slices3([n]); // (n+1) domains with x3 = const
+\end{verbatim}
+\begin{center}
+  \input{slices.eepic}
+\end{center}
+\smallskip
+When possible, resizing preserves grid square sizes. Generally,
+though, integer truncation occurs: If \code{R=domain(P(0,0), P(1,1),
+mesh(10,6))}, then \code{R.resize1(0,0.25)} is the rectangle
+\teximath{[0,0.25]\times[0,1]} subdivided into \teximath{2\times6}
+subrectangles, since \teximath{10\div4=2} in integer arithmetic. For
+expected behavior, choose mesh sizes to avoid integer truncation.
+
+
+The arguments of a \code{plot} command are a map, followed by either a
+domain or its logical equivalent.
+\findex{plot}
+\begin{verbatim}
+  double f(double t) { return t*t; }
+  P F(double u, double v) { return P(u, v, exp(u)*Sin(v)); }
+  P G(double u, double v, double w) { return P(v*w, u*w, u*v); }
+
+  plot(f, a, b, n);       // f:[a,b] -> R, using n intervals
+  plot(F, R2);            // graph of exp(u)*Sin(v)
+  plot(G, R3.slice2(0.5); // G: R^3 -> R^3 restricted to y=0.5
+\end{verbatim}
+By (compiler-enforced) convention, \code{plot} commands involving a
+\code{P}-valued map accept a \code{domain} argument, as in the second
+and third commands above. To plot a \code{double}-valued function, by
+contrast, supply the logical equivalent of a \code{domain}, usually
+the endpoints and the number of intervals, as in the first \code{plot}
+command above.
+
+Resizing and slicing allow a map~\code{F} to be plotted selectively
+over parts of its domain. This can be used to emphasize parts of the
+image, layer scene elements, patch surfaces together, and so forth.
+Resize and slice(s) commands may be used directly in a \code{plot}
+command:
+\findex{plot}
+\begin{verbatim}
+  plot(F, R2.resize1(0,0.5));
+  plot(F, R2.slices1());
+\end{verbatim}
+
+
+\subsubsection*{Meshes and Plotting}
+
+The \code{P}~arguments of a \code{domain} are a pair of opposite
+corners. The first \code{mesh} argument, the \emph{coarse} mesh,
+specifies the number of subdivisions in each coordinate direction.
+The second \code{mesh}, the \emph{fine} mesh, determines the number of
+points used in each direction when plotting.
+
+\begin{comment}
+Suppose the \code{domain}~\code{R2} is, as above, the rectangle
+\teximath{[0,3]\times[-1,2]}. The argument \code{mesh(12,6)} divides the
+rectangle a \teximath{12\times6}~array of subrectangles known as the
+\emph{coarse mesh}. A \code{P}-valued map~\code{F} of two variables is
+plotted over the edges of the coarse mesh. Rather than drawing
+quadrilaterals, however, \ePiX\ draws the image curves at the
+resolution specified by the argument \code{mesh(60,60)}, the
+\emph{fine mesh}. In this example, the curves in each direction are
+drawn using 60~line segments.
+\end{comment}
+
+Separating the roles of coarse and fine meshes allows a plot to
+conform closely to a surface without using a fine grid of curves.
+Both parts of Figure~\ref{fig-plot} are drawn with a
+\teximath{6\times20} coarse mesh. In the first picture, the fine mesh
+is also \teximath{6\times20}, while in the second, the fine mesh is
+\teximath{12\times60}.
+
+\begin{figure}[hbt]
+  \begin{center}
+    \input{plot_a.eepic}\hspace*{0.5in}
+    \input{plot_b.eepic}
+    \caption{Coarse and fine meshes.}
+    \label{fig-plot}
+  \end{center}
+\end{figure}
+
+The coarse mesh is significant only for domains of dimension at
+least~2. The coarse mesh's size determines the number of curves or
+surfaces plotted \emph{perpendicularly} to a coordinate direction,
+while the fine mesh's size determines the number of segments used
+\emph{along} that direction.  For predictable results, the fine mesh
+should be a small multiple of the coarse mesh.
+
+Plotting works analogously for 3-dimensional \code{domain}s and maps
+depending on three variables: The ``one-dimensional skeleton'' of the
+\code{domain}'s image is drawn.  A \code{P}-valued map of
+three variables can be plotted over a 1-~or 2-dimensional
+\code{domain}. (The effect may be unexpected unless the domain arises
+by slicing, however.) A map depending on one or two variables cannot
+be plotted over a 3-dimensional \code{domain}.
+\index{Domain|)}
+
+
+\subsubsection*{Shaded Surfaces}
+
+\index{Plotting!surface|(}
+
+\ePiX's shaded surface plotting implements a degree of hidden surface
+removal. The algorithm breaks a surface into mesh fragments, sorts
+them in decreasing (approximate) distance to the camera, and prints
+them.  If filling is active, a mesh fragment is shaded according to
+the angle between the normal vector and the direction to the camera,
+simulating constant ambient lighting; otherwise, the current fill
+color is used.  This technique works fairly well for surfaces without
+intersection, and even acceptably handles intersecting surfaces for
+which mesh elements intersect only along boundaries.
+
+The syntax of a \code{surface} command is identical to a \code{plot}
+command when only a single surface is drawn. For example,
+\findex{surface}
+\begin{verbatim}
+  surface(F, R, cull=0);
+\end{verbatim}
+plots the \code{P}-valued function~\code{F} over the domain~\code{R},
+the shaded equivalent of the corresponding \code{plot} command. The
+optional \code{cull} argument removes elements that point toward
+(\code{cull=-1}) or away from (\code{cull=1}) the camera. Naturally,
+orientation of mesh elements depends on the parametrization~\code{F},
+not merely on the surface. Culling reduces the output file size, but
+is useful mostly for closed, convex surfaces.
+
+There are special commands for surfaces of rotation; each accepts a
+final \code{cull} argument.
+\findex{surface\_rev}
+\begin{verbatim}
+  surface_rev(f, t_min, t_max, n_lats, n_longs);
+  surface_rev(f, g, t_min, t_max, n_lats, n_longs=24);
+  surface_rev(f, g, R, frame coords);
+\end{verbatim}
+The first revolves the graph of~\teximath{f} about the
+\teximath{x}-axis, the second uses the parametric curve
+\teximath{t\mapsto\bigl(f(t),g(t)\bigr)} as profile. In each case, the
+parameter interval \verb+[t_min,t_max]+ is divided into \verb+n_lats+
+equal-length subintervals, \verb+n_longs+ copies of the profile curve
+are drawn, and the complete surface (one full turn) is drawn.
+
+The third form uses a \code{domain} to control the range of
+longitudes, and draws a surface of rotation in the Cartesian
+coordinate system defined by the orthonormal basis \code{coords}, by
+default the standard basis. The arguments \code{f}~and \code{g} define
+a parametric curve in the plane spanned by the first two elements
+of~\code{coords}, and the first element is the axis of rotation.
+
+As in wire mesh plotting, the fine mesh is used to draw the boundaries
+of surface patches; this tends to make surfaces look smoother for
+modest-sized coarse meshes. If the coarse mesh is too coarse, however,
+two visually undesirable effects can occur. First, adjacent regions of
+the surface may be shaded very differently, since shading is constant
+over patches defined by the coarse mesh. Second, a patch nearly
+tangent to a line of sight may be drawn badly if the patch bends back
+on itself, since the boundary of the \emph{patch} is drawn, not the
+visible edge of the mathematical surface. See
+\filename{samples/artifacts.xp}.
+
+
+\subsubsection*{Multiple Domains and/or Maps}
+
+A scene containing two or more shaded surfaces cannot generally be
+built up one surface at a time. Instead, multiple surfaces must be
+assembled into a single data structure before they can be drawn.
+Multiple surfaces are built from one or more maps and one or more
+2-dimensional \code{domain}s. In the code snippets below, \code{F}~and
+\code{G} are \code{P}-valued functions of 3~variables, and~\code{R} is
+a 3-dimensional \code{domain}.
+
+To plot the images of several \code{domain}s under a \emph{single
+map}, assemble the \code{domain}s into a list if necessary, then issue
+a \code{surface} command:
+\findex{surface}
+\findex{domain\_list}
+\findex{domain\_list.add}
+\begin{verbatim}
+  surface(F, R.slices3(), cull=0);
+
+  domain_list DL(R.slice1(0));  // build domain list
+  DL.add(R.slice2(0.5));        // add a domain, etc.
+  surface(G, DL, cull=0);       // draw
+\end{verbatim}
+For multiple maps, \ePiX\ provides the \code{scenery}
+class. Conceptually, \code{scenery} is an agglomeration of shaded
+surfaces, built one surface at a time from maps and 2-dimensional
+\code{domain}s. The \code{add} function accepts two arguments---a map,
+and either a \code{domain} or a list of \code{domain}s---and
+contributes its data to the \code{scenery} rather than plotting
+immediately. Completed \code{scenery} is drawn manually.
+\findex{scenery}
+\findex{scenery.add}
+\findex{scenery.draw}
+\begin{verbatim}
+  scenery S(F, R.slice3(0.25)); // S contains one surface
+  S.add(F, R.slice2(0));        // S contains two surfaces
+  S.add(G, R.slices1(3));       // S contains six surfaces
+  S.draw(cull=0);
+\end{verbatim}
+Complete examples are included in the \filename{samples} directory:
+\filename{spherical.xp}~and \filename{minkowski.xp}.
+
+In principle, a scene may contain arbitrarily many surfaces. However,
+figures that contain many objects tend to tax \LaTeX's internal
+stacks. Frequent color changes exacerbate the problem.  Even if you
+use \filename{hugelatex} (or increase \LaTeX's memory), a figure
+containing more than a few thousand mesh elements is unlikely to
+compile. At moderate resolution, a surface can easily contain
+1000~patches. Each shell script has a command-line option to invoke
+\filename{hugelatex}; your mileage may vary.
+
+
+\subsubsection*{User-Specified Color Shading}
+
+\index{Color!surface plotting}
+By default, a \code{surface} or \code{scenery} is colored according to
+the current fill color. For finer control, each \code{surface},
+\code{surface\_rev}, and \code{scenery} command accepts an optional
+position-dependent \code{color} specification.
+\findex{surface}
+\findex{surface\_rev}
+\findex{scenery}
+\findex{scenery.add}
+\begin{verbatim}
+  surface(F, R, color, cull=0);
+  surface_rev(f, [g], t_min, t_max, n_lats, n_longs, color);
+  surface_rev(f, g, R, color, [coords]);
+
+  scenery S(F, R, color);
+  S.add(F, R, color);
+\end{verbatim}
+The \code{color} argument is a \code{P}-valued function of two or
+three \code{double}s whose output is interpreted as a set of
+\code{RGB}~densities. If \code{color} takes two arguments, they are
+\code{domain} coordinates, and the surface is colored according to
+parameter values. If \code{color} takes three arguments, they are
+Cartesian coordinates, and the surface is colored according to spatial
+location.  Please see the sample files
+\filename{surface\_shade.xp}~and \filename{S2\_harmonics.xp}. 
+\index{Plotting!surface|)}
+
+
+\subsection{Calculus Plotting} 
+\index{Plotting!calculus|(}
+
+\ePiX\ provides high-level commands for plotting derivatives and
+definite integrals, Riemann sums, tangent lines, slope- and vector
+fields, and solutions of planar and spatial systems of differential
+equations.
+
+In this section, \code{f}~and \code{g} are \code{double}-valued
+functions of one variable.
+
+\subsubsection*{Utility Functions}
+
+\findex{sup}
+\findex{inf}
+\findex{newton}
+\begin{verbatim}
+  sup(f, a, b);     // max/min of f on [a,b]
+  inf(f, a, b);
+  newton(f, g, x0); // find approximate crossing point
+\end{verbatim}
+Newton's method returns the crossing point of the given functions,
+starting from the specified seed, which should be reasonably close to
+the expected solution. If a critical point is hit or 5~iterations
+pass, a warning is issued and the current result (probably incorrect)
+is returned. The second function~\teximath{g} defaults to the zero function if
+omitted.
+
+\subsubsection*{Derivatives and Integrals}
+
+The classes \code{Deriv}~and \code{Integral} are used to calculate
+values of derivatives and integrals, and to plot these functions.
+\findex{Deriv}
+\findex{Deriv.eval}
+\findex{Deriv.left}
+\findex{Deriv.right}
+\findex{Integral}
+\findex{Integral.eval}
+\begin{verbatim}
+  Deriv df(f); // function object: df(x) = f'(x)
+  df.eval(t);  // return f'(t)
+  df.left(t);  // deriv from left at t:  (f(t)-f(t-dt))/dt
+  df.right(t); // deriv from right at t: (f(t+dt)-f(t))/dt
+
+  Integral prim(f,a); // function object: prim(x) = int_a^x f
+  prim.eval(b);  // numerical integral of f over [a,b]
+  double val(Integral(f).eval(1));   // val = \int_0^1 f
+\end{verbatim}
+The lower limit on an integral is~0 by default. \code{Deriv}s and
+\code{Integral}s can be used directly in a \code{plot} command:
+\findex{plot}
+\findex{riemann\_sum}
+\begin{verbatim}
+  plot(Deriv(f), a, b, n);  // plot f' over [a,b]
+  plot(Integral(f, x0), a, b, n);
+  riemann_sum(f, a, b, n, TYPE);
+\end{verbatim}
+The second graphs the definite integral \teximath{x\mapsto\int_{x_0}^x
+f(t)\,dt} over~\teximath{[a,b]}. As above, \teximath{x_0}~defaults
+to~0. The third draws rectangles or trapezoids whose area approximates
+the definite integral of~\teximath{f} over~\teximath{[a,b]}. The
+\code{TYPE} may be \code{UPPER}, \code{LOWER}, \code{LEFT},
+\code{RIGHT}, \code{MIDPT}, or~\code{TRAP}.
+
+Tangent lines and envelopes (families of tangent lines) are drawn with
+\findex{tan\_line}
+\findex{envelope}
+\findex{tan\_field}
+\begin{verbatim}
+  tan_line(f, t);                // f real- or vector-valued
+  envelope(f, t_min, t_max, n);  // family of tangent lines
+  tan_field(f, g, t_min, t_max, n); // field of tangents
+\end{verbatim}
+The sample files \filename{conic.xp}~and \filename{lissajous.xp}
+illustrate these features.
+
+
+\subsubsection*{Systems of Differential Equations}
+
+Let \code{F}~be a \code{P}-valued function of two or three variables.
+\findex{ode\_plot}
+\findex{flow}
+\begin{verbatim}
+  ode_plot(F, p_0, t_min, t_max, n); 
+  flow(F, p_0, t_max, n);
+\end{verbatim}
+The first plots the solution curve of the initial-value problem
+\teximath{\dot{x}=F(x)}, \teximath{x(0)=p_0}, over the specified time
+interval.  If \teximath{t_\mathrm{min}} is omitted, its value is~0, so
+the curve starts at~\teximath{p_0}. With manual calculation to rotate
+a planar field a quarter turn, \code{ode\_plot} can be used to draw
+level curves (isobars) of a function of two variables; see the sample
+file \filename{dipole.xp}.  The \code{flow} function returns the
+result of starting at~\teximath{p_0} and flowing by~\teximath{F} for
+time~\teximath{t_\mathrm{max}}, using Euler's method with~\teximath{n}
+time steps.  This is useful for placing markers or arrowheads precisely
+along a flow line.
+
+A planar or spatial vector field itself may be plotted over a
+domain~\code{R} in three styles:
+\findex{vector\_field}
+\findex{dart\_field}
+\findex{slope\_field}
+\begin{verbatim}
+  vector_field(F, R, [scale]); //  true length
+  dart_field  (F, R, [scale]); // const length
+  slope_field (F, R, [scale]); // const length
+\end{verbatim}
+The field is sampled at the grid points of the coarse mesh. If the
+domain is 2-dimensional, the plot is a planar slice of the field, even
+if the field depends on three variables. If the domain is
+3-dimensional, the field is drawn in successive slices
+\teximath{x_3=\mathrm{const}}, starting at the height of the first
+corner of~\code{R} and ending at the height of the second corner.
+
+The optional final argument, which defaults to~\teximath{1}, scales the
+arrowheads in a vector field, and scales the (constant) length of
+field elements for slope and dart fields. The sample files
+\filename{layout2.xp}, \filename{lorenz.xp}, \filename{slopefield.xp},
+and \filename{vfield.xp} illustrate usage.
+
+In each field-plotting command, the domain argument may be replaced by
+two points, representing corners of a coordinate rectangle, and two
+integers, the number of grid intervals in the selected coordinate
+directions. Only planar slices of a vector field can be plotted using
+the alternative syntax.
+\index{Plotting|)}
+\index{Plotting!calculus|)}
+
+
+\subsection{Non-Euclidean Geometry}
+\label{non-eucl}
+
+\ePiX\ provides limited features for spherical and hyperbolic
+geometry: the ability to draw lines in the half-plane and Poincar\'e
+disk models of the hyperbolic plane, and to draw latitudes,
+longitudes, great circle arcs, spherical triangles, regular polyhedra,
+and parametrized curves on a sphere.
+
+Hyperbolic line segments are specified by their endpoints in the upper
+half space or ball (Poincar\'e) models.  In each case there is no
+output if either endpoint lies outside the model.
+\findex{hyperbolic\_line}
+\findex{disk\_line}
+\begin{verbatim}
+  hyperbolic_line(p, q);
+  disk_line(p, q);
+\end{verbatim}
+For compatibility with 2-dimensional hyperbolic space, the half-space
+model is the set \teximath{\{(x_1,x_2,x_3)\mid x_2>0\}}.
+
+\index{Plotting!spherical|(}
+A \code{frame} determines geographical coordinates on a \code{Sphere}:
+the first element points toward longitude~0 on the equator, the third
+element points to the north pole.  A latitude line depends on a
+\code{Sphere}, a \code{frame}, the numerical latitude, and a range of
+longitudes. A longitude line is described similarly.
+\findex{latitude}
+\findex{longitude}
+\findex{back\_latitude}
+\findex{back\_longitude}
+\begin{verbatim}
+  latitude(lat, long_min, long_max, Sphere S, frame coords);
+  longitude(lngtd, lat_min, lat_max, Sphere S, frame coords);
+\end{verbatim}
+By default, \code{coords} is the standard \code{frame} and \code{S} is
+the unit sphere. These commands draw only the portion of the curve
+that is visible from the current viewpoint. The function
+\code{back\_latitude} draws the invisible portion of a latitude line.
+
+Spherical arcs and triangles are described by their endpoints. Only
+the direction vector from the center of the sphere to an endpoint is
+significant; if a sphere is scaled or moved, the same function call
+will draw the corresponding object on the new sphere. 
+
+The following draw the visible (front) portions of great circle arcs:
+\findex{front\_arc}
+\findex{front\_arc2}
+\findex{front\_line}
+\findex{back\_arc}
+\findex{back\_arc2}
+\findex{back\_line}
+\begin{verbatim}
+  front_arc(p1, p2, S);  // short arc on S from p1 to p2
+  front_arc2(p1, p2, S); // arc from p1 to -p1 through p2
+  front_line(p1, p2, S); // great circle through p1 and p2
+\end{verbatim}
+Triangles and regular (Platonic) polyhedra are provided. The sample
+file \filename{sample/polyhedra.xp} illustrates usage.
+\findex{front\_triangle}
+\findex{front\_tetra}
+\findex{front\_cube}
+\findex{front\_octa}
+\findex{front\_dodeca}
+\findex{front\_icosa}
+\findex{back\_triangle}
+\findex{back\_tetra}
+\findex{back\_cube}
+\findex{back\_octa}
+\findex{back\_dodeca}
+\findex{back\_icosa}
+\begin{verbatim}
+  front_triangle(p1, p2, p3, S); // spherical triangle
+  front_tetra(S, coords);  // regular tetrahedron
+  front_cube(S, coords);   //    hexahedron
+  front_octa(S, coords);   //    octahedron
+  front_dodeca(S, coords); //    dodecahedron
+  front_icosa(S, coords);  //    icosahedron
+\end{verbatim}
+Each function has a \code{back} version, which draws the hidden
+portion. The tetrahedron, cube, and octahedron are (up to scale)
+inscribed in the cube of side length~\teximath{2} centered at the origin whose
+sides are parallel to~\code{frame}. The point \teximath{(1,1,1)} is a vertex of
+the tetrahedron.
+
+Up to scale, the icosahedron's vertices lie on the golden rectangle
+with vertices \teximath{(\pm\gamma,0,\pm1)} and its images under cyclic
+permutation of coordinates. The dodecahedron is dual to the
+icosahedron.
+
+\subsubsection*{Spherical Geometry}
+
+\index{Sline}
+
+The \code{Sline} class represents geodesic arcs on the unit sphere,
+and provides intersection and reflection operators.
+\findex{Sline}
+\findex{pole}
+\findex{cosine}
+\findex{reflect}
+\findex{collinear}
+\findex{cuts}
+\findex{draw}
+\findex{draw\_front}
+\findex{draw\_back}
+\findex{draw\_line}
+\findex{line\_front}
+\findex{line\_back}
+\begin{verbatim}
+  Sline L1(tail, head); // non-proportional vectors
+  L1.pole();            // pole of equator
+  L1.cosine();          // subtended arc
+  L1.reflect(arg);      // reflect arg across L1
+  L1.reflect(L2);       // reflect L2 across L1
+  L1.collinear(L2);     // test for collinearity
+  L1.cuts(L2);          //   or crossing
+  L1.draw();            // arc
+  L1.draw_front();      // front arc (same for back)
+  L1.draw_line();       // draw entire line
+  L1.line_front();      // front line (same for back)
+\end{verbatim}
+
+
+\subsubsection*{Spherical Plotting}
+
+Parametrized paths on a \code{Sphere~S} (by default the unit sphere)
+can be specified either by radial projection of a \code{P}-valued
+curve, or by stereographic projection of a plane curve given as a pair
+of \code{double}-valued functions:
+\findex{frontplot\_R}
+\findex{frontplot\_N}
+\findex{frontplot\_S}
+\findex{backplot\_R}
+\findex{backplot\_N}
+\findex{backplot\_S}
+\begin{verbatim}
+  frontplot_R(phi, t_min, t_max, n, [S]);    // radial
+  frontplot_N(f1, f2, t_min, t_max, n, [S]); // from north pole
+  frontplot_S(f1, f2, t_min, t_max, n, [S]); // from south pole
+\end{verbatim}
+Attempts to perform radial projection on a path through the origin
+will generate division-by-zero errors. Stereographic projection maps
+the equatorial plane \teximath{\{x_3=0\}} to the unit sphere by
+projection from the corresponding pole: \teximath{N=(0,0,1)},
+\teximath{S=(0,0,-1)}.
+
+Each spherical plot command has a \code{back} version that prints only
+the portion of the path invisible from the current viewpoint.
+Because of the way \ePiX\ layers output, it is generally best to put
+hidden portions of the input before visible portions, with line width
+and/or style that suggests hidden lines.
+\index{Plotting!spherical|)}
+
+
+\subsection{Data Plotting} 
+\index{Plotting!data|(}
+\index{Data plotting|(}
+
+Thanks in large part to code and ideas from Marcus Hanwell, files of
+numerical data can be created, manipulated, analyzed, plotted (paths,
+scatter plots, and histograms), read, and written.  The format for a
+data file is one or more floating-point numbers per line, with the
+same number of entries per line. Anything that appears on a line after
+the \LaTeX\ comment character~\code{\%} is a comment.
+
+\ePiX\ provides two \code{plot} commands for file data. The first
+facilitates plotting selected columns; the second simplifies plotting
+the first two columns with one or both scales logarithmic. Either form
+can be used to plot selected columns logarithmically.
+
+The general commands read numbers from two or three columns of a
+specified file, pass them as arguments to a \code{P}-valued
+function~\code{F}, and plot the resulting points:
+\findex{plot}
+\begin{verbatim}
+  plot("filename", STYLE, [i_1], [i_2], [i_3], [F]);
+  plot("filename", STYLE, F, [i_1], [i_2], [i_3]);
+\end{verbatim}
+The first argument is the name of the data file. The \code{STYLE} may
+be \code{PATH}, which joins the points in the order they appear, or
+any of the marker types in Table~\ref{table-marker}.  The
+integers~\teximath{i_k} specify columns from which to extract data; these
+default, respectively, to the first column, second column, and null (a
+column of zeroes). If the ``coordinate system''~\code{F} is omitted in
+the first command, it defaults to the Cartesian point constructor. The
+function~\code{F} is mandatory in the second form; useful choices
+include \code{log\_log}, \code{log\_lin}, and~\code{lin\_log}, which
+plot the corresponding coordinate logarithmically.
+
+
+\subsubsection*{Data Files}
+
+For more elaborate analysis, the \code{data\_file} class presents an
+interface to a file as an ordered list of columns. There are two
+general ways to create a \code{data\_file}: read in an external file,
+or generate data (up to three columns) using specified
+\code{double}-valued functions. In the constructors below, each
+function~\code{fi} is a \code{double}-valued function of one variable.
+\findex{data\_file}
+\findex{data\_file.read}
+\begin{verbatim}
+  data_file DF("my_data"); // read data from disk file
+  data_file DF(f1, t_min, t_max, num_pts); // values of f1
+  data_file DF(f1, f2, t_min, t_max, num_pts);
+  data_file DF(f1, f2, f3, t_min, t_max, num_pts);
+  data_file DF(3);  // create empty data_file with 3 columns
+  DF.read("file1"); // read a disk file
+\end{verbatim}
+
+Columns of a \code{data\_file} can be transformed by a user-specified
+function, averaged, correlated, extracted (for use by other code),
+scatter plotted, and written to a disk file at specified
+precision. Below, the function~\code{f} is a \code{double}-valued
+function of one variable and~\code{F} is a \code{P}-valued function of
+two or three variables, whose components are written back to the
+selected columns.
+\findex{data\_file.transform}
+\begin{verbatim}
+  DF.transform(f, i);    // apply f to selected column(s)
+  DF.transform(F, i=1, j=2);
+  DF.transform(F, i, j, k);
+\end{verbatim}
+Basic statistical operations on columns are provided.
+\findex{data\_file.dot}
+\findex{data\_file.avg}
+\findex{data\_file.var}
+\findex{data\_file.covar}
+\findex{data\_file.regression}
+\begin{verbatim}
+  DF.dot(i,j);        // dot product of columns i, j
+  DF.avg(i);          // mean of column i
+  DF.var(i);          // population variance
+  DF.covar(i,j);      // covariance
+  DF.regression(i,j); // plot regression line
+\end{verbatim}
+A \code{data\_file} is scatter plotted using syntax as described above.
+% The output is cropped automatically to the bounding box.
+\findex{data\_file.plot}
+\begin{verbatim}
+  DF.plot(STYLE, [i1], [i2], [i3], [F]);
+  DF.plot(STYLE, F, [i1], [i2], [i3]);
+\end{verbatim}
+Histograms and bar charts are described below.
+
+A \code{data\_file} can be written to a disk file as raw data, or in
+specified format. Below, \code{fmt} denotes a \code{string}-valued
+formatting function of two variables and \filename{myfile} is the
+name of the disk file to be written.
+\findex{data\_file.precision}
+\findex{data\_file.write}
+\begin{verbatim}
+  DF.precision(4);    // set to 4 significant figures
+  DF.write("myfile"); // write as tab-separated columns
+  DF.write("myfile", fmt, [i1], [i2]); // apply fmt to cols
+\end{verbatim}
+A column can be extracted as a \code{C++}~\code{vector} for use by
+another function.
+\findex{data\_file.column}
+\begin{verbatim}
+  DF.column(i);    // i-th column
+  DF.column(f, i); // i-th column, transformed by f
+\end{verbatim}
+
+
+\subsubsection*{Data Containers}
+
+\ePiX\ provides a \code{data\_mask} class for culling data from a file
+according to the values in a specified column, and a \code{data\_bins}
+class for sorting data by value.
+
+A \code{data\_mask} consists of an interval of numbers and a
+``filter'' function. The (closed, open, or half-open) interval is
+given as a string in standard mathematical notation, or by its
+endpoints (for a closed interval).  The filter is a
+\code{double}-valued function of \code{double}, by default the
+identity, \teximath{f(x)=x}.
+\findex{data\_mask}
+\begin{verbatim}
+  data_mask dm("[a, b]", [f]);
+  data_mask dm(a, b, [f]);
+\end{verbatim}
+A \code{data\_mask} ``passes'' inputs~\teximath{x} if~\teximath{f(x)}
+lies in the interval. The member function \code{reverse()} inverts
+this logical test.
+
+The \code{data\_file} class has \code{prune} functions to cull
+rows for which a specified column's entry satisfies a
+\code{data\_mask}'s criterion.
+\findex{data\_mask.prune}
+\begin{verbatim}
+  DF.prune(dm, i);   // remove row if i-th column entry fails
+  DF.prune(a, b, i); // remove row if i-th column outside [a,b]
+\end{verbatim}
+
+A \code{data\_bins} object models an interval divided at specified
+locations into ``bins'', not necessarily of equal length. Numerical
+data is read in and the number of points in each bin counted. The
+lifetime of a \code{data\_bins} object has two stages. First, ``cuts''
+(endpoints of subintervals) are added. Then, once data is read, the
+cuts are ``locked'' and cannot subsequently be changed.
+\findex{data\_bins}
+\findex{data\_bins.cut}
+\findex{data\_bins.read}
+\begin{verbatim}
+  // [xmin, xmax] divided into n equal intervals, 1 by default
+  data_bins db(xmin, xmax, [n]);
+  db.cut(x);  // add a cut at x (if x is in bounds)
+  db.read(vector<double>); // read data, lock bins
+\end{verbatim}
+
+\index{Histograms}
+\index{Bar Charts}
+A \code{data\_bins} object can be plotted as a histogram (rectangles'
+\emph{area} is proportional to the bin population), bar chart
+(rectangles' \emph{height} is proportional to the bin population), or
+spline interpolation of a bar chart.
+\findex{data\_bins.histogram}
+\findex{data\_bins.bar\_chart}
+\findex{data\_bins.plot}
+\begin{verbatim}
+  db.histogram(c=1);  // c = vertical scale factor
+  db.bar_chart(c=1);
+  db.plot(c=1);
+\end{verbatim}
+By default (\code{c=1}), the height of a bar chart rectangle is the
+fraction of the total population contained in the bin; thus, the
+height is always between 0~and 1. For a histogram, the height of a
+rectangle is the fraction of the population per horizontal unit in the
+bin; thus, the total area over an interval~\teximath{[a,b]} does not
+depend on how~\teximath{[a,b]} has been subdivided. The sample files
+\filename{dataplot.xp}~and \filename{histogram.xp} illustrate use.
+
+Statistical convention dictates cuts be chosen distinctly from data
+values; that is, values should all fall strictly within a bin, not at
+a boundary point. With large, unknown data sets, this convention may
+be difficult to uphold. \ePiX\ attempts to handle anomalous data
+intelligently, by keeping counts of values ``out-of-range'' or
+``on-cut''.
+
+In detail, if \teximath{x<a} or \teximath{x>b} is a data value, it is
+counted as out-of-range and does not contribute to the histogram
+population. If \teximath{x=a} or \teximath{x=b}, the value counts as
+both out-of-range and on-cut but is added to the population of the
+lowest or highest bin, respectively. Any other cut appearing as a data
+input is flagged as on-cut, and increments the population of each
+adjacent bin by one-half. When a histogram or bar chart is written,
+\ePiX\ prints a warning message summarizing the number of anomalous
+data seen.
+
+
+\subsubsection*{Error Bars}
+\index{Error bars}
+
+Simple horizontal and vertical error bars are provided.  The final
+(optional) argument is the true height or width (respectively) in pt.
+\findex{h\_error\_bar}
+\findex{v\_error\_bar}
+\begin{verbatim}
+  h_error_bar(P location, double error, <mark type>, ht=6);
+  v_error_bar(P location, double error, <mark type>, wd=6);
+\end{verbatim}
+
+To create more complex elements, such as asymmetric bars, whisker
+plots, labeled error bars, and the like, write a custom function using
+true-size drawing, see page~\pageref{truesize}. For example, a
+fillable, labeled, asymmetric, vertical rectangular error bar can be
+implemented (entirely in \ePiX) like this:
+\begin{verbatim}
+  void error_bar(P loc, double lo, double hi, P offset,
+                 std::string text, align, double wd=6)
+  {
+    const double width(pt_to_screen(0.5*wd)); // converts to 3pt
+    rect(loc - P(width, lo), loc + P(width, hi));
+    line(loc - P(width,  0), loc + P(width,  0));
+    label(loc + P(width, 0), offset, text, align);
+  }
+\end{verbatim}
+For stylistic uniformity, functions such as this should be put into a
+library and used systematically. Section~\ref{section-extensions}
+outlines the process of writing, compiling, and using a custom
+library.
+\index{Plotting!data|)}
+\index{Data plotting|)}
+
+
+\subsection{Legends}
+\index{Legends}
+
+A \code{legend} systematically labels different parts of a plot by
+associating visual ``keys'' with explanatory text. This tends to be
+most useful for plots containing several distinct but conceptually
+related graphs requiring contrast. 
+
+Visually, a \code{legend} is represented as an aligned list of rows,
+each containing a box (the key), a gap (the label skip), and some
+text.  These rows are printed in a (usually large) masked label. By
+default, keys are \code{12pt}~squares bordered in black, the label
+skip is~\code{6pt}, the background is white, and the border is plain
+black. These attributes are controlled (simultaneously for all items)
+with member functions.  Parameters of type \code{double} represent
+lengths in~\code{pt}.
+\findex{legend}
+\findex{legend.backing}
+\findex{legend.border}
+\findex{legend.item\_border}
+\findex{legend.label\_skip}
+\findex{legend.key\_size}
+\begin{verbatim}
+  legend L;
+  L.backing(color);          // set background
+  L.border(color, [double]); // set border color [and width]
+  L.border(double);          // border width
+
+  L.item_border(color, [double]);
+  L.item_border(double);     // same, for item borders
+
+  L.label_skip(double);
+  L.key_size(double);
+\end{verbatim}
+
+
+\subsubsection*{Legend Keys}
+
+There are three types of legend key, representing filled regions,
+paths, and markers. Fill and path keys get their visual attributes
+from the current drawing state. A mark key must be told the marker
+type. Each is created by specifying the item text.
+\findex{legend.fill\_item}
+\findex{legend.path\_item}
+\findex{legend.mark\_item}
+\begin{verbatim}
+  L.fill_item(text);
+  L.path_item(text);
+  L.mark_item(<mark type>, text);
+\end{verbatim}
+Keys in the printed legend appear in the same order they are created
+in the input file.
+
+
+\subsubsection*{Creating a Legend}
+
+Normally, a \code{legend} is defined near the start of a file, and an
+item is added at the point in the file where the corresponding object
+or plot is drawn, so that the item receives the correct attributes. A
+\code{legend} is placed into the figure with the \code{draw}
+function. The arguments have the same meaning as for ordinary
+\code{label}s.
+\findex{legend.draw}
+\begin{verbatim}
+  L.draw(P location, P offset, align);
+\end{verbatim}
+All three arguments are mandatory.  ``Global'' \code{legend} settings
+(border, backing, etc.) may be changed anywhere between the
+\code{legend}'s creation and \code{draw} function. The sample file
+\filename{legend.xp} revisits the example on
+page~\pageref{taylor_poly}, including a trig-labeled axis and a
+legend. The file \filename{shadeplot.xp} contains filled keys, and
+\filename{dataplot.xp} contains a \code{legend} with items of mixed
+type.
+
+
+\section{More About \CXX}
+\index{Cplusplus@\CXX|(emph}
+
+A textbook or similarly detailed reference is essential for serious
+study of~\code{C} or~\CXX. \emph{The \code{C} Programming Language},
+second edition, by Kernighan~and Ritchie~\cite{KnR}, is an excellent,
+manageable resource for the basics of procedural
+programming. \emph{C++ Primer Plus}, by Stephen Prata~\cite{Prata},
+clearly lays out the extensive details of~\CXX.  Marshall Cline's
+\emph{\CXX\ FAQ Lite}~\cite{Cline} engagingly discusses common points
+of confusion and furnishes tips on good design and programming.
+
+\CXX\ is a powerful, complex language whose syntax is similar to that
+of~\C, or to the scripting languages of Maple~and Mathematica. An
+\ePiX\ input file is source code for a \CXX~program that writes a
+\LaTeX\ picture as output.  \ePiX\ may be viewed as an extension
+to~\CXX; in the same way that \LaTeX\ furnishes a high-level interface
+to~\TeX, \ePiX\ provides a high-level bridge between the computational
+power of~\CXX\ and the \LaTeX\ \code{picture} environment.
+
+\index{Function}
+\index{Conditional statement}
+Like all high-level programming languages, \CXX\ provides variables,
+functions, and control structures. Variables hold pieces of data such
+as numerical values and geometric locations, while functions operate
+on data. A control structure, such as a loop or conditional statement,
+affects the program's course according to the program's current state.
+A source file is composed primarily of ``statements'', which perform
+actions ranging from defining variables and functions to setting
+figure attributes, performing calculations, and writing objects to the
+output file.
+
+\subsection{Names and Types}
+
+\index{Variable!names|(}
+Names of variables and functions may consist (only) of letters,
+digits, and the underscore character. The first character of a name
+must not be a digit, and the language standard reserves names starting
+with underscore for library authors. Names are case-sensitive, but
+it's usually a bad idea to use a single name capitalized and
+uncapitalized in a single file. Numerous capitalization conventions
+are used informally; this document uses uncapitalized words separated
+by underscores for variables and functions, and occasionally uses all
+capitals for constants. As with names of \LaTeX\ macros, primary
+considerations are clarity (of meaning), readability, and consistency.
+\index{Variable!names|)}
+
+\index{Variable!type of}
+Every variable in \CXX\ has a ``type'',
+such as integer (\code{int}), double-precision floating point
+(\code{double}), or Boolean (\code{bool}, true~or false).  \ePiX\ 
+provides additional types, the most common of which is~\code{P}, for
+point. The construct \code{P(x,y,z)} creates~\teximath{(x,y,z)}, while
+\code{P(x,y)} gives~\teximath{(x,y,0)}, which is effectively the
+pair~\teximath{(x,y)}. A variable is defined by giving its type, its
+name, and an initializing expression.
+
+\index{Variable!pointer}
+\index{Pointer}
+In~\code{C} and~\CXX, a \emph{pointer} variable holds the memory
+address of another variable. Pointers are useful for manipulating
+(possibly large) data structures through ``handles'' of fixed small
+size. \CXX\ also provides \emph{references}, which bind an additional
+name to an existing object and allow the object to be manipulated
+through this alias. The statements
+\begin{verbatim}
+  double  x=1;   // ordinary variable definition
+  double& rx=x;  // bind a reference, signified by &
+\end{verbatim}
+define a variable~\code{x} having the value~1, and bind a reference
+variable~\code{rx} to it. As long as~\code{rx} exists, it refers
+to~\code{x}. If the value of~\code{x} changes, the value of~\code{rx}
+does as well. Conversely, the value of~\code{x} can be altered by
+assigning to~\code{rx}. However,~\code{rx} is the size of a pointer,
+regardless of the size of~\code{x}, so~\code{rx} can be passed
+efficiently in a function call.
+\texicomment
+Some applications are discussed on page~\pageref{references}.
+\texicommentend
+
+
+\subsection{Functions}
+
+\index{Function|(}
+In a programming language, the term ``function'' refers to a block of
+code that is executable by name.  A \CXX\ function takes a list of
+``arguments'', and has a ``return value''.  This information, together
+with the function's name, must be provided when a function is defined.
+A function may not be defined inside another function. However, a
+function may call other functions (including itself) as part of its
+execution:
+\begin{verbatim}
+  int factorial(unsigned int n)
+  {
+    if (n == 0) return 1;
+    else return n*factorial(n-1);
+  }
+\end{verbatim}
+
+\index{Function!returning \code{void}}
+The special type~\code{void} represents a ``null type''. A function
+that performs an action but does not return a value has return type
+\code{void}. A function that takes no arguments may be viewed as
+taking a single \code{void} argument.
+
+Every \CXX\ program has a special function~\code{main()}, which is
+called by the operating system when the program is run. The arguments
+of~\code{main()} are command-line arguments, and the return type is an
+integer that signals success or failure. User-specified functions must
+be defined before the call to \code{main()} or in a
+separately-compiled file.
+
+Functions in~\CXX\ may be as simple as an algebraic formula or as
+complex as an arbitrary algorithm. Greatest common divisors, finite
+sums, numerical derivatives and integrals, solutions of differential
+equations, recursively generated fractal curves, and curves of best
+fit are a few applications in \ePiX. Several sample files contain
+user-level algorithms, which do not require knowledge of \ePiX's
+internal data structures. The source file \filename{functions.cc}
+contains simple functions defined by algorithms, and
+\filename{functions.h} illustrates the use of \CXX\ templates. Other
+source files, such as \filename{plots.cc}, may be consulted for
+Simpson's rule, Euler's method, and the like.
+
+
+\subsection{Mathematical Functions}
+
+\index{Function!mathematical|(}
+\CXX~knows several familiar mathematical functions by name:
+\begin{verbatim}
+  sqrt   exp   log   log10   ceil   floor   fabs
+\end{verbatim}
+(\code{fabs} is the absolute value for a floating-point argument.)
+\ePiX\ provides trig and inverse trig functions sensitive to angular
+mode:
+\index{Angle!mode}
+\findex{Cos}
+\findex{Sin}
+\findex{Tan}
+\findex{Sec}
+\findex{Csc}
+\findex{Cot}
+\findex{Acos}
+\findex{Asin}
+\findex{Atan}
+\begin{verbatim}
+  Cos       Sin       Tan
+  Sec       Csc       Cot
+  Acos      Asin      Atan
+\end{verbatim}
+The inverse functions are principle branches.
+
+The function \code{pow(x,y)} returns~\teximath{x^y} when
+\teximath{x>0}, and \code{atan2(y,x)} (N.B. argument order) returns
+\teximath{\mathrm{Arg}(x+iy)\in(-\pi,\pi]}, the principle branch of
+arg.  \CXX~knows many constants to 20~decimal places, such as
+\code{M\_PI}, \code{M\_PI\_2}, and \code{M\_E} for~\teximath{\pi},
+\teximath{\pi/2}, and~\teximath{e} respectively.  \ePiX\ defines a few
+additional functions:
+\findex{sgn}
+\findex{zero}
+\findex{sinx}
+\findex{cb}
+\begin{verbatim}
+  sgn   zero   sinx   cb
+\end{verbatim}
+\texicomment
+\begin{center}
+  \input{sgn.eepic}\qquad
+  \input{sinx.eepic}\qquad
+  \input{cb.eepic}
+\end{center}
+\medskip
+\texicommentend
+\code{sgn} is the signum function; \code{zero} is the constant
+function; \code{sinx} is the function \teximath{x\mapsto \sin(x)/x}
+with the discontinuity removed; \code{cb} (for ``Charlie Brown'') is
+the period-2 extension of the absolute value function
+on~\teximath{[-1,1]}.
+
+The GNU \CXX\ library defines other functions, including inverse
+hyperbolic functions (\code{acosh}, etc.), \code{log}~and \code{exp}
+with base~2, 10, or arbitrary~\teximath{b} (\code{log2}, etc.), the
+error and gamma functions (\code{erf}~and \code{tgamma} [sic],
+respectively), and Bessel functions of first and second kind:
+\code{j0}, \code{j1}, \code{y0}, etc. Use, e.g., \code{jn(5,~)} to get
+higher indices.  The GNU \C~library reference manual~\cite{GNUC}
+describes these and other functions in detail.
+
+Functions may be used in subsequent definitions, and functions of two
+(or more) variables are defined in direct analogy to functions of one
+variable:
+\begin{verbatim}
+double f(double t) { return t*t*log(t*t); } // t^2 \ln(t^2)
+double g(double s, double t) { return exp(2*s)*Sin(t); }
+\end{verbatim}
+\index{Function!mathematical|)}
+
+
+\subsection{Basics of Classes}
+
+\index{Classes|(}
+Unlike~\code{C}, \CXX\ supports ``object-oriented programming''. In a
+nutshell, a \emph{class} is an abstraction in computer code of some
+concept, such as a point, a sphere, a mapping that can be plotted, or
+a camera. Classes allow a programmer to separate an object's
+\emph{interface} (the set of meaningful operations) from its
+\emph{implementation} (the data structures and algorithms that realize
+the interface). 
+
+\index{Function!class member}
+A class implementation consists of \emph{members} (named data
+elements) and \emph{member functions} (functions that belong to the
+class and have free access to members).  \CXX\ classes enforce access
+permissions on their members, protecting data from being manipulated
+except as promised by the interface.
+
+An ideal interface looks like a black box: It hides the implementation
+completely.  In order to cooperate, two classes need only know each
+other's interfaces. This separation of form and function modularizes a
+program, and facilitates debugging, code reuse, and overall
+maintainability, particularly in large programs. 
+
+In simple programming, classes may be treated like built-in types.
+Each class object has its own member functions, whose call syntax
+differs from standard function calls:
+\begin{verbatim}
+  Circle C1(P(1,0), 1.5); // circle of given center and radius
+  C1.draw();              // member function Circle::draw();
+\end{verbatim}
+Naturally, this call draws the circle~\code{C1}. Generally, a member
+function call consists of a class object's name, a period, and the
+name of the member function. Arguments, if any, go in the parentheses
+after the member function name, just as in a regular function call.
+
+A few short paragraphs cannot do more than scratch the surface of
+classes and object-oriented programming. For more details, please
+consult a book, such as Prata~\cite{Prata} or Stroustrup~\cite{S}, or
+Cline's on-line FAQ~\cite{Cline}.
+\index{Classes|)}
+
+
+\subsection{References and Function Arguments}
+
+\index{Function!call syntax}
+\index{Variable!reference}
+\label{references}
+\code{C}~and \CXX\ are ``call by value'' languages. Variables are not
+passed to a function; instead a copy of the value is made, and the
+function operates only on the copy. Though this feature causes
+occasional inconvenience, it prevents an object from being altered
+unexpectedly by a function call in a different part of the program.
+Calling by value helps localize the logic of a program, and
+circumvents easy-to-write but extremely hard-to-find bugs.
+
+In \CXX, a function may accept reference arguments. Passing an object
+by reference grants the calling function access to the object itself,
+not to a copy. There are two common applications: The object is a
+large data structure for which copying is ``expensive'', or the
+function \emph{needs} to modify its arguments (e.g., a function
+\code{swap(x,y)} that exchanges the values of \code{x}~and
+\code{y}). 
+
+For the first situation, \CXX\ provides the \code{const} keyword,
+which ensures the function does not modify its arguments, but accepts
+a reference merely for efficiency. Any attempt to modify a
+\code{const} argument will be caught by the compiler. Most \ePiX\
+commands accept \code{const} reference arguments.
+
+The ability to pass function arguments by reference is sometimes
+touted as a feature in \CXX\ texts. However, the technique circumvents
+the data encapsulation of calling by value, and should be avoided
+unless absolutely necessary. If a function merely ``updates'' the
+value of a variable, probably the variable should be of class type,
+and the update should be performed by a member function.
+
+A function declaration must indicate that its arguments are
+references. The declarations below have the indicated idiomatic
+meanings.
+\begin{verbatim}
+  class matrix;
+  double det(matrix); // call by value, perhaps inefficient
+  matrix& transpose(matrix&); // probably changes its argument
+  double trace(const matrix&); // does not change its argument
+\end{verbatim}
+Unlike pointer arguments, reference arguments impose no syntactic
+burden on the user. If~\code{A} is a~\code{matrix}, then
+\code{transpose(A);} and \code{trace(A);} will compile. You need not
+declare explicit reference variables and pass those to the function.
+
+
+\subsection{Overloading}
+
+\index{Function!overloaded}
+\CXX\ provides ``overloading'': Multiple functions can be given the
+same name, so long as the number and/or type of their arguments
+differ. (It is \emph{not} enough for the return types alone to differ.
+The compiler must be able to select a function from its calling
+syntax.)  To the user, the appearance is that a single function
+intelligently handles multiple argument lists. Naturally, overloaded
+names should refer to functions that are conceptually related.
+\index{Function|)}
+
+
+\subsection{Scope}
+
+\index{Variable!local}
+A \CXX\ statement ends with a semicolon. A collection of statements
+enclosed by curly braces is a ``code block'', and may be viewed as a
+single logical statement. Curly braces determine a ``scope'', inside
+which variable names may be re-used without ambiguity.  Function
+bodies are code blocks, as are the alternatives associated to control
+statements.  A variable defined between curly braces is said to be
+\emph{local} to the scope in which it is defined; its value cannot
+be used out of scope.  Variables should be declared in the smallest
+scope possible.
+
+The compiler is not picky about spaces, tabs, and newlines, so an
+input file should be formatted to make local scopes visually
+apparent. \code{emacs} automatically indents code to reflect scope,
+though the default behavior does not please all users.  As with
+variable naming, clarity and consistency are paramount.
+
+
+\subsection{Headers and Pre-Processing}
+
+A \CXX\ source file is compiled in multiple stages that occur
+transparently to the user. The first step, pre-processing, involves
+simple text replacement for file inclusion, macro expansion and
+conditional compilation. Next, the source is compiled and assembled:
+Human-readable language instructions are parsed, then represented in
+assembly language. Finally, the object files are linked: Function
+calls are resolved to hard-coded file offsets, possibly involving
+external library files, and the program instructions are packaged into
+an executable binary that the operating system can run.
+
+Pre-processing is used much less in~\CXX\ than in~\code{C}; the
+language itself supports safer and more featureful alternatives to
+macros, such as \code{const} variables and inline functions. File
+inclusion and conditional compilation are the chief uses of the
+pre-processor. Lines of the form 
+\begin{verbatim}
+  #include <iostream>
+  #include "epix.h"
+\end{verbatim}
+cause the contents of a \emph{header file} to be read into the source
+file. A header file contains variable and function
+\emph{declarations}, statements that specify types and names but do
+not define actual data. Declarations tell the compiler just enough
+to resolve expressions and function calls without knowing specific
+values or function definitions. 
+
+\index{Input file!conditional compilation}
+Conditional compilation is similar to conditional \LaTeX\ code. For
+example, a file might produce either color or monochrome output as
+follows:
+\begin{verbatim}
+#ifdef COLOR
+  ...  // code for generating color figure
+#endif /* COLOR */
+#ifndef COLOR
+  ...  // monochrome code
+#endif /* undef COLOR */
+\end{verbatim}
+The ``compiler symbol'' \code{COLOR} is an ordinary \CXX\ name. To
+control compilation, either put a \code{\#define COLOR} line in the
+file, or (better) supply the flag on the command line: \\
+\verb+  epix -DCOLOR <file.xp>+ \\
+Every \code{\#ifdef} must have a matching \code{\#endif}. Commenting
+the \code{\#endif} is a good habit; in a realistic file, the start and
+end of a conditional block may be separated by more than one screen.
+
+
+\subsection{Comparison with \LaTeX\ Syntax}
+
+As a programming language, \CXX\ provides certain features common to
+all languages (such as \LaTeX, MetaPost, Perl, Lisp\ldots) and adheres
+to rules of grammar. Salient differences between \LaTeX\ and \CXX\ 
+include:
+
+\begin{enumerate}
+\item Every \CXX\ statement and function call must end with a
+  semicolon. An omitted semicolon may result in a cryptic error
+  message from the compiler. Pre-processor directives, which start
+  with a~\code{\#}, do not end with a semicolon.
+
+\item Backslash is an escape character in \CXX:
+  \index{Label}
+\begin{verbatim}
+  // Put label $y=\sin x$ at (2,1)
+  // Note single  ^ backslash in output
+  label(P(2,1), P(0,0), "$y=\\sin x$"); 
+  //       Double backslash ^^ in source
+\end{verbatim}
+  
+\item Variable and function names may contain letters (including
+  underscore) and digits \emph{only}, are case sensitive, and must
+  begin with a letter.
+
+\item Variables in \CXX\ must have a declared \emph{type}, such as
+  \code{int} (integer) or \code{double} (double-precision floating
+  point). If a variable has global scope and its value does not
+  change, the definition should probably come in the preamble or at
+  the beginning of \code{main}. Local variables should be defined in
+  the smallest possible scope. Unlike~\C, \CXX\ allows variables to be
+  defined where they first appear.
+  
+\item \CXX~requires explicit use of~\code{*} to denote multiplication;
+  juxtaposition is not enough. \CXX~does not support the use of
+  \verb+^+ for exponentiation, e.g., \verb+t^2+ is invalid. Instead,
+  use \code{t*t}~or \code{pow(t,2)}.
+
+\item \CXX\ has single- and multi-line comments. Everything between a
+  double slash and the next newline is ignored, while the strings
+  \verb+/*+~and \verb+*/+ delimit multi-line comments. A single-line
+  comment may appear within a multi-line comment, but the compiler
+  does not nest multi-line comments.
+  \index{Input file!comment in}
+
+\end{enumerate}
+
+Between them, \C~and \CXX~have about 100~reserved keywords which
+cannot be used as function or variable names.
+\index{Cplusplus@\CXX|)}
+
+
+\section{Attribute Quick Reference}
+\label{section-quickref}
+
+In the body of an input file, the ``drawing state'' determines the
+figure's appearance. Attributes are declarations, set by commands that
+accept arguments of the stated type.
+
+A \code{len} argument is a double-quoted string containing a number
+and a two-letter \LaTeX\ length unit, such as \code{"1.5pt"} or
+\code{"6cm"}. A \code{color} argument is a named primary
+(\code{Red()}, \code{Cyan()}, \code{White()}, etc.), a \code{Color}
+specified by densities (\code{RGB(...)}, \code{CMYK(...)}, etc.), or a
+\code{Color} object. Using \code{Neutral()} as a \code{Color} argument
+generally turns off the corresponding attribute.
+
+\begin{itemize}
+
+\item Angular mode: \code{radians()}, \code{degrees()}, or
+  \code{revolutions()}.
+
+  The angular mode affects all trigonometric operations, including
+  camera rotations, the drawing of arcs and ellipses, polar plotting,
+  label angle, and the trig functions themselves. Angle-sensitive trig
+  functions are capitalized, e.g., \code{Cos}, \code{Tan}.
+
+\item Fill style: \code{fill(color)}, \code{fill(bool)},
+  \code{nofill()}.
+
+\item Path style:
+
+  \begin{itemize}
+
+  \item Width: \code{plain()}, \code{bold()}, \code{bbold()},
+    \code{pen(len)}.
+
+  \item Line style: \code{line\_style(string)}. The argument is a
+    WYSIWYG sequence of dashes, spaces, and periods.
+    \code{dash\_size(double)} and \code{dot\_sep(double)} set the
+    (approximate) length in~\code{pt} of the pattern.  The commands
+    \code{solid()}, \code{dashed()}, \code{dotted()} define
+    ``standard'' defaults for brevity.
+
+  \item Path color:
+    Paths can be drawn using \emph{two} pens, one atop the other. When
+    the ``base'' pen is white (or the background color) and wider than
+    the ``line'' pen, a path masks parts of the figure it crosses. A
+    3-D effect may be obtained by making the base pen a darker shade
+    than the ``line'' pen.
+
+    \code{pen(color,[len])}, \code{base(color,[len])}
+
+    Standard widths: \code{plain(color)}, \code{bold(color)},
+    \code{bbold(color)}
+
+  \end{itemize}
+
+\item Text attributes:
+
+  \begin{itemize}
+
+  \item Color: \code{label\_color(color)}
+
+  \item Mask: \code{label\_mask(color)}, \code{label\_pad(len)}
+
+  \item Border: \code{label\_border(color, [len])},
+    \code{label\_border(len)}. The command \code{no\_label\_border()}
+    turns off label borders.
+
+  \item Font size: \code{font\_size(LaTeX size)}, no argument means
+    \code{normalsize}.
+
+  \item Font face: \code{font\_face(LaTeX font)}, two-letter font
+    selection string, default is \code{rm}.
+
+  \item Rotation: \code{label\_angle(double)}
+
+  \end{itemize}
+
+\end{itemize}
+
+Do not confuse \code{Color} constructors with the similarly-named
+(deprecated) lowercase attribute-setting commands, \code{rgb(r,g,b)},
+\code{cmyk(c,m,y,k)}, \code{red(d)}, etc. These commands affect text,
+paths, and filled regions. For example, the single command
+\code{red()} has the same effect as the three commands
+\code{pen(Red())}, \code{fill(Red())}, and \code{label\_color(Red())}.
+
+
+\texinfochapter{4}{Advanced Topics}
+\label{chapter-adv}
+
+This chapter covers \emph{ad hoc} tricks and open-ended techniques
+that require relatively more programming sophistication. You will
+almost surely need an external \CXX\ reference if you do not speak the
+language.
+
+
+\section{Hidden Object Removal}
+\label{section-hidden}
+
+\index{Hidden object removal|(}
+\ePiX\ writes the output file in the same order that objects appear in
+the input. The order is significant because PostScript builds a figure
+in layers: Objects are drawn over objects that come earlier in the
+file. Shaded polygons can be used to obtain surprisingly effective
+hidden object removal in surface meshes. This section describes the
+data structures defined in the source files \code{surface.*}.
+
+\index{Camera}
+The basic idea is to create a shaded polygon class that knows its
+approximate distance to the camera. For computational simplicity, a
+mesh ``facet'' is treated as a quadrilateral, located at the
+arithmetic mean of its vertices. A facet's boundary is created from a
+map and a domain by tracing a fine mesh rectangle counterclockwise.
+
+To draw a parametrized surface, facets are stored in a \CXX\ vector,
+sorted in decreasing order of distance to the camera, and printed to
+the output file. If filling is active, the gray density of a facet
+depends on the cosine of the angle between the normal vector and the
+vector from the camera to the element.
+
+This simple algorithm works surprisingly well when mesh elements
+intersect at most along complete edges. To incorporate line-like
+elements (e.g., coordinate axes, wire-mesh plots) with shaded
+surfaces, the best technique is often to order high-level scene
+elements manually, breaking up shaded surfaces (for example, with
+domain resizing or clipping) as necessary. The sample file
+\filename{saddle.xp} illustrates possible techniques.
+
+Shaded surfaces can be decorated with a bit of hackery. For example,
+the \code{facet::draw} function in \filename{facet.cc} can be
+modified easily to draw line elements, tangents, or normal vectors
+along with the facet itself. The sample file
+\filename{decorate.xp} contains a couple of ideas. (The
+decorations are activated by compiler flags; please consult the file
+itself for information on compiling.)
+\index{Hidden object removal|)}
+
+
+\section{Extensions}
+\label{section-extensions}
+
+Thanks to a suggestion of Andrew Sterian, \ePiX\ is extensible. User
+extensions span a spectrum, from header files that require only basic
+knowledge of~\CXX\ to separately compiled libraries that add
+substantial new features.  The structure of the source code is
+outlined in Section~\ref{section-programmers}.
+
+
+\subsection{Header Files}
+
+A \CXX~header file conventionally has suffix~\filename{.h}, as in
+\filename{myheader.h}. To use this custom header, put a line
+\code{\#include "myheader.h"} in your source file.
+
+User definitions can be easily and robustly implemented with ``inline
+functions''. Inline functions are superficially similar to macros, but
+are far more safe and featureful (since they are handled by the
+compiler rather than by the pre-processor).  Examples are
+\begin{verbatim}
+  inline void Bold() { pen(1.6); }
+  inline void purple() { rgb(0.5, 0, 0.7); }
+  inline void draw_square(double s) { rect(P(-s,-s),P(s,s)); }
+  inline double cube(double x) { return pow(x,3); // x^3 }
+\end{verbatim}
+The keyword \code{void} signifies a function that does not return a
+value, or (when used as an implicit parameter) a function that does
+not accept arguments. Inline function definitions are syntactically
+identical to ordinary function definitions, but \emph{must} occur in a
+header file or in the source file where they are used. The examples
+above might be used in an input file as follows:
+\begin{verbatim}
+  Bold();  
+  draw_square(cube(1.25));
+\end{verbatim}
+
+
+\subsection{Compiling}
+
+The next few sections outline the creation of a ``static library'' on
+GNU/Linux, and explain how to incorporate custom features at runtime.
+The extensively-commented sample files \filename{std\_F.cc}~and
+\filename{std\_F.h} illustrate the techniques described below, and may
+be used for guidance and experimentation.
+
+A small library is usually written as a \emph{header} file, which
+contains class and function declarations (also called ``prototypes''),
+and a \emph{source} file, which contains the actual
+code. Conventionally (under *nix), these files have extension
+\filename{.h}~and \filename{.cc} respectively. Header and source files
+may ``include'' other header files, to incorporate additional
+functionality.
+\begin{verbatim}
+/* my_code.h */
+#ifndef MY_CODE
+#define MY_CODE
+#include <cmath>   // standard library math header
+#include "epix.h"  // ePiX header
+using ePiX::P;
+
+namespace Mine {   // to avoid name conflicts
+  // functions for special relativity
+  double lorentz_norm(const P&);
+  bool   spacelike(const P&);
+} // end of namespace
+#endif /* MY_CODE */
+\end{verbatim}
+This file exhibits two ``safety features''. The three \code{MY\_CODE}
+lines prevent the file from being included multiple times. In a file
+of this size, inclusion protection is overkill, but as your code base
+grows and the number of header files increases, this protection is
+essential. Second, the header introduces a ``Mine'' namespace. Inside
+this namespace, two functions are declared as prototypes, giving the
+function's return type, name, and argument type(s). A header file
+should be commented fairly liberally, so that a year or two from now
+you'll be able to decipher the file's contents.  For a longer file,
+version and contact information, an overall comment describing the
+file's features, and license information are appropriate.
+
+Next, the corresponding source file; definitions are also placed into
+the namespace, and must match their prototypes from the header file
+exactly.
+\begin{verbatim}
+/* my_code.cc */
+#include "my_code.h"
+using namespace ePiX;
+
+namespace Mine {
+  double lorentz_norm(const P& arg)
+  {
+    double x(arg.x1()), y(arg.x2()), z(arg.x3()); // extract coords
+    return (y-x)*(y+x) + z*z; // -x^2 + y^2 + z^2
+  }
+  bool spacelike(const P& arg)
+  {
+    return (lorentz_norm(arg) > 0); // true if inequality is
+  }
+} // end of namespace
+\end{verbatim}
+Copies of these files are included with the source code so you can
+experiment with them. Next, the source file must be ``compiled'',
+``archived'', and ``indexed''. In the commands below, the percent sign
+is the prompt.
+\begin{verbatim}
+% g++ -c my_code.cc
+% ar -ru libcustom.a my_code.o
+% ranlib libcustom.a
+\end{verbatim}
+Please see your system documentation for details on command options
+and what each step does. For linking (below), the name of the library
+file must begin ``lib'' and have the extension~\filename{.a}. Once these
+steps are successfully completed, put the library \filename{libcustom.a}
+and header file \filename{my\_code.h} in your project directory. You're
+ready to use the code in an \ePiX\ figure.
+
+
+\subsection{Runtime Linking}
+
+The script~\epix\ allows input files to be linked with external
+libraries at run time, when the input file is compiled into a
+temporary executable.
+
+\epix\ recognizes command line options and passes them verbatim to the
+compiler. The most commonly used options are those of the form
+\begin{verbatim}
+   -I<include>     -L<libdir>     -l<lib>
+\end{verbatim}
+For example, to link \filename{figure.xp} against
+\filename{mylibs/libcustom.a}, run the command
+\begin{verbatim}
+   epix -Lmylibs -lcustom figure
+\end{verbatim}
+The options \code{-I. -L.} tell the compiler to look in the current
+directory for header and library files.  Compiler options may appear
+in any order, but must come before the name of the input file(s).
+
+Compiler options may be placed in the configuration file
+\filename{\$HOME/.epixrc}, with syntax as above. A line in the config
+file that contains a pound sign~(\code{\#}) is a comment, no matter
+where in the line the~\code{\#} appears. If any non-comment line
+fails to start with a dash, the rest of the file is silently
+discarded.  Command-line options are read before the config file.
+
+
+\subsection{Using Multiple Versions}
+
+The script \filename{epix}~links by default against the \code{C}~math
+library \code{libm.a}~and the \ePiX\ library \code{libepix.a}.  The
+command option \code{--no-defaults} clears the header and include
+paths and removes \code{libepix.a} from the link list. The script may
+therefore be used with multiple versions of \ePiX, a potentially
+useful feature if you regularly need to compile old source files, or
+simply prefer the syntax of an older version.
+
+To install and use (say) Version~1.0.0, build the package according to
+its \filename{INSTALL} instructions, but \emph{do not use the makefile
+  to install}. Instead, manually install the header and library only,
+using their version number:
+\begin{verbatim}
+# install -m 644 epix.h /usr/local/include/epix-1.0.h
+# install -m 644 libepix.a /usr/local/lib/libepix-1.0.a
+\end{verbatim}
+A non-system directory may be used instead of \filename{/usr/local}.
+To use the old version, a source file must \code{include} the
+appropriate header file (which is identified by its version number).
+To compile, issue a command such as
+\begin{verbatim}
+epix --no-defaults -I/usr/local -L/usr/local -lepix-1.0 file.xp
+\end{verbatim}
+
+
+\section{Programmer's Guide}
+\label{section-programmers}
+
+This section briefly surveys \ePiX's implementation, and is intended
+for (potential) programmers. The source code is divided into modules
+with small, well-defined responsibilities, but the user interface is
+mostly compatible with the syntax of Version~1.0. These constraints
+demanded a degree of implementation hiding. For example, the
+user-visible classes defined in \filename{Color.h}, \filename{path.h},
+and~\filename{screen.h} contain only a pointer to the implementation
+class, and style data is hidden behind global commands.
+
+Functionally, the code consists of the user interface; implementation
+class\-es comprising drawing attributes, spatial objects, screens and
+representations of their elements, and output; and miscellaneous
+utility functions. The headers in each group, and their contents, are
+described in Section~\ref{section-interface}.
+
+The user interface headers are assembled into a single file,
+\filename{epix.h}, and installed in \filename{/usr/local/include} by
+default. In normal use, the shell scripts read only the user interface
+header.  The individual headers, including the components of
+\filename{epix.h}, are installed in
+\filename{/usr/local/include/epix}. These are provided for authors of
+external libraries, who may need access to implementation details.
+
+
+\subsection{External Packages}
+
+\ePiX\ harnesses the computational power of~\CXX\ to the typographical
+capabilities of \LaTeX. Consequently, \ePiX\ should be viewed in part
+as a framework for expressing numerical data visually.
+
+In the course of your work, you may develop specialized code filling a
+gap in \ePiX's functionality. If your code seems likely to be of
+interest to other users, please consider bundling it as an external
+package and notifying the \ePiX\ community so your work can be linked
+from the project pages and distributed to interested users.
+
+There are no formal requirements for external packages, but in the
+interest of uniformity contributed code should follow the GNU Coding
+Standards~\cite{GNUCoding}. At a minimum, an external package should
+build with the standard \code{./configure; make; make install}
+commands, and the \code{configure} script should accept an option
+\code{--with-epix} for the user to specify a non-default \ePiX\
+install directory.
+
+If an external package builds a static library, it should provide a
+single header containing all the package's entry points, and enclose
+its interface in a namespace. Entry points should not collide with
+\ePiX\ functions. Naming the package ``\filename{epix-<...>}'' is a
+good idea, but not essential. For example, a package providing textual
+nodes and diagram layout might be named \filename{epix-nodes}.  Input
+files would use the package with the lines
+\begin{verbatim}
+  #include "epix-nodes.h"
+  using namespace ePiX-nodes;
+\end{verbatim}
+and be compiled with
+\begin{verbatim}
+  epix -lepix-nodes <file>
+\end{verbatim}
+
+The user and internal interfaces of \ePiX-1.2 are not likely to
+change. Still, it's prudent to rely only on the user interface in
+contributed code whenever possible. Doing so also simplifies your work
+as an author; your library can simply \code{include} the user header
+file, and deal only with high-level objects and drawing attributes.
+
+
+\subsection{User Interface}
+\label{section-interface}
+
+\index{Header file listing|(}
+These files (in order) comprise the global header \filename{epix.h}.
+
+\Header{enums.h} Marker, alignment, Riemann integral, and vector field
+types.
+
+\Header{length.h} Physical lengths, conceptually a number and
+two-letter \LaTeX\ length unit.
+
+\Header{interval.h} Closed, open, and half-open interval ranges for
+data culling.
+
+\Header{triples.h} The \code{P} class.
+
+\Header{Complex.h} The \code{Complex} class.
+
+\Header{functions.h} Angle-sensitive trig functions, miscellaneous
+utility functions, the \code{Deriv}~and \code{Integral} classes.
+
+\Header{pairs.h} Screen locations and displacements, with complex
+arithmetic operations.
+
+\Header{Color.h} The Color class interface, named
+primaries and constructors.
+
+\Header{state.h} Angle mode; clipping and cropping; label styles;
+filling; arrow head style; dot and tick sizes, dash length; line
+style; line and base pen attributes; color-setting commands.
+
+\Header{frame.h} Orthonormal bases.
+
+\Header{domain.h} Coordinate boxes for function plotting.
+
+\Header{camera.h} The camera.
+
+\Header{screen.h} The screen class.
+
+\Header{picture.h} Dimension-setting, offset, layout, decoration,
+verbatim text, and output format commands.
+
+\Header{markers.h} Point markers, axis labels, and coordinate axes.
+
+\Header{axis.h} Coordinate axes and labels in various styles.
+
+\Header{legend.h} Plot legends.
+
+\Header{path.h} The path class.
+
+\Header{curves.h} Polygons, arrows, ellipses, arcs, splines,
+coordinate grids, and recursive fractal curves.
+
+\Header{circle.h} The \code{Circle} shape object class.
+
+\Header{plane.h} The \code{Plane} shape object class.
+
+\Header{segment.h} The \code{Segment} shape object class.
+
+\Header{sphere.h} The \code{Sphere} shape object class.
+
+\Header{intersections.h} Shape object intersection operators.
+
+\Header{plots.h} Plotting commands.
+
+\Header{surface.h} Shaded surface plots.
+
+\Header{data\_mask.h} Helper class for data pruning.
+
+\Header{data\_file.h} Class for storing and representing data.
+
+\Header{data\_bins.h} Class for sorting and counting data.
+
+\Header{geometry.h} Latitudes and longitudes; spherical plotting,
+arcs, polygons, and polyhedra; hyperbolic arcs.
+
+\Header{Sline.h} The \code{Sline} (spherical line) class.
+
+
+\subsection{Implementation Classes}
+
+\Header{Color\_Base.h} The Color implementation interface.
+
+\Header{Color\_CMY.h} The CMY color model.
+
+\Header{Color\_CMYK.h} The CMYK color model.
+
+\Header{Color\_Gray.h} The Gray color model.
+
+\Header{Color\_Neutral.h} Each color class has a ``Neutral'' member
+that converts colors to that model by filtering. This file defines the
+unique ``model-less'' Neutral color for which filtering performs no
+action.
+
+\Header{Color\_RGB.h} The RGB color model.
+
+\Header{Color\_Sep.h} Classes for CMYK separation.
+
+\Header{active\_screen.h} Simple manipulator for the active screen.
+
+\Header{picture\_data.h} Picture implementation: two \code{screen}s
+(representing the \code{canvas}~and the output page), true dimensions
+and offsets, pointer to output format, list of colors, and lists of
+verbatim text to write before and after printing the \code{picture}
+environment in the output file. For simplicity, the \code{screen}s and
+dimensions are public; encapsulation from the user results from
+``hiding'' this header.
+
+
+\subsubsection*{Style Attributes}
+
+Declaration-style attributes are maintained with functions returning
+static references: \code{the\_angle\_style()},
+\code{the\_arrowhead\_style()}, \code{the\_label\_style()},
+\code{the\_mark\_size()}, \code{the\_paint\_style()}, and
+\code{the\_path\_style()}. Each function is declared in the
+analogously-named header.
+
+\Header{angle\_units.h} Angular modes: \code{radians},
+\code{revolutions}, and \code{degrees}.
+
+\Header{arrow\_style.h} Arrow head style data: width, ratio, and
+inset.
+
+\Header{label\_style.h} Text object style: Label and mask colors,
+padding, border color and width, alignment, font size, font face, and
+angle.
+
+\Header{marker\_style.h} Dot and tick sizes.
+
+\Header{paint\_style.h} Line and base pens, fill color.
+
+\Header{path\_style.h} Solid, dashed, dotted lines.
+
+\Header{pen\_data.h} The pen class.
+
+
+\subsubsection*{Objects}
+
+\Header{arrow\_data.h} Arrow representation.
+
+\Header{facet.h} Shaded surface elements.
+
+\Header{label\_data.h} Text (label and marker) objects.
+
+\Header{legend\_item.h} Items for \code{legend}s.
+
+\Header{path\_data.h} Path implementation.
+
+\Header{spline.h} The natural spline class.
+
+\Header{spline\_data.h} Templates for quadratic and cubic splines.
+
+
+\subsubsection*{Screen Representation}
+
+Elements in a \code{screen} are represented polymorphically as
+``\code{tile}s'', of which there are six types: \code{glyph} (textual
+elements), \code{pen\_arrow} (arrows), \code{pen\_fill} (filled
+regions), \code{pen\_line} (path-like elements), \code{verbatim}
+(raw text), and \code{legend\_tile} (legends).
+
+Border and background shape are dictated by the \code{screen\_mask}
+class. The cropping algorithm assumes the contour of a screen mask is
+convex.
+
+\Header{affine.h} Affine maps.
+
+\Header{cropping.h} Screen mask cropping.
+
+\Header{glyph.h} Markers and labels.
+
+\Header{legend\_tile.h} Screen representation of a \code{legend}.
+
+\Header{mask\_diamond.h} Screen diamond mask.
+
+\Header{mask\_ellipse.h} Screen elliptical mask.
+
+\Header{mask\_rectangle.h} Screen rectangular mask.
+
+\Header{pen\_arrow.h} Arrows.
+
+\Header{pen\_fill.h} Filled regions.
+
+\Header{pen\_line.h} Paths.
+
+\Header{screen\_data.h} Screen implementation class.
+
+\Header{screen\_mask.h} Screen mask interface.
+
+\Header{tile.h} Screen element interface.
+
+\Header{verbatim.h} Text in output stream.
+
+
+\subsubsection*{Output}
+
+Output is divided into a couple of high-level operations and several
+``atomic'' low-level operations.  To create a new output
+format, one need only implement the \code{format} interface for the
+desired file type. Paths and filled regions may be implemented however
+the output type dictates.
+
+\Header{eepic.h} eepic macros.
+
+\Header{fmt\_template.h} ``skeleton'' header for new output formats.
+
+\Header{format.h} The output interface.
+
+\Header{pst.h} PSTricks macros.
+
+\Header{tikz.h} tikz macros.
+
+
+\subsubsection*{Utilities}
+
+\Header{Color\_Utils.h} Functions for setting color channel densities.
+
+\Header{clipping.h} The clip box.
+
+\Header{constants.h} Global constants: Line widths; dot, tick, and
+dash sizes; arrowhead parameters; miscellaneous numerical constants
+and internal parameters.
+
+\Header{crop\_algorithms.h} Path and loop clipping templates.
+
+\Header{deriv.h} Finite difference template.
+
+\Header{edge\_data.h} Path element representation template.
+
+\Header{errors.h} Warning and error messages.
+
+\Header{frac.h} Rational numbers and operators.
+
+\Header{halfspace.h} Halfspace cutting.
+
+\Header{hatching.h} Filling regions in eepic.
+
+\Header{lens.h} Camera lenses.
+
+\Header{map.h} Wrappers for templated plotting.
+
+\Header{plot\_algorithms.h} Plotting templates.
+
+\Header{screen\_crop.h} Crop paths and loops.
+
+\Header{utils.h} Truncation, date and time, line breaking.
+\index{Header file listing|)}
+
+
+\appendix
+\texinfoappendix{A}{Software Freedom}
+\index{Free software|(} 
+
+Academics in general, and mathematicians in particular, depend on free
+exchange of information. We prove theorems or establish experimental
+results, write up formal accounts, place preprints on public file
+servers, and submit papers to peer-reviewed journals. If accepted, the
+results---data, techniques, methods of reasoning, citations, and
+conclusions---are published in print and become part of the public
+record, governed by copyright law. Libraries purchase journal
+subscriptions, but researchers and scholars may use ideas from the
+literature merely by giving appropriate citations in their own
+work. ``Theft'' arises from false claims of authorship.
+
+Carried over to software, the academic process would guarantee rights
+similar to those provided by the GNU General Public License (GPL):
+
+\begin{itemize}
+
+\item (GPL~0) To run a program for any purpose.
+
+\item (GPL~1) To study how the program works, and adapt it to your
+  needs.
+
+\item (GPL~2) To redistribute copies of the program.
+
+\item (GPL~3) To improve the program, and release improvements to the
+  public, so that the whole community benefits.
+
+\end{itemize}
+
+In reality, attitudes toward software differ markedly. Most academics
+work on a proprietary platform, use proprietary software for research
+and teaching, and share information with colleagues and students in
+proprietary, even obfuscated, data formats.  Contrary to the academic
+ethic, proprietary software licenses restrict access to information:
+preventing users from learning how a program works internally
+(``reverse engineering''), limiting the number of users who may run a
+piece of software, and forbidding users from running (or sometimes
+even installing) a purchased copy on multiple machines.
+
+Restrictions on use aside, if one cannot examine a program's source
+code, one cannot fully trust the output, any more than one can trust
+(for purposes of scientific publication) results of a commercial
+testing lab.
+
+\texicomment
+\noindent$\phantom{.}$\hfil\vbox{\hrule width 4in}\hfil
+\texicommentend
+
+Consider a hypothetical future world in which scholarly results are
+disseminated like software. Instead of subscriptions, journals 
+sell licenses granting readership to a specified number of
+individuals. Photocopying an article for a class or research seminar
+constitutes ``piracy'', though if the institution has purchased a
+sufficiently large site license the teacher or speaker may bring the
+physical volume to class and project the pages onto a screen.
+
+Of course, reading an article is scarcely enlightening. Mathematics
+papers contain only the statements of theorems. Merely opening the
+journal binds the reader to a lengthy legal agreement, stating that
+theorems be used only for specific purposes and threatening serious
+legal consequences for attempting to discover the author's proofs.
+
+The actions of a single student, employee, or faculty member can
+expose an institution to a costly ``journal audit'' from the
+Mathematical Society of America (MSA), with the institution
+responsible for legal costs if the audit reveals license violations
+anywhere in the organization.
+
+Mathematicians who long for the Old Days when papers contained
+proofs and were shared freely are dismissed as idealistic cranks
+or labeled anti-business communists. Common knowledge asserts the
+obvious superiority of proprietary journals, and the necessity of
+licenses for keeping mathematicians gainfully employed.
+
+\texicomment
+\noindent$\phantom{.}$\hfil\vbox{\hrule width 4in}\hfil
+\texicommentend
+
+Back in our world, some vendors have attempted to placate opponents of
+closed source with ``shared source'' licenses, under which one may
+sign a non-disclosure agreement and subsequently examine source
+code. In the future world analogy, a shared source agreement would
+allow journal licensees to sign an NDA, then see the proofs of
+theorems. Readers could thereby correct errors in proofs (benefitting
+the publisher by improving the reliability of the journal), but would
+be legally forbidden from using the ideas elsewhere (denying benefit
+to other mathematicians).
+
+Legally and conceptually codifying software as a commodity ignores a
+fundamental reality: Like an idea or recipe, software can be copied
+without loss of the original. The perception of ``theft'' by copying
+arises from an artificial belief that software has an owner who must
+be monetarily compensated each time a person acquires a copy.  The
+nature of software does not enforce the ``sale'' model in the way
+services and physical commodities do. It therefore seems
+philosophically inappropriate to treat software as a commodity, and
+perilous to conform the legal system to the enforcement of such a
+model.
+
+At its best, software enhances our productivity and
+creativity. Sharing software, like sharing ideas, benefits a larger
+number of people without detriment to existing users.  I hope this
+modest program is, in conjunction with the much larger efforts of
+others (especially Donald Knuth, Richard Stallman, and the many people
+who have contributed to the authorship of \LaTeX\ and its packages),
+useful to you in your mathematical work.
+
+Please visit the Free Software Foundation, at
+\URL{www.fsf.org}, to learn more about free software and how
+you can contribute to its development and adoption.
+\index{Free software|)}
+
+\texinfoappendix{B}{Acknowledgments}
+
+\ePiX\ is built on the work of many people, many of whom I am
+unaware. The following people have contributed, sometimes unknowingly
+but always generously:
+
+\paragraph{Infrastructure} Donald Knuth, Conrad Kwok, Leslie Lamport,
+Tim Morgan, Piet van~Oostrum, Sunil Podar, Richard Stallman, Till
+Tantau, Herbert Vo\ss, Timothy van~Zandt
+
+\paragraph{Enhancements} Jay Belanger, Robin Blume-Kohout, Julian
+Gilbey, Marcus Hanwell, Yvon Henel, Svend Daug{\aa}rd Pedersen, Andrew
+Sterian
+
+\paragraph{Porting and packaging} Youn\`es Hafri (Crux), Julian Gilbey
+(Debian); Tsuguru Kato (FreeBSD); Markus Dittrich, Danny van Dyk,
+Christian Faulhammer, Olivier Fisette, Chris Gianelloni, Michael
+Hanselmann, Marcus Hanwell, David Holm, Peter Johanson, Patrick
+Kursawe, Tobias Scherbaum, Markus Ullmann (Gentoo); Guido Gonzato
+(RPM); Rene Rebe (T2)
+
+\paragraph{Debugging, advice, and other assistance} Maik Beckmann, Jay
+Belanger, Felipe Paulo Guazzi Bergo, Karl Berry, Robin Blume-Kohout,
+Aran Clauson, Patrick Cousot, Stephen Gibson, Julian Gilbey, Dov
+Grobgeld, Bob Grover, Jim Hefferon, Jacques L'helgoualc'h, Yvon Henel,
+Hartmut Henkel, Herng-Jeng Jou, Walter Kehowski, Paul Kornman, Kevin
+McCormick, Ross Moore, Mike Protts, Thorsten Riess, Jean-Michel
+Sarlat, Alan Sill, Neel Smith, Michael Somos, Andrew Sterian, Ryszard
+Tanas, Ben Tillman, Kai Trukenmueller, Torbjorn Vik, Wenguang Wang,
+Gabe Weaver, Mariusz Wodzicki
+
+\texicomment
+\begin{thebibliography}{9}
+%
+\bibitem{Cline} Marshall Cline, \emph{\CXX\ FAQ Lite}, \\
+  \URL{http://www.parashift.com/c++-faq-lite/}
+%
+\bibitem{xcolor} Uwe Kern, \emph{Extending \LaTeX's color facilities:
+  the \code{xcolor} package}, white paper, Jan.~21, 2007
+%
+\bibitem{KnR} Brian Kernighan and Dennis Ritchie, \emph{The \code{C}
+    Programming Language}, Second Ed., Prentice-Hall Software Series,
+    1988
+%
+\bibitem{GNUC} Sandra Loosemore, Richard M. Stallman, et.\ al.,
+    \emph{The GNU \code{C}~Library Reference Manual}, GNU Press,
+    2004
+%
+\bibitem{Prata} Stephen Prata, \emph{\CXX\ Primer Plus}, Sams, 2002
+%
+\bibitem{R} Keith Reckdahl, \emph{Using Imported Graphics in
+  \LaTeX2e}, Version~2.0, white paper, Dec.~15, 1997
+%
+\bibitem{GNUCoding} Richard M. Stallman, et.\ al., \emph{The GNU
+  Coding Standards}, \\
+  \URL{http://www.gnu.org/prep/standards/}
+%
+\bibitem{S} Bjarne Stroustrup, \emph{The \CXX\ Programming Language},
+  Special Ed., Addison-Wesley, 1997
+%
+\bibitem{Z} Timothy van~Zandt, \emph{PSTricks: PostScript Macros for
+  Generic \TeX}, Version~0.93a, white paper, Mar.~12, 1993
+%
+\end{thebibliography}
+
+%\clearpage
+
+%\printindex[xfcns]
+
+\printindex
+
+\end{document}
+
+\texicommentend

@@ -1,0 +1,109 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double ht(2), // truncation height
+  sz(2),  // domain size
+  sq(12), // domain mesh
+  eps(0.0000001);
+
+Complex poly(double x, double y)
+{
+  return Complex(1-x, -y)*Complex(1+x, y); // 1 - (x + iy)^2
+}
+
+// z^3 = 1 - w^2, w = x + iy
+// three branches
+P f0(double x, double y) {  return rootC(poly(x, y), 3) + x*E_3; }
+P f1(double x, double y) {  return rootC(poly(x, y), 3, 1) + x*E_3; }
+P f2(double x, double y) {  return rootC(poly(x, y), 3, 2) + x*E_3; }
+
+// real sections
+P fp(double t) {  return P(t, 0,  sqrt(1-t*t*t)); }
+P fm(double t) {  return P(t, 0, -sqrt(1-t*t*t)); }
+
+// coloring
+double dens(double d) {  return 0.5*(1+tanh(d)); }
+P color(double u, double v) {  return P(dens(v), 0.2, 1-dens(v)); }
+
+// pen styles; called multiple times, so "macro-ized"
+void real_section()
+{
+  bbold(Magenta(0.6));
+  base(RGB(0.8,0,1), 2.5);
+}
+
+void mesh_pen() {  plain(RGB(1, 0.8, 0.5)); } // surface mesh
+void grid_pen() {  plain(Black(0.4)); } // coordinate grid
+void axis_pen() {  bold(Black()); } // axes
+
+// lower and upper half-planes
+domain LHP(P(-sz,-sz), P(sz,-eps), mesh(2*sq, sq), mesh(10*sq,5*sq));
+domain UHP(P(-sz,eps), P( sz, sz), mesh(2*sq, sq), mesh(10*sq,5*sq));
+
+int main()
+{
+  picture(P(-2,-2), P(2,2), "6 x 6in");
+
+  begin();
+  camera.at(P(4,8,4)).look_at(P(0.5,0,0.5));
+
+  fill();
+  mesh_pen();
+
+  // three branches of cube root over each half-plane
+  scenery sc(f0, LHP, color);
+  sc.add(f1, LHP, color);
+  sc.add(f2, LHP, color);
+
+  sc.add(f0, UHP, color);
+  sc.add(f1, UHP, color);
+  sc.add(f2, UHP, color);
+
+  // Manual object hiding: draw lower back portion
+  clip_box(P(-2,-2,-ht), P(2,0,0));
+  sc.draw();
+
+  // lower portion of real section
+  real_section();
+  plot(fm, xmin(), 1, 240);
+
+  base(Neutral(), 0);
+
+  // Re w axis and z-grid
+  clip_box();
+  nofill();
+  axis_pen();
+  line(P(0,0,-sz), P(0,0,0));
+
+  grid_pen();
+  grid(P(-2,-2), P(2,2), 24, 24);
+
+  // Im z axis
+  axis_pen();
+  arrow(P(0,-1.1*sz,0), P(0, 1.1*sz,0));
+
+  // upper back portion
+  fill();
+  clip_box(P(-2,-2,0), P(2,0,ht));
+  sc.draw();
+
+  // upper portion of real section
+  real_section();
+  plot(fp, xmin(), 1, 240);
+
+  base(Neutral(), 0);
+
+  // remaining axes, labels
+  clip_box();
+  axis_pen();
+  arrow(P(-1.1*sz,0,0), P(1.1*sz,0,0));
+  arrow(P(0,0,0), P(0,0,sz));
+
+  label(P(1.1*sz,0), P(-2,-4), "$\\operatorname{Re} z$", l);
+  label(P(0,1.1*sz), P( 2,-2), "$\\operatorname{Im} z$", br);
+  label(P(0,0,sz), P(0,4), "$\\operatorname{Re} \\sqrt{1-z^3}$", t);
+
+  pst_format();
+  end();
+}

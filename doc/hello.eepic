@@ -1,0 +1,15 @@
+%% Generated from hello.xp on Thu Jun 28 11:33:40 EDT 2007 by
+%% ePiX-1.1.6
+%%
+%%   Cartesian bounding box: [-1,1] x [-1,1]
+%%   Actual size: 2 x 1in
+%%   Figure offset: left by 0in, down by 0in
+%%
+\xdefinecolor{rgb_000000}{rgb}{0,0,0}
+\setlength{\unitlength}{1in}
+\begin{picture}(2,1)(-0,-0)
+\put(1,0.5){\makebox(0,0)[c]{{\Huge Hello, world!}}}
+\allinethickness{1pt}%
+\path(2,0)(2,1)(0,1)(0,0)(2,0)
+%%
+\end{picture}

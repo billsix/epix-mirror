@@ -1,0 +1,70 @@
+/* -*-flix-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double MAX(2.5), rad(0.8*MAX);
+
+int N(6); // slices
+
+P F(double u, double v)
+{
+  double x(rad*Cos(u)*Cos(v)), y(rad*Cos(u)*Sin(v)), z(rad*Sin(u));
+  return P(y*z, x*z, x*y);
+}
+
+/*
+P color(double x, double y)
+{
+#ifdef COLORSHADE
+  return P(0.5*Sin(x), -0.5*Sin(x), Cos(y));
+#else
+  return P(1,1,1); // white
+#endif
+}
+*/
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1(strtod(argv[1], &arg)), temp2(strtod(argv[2], &arg));
+
+      tix()=temp1/temp2;
+    }
+
+  picture(P(-MAX,-MAX),P(MAX,MAX), "4x4in");
+
+  begin();
+
+  backing(RGB(0.7, 0.9, 1));
+
+  fill();
+  revolutions();
+  camera.at(cyl(10, 0.25, 4));
+
+  P perp(sph(1, 0.125, tix()));
+
+  domain R(P(-0.25, 0), P(0.25, 0.5), mesh(32,32), mesh(64,64));
+#ifdef SHOWGRID
+  plain(Red());
+  plot(F, R);
+#endif
+
+  int mult(1);
+  // reverse slice order if necessary
+  if ((perp | camera.eye()) < 0)
+    mult=-1;
+
+  for (int i=-mult*N; i != mult*N; i += mult)
+    {
+      clip_slice((MAX*i*1.0/N)*perp, perp, 0.1);
+      rgb(0.25+0.1*i, 0, -0.1*i);
+
+      surface(F, R);
+      clip_restore();
+    }
+
+  pst_format();
+  end();
+}

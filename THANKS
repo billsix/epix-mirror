@@ -1,0 +1,130 @@
+ePiX -- THANKS
+
+ePiX is built on the work of many people (unfortunately, most of whom 
+I am unaware). A few of the obvious ones are, in alphabetical order:
+
+Donald E. Knuth		TeX, and so much more
+Conrad Kwok		eepic
+
+Leslie Lamport		LaTeX
+
+Tim Morgan		tpic
+
+Piet van Oostrum	eepic
+
+Sunil Podar 		the epic style
+
+Richard M. Stallman	the GNU project
+
+Till Tantau		pgf/tikz
+
+Herbert Voß             PSTricks
+Timothy Van Zandt
+
+----------------------------------------------------------------------
+
+Special thanks to:	For:
+
+Jay Belanger		The emacs mode
+Robin Blume-Kohout	Design suggestions
+
+Svend Daugaard Pedersen	Extended coordinate systems and plotting capability
+
+Julian Gilbey		Getting ePiX to work with the GNU autotools
+Guido Gonzato		Creating and maintaining the RPM
+
+Marcus Hanwell		Data plotting and manipulation code
+Yvon Henel		French translation of the manual
+
+Jean-Michel Sarlat	http://melusine.eu.org/syracuse/epix/
+Andrew Sterian		Pyepix and its Windows package
+
+
+---
+
+Ports contributors and maintainers:
+
+Crux:
+Younès Hafri		http://yhafri.club.fr/crux/index.html
+
+Debian:			http://packages.debian.org/unstable/tex/epix
+Julian Gilbey
+
+
+FreeBSD:		http://www.freshports.org/graphics/epix/
+Tsuguru Kato
+
+
+Gentoo:			http://packages.gentoo.org/search/?sstring=epix
+Markus Dittrich
+Danny van Dyk
+Christian Faulhammer
+Olivier Fisette
+Chris Gianelloni
+Michael Hanselmann
+Marcus Hanwell
+David Holm
+Peter Johanson
+Patrick Kursawe
+Tobias Scherbaum
+Markus Ullmann
+
+T2:			http://www.t2-project.org/packages/epix.html
+René Rebe
+
+
+----------------------------------------------------------------------
+
+Many thanks to the following people, who have helped publicize ePiX
+or reported and/or patched bugs (in both code and documentation)
+
+<Anonymous>
+
+Maik Beckmann
+Jay Belanger
+Felipe Paulo Guazzi Bergo
+Karl Berry
+Robin Blume-Kohout
+
+Aran Clauson
+Patrick Cousot
+
+Kjell Magne Fauske
+
+Stephen Gibson
+Julian Gilbey
+Dov Grobgeld
+Bob Grover
+
+Jim Hefferon
+Yvon Henel
+Hartmut Henkel
+
+Herng-Jeng Jou
+
+Walter A. Kehowski
+Paul T. Kornman
+
+Jacques L'helgoualc'h
+
+Kevin McKormick
+Ross Moore
+
+Mike Protts
+
+Thorsten Riess
+
+Jean-Michel Sarlat
+Neel Smith
+Michael Somos
+Andrew Sterian
+
+Ryszard Tanas
+Ben Tillman
+Kai Trukenmueller
+
+Torbjorn Vik
+
+Wenguang Wang
+Gabe Weaver
+Mariusz Wodzicki

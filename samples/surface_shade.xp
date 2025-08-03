@@ -1,0 +1,46 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// surface to plot (a dog saddle)
+P f(double u, double v)
+{
+  return P(u, v, 0.5*u*v*(u-v)*(u+v));
+}
+
+// position-dependent color function
+P color(double x, double y, double z)
+{
+#ifdef LAUREL_BURCH
+  return P(-Sin(0.25*x), 0.2, -Cos(0.25*x)); // Laurel Burch colors
+#else
+  return P(-tanh(z), 0, tanh(z)); // Quasi-geographic 70s colors
+#endif
+}
+
+int main()
+{
+  picture(P(-3,-3), P(3,3), "6x6in");
+
+  begin();
+
+  // Set creation attributes,
+  revolutions();
+  set_crop();
+  fill();
+
+  // style attributes,
+  backing(Black());
+  plain(Yellow());
+
+  // and viewpoint.
+  camera.at(P(8, -8, 4));
+
+  // Add scenery
+  domain R(P(-2,-2), P(2, 2), mesh(36, 36), mesh(72, 72));
+  surface(f, R, color);
+
+  // and print
+  pst_format();
+  end();
+}

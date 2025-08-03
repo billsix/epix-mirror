@@ -1,0 +1,32 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// the function to be plotted
+double f(double x)
+{
+  return x*x;
+}
+
+int main() 
+{
+  picture(P(-2,0), P(2,4), "2.5x2.5in");
+
+  begin();
+
+  pen(Black(0.3));
+  grid(8,8); // and coarse
+
+  pen(Black());
+  axis Ax(P(xmin(),0), P(xmax(),0), 4, P(0,-4), b);
+  axis Ay(P(0,ymin()), P(0,ymax()), 4, P(4, 0), r);
+
+  font_size("scriptsize");
+  Ax.draw();
+  Ay.unmark(0).draw();
+
+  bold(Red());
+  plot(f, xmin(), xmax(), 40);
+  
+  end();
+}

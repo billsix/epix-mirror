@@ -1,0 +1,24 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+void dash_sample(double ht, std::string pattern)
+{
+  line_style(pattern);
+  line(P(0,ht), P(3,ht));
+  label(P(3, ht), P(4,0), "\\code{line\\_style(\""+pattern+"\")}", r);
+}
+
+int main() {
+  picture(P(0,0), P(4,4), "4x1in");
+
+  begin();
+
+  dash_sample(4, "-\\ \\ -");
+  dash_sample(3, "-\\ \\ \\ \\ -");
+  dash_sample(2, " .\\ ");
+  dash_sample(1, "-\\ .\\ -");
+  dash_sample(0, ".\\ - .");
+
+  end();
+}

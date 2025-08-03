@@ -1,0 +1,37 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const int N(12); // Number of rectangles
+
+// gather references to integrand
+double f(double t)
+{
+  return Sin(t);
+}
+
+int main()
+{
+  picture(P(0,0), P(3,1), "3x1in");
+
+  begin();
+
+  const double dx(xsize()/N);
+
+  riemann_sum(f, xmin(), xmax(), N, UPPER);
+
+  fill(Black(0.1));
+  riemann_sum(f, xmin(), xmax(), N, LOWER);
+  nofill();
+
+  h_axis(xsize());
+  v_axis(2*ysize());
+
+  h_axis_labels(xsize(), P(0,-4), b);
+  label(P(2, f(2)), P(4,2), "$y=\\sin x$", tr);
+
+  bold(Blue());
+  plot(f, xmin(), xmax(), 40);
+
+  end();
+}

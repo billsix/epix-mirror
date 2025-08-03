@@ -1,0 +1,14 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+int main() 
+{
+  picture(P(-2,-1),P(2,1), "24x12pt");
+
+  begin();
+  arrow_inset(0.5);
+
+  arrow(P(xmin(),0), P(xmax(),0));
+  end();
+}

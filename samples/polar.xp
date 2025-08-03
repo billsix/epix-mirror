@@ -1,0 +1,29 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double f(double t) 
+{ 
+  return 2*Cos(3*t); 
+}
+
+int main() 
+{
+  picture(P(-2,-2), P(2,2), "2x2in");
+
+  begin();
+  degrees();
+
+  black(0.3);  
+  polar_grid(2, 4, 24); // radius, rings, sectors
+
+  black();
+  bottom_axis(4, P(0,-4)).subdivide(2).draw();
+  left_axis(4, P(-4,0)).subdivide(2).draw();
+
+  bold();
+  polarplot(f, 0, 180, 120); // plot over [0, 180] using 120 intervals
+
+  end();
+}
+

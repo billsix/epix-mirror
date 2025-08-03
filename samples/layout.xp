@@ -1,0 +1,36 @@
+/* -*-ePiX-*- */
+/* layout.xp -- June 27, 2007 */
+#include "epix.h"
+using namespace ePiX;
+
+P f(double u, double v)
+{
+  return P((u-v)*(u+v), 2*u*v, u);
+}
+
+int main()
+{
+  picture(P(0,0), P(2,3), "5x7.5in");
+
+  begin();
+
+  domain R(P(-1,-1), P(1,1), mesh(12,12), mesh(24,24));
+
+  for (int i=0; i<2; ++i)
+    for (int j=0; j<3; ++j)
+      {
+        screen my(P(-3,-3), P(3,3));
+        activate(my);
+        border(Red(0.6), "1pt");
+	camera.at(sph(10, (2*j+i+1)*M_PI/8, M_PI/6));
+
+	plot(f, R);
+	arrow(P(0,0,0), 2*E_1);
+	arrow(P(0,0,0), 2*E_2);
+        inset(P(i+0.05,2.05-j), P(i+0.95,2.95-j));
+	deactivate(my);
+      }
+
+  end();
+}
+

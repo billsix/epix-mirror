@@ -1,0 +1,66 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double gap(0.15); // distance between graph portions
+
+Color GRAY(Black(0.5));
+
+int main()
+{
+  picture(P(0,0),P(2+gap,2+gap), "4x4in");
+
+  begin();
+
+  plain(GRAY);
+  // draw in global coordinates
+  axis_break(P(1,0), P(1+gap,0));
+  axis_break(P(0,1), P(0,1+gap));
+
+  // portion adjacent to origin
+  screen scr1(P(0,0), P(4,4));
+  activate(scr1);
+
+  set_crop();
+  grid(8,8);
+
+  h_axis_labels(4, P(0,-4), b);
+  v_axis_labels(4, P(-4,0), l);
+
+  bold(Red());
+  plot(recip, 0, 4, 120);
+
+  inset(P(0,0), P(1,1));
+
+  // right portion
+  screen scr2(P(10,0), P(14,4));
+  activate(scr2);
+
+  set_crop();
+  plain(GRAY);
+  grid(8,8);
+
+  h_axis_labels(4, P(0,-4), b);
+
+  bold(Red());
+  plot(recip, 10, 14, 20);
+
+  inset(P(1+gap,0), P(2+gap,1));
+
+  // top portion
+  screen scr3(P(0,10), P(4,14));
+  activate(scr3);
+
+  set_crop();
+  plain(GRAY);
+  grid(8,8);
+
+  v_axis_labels(4, P(-4,0), l);
+
+  bold(Red());
+  plot(recip, 0.05, 0.1, 10);
+
+  inset(P(0,1+gap), P(1,2+gap));
+
+  end();
+}

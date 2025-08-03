@@ -1,0 +1,38 @@
+#!/bin/sh
+#
+HEADER_FILE="epix.h"
+
+HEADERS="enums.h length.h interval.h triples.h Complex.h functions.h pairs.h \
+     affine.h Color.h state.h frame.h domain.h camera.h screen.h picture.h \
+     markers.h axis.h legend.h path.h curves.h \
+     circle.h plane.h segment.h sphere.h intersections.h \
+     plots.h surface.h data_mask.h data_file.h data_bins.h geometry.h \
+     Sline.h"
+
+# N.B. Spaces in 2nd line are properly adjusted
+cat <<HEADER_HEADER > $HEADER_FILE
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *\\
+ *  $HEADER_FILE -- Automatically created on $(date)  *
+\* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+#include <iostream>
+#include <vector>
+#include <list>
+#include <set>
+#include <algorithm>
+#include <string>
+#include <sstream>
+#include <cstdlib>
+#include <cmath>
+
+#ifndef EPIX_H
+#define EPIX_H
+
+HEADER_HEADER
+
+cat $HEADERS | grep -v "\#include" >> $HEADER_FILE
+
+echo >> $HEADER_FILE
+echo "#endif /* EPIX_H */" >> $HEADER_FILE
+
+exit 0;

@@ -1,0 +1,55 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const int MAX(24);
+const double x0(4);
+const double ht(3); // camera height
+const double INFTY(100000);
+
+P f(double t)
+{
+  return P(t, t*t, 0);
+}
+
+int main() 
+{
+  picture(P(-3,-3),P(3,3), "4x4in");
+
+  begin();
+
+  border();
+  set_crop();
+
+  viewpoint(0,-ht*ht, ht);
+  camera.look_at(P(0,0,1));
+
+  pen(Black(0.3), "0.1pt");
+  grid(P(-MAX,0), P(MAX, MAX*MAX), MAX, MAX*MAX/8);
+  grid(P(-MAX, 0, 2*ht), P(MAX, MAX*MAX, 2*ht), MAX, MAX*MAX/8);
+
+  pen(Blue(1.4));
+  envelope(f, -MAX/2, MAX/2, 20); // envelope of tangent lines
+
+
+  bbold(Blue());
+  Line(P(-100, INFTY, 0), P(100, INFTY, 0));
+
+  masklabel(P(0,0), P(0,2), "$(0,0)$", t);
+  label(P(0,INFTY), P(0,-2), "$(0,\\infty)$", b);
+  label(P(-0.25*INFTY,INFTY), P(0, 2), "Horizon", t);
+
+  masklabel(P(x0, x0*x0), P(-4,0), "$y=x^2$", l);
+
+  box(P(0,0));
+  box(P(0,INFTY));
+
+  pen(1);
+  plot(f, -MAX, MAX, 240);
+
+  camera.at(0,0,1000);
+  masklabel(P(0, ymin()), P(0,0), 
+	"Projective equivalence of a parabola and a circle", t);
+
+  end();
+}

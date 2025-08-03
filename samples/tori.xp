@@ -1,0 +1,63 @@
+/* -*-ePiX-*- */
+/* tori.xp -- May 09, 2005 */
+// compile tutorial torus meshes at once
+#include "epix.h"
+using namespace ePiX;
+
+// torus
+P F(double u, double v)
+{
+  return polar(2.25+Cos(u), v) + P(0,0,Sin(u));
+}
+
+int main()
+{
+  picture(P(0,0), P(4,1), "6 x 1.5in");
+
+  begin();
+
+  domain R(P(0,0), P(1,1), mesh(12,30), mesh(24, 60));
+
+  revolutions();
+  camera.at(10,7,5);
+
+  // unclipped/cropped
+  screen scr1(P(-3,-3), P(3,3));
+  activate(scr1);
+  fill(White());
+  surface(F, R);
+  inset(P(0,0), P(1,1));
+  deactivate(scr1);
+
+  // cropped
+  screen scr2(P(-3,-3), P(3,3));
+  activate(scr2);
+  set_crop();
+  border();
+  surface(F, R);
+  inset(P(1.5,0), P(2.5,1));
+  deactivate(scr2);
+
+  // clipped
+  screen scr3(P(-3,-3), P(3,3));
+  activate(scr3);
+  clip_box(P(3.5, 2, 1.5));
+
+  // box, sides layered manually
+  nofill();
+  rect(P(-3.5, -2, -1.5), P(-3.5,  2, 1.5));
+  rect(P(-3.5, -2, -1.5), P( 3.5, -2, 1.5));
+
+  fill();
+  surface(F, R);
+  nofill();
+  rect(P( 3.5, -2, -1.5), P( 3.5,  2, 1.5));
+  rect(P(-3.5,  2, -1.5), P( 3.5,  2, 1.5));
+
+  inset(P(3,0), P(4,1));
+  deactivate(scr3);
+
+  pst_format();
+  end();
+}
+

@@ -1,0 +1,42 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+double dX(0.125), dY(0.25);
+
+int main()
+{
+  picture(P(-2, 0), P(2, 1.125 + dY), "4 x 1.5in");
+
+  begin();
+
+  fill();
+  for (int i=-6; i<=6; ++i)
+    {
+      const double x(0.333*i);
+      fill(Red(x));
+      rect(P(x-dX, 1.125), P(x+dX, 1.125+dY));
+    }
+  nofill();
+
+  h_axis(4);
+  v_axis(P(0,0), P(0,1), 1);
+
+  h_axis_labels(4, P(0,-4), b);
+  red(-1);
+  line(P(-2,1), P(-1,1));
+  line(P(-1,1), P(0,0));
+  line(P(0,0), P(1,0));
+  line(P(1,0), P(2,1));
+
+  red();
+  bold();
+  line(P(-2,1), P(-1,0));
+  line(P(-1,0), P(0,0));
+
+  line(P(0,0), P(1,1));
+  line(P(1,1), P(2,1));
+
+  pst_format();
+  end();
+}

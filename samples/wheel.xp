@@ -1,0 +1,50 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P F(double t, double r)
+{
+  return P(t-r*Sin(t), 1-r*Cos(t)); // a cycloid
+}
+
+int main()
+{
+  picture(P(0,0), P(15,27), "4 x 7.2in");
+
+  begin();
+
+  const double dt(5*M_PI/11);
+  double t(dt);
+
+  for(int i=0; i < 9; ++i, t += dt)
+    {
+      screen scr(P(-1,0), P(15,2)); // drawing area
+      activate(scr);
+
+      plain(Black());
+      line(P(-1, 0), P(15, 0)); // the ground
+
+      circle(P(t,1), 1); // the wheel
+
+      // [0,t] x [0,1]
+      domain R(P(0,0), P(t, 1), mesh(10*i,5), mesh((int) ceil(1+4*t), 5));
+
+      // the paths
+      bold();
+      for (int j=0; j < 6; ++j)
+        {
+          pen(RGB(1-0.125*j, 0.125*j, 0.5+0.125*j));
+          plot(F, R.slice2(0.2*j));
+        }
+
+      // the spoke
+      bold(Green());
+      line(P(t,1), F(t,1));
+
+      inset(P(0, 25-3*i), P(15, 27-3*i)); // page layout
+      deactivate(scr);
+    }
+
+  end();
+}
+

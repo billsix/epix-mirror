@@ -1,0 +1,37 @@
+/* -*-ePiX-*- */
+/* geomsum.c -- July 16, 2001 */
+#include "epix.h"
+using namespace ePiX;
+
+const int N(8);
+
+int main() 
+{
+  picture(P(0,0), P(1,1), "2.5x2.5in");
+  begin();
+
+  pen(White(), "0.8pt");
+  fill(White(0.9));
+  rect(P(0,0), P(1,1));
+
+  black();
+  label(P(1.0/4,   1.0/2), "$\\frac{1}{2}$");
+  label(P(5.0/8,   3.0/4), "$\\frac{1}{8}$");
+  label(P(13.0/16, 7.0/8), "$\\frac{1}{32}$");
+
+  white();
+  fill(Blue());
+  double t(0.5);
+
+  for(int i=0; i<N; ++i, t *= 0.5)
+    {
+      rect(P(1-t, 1-2*t), P(1, 1-t));
+      line(P(1-t, 1-2*t), P(1-t, 1));
+    }
+
+  label(P(3.0/4,     1.0/4), "$\\mathbf{\\frac{1}{4}}$");
+  label(P(7.0/8,     5.0/8), "$\\mathbf{\\frac{1}{16}}$");
+  label(P(15.0/16, 13.0/16), "$\\mathbf{\\frac{1}{64}}$");
+
+  end();
+}

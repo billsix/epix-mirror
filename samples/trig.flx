@@ -1,0 +1,74 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P f(double x, double t)
+{
+  return P(x, Sin(x+t));
+}
+
+domain R(P(0,0), P(1,1), mesh(60,24), mesh(120, 72));
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix()=temp1/temp2;
+    }
+
+  picture(P(0,0), P(5,2), "5x2in");
+
+  begin();
+  revolutions();
+
+  border();
+  set_crop();
+
+  screen rolling(P(-1,-1), P(1,1));
+  screen waving(P(0,-1), P(1,1));
+
+  activate(rolling);
+
+  P  ctr(polar(0.5, tix()));
+  P  rim(polar(0.5, tix()) + polar(0.5, -tix()));
+  P rim2(polar(0.5, tix()) + polar(0.5, 0.5-tix()));
+
+  circle(ctr, 0.5); // small wheel
+
+  bold();
+  circle(P(0,0), 1); // big wheel
+
+  green();
+  line(P(1,0), P(-1,0));
+
+  blue();
+  line(P(0,1), P(0,-1));
+
+  red();
+  line(ctr, rim);
+  line(ctr, rim2);
+
+  ddot(rim);
+  ddot(rim2);
+  deactivate(rolling);
+
+  activate(waving);
+  set_crop();
+  blue();
+  plot(f, R.slice2(tix()));
+  deactivate(waving);
+
+  inset(rolling, P(0,0), P(2,2));
+  inset(waving, P(3,0), P(5,2));
+
+  dashed();
+  pen(Blue(1.6), 0.15);
+  line(P(1,1+Sin(tix())), P(3,1) + f(0, tix()));
+
+  end();
+}

@@ -1,0 +1,43 @@
+%% Generated from marker.xp on Thu Jun 23 14:31:08 EDT 2011 by
+%% ePiX-1.2.4
+%% 
+%%   Cartesian bounding box: [0,5] x [0,1]
+%%   Actual size: 3.75 x 1in
+%%   Figure offset: left by 0in, down by 0in
+%% 
+%% usepackages epic,eepic,xcolor
+%% 
+\xdefinecolor{rgb_000000}{rgb}{0,0,0}%
+\xdefinecolor{rgb_ffffff}{rgb}{1,1,1}%
+\setlength{\unitlength}{1in}%
+\begin{picture}(3.75,1)(0,0)%
+\put(0.159941,0.928915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{CIRC}}}}}
+\put(0,1){\color{rgb_ffffff}$\allinethickness{0.0207555in}\circle{0.0207555}$}%
+\put(0,1){\color{rgb_000000}$\circle{0.041511}$}%
+\put(1.09744,0.928915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{SPOT}}}}}
+\put(0.9375,1){\color{rgb_000000}$\allinethickness{0.027674in}\circle{0.027674}$}%
+\put(2.03494,0.928915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{RING}}}}}
+\put(1.875,1){\color{rgb_000000}$\circle{0.055348}$}%
+\put(2.97244,0.928915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{DOT}}}}}
+\put(2.8125,1){\color{rgb_000000}$\allinethickness{0.0207555in}\circle{0.0207555}$}%
+\put(3.90994,0.928915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{DDOT}}}}}
+\put(3.75,1){\color{rgb_000000}$\allinethickness{0.013837in}\circle{0.013837}$}%
+\put(0.159941,0.428915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{PLUS}}}}}
+\put(0,0.5){\makebox(0,0){\hbox{\color{rgb_000000}$+$}}}
+\put(1.09744,0.428915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{OPLUS}}}}}
+\put(0.9375,0.5){\makebox(0,0){\hbox{\color{rgb_000000}$\oplus$}}}
+\put(2.03494,0.428915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{TIMES}}}}}
+\put(1.875,0.5){\makebox(0,0){\hbox{\color{rgb_000000}$\times$}}}
+\put(2.97244,0.428915){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{OTIMES}}}}}
+\put(2.8125,0.5){\makebox(0,0){\hbox{\color{rgb_000000}$\otimes$}}}
+\put(0.159941,-0.0710847){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{DIAMOND}}}}}
+\put(0,0){\makebox(0,0){\hbox{\color{rgb_000000}$\diamond$}}}
+\put(1.09744,-0.0710847){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{UP}}}}}
+\put(0.9375,0){\makebox(0,0){\hbox{\color{rgb_000000}$\bigtriangleup$}}}
+\put(2.03494,-0.0710847){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{DOWN}}}}}
+\put(1.875,0){\makebox(0,0){\hbox{\color{rgb_000000}$\bigtriangledown$}}}
+\put(2.97244,-0.0710847){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{BOX}}}}}
+\put(2.8125,0){\makebox(0,0){\hbox{\color{rgb_000000}$\rule{3pt}{3pt}$}}}
+\put(3.90994,-0.0710847){\makebox(0,0){\hbox{\color{rgb_000000}{\tt{BBOX}}}}}
+\put(3.75,0){\makebox(0,0){\hbox{\color{rgb_000000}$\rule{2pt}{2pt}$}}}
+\end{picture}%

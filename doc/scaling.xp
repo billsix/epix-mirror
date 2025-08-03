@@ -1,0 +1,37 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+int main()
+{
+  picture(P(0,0), P(4,1), "4x0.75in");
+
+  begin();
+
+  font_size("scriptsize");
+
+  screen canv(P(0,0), P(1,1));
+  activate(canv);
+
+  border();
+  ddot(canv.bl(), P(2,2),   "$(x_\\mathrm{min},y_\\mathrm{min})$", tr);
+  ddot(canv.tr(), P(-2,-2), "$(x_\\mathrm{max},y_\\mathrm{max})$", bl);
+  label(canv.b(), P(0,-4), "Canvas (virtual)", b);
+  deactivate(canv);
+
+  screen pg(P(0,0), P(1,1));
+  activate(pg);
+
+  border();
+  ddot(pg.bl(), P(2,2),   "$(0,0)$", tr);
+  ddot(pg.tr(), P(-2,-2), "$(h_\\mathrm{size}, v_\\mathrm{size})$", bl);
+  label(pg.b(), P(0,-4), "Page (actual)", b);
+  deactivate(pg);
+
+  arrow(P(1.75, 0.5), P(2.75,0.5));
+
+  inset(canv, P(0,0.125), P(1.5, 1));
+  inset(pg, P(3,0.125), P(4,0.875));
+
+  end();
+}

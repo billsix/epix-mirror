@@ -1,0 +1,68 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P F(double t, double r, double theta)
+{ 
+  return P(r*r*Cos(2*theta), 
+           r*r*Cos(t)*Sin(2*theta) + r*Sin(t)*Sin(theta),
+           r*Cos(theta));
+}
+
+domain R(P(0,0,0), P(1, 1.5, 1), mesh(24, 8, 32), mesh(24, 40, 80));
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix()=temp1/temp2;
+    }
+
+  domain R1(R.slice1(tix()));
+
+  picture(P(-4,-4),P(4,4), "5x5in");
+
+  begin();
+  revolutions();
+
+  grid(1,1);
+
+  const P ctr(3.25,-3.25); // "clock" center
+  bold();
+  circle(ctr, 0.5);        // clock face
+
+  line(ctr, ctr+polar(0.4, tix())); // hands
+  label(ctr+polar(0.6, tix()), "$y$");
+
+  line(ctr, ctr+polar(0.4, tix()+0.25));
+  label(ctr+polar(0.6, tix()+0.25), "$w$");
+
+  viewpoint(4,5,3);
+  camera.range(20);
+
+  line(P(0,0,0), P(3,0,0));
+  line(P(0,0,0), P(0,3,0));
+  line(P(0,0,0), P(0,0,2));
+
+  plain(Red());
+  plot(F, R1.resize3(0, 0.5));
+
+  blue();
+  plot(F, R1.resize3(0.5, 1));
+
+  bold(Magenta());
+  plot(F, R.slice3(0));
+  plot(F, R.slice3(0.5));
+
+  black();
+  masklabel(P(3,0,0), "$x$");
+  masklabel(P(0,3,0), "$y$");
+  masklabel(P(0,0,2), P(-4,0), "$z=\\textrm{Re}\\,\\sqrt{x+iy}$", tr);
+
+  end();
+}

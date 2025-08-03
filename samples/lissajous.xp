@@ -1,0 +1,28 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+P f(double t)
+{
+  return P(Sin(3*t), Sin(4*t));
+}
+
+int main()
+{
+  picture(P(-1,-1), P(1,1), "2 x 2in");
+
+  begin();
+  revolutions();
+
+  bold(Red());
+  plot(f, 0, 1, 200);
+
+  arrow_inset(0.2);
+  arrow_width(1.5);
+
+  plain(Blue());
+  tan_field(f, 0, 1, 81);
+
+  end();
+}
+

@@ -1,0 +1,83 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// See binom.cc for instructions on creating data file binom.dat
+
+double erf(double x)
+{
+  return 100*exp(-0.02*(x-50)*(x-50))/sqrt(50*M_PI);
+}
+
+int main() 
+{
+  picture(P(0,0),P(100,20), "6 x 6in");
+
+  begin();
+
+  grid(1,10);
+
+  // read disk file
+  data_file binom("binom.dat");
+
+  // create "bins" for bar chart
+  data_bins db05(-0.5, 100.5, 101);  // 5% biased coin
+  data_bins db10(-0.5, 100.5, 101);  // 10%
+  data_bins db30(-0.5, 100.5, 101);  // 30%
+  data_bins db50(-0.5, 100.5, 101);  // 50%
+
+  db05.read(binom.column(1));
+  db10.read(binom.column(2));
+  db30.read(binom.column(3));
+  db50.read(binom.column(4));
+
+  legend L;
+
+  fill();
+  gray(0.6);
+  db05.bar_chart(100);
+  L.fill_item("5\\%");
+
+  gray(0.4);
+  db10.bar_chart(100);
+  L.fill_item("10\\%");
+
+  gray(0.2);
+  db30.bar_chart(100);
+  L.fill_item("30\\%");
+
+  gray(0);
+  db50.bar_chart(100);
+  L.fill_item("50\\%");
+
+  nofill();
+
+  font_size("footnotesize");
+  tick_size(1);
+  bottom_axis(10, P(0,-4), b).draw();
+
+  left_axis(10, P(-4,0), l).subdivide(2).draw();
+
+  bold(Red());
+  plot(erf, xmin(), xmax(), 240);
+  L.path_item("Normal");
+
+  font_size("LARGE");
+  L.key_size(18);
+  L.draw(P(50, 12.5), P(2,2), tr);
+
+  font_face("sc");
+  label(P(0.5*(xmin()+xmax()), ymax()), P(0,12), 
+	"Tossing a Biased Coin, 100,000 Trials", t);
+
+  font_size(); // reset to default
+  label(P(0.5*(xmin()+xmax()), ymin()), P(0,-18), 
+	"Number of Heads (100 Tosses per Trial)", b);
+
+  degrees();
+  label_angle(90);
+  label(P(xmin(), 0.5*(ymin()+ymax())), P(-18,0), "Percentage of Trials", l);
+
+  pst_format();
+  end();
+}

@@ -1,0 +1,46 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double k(2*M_PI/(360*sqrt(3))); // assume "degrees" mode
+
+double exp_cos(double t) { return exp(k*t)*Cos(t); }
+double exp_sin(double t) { return exp(k*t)*Sin(t); }
+double minus_exp_cos(double t) { return -exp_cos(t); }
+double minus_exp_sin(double t) { return -exp_sin(t); }
+
+int main()
+{
+  picture(P(-1,-1), P(1,1), "2.5 x 2.5in");
+
+  begin();
+  degrees(); // set angle units
+  camera.at(P(1, 2.5, 3));
+
+  sphere(); // draw unit sphere's horizon
+
+  pen(Blue(1.6)); // hidden portions of loxodromes
+  backplot_N(exp_cos, exp_sin, -540, 540, 180);
+  backplot_N(minus_exp_cos, minus_exp_sin, -540, 540, 180);
+
+  pen(Red(1.6));
+  backplot_N(exp_sin, minus_exp_cos, -540, 540, 180);
+  backplot_N(minus_exp_sin, exp_cos, -540, 540, 180);
+
+  pen(Black(0.3)); // coordinate grid
+
+  for (int i=0; i<=12; ++i) {
+    latitude(90-15*i, 0, 360);
+    longitude(30*i, 0, 360);
+  }
+
+  bold(Blue()); // visible portions of loxodromes
+  frontplot_N(exp_cos, exp_sin, -540, 540, 360);
+  frontplot_N(minus_exp_cos, minus_exp_sin, -540, 540, 360);
+
+  pen(Red());
+  frontplot_N(exp_sin, minus_exp_cos, -540, 540, 360);
+  frontplot_N(minus_exp_sin, exp_cos, -540, 540, 360);
+
+  end();
+}

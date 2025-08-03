@@ -1,0 +1,56 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// arc arrow extent
+const double theta(60);
+
+// arc radii
+const double rad(0.25);
+const double Rad(4.5);
+
+// half-width of slit
+const double ht(0.0625);
+
+int main() 
+{
+  // old-style size declarations
+  bounding_box(P(-5, -5), P(5,5));
+  picture(160, 160);
+  unitlength("0.35mm");
+
+  begin();
+  degrees();
+  tikz_format();
+
+  // "start" angles of arcs; must come after degrees()
+  const double theta1(Asin(ht/rad));
+  const double theta2(Asin(ht/Rad));
+
+  fill(Black(0.1)); // light gray
+
+  // build keyhole in pieces; += concatenates
+  path contour(P(0,0), Rad*E_1, Rad*E_2, theta2, 360-theta2);    // outer arc
+  contour += path(polar(Rad,-theta2), polar(rad,-theta1));       // lower slit
+  contour += path(P(0,0), rad*E_1, rad*E_2, 360-theta1, theta1); // inner arc
+  contour += path(polar(rad, theta1), polar(Rad, theta2));       // upper slit
+
+  contour.close().fill().draw();
+
+  dot(P(0,0));   // the origin
+
+  //  plain(Black());
+  arrow_width(2);
+  arrow_inset(0.25);
+
+  arrow(P(Rad/4, 0.1*Rad), P(3*Rad/4, 0.1*Rad)); // arrow ends in terms of Rad
+  arrow(P(3*Rad/4, -0.1*Rad), P(Rad/4, -0.1*Rad));
+
+  arc_arrow(P(0,0), 0.9*Rad, 180-theta, 180+theta);
+
+  label(P(Rad,ht), P(2,4), "$R\\to\\infty$", tr);
+  label(P(0,rad), P(0,4), "$\\delta\\to0$", tl);
+  label(polar(Rad, 45), P(0,0), "$\\gamma$", tr);
+
+  end();
+}

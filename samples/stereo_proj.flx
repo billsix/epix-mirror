@@ -1,0 +1,79 @@
+/* -*-flix-*- */
+/*
+ * Depicts the "shadow" in C of a hemisphere rotating about the real
+ * axis.  To avoid drawing a frame where the boundary passes through
+ * the point at infinity, compile with an odd number of frames.
+ */
+#include "epix.h"
+using namespace ePiX;
+
+P O(0,0,0);
+
+void circ(double t)
+{
+  if (std::isnan(t)) // fallback, doesn't fill properly
+    line(P(-2,0), P(2,0));
+
+  else
+    circle(P(0, t), sqrt(1+t*t));
+}
+
+P f(double u, double v)
+{
+  P tmp(sph(1, u, v));
+  return P(tmp.x3(), tmp.x1(), tmp.x2());
+}
+
+domain R(P(0,-M_PI_2), P(4*M_PI,M_PI_2), mesh(144,48));
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1(strtod(argv[1], &arg)), temp2(strtod(argv[2], &arg));
+
+      tix()=temp1/temp2;
+    }
+  picture(P(-2,-2), P(2,2), "6 x 6in");
+
+  begin();
+
+  camera.at(P(4,-6,3));
+
+  border();
+
+  set_crop();
+
+  // disk
+  plain(Black());
+  fill(Black(0.3));
+
+  if (0.25 <= tix() && tix() <= 0.75)
+    {
+      rect(P(-100,-100), P(100,100));
+      fill(White());
+    }
+
+  circ(Tan(2*M_PI*tix()));
+
+  dot(P(-1,0), P(4,-2), "$-1$", br);
+
+  plain(RGB(0.9,0.7,1));
+
+  // light purple
+  fill(RGB(0.9,0.7,1));
+
+  clip_face(O, E_3);
+  plot(f, R);
+
+  clip_face(O, P(0, Sin(2*M_PI*tix()), -Cos(2*M_PI*tix())));
+  surface(f, R);
+  clip_restore();
+  dot(P(1,0), P(2,-2), "$1$", br);
+
+  dot(P(0,0,1), P(0,8), "$\\infty$", t);
+
+  pst_format();
+  end();
+}

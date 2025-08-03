@@ -1,0 +1,93 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const double r_0(1); //0.75;
+const double golden(0.5*(1+sqrt(5)));
+
+Sphere S0(P(0,0,0), sqrt(3));
+
+Sphere S1(P( 1, golden, 0), r_0);
+Sphere S2(P(-1, golden, 0), r_0);
+Sphere S3(P( 1,-golden, 0), r_0);
+Sphere S4(P(-1,-golden, 0), r_0);
+
+Sphere S5(P( 0, 1, golden), r_0);
+Sphere S6(P( 0,-1, golden), r_0);
+Sphere S7(P( 0, 1,-golden), r_0);
+Sphere S8(P( 0,-1,-golden), r_0);
+
+Sphere S9(P( golden, 0, 1), r_0);
+Sphere Sa(P( golden, 0,-1), r_0);
+Sphere Sb(P(-golden, 0, 1), r_0);
+Sphere Sc(P(-golden, 0,-1), r_0);
+
+Circle C1(S0*S1);
+Circle C2(S0*S2);
+Circle C3(S0*S3);
+Circle C4(S0*S4);
+Circle C5(S0*S5);
+Circle C6(S0*S6);
+Circle C7(S0*S7);
+Circle C8(S0*S8);
+Circle C9(S0*S9);
+Circle Ca(S0*Sa);
+Circle Cb(S0*Sb);
+Circle Cc(S0*Sc);
+
+// bold circle if facing camera, otherwise plain
+void sphere_draw(const Circle& C)
+{
+  if ((C.center()|camera.viewpt()) >= 0)
+    bold();
+  else plain();
+
+  C.draw();
+}
+
+void icosa()
+{
+  // S0.draw();
+  sphere_draw(C1);
+  sphere_draw(C2);
+  sphere_draw(C3);
+  sphere_draw(C4);
+  sphere_draw(C5);
+  sphere_draw(C6);
+  sphere_draw(C7);
+  sphere_draw(C8);
+  sphere_draw(C9);
+  sphere_draw(Ca);
+  sphere_draw(Cb);
+  sphere_draw(Cc);
+}
+
+int main(int argc, char* argv[])
+{
+  if (argc == 3)
+    {
+      char* arg;
+      double temp1, temp2;
+      temp1=strtod(argv[1], &arg);
+      temp2=strtod(argv[2], &arg);
+
+      tix()=temp1/temp2;
+    }
+
+  picture(P(-2,-2),P(2,2), "6x6in");
+
+  begin();
+  set_crop();
+  revolutions();
+
+  // draw frames
+  camera.at(sph(12, 0.5*tix(), 0.05));
+  red(-1.4); // nearly cyan
+  icosa();
+
+  camera.at(sph(12, 0.01+0.5*tix(), 0.05));
+  red(1.4);
+  icosa();
+
+  end();
+}

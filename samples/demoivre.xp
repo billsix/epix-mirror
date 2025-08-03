@@ -1,0 +1,42 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const int N(24);
+const double theta(0.875*M_PI);
+const pair alpha(1, theta/N);
+
+// pairs implement complex arithmetic, but need P to draw
+P pair2P(pair arg)
+{
+  return P(arg.x1(), arg.x2());
+}
+
+int main()
+{
+  picture(P(-1.5,0), P(1,1.25), "200 x 100pt");
+
+  begin();
+
+  pair power(1,0);
+
+  for(int i=0; i<N; ++i)
+    {
+      line(P(0,0), pair2P(alpha*power));         // draw two sides
+      line(pair2P(power), pair2P(alpha*power));  // of triangle
+      power *= alpha;            // and increment power
+    }
+
+  label(pair2P(alpha), P(2,0), "$\\alpha=1+\\frac{i\\theta}{n}$", r);
+  label_angle(theta-M_PI);
+  ddot(pair2P(power), P(2,4), "$\\alpha^n\\approx e^{i\\theta}$", b);
+
+  plain(Black(0.3));
+  arc(P(0,0), 1, 0, theta);
+  ddot(cis(theta), P(0,-4), "$$", b);
+
+  bold(Red());
+  triangle(P(0, 0), P(1, 0), pair2P(alpha));
+
+  end();
+}

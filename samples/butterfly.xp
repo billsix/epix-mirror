@@ -1,0 +1,136 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+const P VIEWPT(20, 0, 8);
+
+const double tmin(2/sqrt(3));
+
+const Color light(Blue(1.6));
+const Color dark(Red(0.8));
+const Color lt_gray(Black(0.2));
+const Color net_color(Yellow(0.1));
+
+void label_tag(P loc, P head, std::string txt, epix_label_posn align)
+{
+  dart(loc, head);
+  masklabel(loc, P(0,0), txt, align);
+}
+
+domain R(P(-2,-2), P(2,2), mesh(20, 20), mesh(40,40));
+domain edge(P(-2,-2), P(2,2), mesh(1,1), mesh(40,40));
+
+// surface
+P Phi(double u, double v)
+{
+  return P(4*v, 0.75*(u*u-2*v)*u, 2*u);
+}
+
+P cubic(double t) { return Phi(t, 1.5*t*t); }
+
+// cubic projections to background planes
+P Phi12(double t) 
+{ 
+  P temp(cubic(t));
+  return P(temp.x1(), temp.x2(), -8); 
+}
+
+P Phi13(double t) 
+{ 
+  P temp(cubic(t));
+  return P(temp.x1(), -8, temp.x3()); 
+}
+
+P Phi23(double t) 
+{ 
+  P temp(cubic(t));
+  return P(-8, temp.x2(), temp.x3()); 
+}
+
+
+int main() {
+  picture(P(-14,-15), P(10,9), "6x6in");
+
+  begin();
+  set_crop();
+  camera.at(VIEWPT);
+
+  // background grids
+  pen(lt_gray);
+  grid(P(-8, -8, -8), P(8, 8, -8), 8,8);
+  grid(P(-8, -8, -8), P(8, -8, 6), 7,8); // n.b. (z,x) divisions
+  grid(P(-8, -8, -8), P(-8, 8, 6), 8,7);
+
+  // background coordinate axes
+  pen(Black());
+  line(P(0, -8, -8), P(0, 8, -8));
+  line(P(-8, 0, -8), P(8, 0, -8));
+
+  line(P(0, -8, -8), P(0, -8, 6));
+  line(P(-8, -8, 0), P(8, -8, 0));
+
+  line(P(-8, 0, -8), P(-8, 0, 6));
+  line(P(-8, -8, 0), P(-8, 8, 0));
+
+  // projections of cubic
+  bold(dark);
+  plot(Phi12, -tmin, tmin, 80);
+  plot(Phi13, -tmin, tmin, 80);
+  plot(Phi23, -tmin, tmin, 80);
+
+  // surface
+  plain(net_color);
+  fill(lt_gray);
+  surface(Phi, R.resize1(-2,0)); // bottom half
+
+  // and cubic curve
+  bold(dark);
+  plot(cubic, -tmin, 0, 80);
+
+  plain(net_color);
+  surface(Phi, R.resize1(0,2)); // top half
+
+  bold(dark);
+  plot(cubic, 0, tmin, 80);
+
+  // surface boundary
+  bold(Yellow());
+  plot(Phi, edge);
+
+  // guide lines to cusp projection
+  plain(light);
+  dashed();
+  line(cubic( tmin), Phi12( tmin));
+  line(cubic(-tmin), Phi12(-tmin));
+
+  /*
+  // guide lines to other projections
+  line(cubic( tmin), Phi13( tmin));
+  line(cubic(-tmin), Phi13(-tmin));
+
+  line(cubic( tmin), Phi23( tmin));
+  line(cubic(-tmin), Phi23(-tmin));
+  */
+
+  // fake transparency
+  plain(dark);
+  plot(Phi12, -tmin, tmin, 20); // cusp
+  //  plot(Phi13, -tmin, tmin, 20);
+  //  plot(Phi23, -tmin, tmin, 20);
+
+  label_color(Black());
+  label(P(8,0,-8), P(0,-4), "$x$", b);
+  label(P(0,8,-8), P(4,0), "$y$", r);
+
+  pen(light);
+  label_border(light, "0.4pt");
+  solid();
+  label_tag(Phi(-2,-2)+P(0,2,6), Phi(-1.75,-1.75),
+	 "$y=\\frac{3}{32}(z^3-2xz)$", t);
+
+  label_tag(cubic(-1)+P(0,2,3), cubic(-1),
+	 "$(x,y,z)=(6t^2, -\\frac{3}{2}t^3, 2t)$", t);
+
+  pst_format();
+  end();
+}

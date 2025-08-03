@@ -1,0 +1,120 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+/*
+ * Compile with, e.g. elaps -DNORMAL --huge decorate.xp
+ */
+
+#define LINEFIELD
+// #define NORMAL
+
+const int N1(24);  // latitudes
+const int N2(48);  // longitudes
+
+const double du(1.0/N1);
+const double dv(1.0/N2);
+
+const P VIEWPT(6, 3, 4);
+
+const double r_0(0.95); // minor radius
+const double R_0(2);    // major radius
+double g(double u)
+{
+  return R_0 + r_0*Cos(u);
+}
+
+P F(double u, double v)
+{
+  return polar(g(u), v) + P(0,0,r_0*Sin(u));
+}
+
+namespace ePiX {
+  // a facet-like class that can be drawn with extra decorations, e.g.,
+  // normal vectors, diagonals, orientation-dependent colors...
+  class mesh_quad {
+  private:
+    P pt1, pt2, pt3, pt4, center;
+    double distance;
+
+  public:
+    mesh_quad(P f(double u, double v), double u0, double v0)
+      : pt1(f(u0,v0)), pt2(f(u0+du,v0)), pt3(f(u0+du,v0+dv)), pt4(f(u0,v0+dv)),
+	center(0.25*(pt1 + pt2 + pt3 + pt4)),
+	distance(norm(center-camera.viewpt())) { }
+	  
+    double how_far() const { return distance; }
+
+    void draw() const
+    { 
+      P direction(center-camera.viewpt());
+      P normal((pt2 - pt1)*(pt4 - pt1));
+      normal *= 1/norm(normal);
+
+      blue(0.75*(normal|(recip(distance)*direction)));
+
+#ifdef NORMAL
+      if ((normal|direction) < 0)
+	{
+	  plain(Green(0.6));
+	  arrow(center, center-0.5*normal, 0.5);
+	}
+#endif
+      fill();
+      ePiX::quad(pt1, pt2, pt3, pt4);
+      fill(false);
+
+#ifdef LINEFIELD
+      if ((normal|direction) > 0)
+	bbold(Blue(1.8));
+      else
+	bold(Red());
+
+      line(pt1, 0.5*(pt3+pt4));
+      line(0.5*(pt1+pt2), pt3);
+#endif
+
+#ifdef NORMAL
+      if ((normal|direction) > 0)
+	{
+	  plain(Green(0.6));
+	  arrow(center, center-0.5*normal, 0.5);
+	}
+#endif
+    }
+  };
+
+  class by_distance {
+  public:
+    bool operator() (const mesh_quad& arg1, const mesh_quad& arg2)
+    { return arg1.how_far() > arg2.how_far(); }
+  };
+} // end of namespace
+
+int main() {
+  picture(P(-3,-3),P(3,3), "4x4in");
+
+  begin();
+  revolutions();
+
+  viewpoint(VIEWPT);
+  camera.range(10);
+
+  // chop off the front
+  clip_face(P(R_0, 0, r_0), P(-0.25,-0.25,-1));
+
+  // build and draw a torus
+  std::vector<mesh_quad> mesh;
+
+  for (int i=0; i<N1; ++i)
+    for (int j=0; j<N2; ++j)
+      mesh.push_back(mesh_quad(F, i*du, j*dv));
+
+  sort(mesh.begin(), mesh.end(), by_distance());
+
+  //  arrow_fill(1);
+  for (unsigned int i=0; i<mesh.size(); ++i)
+    mesh.at(i).draw();
+
+  pst_format();
+  end();
+}

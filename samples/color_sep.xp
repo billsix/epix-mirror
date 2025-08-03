@@ -1,0 +1,76 @@
+/* -*-ePiX-*- */
+#include "epix.h"
+using namespace ePiX;
+
+// re cos(u+iv)
+P f(double u, double v)
+{
+  return P(u, v, 2*cosh(u)*Cos(v));
+}
+
+domain R(P(-1,-1), P(1,1), mesh(16,16));
+
+// RGB densities
+P color(double x, double y, double z)
+{
+  return P(Sin(x), -Sin(y), -Sin(x));
+}
+
+int main()
+{
+  picture(P(0,0), P(5,1), "5x1in");
+
+  begin();
+
+  camera.filter(CMYK_Neutral()); // convert colors to CMYK in output
+  grid(5,1);
+  camera.at(4,3,1);
+
+  plain(Red(1.6));
+
+  // Original
+  screen all(P(-1.5,0.5), P(1.5,3.5));
+  activate(all);
+  set_crop();
+
+  surface(f, R, color);
+  inset(all, P(0,0), P(1,1));
+
+  // Cyan
+  screen cyn(P(-1.5,0.5), P(1.5,3.5));
+  activate(cyn);
+  set_crop();
+  camera.filter(C_Process()); // get cyan layer
+
+  surface(f, R, color);
+  inset(cyn, P(1,0), P(2,1));
+
+  // Magenta
+  screen mgn(P(-1.5,0.5), P(1.5,3.5));
+  activate(mgn);
+  set_crop();
+  camera.filter(M_Process());
+
+  surface(f, R, color);
+  inset(mgn, P(2,0), P(3,1));
+
+  // Yellow
+  screen ylw(P(-1.5,0.5), P(1.5,3.5));
+  activate(ylw);
+  set_crop();
+  camera.filter(Y_Process());
+
+  surface(f, R, color);
+  inset(ylw, P(3,0), P(4,1));
+
+  // Black
+  screen blk(P(-1.5,0.5), P(1.5,3.5));
+  activate(blk);
+  set_crop();
+  camera.filter(K_Process());
+
+  surface(f, R, color);
+  inset(blk, P(4,0), P(5,1));
+
+  end();
+}
