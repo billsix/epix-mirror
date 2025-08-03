@@ -11,8 +11,8 @@
 # searches for completions in the order of preference dictated by the
 # variable EPIX_EXTENSIONS. A warning is issued for multiple matches.
 #
-# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
-# Andrew D. Hwang   <For address, do "elaps -V">
+# Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2022
+# Andrew D. Hwang   <ahwang -at- holycross -dot- edu>
 # 
 
 . "@pkgdatadir@/epix-lib.sh"
@@ -23,7 +23,7 @@ ELAPS_EXTENSIONS="eepic xp flx cc c C cpp" # or NULL
 ELAPS_DOT_EXT=".${ELAPS_EXTENSIONS// /|.}" # for usage message
 
 # default options
-ELAPS_PKGS="latexsym,amsmath,rotating"
+ELAPS_PKGS="amsmath,amssymb,rotating"
 declare ELAPS_PSTCOL
 ELAPS_SIZE=12 # figure compiled in [12pt]{article}
 
@@ -39,8 +39,8 @@ declare -a DVIPS_OPTS
 LATEX_BIN=latex  # elaps only uses [huge]latex, not pdflatex or pslatex
 LATEX_INTERACT="scrollmode"
 
-# auxiliary programs
-PS2EPS="ps2epsi"
+# auxiliary program (set by autoconf)
+PS2EPS_PROG="@PS2EPS_BIN@"
 
 # internal filenames
 PID=$$
@@ -49,6 +49,7 @@ ELAPS_TEMP_LATEX="$PROG-$PID".tex
 ELAPS_TEMP_DVI="$PROG-$PID".dvi
 ELAPS_TEMP_PS="$PROG-$PID".ps
 ELAPS_TEMP_EPSI="$PROG-$PID".epsi
+ELAPS_TEMP_EPS="$PROG-$PID".eps
 
 # globals to pass tokens
 ELAPS_USER_OUT="no" # user specified output file?
@@ -86,6 +87,9 @@ Options:
 
     -o, --output
       Specify output file (ONLY for use with a single input file)
+
+    --ps2eps
+      Use alternative ps2eps instead of ps2epsi as PostScript to EPS converter
 
     --pst
       Write eepic file using PSTricks macros
@@ -220,6 +224,10 @@ function elaps_parse_options ()
             fi
             ELAPS_USER_OUT="yes"
             shift 2
+            ;;
+        --ps2eps)
+	    PS2EPS_PROG="ps2eps";
+            shift
             ;;
 
 	--pst)
@@ -433,31 +441,37 @@ function elaps_process_files()
 
         if [ "$ELAPS_PS" = "yes" ]; then
             # fix title; can't conveniently put sed command into ePiX_command
-            ePiX_echo -n "sed \"s/$PROG-$PID/$EPIX_INROOT/g\" \"$ELAPS_TEMP_PS\""
+            ePiX_echo -n "sed \"s;$PROG-$PID;$EPIX_INROOT;g\" \"$ELAPS_TEMP_PS\""
             ePiX_echo " > \"$EPIX_OUTROOT.ps\""
 
-            sed "s/$PROG-$PID/$EPIX_INROOT/g" "$ELAPS_TEMP_PS" \
+            sed "s;$PROG-$PID;$EPIX_INROOT;g" "$ELAPS_TEMP_PS" \
                 > "$EPIX_OUTROOT.ps"
 
         else
             # Create eps file,
-            TMP_CMD=("$PS2EPS" "$ELAPS_TEMP_PS")
+            TMP_CMD=("$PS2EPS_PROG" "$ELAPS_TEMP_PS")
+
             ePiX_command "${TMP_CMD[@]}"
 
+	    # If ps-eps conversion created an .eps file, rename to .epsi
+            if [ -f "$ELAPS_TEMP_EPS" ]; then
+                mv -f "$ELAPS_TEMP_EPS" "$ELAPS_TEMP_EPSI"
+            fi
+
             # fix title,
-            ePiX_echo -n "sed \"s/$PROG-$PID/$EPIX_INROOT/g\" \"$ELAPS_TEMP_EPSI\""
+            ePiX_echo -n "sed \"s;$PROG-$PID;$EPIX_INROOT;g\" \"$ELAPS_TEMP_EPSI\""
             ePiX_echo " > \"$EPIX_OUTROOT.eps\""
 
-            sed "s/$PROG-$PID/$EPIX_INROOT/g" \
+            sed "s;$PROG-$PID;$EPIX_INROOT;g" \
                 "$ELAPS_TEMP_EPSI" > "$EPIX_OUTROOT.eps" &&
             rm -f "$ELAPS_TEMP_EPSI"
 
             # create pdf if requested,
             if [ "$ELAPS_PDF" = "yes" ]; then
-                ePiX_echo -n "grep -v \"^%%Orientation:\" \"$EPIX_OUTROOT.eps\""
+                ePiX_echo -n "grep -a -s -v \"^%%Orientation:\" \"$EPIX_OUTROOT.eps\""
                 ePiX_echo " | epstopdf --filter --outfile=\"$EPIX_OUTROOT.pdf\""
                 # avoid ghostscript rotation bug
-                grep -v "^%%Orientation:" "$EPIX_OUTROOT.eps" \
+                grep -a -s -v "^%%Orientation:" "$EPIX_OUTROOT.eps" \
                     | epstopdf --filter --outfile="$EPIX_OUTROOT.pdf"
                 rm -f "$EPIX_OUTROOT.eps" # clean up eps
             fi

@@ -10,7 +10,7 @@
 
 /* 
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
- * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+ * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
  * Worcester, MA, 01610-2395, USA

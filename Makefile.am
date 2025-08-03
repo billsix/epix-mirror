@@ -77,6 +77,7 @@ epix elaps flix laps: %: %.in epix.el
 	    -e 's%@pkglibdir\@%$(pkglibdir)%;' \
 	    -e 's%@pkgdatadir\@%$(pkgdatadir)%;' \
 	    -e 's%@includedir\@%$(includedir)%;' \
+	    -e 's%@PS2EPS_BIN\@%$(PS2EPS_BIN)%;' \
 	    -e 's%@RUNTIME_COMPILER\@%$(RUNTIME_COMPILER)%;' $< > $@
 	sed -e 's%^#! /bin/bash%#! $(BASH_PATH)%;' \
 	    -e 's%@bindir\@%$(CURDIR)%;' \

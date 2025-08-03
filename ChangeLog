@@ -1,6 +1,34 @@
 ePiX 1.2.x
 
 Andrew D. Hwang  <ahwang -at- holycross -dot- edu>
+2022-05.08
+	Version 1.2.22
+	* elaps.in: Use ";" as separator in sed commands to permit
+	filenames containing "/", add "-a" and "-s" options to grep to
+	accommodate binary stream in output of ps2epsi, provide --ps2eps
+	option to use Roland Bless's "ps2eps" instead of ps2epsi. (Thanks
+	to Giuseppe Ghibò.)
+	Replace obsolete latexsym package with amssymb in wrapper file.
+	* configure.ac, Makefile.am, makefile.in: Provide configure option
+	--with-ps2eps to specify path to ps2epsi. (Thanks to Giuseppe Ghibò.)
+2022-02.03
+	* doc/Makefile: remove timestamps from gzip files (Thanks to
+	Julian Gilbey)
+	* epix.el.in: Make epix.el work with elpa (Thanks for Julian
+	Gilbey)
+	* ChangeLog, THANKS: Convert to UTF-8 (Thanks to Julian Gilbey)
+2022-01.11
+	Version 1.2.21
+	* surface.h, surface.cc:
+	- (surface): Add missing declaration and function
+	* *.cc, *.h, README:
+	- Update email address
+
+2021-12.05
+	Version 1.2.20
+	* geometry.cc:
+	 - (klein_poincare): Guard against negative argument to sqrt
+
 2020-03.21
 	Version 1.2.19
 	* Complex.cc:
@@ -176,7 +204,7 @@ Andrew D. Hwang  <ahwang -at- holycross -dot- edu>
 	* configure.ac, Makefile.am: New option --enable-epix-el
 	  (formerly --with-nolisp)
 	* doc/Makefile.am: Build ps, pdf under manual-stamp so package can
-	  be built with parallel make (error noted by René Rebe)
+	  be built with parallel make (error noted by RenÃ© Rebe)
 
 2007-09.28 (ADH)
 	* legend_tile.cc, legend_tile.h: Store offset as a pair

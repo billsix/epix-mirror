@@ -4,13 +4,13 @@
  * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
- * Version 1.2.5
- * Last Change: June 18, 2008
+ * Version 1.2.21
+ * Last Change: January 11, 2022
  */
 
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
- * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2022
+ * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
  * Worcester, MA, 01610-2395, USA
@@ -992,7 +992,7 @@ namespace ePiX {
     surf.draw(cull);
   }
 
-  void surface(P F(double, double, double), const domain_list& R,
+  void surface(P F(double, double), const domain_list& R,
 	       P color(double, double), int cull)
   {
     scenery tmp;
@@ -1003,6 +1003,16 @@ namespace ePiX {
     tmp.draw(cull);
   }
 
+  void surface(P F(double, double), const domain_list& R,
+	       P color(double, double, double), int cull)
+  {
+    scenery tmp;
+
+    for (dolci p= R.m_list.begin(); p!=R.m_list.end(); ++p)
+      tmp.add(F, *p, color);
+
+    tmp.draw(cull);
+  }
 
   void surface_rev(double f(double), double g(double), 
 		   double min_x, double max_x, int i_max, int j_max,

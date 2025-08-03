@@ -153,7 +153,7 @@ HELP
 function ePiX_version()
 {
 cat <<VERSION
-$1 (ePiX 1.2.19)
+$1 (ePiX 1.2.22)
 
 Copyright (C) 2007  Andrew D. Hwang
 

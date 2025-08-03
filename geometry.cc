@@ -4,13 +4,13 @@
  * This file is part of ePiX, a C++ library for creating high-quality 
  * figures in LaTeX 
  *
- * Version 1.1.21
- * Last Change: September 22, 2007
+ * Version 1.2.20
+ * Last Change: December 5, 2021
  */
 
 /* 
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
- * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2021
+ * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
  * Worcester, MA, 01610-2395, USA
@@ -776,7 +776,7 @@ namespace ePiX {
 
   P klein_poincare(P pt)
   {
-    return (1.0/(1+sqrt(1-(pt|pt))))*pt;
+    return (1.0/(1+sqrt(fabs(1 - (pt|pt)))))*pt;
   }
 
   P p_line(const P& tail, const P& head, double t)

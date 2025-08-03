@@ -1,6 +1,6 @@
 dnl Process this file with autoconf 2.60 or later
 dnl to produce a configure script.
-AC_INIT(epix, 1.2.19)
+AC_INIT(epix, 1.2.22)
 AC_PREREQ(2.60)
 AC_CONFIG_SRCDIR(utils.h)
 AM_INIT_AUTOMAKE
@@ -34,6 +34,13 @@ AC_ARG_WITH(runtime,
             AS_HELP_STRING([--with-runtime=<g++>],
                            [The runtime compiler]),
             RUNTIME_COMPILER=$withval)
+
+dnl Set ps2epsi program path
+AC_PATH_PROG(PS2EPS_BIN, ps2epsi, ps2epsi)
+AC_ARG_WITH(ps2eps,
+            AS_HELP_STRING([--with-ps2eps=<ps2eps>],
+                           [Specify a the ps2eps program path]),
+            PS2EPS_BIN=$withval)
 
 dnl AC_ARG_WITH(contrib,
 dnl             AS_HELP_STRING([--with-contrib],

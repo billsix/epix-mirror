@@ -4,8 +4,8 @@
 
 ;; Author: Jay Belanger
 ;; Maintainer: Jay Belanger <belanger@truman.edu>
-
 ;; Keywords: epix
+;; Version: 1.2.21
 
 ;; This program is free software; you can redistribute it and/or
 ;; modify it under the terms of the GNU General Public License as
@@ -121,6 +121,8 @@
 ;;
 ;;         end();
 ;;       }
+
+;;; Code
 
 ;;; Require
 (require 'cc-mode)
@@ -1072,3 +1074,5 @@ original, up to a depth of D, and draw it from P(a,b) to P(c,d)."
   (run-hooks 'flix-mode-hook))
 
 (provide 'epix)
+
+;;; epix.el ends here

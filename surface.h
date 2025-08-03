@@ -4,13 +4,13 @@
  * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
- * Version 1.1.7
- * Last Change: July 08, 2007
+ * Version 1.2.21
+ * Last Change: January 11, 2022
  */
 
 /*
- * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
- * Andrew D. Hwang <rot 13 nujnat at zngupf dot ubylpebff dot rqh>
+ * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2022
+ * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
  * College of the Holy Cross
  * Worcester, MA, 01610-2395, USA
@@ -173,6 +173,9 @@ namespace ePiX
 	       P color(double, double), int cull=0);
 
   // plot multiple slices
+  void surface(P F(double, double), const domain_list& R,
+	       P color(double, double), int cull=0);
+
   void surface(P F(double, double), const domain_list& R,
 	       P color(double, double, double), int cull=0);
 
