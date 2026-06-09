@@ -38,9 +38,11 @@ out of scope for syntax modernization).
 the image's `epix` bakes `-std=c++17` for the user `.xp` compile. `warning_level`
 left at 0 (mining was done via clang-tidy, not compiler warnings).
 
-**Follow-ons (separate, not in this pass):** Tier 3 `enum class` (gated on the
-bindings A/B decision); optional C++20 revisit; the `intersections.cc:225`
-most-vexing-parse (behavioral, needs author intent).
+**Follow-ons (separate, not in this pass):** Tier 3 `enum class` (a standalone,
+opt-in, compat-preserving change — **decoupled** from the bindings, since the
+`.xp` samples are kept; see Tier 3 and "Relationship" below); optional C++20
+revisit; the `intersections.cc:225` most-vexing-parse (behavioral, needs author
+intent).
 
 ## Goal
 
@@ -115,7 +117,16 @@ cost here.** Recommend: pin C++17 now; revisit C++20 after.
 - **`enum class` for `enums.h`** — **API-breaking**: the enumerators (`PATH`,
   `CIRC`, `c`, `r`, `LEFT`, …) are used **unqualified** and are part of the
   public/user-facing API; scoping them forces `epix_mark_type::PATH` everywhere
-  including user `.xp`. Treat as a deliberate API change, not a sweep.
+  including user `.xp`. The real motivation is a genuine footgun: the single-
+  letter `epix_label_posn` values (`none, c, r, t, l, b, …`) leak into every
+  user's scope via `using namespace ePiX;` and collide with ordinary variables
+  (the samples already declare `double t`/`double r`, which silently shadow the
+  enum — plain enums convert to int, so it compiles wrong). **But** because the
+  port is *additive* — the 70 `.xp` samples are **kept and must keep compiling**
+  (clarified 2026-06-09) — the break can't be absorbed by the Python work; doing
+  it means qualifying all 70 samples + ~13 library files, or a compat shim that
+  re-introduces the pollution. So: deliberate, opt-in, compat-preserving change
+  **decoupled from the bindings** — or leave it as the long-standing sharp edge.
 - **Smart pointers / `std::array` / structured bindings** — only where they
   clarify; ePiX does little raw-pointer ownership, so likely small.
 
@@ -153,13 +164,16 @@ two together where they touch:
   Make the "target standard" decision jointly with the bindings' "pybind11 vs
   nanobind" decision. Whatever is pinned is also the floor the binding module
   compiles at.
-- **`enum class` (Tier 3) aligns *with* bindings.** pybind11/nanobind expose
-  enums as **scoped** Python enums (`MarkType.PATH`) by default — the Pythonic
-  shape anyway. So the unqualified-enumerator "API break" matters far less if
-  the demos are being rewritten in Python; the two tasks pull the enum decision
-  the same way. **If real bindings (approach A) are chosen, do any API-affecting
-  modernization (enum class, signature/naming) _before_ binding**, so the clean
-  API is bound once.
+- **`enum class` (Tier 3) is DECOUPLED from bindings (corrected 2026-06-09).**
+  pybind11/nanobind expose enums as **scoped** Python enums (`MarkType.PATH`)
+  anyway, so the Python side gets scoping *for free in the binding layer* —
+  without touching the C++ `enum`. And because the port is **additive** (the 70
+  `.xp` samples are kept and must keep compiling), the earlier idea that "the
+  Python rewrite absorbs the API break" is **void**: converting the C++ enums
+  would break the retained samples. So `enum class` is **not** a binding
+  prerequisite and shouldn't be sequenced with the bindings — it's a separate,
+  opt-in, compat-preserving decision (qualify all call sites, or keep the bare
+  names as aliases), or just leave it.
 - **Bindings retire the "two standards" gotcha — for approach A only.** With
   real bindings, Python users never invoke `g++`, so the runtime `-std`
   coupling disappears for the Python path (it remains under codegen/approach B).

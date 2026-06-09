@@ -23,6 +23,16 @@ full demo set is both the **coverage spec** (the bindings must cover the union
 of API features the demos use) and the **test oracle** (each ported notebook
 must reproduce its original figure).
 
+**This is purely ADDITIVE (clarified by Bill 2026-06-09).** Nothing is removed
+or migrated: the existing `samples/*.xp` / `.flx` and the whole C++/eepic
+workflow stay exactly as they are. The Python notebooks are net-new artifacts
+*alongside* them. Consequence: the C++ samples + their rendered figures are the
+**permanent reference oracle** each Python notebook is checked against — and the
+bindings must **not** require any breaking change to the C++ library or `.xp`
+API (e.g. no `enum class` prerequisite; if the Python layer wants scoped enums,
+that is defined in the binding layer, not by changing the C++ enums). See the
+corrected enum note under "Relationship to other tasks."
+
 **Implications:**
 - **API coverage is dictated by the demos, not chosen.** The samples exercise a
   wide swath — points/vectors, colors, paths/curves, `plot`/surfaces, clipping &
@@ -165,13 +175,16 @@ together:
   `pybind11` works at C++11+. So the "pybind11 vs nanobind" choice depends on
   what the modernization task pins (`cpp_std`). The binding module also compiles
   at that pinned standard.
-- **Approach A vs B decides how much modernization matters.** With **A (real
-  bindings)** the C++ API shape *becomes* the Python API shape, so API-affecting
-  modernization (esp. `enum class` → scoped Python enums, which bindings want
-  anyway) should land **before** binding, to bind a clean API once. With **B
-  (codegen/emit)** the bindings don't link the C++ ABI, so modernization is
-  largely independent. → Fold the A/B decision and the modernization
-  API-break decision into one conversation.
+- **Approach A vs B and `enum class` (corrected 2026-06-09).** Because the port
+  is **additive** — the C++ `.xp` samples stay and must keep compiling
+  unchanged — a breaking C++ API change like `enum class` is **NOT** something
+  the Python work can "absorb" (the earlier reasoning that the all-demos rewrite
+  would absorb it is void). Under **A (real bindings)** the Python layer simply
+  exposes its own scoped enums (`LabelPos.t`-style) without touching the C++
+  `enum`; under **B (codegen/emit)** the C++ side isn't linked at all. Either
+  way, **bindings do not require — and should not trigger — the C++ enum-class
+  change.** `enum class` is now a fully separate, opt-in, compat-preserving
+  decision (see `modernize-cxx-standard.md`), decoupled from this task.
 - **Approach A retires a modernization gotcha.** Python users never invoke
   `g++`, so the runtime `-std` coupling the modernization task calls out
   disappears for the Python path under A (it remains under B, which still shells
@@ -183,10 +196,12 @@ together:
 - Minor: `normalize-repo-structure.md`'s `include/epix/` layout makes the
   bindings' includes/packaging cleaner — structure-first is mildly favorable.
 
-**Suggested order if all proceed:** modernization Tier 1 (pin C++17,
-`override`/`nullptr`; no output change) → shared API/demo audit → choose A/B +
-pybind11/nanobind → any API-breaking modernization (only if A) → port the 81
-demos against the locked oracle.
+**Suggested order if all proceed:** C++17 modernization Tier 1+2 (**done** —
+output-neutral, oracle 96/97) → shared API/demo audit (Stage 0) → choose A/B +
+pybind11/nanobind → build the binding/emit + render pipeline → port the 81 demos
+against the locked oracle. **No C++ API-breaking step in this sequence** —
+`enum class` is decoupled (additive port keeps the `.xp` samples), so it's not
+on the bindings path.
 
 ## Out of scope (this task)
 
