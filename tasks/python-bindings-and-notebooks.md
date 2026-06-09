@@ -156,6 +156,38 @@ Net: a working *pipeline* (bindings/emit + render + one ported notebook) is
 5. **Container/jupyter scaffolding** — mirror the `Makefile.docker` jupyter
    target + jupytext flow now, or just a local `pyproject` first?
 
+## Relationship to other tasks
+
+This couples with `modernize-cxx-standard.md`; decide the overlapping points
+together:
+
+- **Binding tech is gated on the C++ standard.** `nanobind` needs **C++17**;
+  `pybind11` works at C++11+. So the "pybind11 vs nanobind" choice depends on
+  what the modernization task pins (`cpp_std`). The binding module also compiles
+  at that pinned standard.
+- **Approach A vs B decides how much modernization matters.** With **A (real
+  bindings)** the C++ API shape *becomes* the Python API shape, so API-affecting
+  modernization (esp. `enum class` → scoped Python enums, which bindings want
+  anyway) should land **before** binding, to bind a clean API once. With **B
+  (codegen/emit)** the bindings don't link the C++ ABI, so modernization is
+  largely independent. → Fold the A/B decision and the modernization
+  API-break decision into one conversation.
+- **Approach A retires a modernization gotcha.** Python users never invoke
+  `g++`, so the runtime `-std` coupling the modernization task calls out
+  disappears for the Python path under A (it remains under B, which still shells
+  to `epix`).
+- **Shared audit + locked oracle.** Stage 0 (the demo API audit) is the same
+  public-API inventory the modernization task needs — share it. And the
+  per-demo render verification assumes a **frozen** output, so let the
+  modernization output-identical work settle first.
+- Minor: `normalize-repo-structure.md`'s `include/epix/` layout makes the
+  bindings' includes/packaging cleaner — structure-first is mildly favorable.
+
+**Suggested order if all proceed:** modernization Tier 1 (pin C++17,
+`override`/`nullptr`; no output change) → shared API/demo audit → choose A/B +
+pybind11/nanobind → any API-breaking modernization (only if A) → port the 81
+demos against the locked oracle.
+
 ## Out of scope (this task)
 
 - Any implementation — this is the feasibility read only.

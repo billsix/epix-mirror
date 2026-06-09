@@ -105,6 +105,36 @@ modernization targets the compiler can flag (e.g. `-Wsuggest-override`).
 - Tier 2: **~1–2 sessions**, per-site judgment.
 - Tier 3: separate, decision-gated.
 
+## Relationship to other tasks
+
+This task couples tightly with `python-bindings-and-notebooks.md` — decide the
+two together where they touch:
+
+- **Standard choice gates the binding tech.** `nanobind` requires **C++17**;
+  pinning C++17 here unlocks it (the leaner option for ePiX's large API).
+  Make the "target standard" decision jointly with the bindings' "pybind11 vs
+  nanobind" decision. Whatever is pinned is also the floor the binding module
+  compiles at.
+- **`enum class` (Tier 3) aligns *with* bindings.** pybind11/nanobind expose
+  enums as **scoped** Python enums (`MarkType.PATH`) by default — the Pythonic
+  shape anyway. So the unqualified-enumerator "API break" matters far less if
+  the demos are being rewritten in Python; the two tasks pull the enum decision
+  the same way. **If real bindings (approach A) are chosen, do any API-affecting
+  modernization (enum class, signature/naming) _before_ binding**, so the clean
+  API is bound once.
+- **Bindings retire the "two standards" gotcha — for approach A only.** With
+  real bindings, Python users never invoke `g++`, so the runtime `-std`
+  coupling disappears for the Python path (it remains under codegen/approach B).
+- **Lock output first.** The bindings task verifies each ported demo against the
+  render oracle, so finish (and freeze) this task's *output-identical* work
+  before the 81-demo port verifies against it — don't make them chase a moving
+  baseline.
+- **Shared inventory.** The public-API enumeration this task needs is the same
+  one the bindings' Stage-0 demo audit needs — do it once.
+- Minor: `normalize-repo-structure.md` is output-neutral and independent, but a
+  clean `include/epix/` layout (that task) makes both this work and the bindings'
+  includes tidier; structure-first is mildly favorable.
+
 ## Out of scope
 
 - Algorithmic/behavioral changes — modernization is syntax/safety only, output
