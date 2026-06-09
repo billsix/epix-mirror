@@ -153,7 +153,7 @@ code/ChangeLog wins:
 
 - Don't "fix" generated files (above) — change the source they're built from.
 - This is a faithful mirror; keep upstream-authored prose (`NEWS`, `BUGS`,
-  `THANKS`, `AUTHORS`, `INSTALL`, `ChangeLog`) intact unless asked otherwise.
+  `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise.
 - Bill commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
   `tasks/<slug>.md` doc — see `tasks/` for in-flight items and
   `tasks/archive/` for finished ones.
