@@ -55,7 +55,7 @@
 
 namespace ePiX {
 
-  typedef std::list<domain>::const_iterator dolci;
+  using dolci = std::list<domain>::const_iterator;
 
   scenery::scenery() : m_cull(0) { }
 
@@ -123,9 +123,8 @@ namespace ePiX {
       {
 	epix_warning("scenery() internal error!");
 	// clean up
-	for (std::list<facet*>::iterator p=m_data.begin();
-	     p!=m_data.end(); ++p)
-	  delete *p;
+	for (auto & p : m_data)
+	  delete p;
 
 	return;
       }
@@ -201,9 +200,8 @@ namespace ePiX {
       {
 	epix_warning("scenery() internal error!");
 	// clean up
-	for (std::list<facet*>::iterator p=m_data.begin();
-	     p!=m_data.end(); ++p)
-	  delete *p;
+	for (auto & p : m_data)
+	  delete p;
 
 	return;
       }
@@ -307,9 +305,8 @@ namespace ePiX {
       {
 	epix_warning("scenery() internal error!");
 	// clean up
-	for (std::list<facet*>::iterator p=m_data.begin();
-	     p!=m_data.end(); ++p)
-	  delete *p;
+	for (auto & p : m_data)
+	  delete p;
 
 	return;
       }
@@ -414,9 +411,8 @@ namespace ePiX {
       {
 	epix_warning("scenery() internal error!");
 	// clean up
-	for (std::list<facet*>::iterator p=m_data.begin();
-	     p!=m_data.end(); ++p)
-	  delete *p;
+	for (auto & p : m_data)
+	  delete p;
 
 	return;
       }
@@ -512,9 +508,8 @@ namespace ePiX {
       {
 	epix_warning("scenery() internal error!");
 	// clean up
-	for (std::list<facet*>::iterator p=m_data.begin();
-	     p!=m_data.end(); ++p)
-	  delete *p;
+	for (auto & p : m_data)
+	  delete p;
 
 	return;
       }
@@ -610,9 +605,8 @@ namespace ePiX {
       {
 	epix_warning("scenery() internal error!");
 	// clean up
-	for (std::list<facet*>::iterator p=m_data.begin();
-	     p!=m_data.end(); ++p)
-	  delete *p;
+	for (auto & p : m_data)
+	  delete p;
 
 	return;
       }
@@ -625,9 +619,8 @@ namespace ePiX {
   scenery::scenery(const scenery& sc)
     : m_cull(sc.m_cull)
   {
-    for (std::list<facet*>::const_iterator p=sc.m_data.begin();
-	 p!=sc.m_data.end(); ++p)
-      m_data.push_back((*p)->clone());
+    for (auto p : sc.m_data)
+      m_data.push_back(p->clone());
   }
 
   scenery& scenery::operator= (const scenery& sc)
@@ -636,14 +629,12 @@ namespace ePiX {
       {
 	std::list<facet*> tmp;
 	// get facets from sc
-	for (std::list<facet*>::const_iterator p=sc.m_data.begin();
-	     p!=sc.m_data.end(); ++p)
-	  tmp.push_back((*p)->clone());
+	for (auto p : sc.m_data)
+	  tmp.push_back(p->clone());
 
 	// free memory
-	for (std::list<facet*>::iterator p=m_data.begin();
-	     p!=m_data.end(); ++p)
-	  delete *p;
+	for (auto & p : m_data)
+	  delete p;
 
 	swap(m_data, tmp);
 
@@ -655,8 +646,8 @@ namespace ePiX {
 
   scenery::~scenery()
   {
-    for (std::list<facet*>::iterator p=m_data.begin(); p!=m_data.end(); ++p)
-      delete *p;
+    for (auto & p : m_data)
+      delete p;
   }
 
 
@@ -678,9 +669,9 @@ namespace ePiX {
 
   scenery& scenery::add(P F(double, double), const domain_list& DL)
   {
-    for (dolci p=DL.m_list.begin(); p!=DL.m_list.end(); ++p)
+    for (const auto & p : DL.m_list)
       {
-	scenery tmp(F, *p);
+	scenery tmp(F, p);
 	(*this).m_data.merge(tmp.m_data, by_distance());
       }	
 
@@ -689,9 +680,9 @@ namespace ePiX {
 
   scenery& scenery::add(P F(double, double, double), const domain_list& DL)
   {
-    for (dolci p=DL.m_list.begin(); p!=DL.m_list.end(); ++p)
+    for (const auto & p : DL.m_list)
       {
-	scenery tmp(F, *p);
+	scenery tmp(F, p);
 	(*this).m_data.merge(tmp.m_data, by_distance());
       }	
 
@@ -722,9 +713,9 @@ namespace ePiX {
   scenery& scenery::add(P F(double, double), const domain_list& DL,
 			P color(double, double, double))
   {
-    for (dolci p=DL.m_list.begin(); p!=DL.m_list.end(); ++p)
+    for (const auto & p : DL.m_list)
       {
-	scenery tmp(F, *p, color);
+	scenery tmp(F, p, color);
 	(*this).m_data.merge(tmp.m_data, by_distance());
       }	
 
@@ -734,9 +725,9 @@ namespace ePiX {
   scenery& scenery::add(P F(double, double, double), const domain_list& DL,
 			P color(double, double, double))
   {
-    for (dolci p=DL.m_list.begin(); p!=DL.m_list.end(); ++p)
+    for (const auto & p : DL.m_list)
       {
-	scenery tmp(F, *p, color);
+	scenery tmp(F, p, color);
 	(*this).m_data.merge(tmp.m_data, by_distance());
       }	
 
@@ -766,9 +757,9 @@ namespace ePiX {
   scenery& scenery::add(P F(double, double), const domain_list& DL,
 			P color(double, double))
   {
-    for (dolci p=DL.m_list.begin(); p!=DL.m_list.end(); ++p)
+    for (const auto & p : DL.m_list)
       {
-	scenery tmp(F, *p, color);
+	scenery tmp(F, p, color);
 	(*this).m_data.merge(tmp.m_data, by_distance());
       }	
 
@@ -778,9 +769,9 @@ namespace ePiX {
   scenery& scenery::add(P F(double, double, double), const domain_list& DL,
 			P color(double, double))
   {
-    for (dolci p=DL.m_list.begin(); p!=DL.m_list.end(); ++p)
+    for (const auto & p : DL.m_list)
       {
-	scenery tmp(F, *p, color);
+	scenery tmp(F, p, color);
 	(*this).m_data.merge(tmp.m_data, by_distance());
       }	
 
@@ -801,9 +792,8 @@ namespace ePiX {
 
   void scenery::draw(int cull) const
   {
-    for (std::list<facet*>::const_iterator p=m_data.begin();
-	 p!=m_data.end(); ++p)
-      (*p)->draw(cull);
+    for (auto p : m_data)
+      p->draw(cull);
   }
 
 
@@ -826,8 +816,8 @@ namespace ePiX {
   {
     scenery tmp;
 
-    for (dolci p= R.m_list.begin(); p!=R.m_list.end(); ++p)
-      tmp.add(F, *p);
+    for (const auto & p : R.m_list)
+      tmp.add(F, p);
 
     tmp.draw(cull);
   }
@@ -872,10 +862,10 @@ namespace ePiX {
     mesh.sort(by_distance());
     // sort(mesh.begin(), mesh.end(), by_distance());
 
-    for (std::list<facet*>::iterator p=mesh.begin(); p!=mesh.end(); ++p)
+    for (auto & p : mesh)
       {
-	(*p)->draw(cull);
-	delete *p;
+	p->draw(cull);
+	delete p;
       }
   }
 
@@ -902,8 +892,8 @@ namespace ePiX {
   {
     scenery tmp;
 
-    for (dolci p= R.m_list.begin(); p!=R.m_list.end(); ++p)
-      tmp.add(F, *p, color);
+    for (const auto & p : R.m_list)
+      tmp.add(F, p, color);
 
     tmp.draw(cull);
   }
@@ -968,10 +958,10 @@ namespace ePiX {
     mesh.sort(by_distance());
     // sort(mesh.begin(), mesh.end(), by_distance());
 
-    for (std::list<facet*>::iterator p=mesh.begin(); p!=mesh.end(); ++p)
+    for (auto & p : mesh)
       {
-	(*p)->draw(cull);
-	delete *p;
+	p->draw(cull);
+	delete p;
       }
   }
 
@@ -997,8 +987,8 @@ namespace ePiX {
   {
     scenery tmp;
 
-    for (dolci p= R.m_list.begin(); p!=R.m_list.end(); ++p)
-      tmp.add(F, *p, color);
+    for (const auto & p : R.m_list)
+      tmp.add(F, p, color);
 
     tmp.draw(cull);
   }
@@ -1008,8 +998,8 @@ namespace ePiX {
   {
     scenery tmp;
 
-    for (dolci p= R.m_list.begin(); p!=R.m_list.end(); ++p)
-      tmp.add(F, *p, color);
+    for (const auto & p : R.m_list)
+      tmp.add(F, p, color);
 
     tmp.draw(cull);
   }
@@ -1073,10 +1063,10 @@ namespace ePiX {
     mesh.sort(by_distance());
     // sort(mesh.begin(), mesh.end(), by_distance());
 
-    for (std::list<facet*>::iterator p=mesh.begin(); p!=mesh.end(); ++p)
+    for (auto & p : mesh)
       {
-	(*p)->draw(cull);
-	delete *p;
+	p->draw(cull);
+	delete p;
       }
   }
 } // end of namespace

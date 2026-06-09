@@ -67,7 +67,7 @@ namespace ePiX {
     : m_here(here), m_offset(offset), m_align(align), m_style(style),
       m_item_border(pen), m_key_size(key_size), m_label_skip(skip)
   {
-    for (std::list<legend_item*>::const_iterator li=items.begin();
+    for (auto li=items.begin();
 	 li != items.end(); ++li)
       m_items.push_back((*li)->clone());
   }
@@ -77,9 +77,8 @@ namespace ePiX {
       m_style(L.m_style), m_item_border(L.m_item_border),
       m_key_size(L.m_key_size), m_label_skip(L.m_label_skip)
   {
-    for (std::list<legend_item*>::const_iterator ip = L.m_items.begin();
-	 ip != L.m_items.end(); ++ip)
-      m_items.push_back((*ip)->clone());
+    for (auto m_item : L.m_items)
+      m_items.push_back(m_item->clone());
   }
 
   legend_tile& legend_tile::operator=(const legend_tile& L)
@@ -87,9 +86,8 @@ namespace ePiX {
     if (&L != this)
       {
 	std::list<legend_item*> tmp;
-	for (std::list<legend_item*>::const_iterator ip = L.m_items.begin();
-	     ip != L.m_items.end(); ++ip)
-	  tmp.push_back((*ip)->clone());
+	for (auto m_item : L.m_items)
+	  tmp.push_back(m_item->clone());
 
 	m_here = L.m_here;
 	m_offset = L.m_offset;
@@ -110,9 +108,8 @@ namespace ePiX {
 
   legend_tile::~legend_tile()
   {
-    for (std::list<legend_item*>::iterator ip = m_items.begin();
-	 ip != m_items.end(); ++ip)
-      delete *ip;
+    for (auto & m_item : m_items)
+      delete m_item;
   }
 
 
@@ -149,11 +146,10 @@ namespace ePiX {
 
     item_buf << "%" << std::endl << "\\begin{tabular}{l}%" << std::endl;
 
-    for (std::list<legend_item*>::const_iterator ip=m_items.begin();
-	 ip != m_items.end(); ++ip)
-      item_buf << (*ip)->key(fmt, m_key_size, m_item_border, len)
+    for (auto m_item : m_items)
+      item_buf << m_item->key(fmt, m_key_size, m_item_border, len)
 	       << "\\hskip " << m_label_skip << "pt "
-	       << fmt.print_latex_hbox(m_style, (*ip)->value())
+	       << fmt.print_latex_hbox(m_style, m_item->value())
 	       << " \\\\" << std::endl;
 
     item_buf << "\\end{tabular}%" << std::endl;

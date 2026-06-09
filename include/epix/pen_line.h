@@ -52,15 +52,15 @@ namespace ePiX {
     pen_line();
     pen_line(const pen_data&, const pen_data&, const std::list<edge2d>&);
 
-    pen_line* clone() const;
+    pen_line* clone() const override;
 
-    pen_line& map_by(const affine&);
-    pen_line& crop_to(const screen_mask&);
+    pen_line& map_by(const affine&) override;
+    pen_line& crop_to(const screen_mask&) override;
 
-    bool is_empty() const;
+    bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const;
-    void add_to_palette() const;
+    std::string print_to(const format&, const std::string&) const override;
+    void add_to_palette() const override;
 
     void add(const edge2d&);
 

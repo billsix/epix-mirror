@@ -40,24 +40,24 @@ namespace ePiX {
   public:
     Neutral_Color();
 
-    Color_Base& filter(const Color_Base&);
+    Color_Base& filter(const Color_Base&) override;
 
-    std::string name() const;
+    std::string name() const override;
 
   private:
     // these functions are implemented, but should never be called
-    RGB_Densities to_rgb() const;
-    Neutral_Color* clone() const;
+    RGB_Densities to_rgb() const override;
+    Neutral_Color* clone() const override;
 
-    Neutral_Color& operator*= (double c);
+    Neutral_Color& operator*= (double c) override;
 
-    Neutral_Color& blend(const Color_Base&, double);
-    Neutral_Color& superpose(const Color_Base&);
-    Neutral_Color& invert();
+    Neutral_Color& blend(const Color_Base&, double) override;
+    Neutral_Color& superpose(const Color_Base&) override;
+    Neutral_Color& invert() override;
 
     // not implemented, should never be called
-    std::string model() const;
-    std::vector<double> densities() const;
+    std::string model() const override;
+    std::vector<double> densities() const override;
   }; // end of class Neutral_Color
 
 } // end of namespace

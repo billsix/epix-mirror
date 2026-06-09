@@ -26,6 +26,9 @@ EPIX_DOT_EXT=".${EPIX_EXTENSIONS// /|.}" # for usage message
 DEFAULT_INC="-I@includedir@"
 DEFAULT_LIB="-L@pkglibdir@"
 COMPILER="@RUNTIME_COMPILER@"
+# Match the C++ standard the library is built with (user flags can override,
+# since $EPIX_MYFLAGS appears later on the command line).
+DEFAULT_STD="-std=c++17"
 
 # Use default library unless we're called by version number
 LIBS="-lm"
@@ -271,7 +274,7 @@ function epix_compile_files {
             continue; }
 
         # Log message, and compile executable
-        TMP_CMD=($COMPILER "${EPIX_TEMPDIR}/${TEMP_INPUT}" $EPIX_MYWARNS \
+        TMP_CMD=($COMPILER $DEFAULT_STD "${EPIX_TEMPDIR}/${TEMP_INPUT}" $EPIX_MYWARNS \
             -o "${EPIX_TEMPDIR}/${TEMP_BIN}" \
             $EPIX_MYFLAGS $EPIX_MYINCLUDES $DEFAULT_INC $EPIX_MYLIBDIRS \
             $DEFAULT_LIB $LIBS $EPIX_MYLIBS $POSTLIBS)

@@ -72,9 +72,8 @@ namespace ePiX {
       m_item_bord(L.m_item_bord), m_item_bord_width(L.m_item_bord_width),
       m_key_size(L.m_key_size), m_label_skip(L.m_label_skip)
   {
-    for (std::list<legend_item*>::const_iterator ip = L.m_items.begin();
-	 ip != L.m_items.end(); ++ip)
-      m_items.push_back((*ip)->clone());
+    for (auto m_item : L.m_items)
+      m_items.push_back(m_item->clone());
   }
 
   legend& legend::operator=(const legend& L)
@@ -82,9 +81,8 @@ namespace ePiX {
     if (&L != this)
       {
 	std::list<legend_item*> tmp;
-	for (std::list<legend_item*>::const_iterator ip = L.m_items.begin();
-	     ip != L.m_items.end(); ++ip)
-	  tmp.push_back((*ip)->clone());
+	for (auto m_item : L.m_items)
+	  tmp.push_back(m_item->clone());
 
 	m_backing = L.m_backing;
 	m_bord = L.m_bord;
@@ -104,9 +102,8 @@ namespace ePiX {
 
   legend::~legend()
   {
-    for (std::list<legend_item*>::iterator ip = m_items.begin();
-	 ip != m_items.end(); ++ip)
-      delete *ip;
+    for (auto & m_item : m_items)
+      delete m_item;
   }
 
   // add items
@@ -182,7 +179,7 @@ namespace ePiX {
 
   void legend::draw(const P& loc, const P& off, epix_label_posn align) const
   {
-    std::list<legend_item*>::const_iterator ip(m_items.begin());
+    auto ip(m_items.begin());
     if (ip == m_items.end())
       return;
 

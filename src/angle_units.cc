@@ -88,7 +88,7 @@ namespace ePiX {
 
   angle_state& the_angle_style()
   {
-    static angle_state* the_angle_state(new angle_state());
+    static auto* the_angle_state(new angle_state());
     return *the_angle_state;
   }
 } // end of namespace

@@ -79,7 +79,7 @@ namespace ePiX {
   class format {
   public:
     // Free resources allocated by the constructor (usually unnecessary)
-    virtual ~format() { }
+    virtual ~format() = default;
 
     // Return a copy of this
     virtual format* clone() const = 0;

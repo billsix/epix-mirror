@@ -52,7 +52,7 @@ namespace ePiX {
 
   class screen_mask {
   public:
-    virtual ~screen_mask() { }
+    virtual ~screen_mask() = default;
 
     virtual screen_mask* clone() const = 0;
 

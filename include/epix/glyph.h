@@ -57,15 +57,15 @@ namespace ePiX {
 	  const marker_sizes& sizes, 
 	  const label_state& style, const bool seen);
 
-    glyph& map_by(const affine&);
-    glyph& crop_to(const screen_mask&);
+    glyph& map_by(const affine&) override;
+    glyph& crop_to(const screen_mask&) override;
 
-    glyph* clone() const;
+    glyph* clone() const override;
 
-    bool is_empty() const;
+    bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const;
-    void add_to_palette() const;
+    std::string print_to(const format&, const std::string&) const override;
+    void add_to_palette() const override;
 
   private:
     pair m_here;

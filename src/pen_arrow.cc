@@ -91,7 +91,7 @@ namespace ePiX {
       // search for visible segment; will find no more than one
       bool still_seen(false);
 
-      for (std::list<edge2d>::const_iterator ep = shaft.begin();
+      for (auto ep = shaft.begin();
 	   ep != shaft.end(); ++ep)
 	if ((*ep).is_seen())
 	  {

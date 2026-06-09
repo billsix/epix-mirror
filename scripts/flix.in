@@ -402,8 +402,8 @@ function flix_compile_files()
           { ePiX_fail "Couldn't create \"${EPIX_TEMPDIR}/$TEMP_INPUT\"" && \
             continue ; }
 
-        # Compile executable
-        TMP_CMD=($COMPILER "${EPIX_TEMPDIR}/$TEMP_INPUT" $FLIX_WARNS \
+        # Compile executable (-std matches the library; $FLIX_FLAGS can override)
+        TMP_CMD=($COMPILER -std=c++17 "${EPIX_TEMPDIR}/$TEMP_INPUT" $FLIX_WARNS \
             "${GXX_DEFINES[@]}" -o "${EPIX_TEMPDIR}/$TEMP_BIN" \
             $HDR_PATH $GXX_INCLUDES $LIB_PATH $GXX_LIBDIRS $GXX_LIBS \
             $GXX_POSTLIBS $FLIX_FLAGS)

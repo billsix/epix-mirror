@@ -333,7 +333,7 @@ namespace ePiX {
 	  const P loc(m_tail + i*major_step);
 	  const double tmp_lbl(truncate(m_coord(loc))); // round to 0 if nec.
 
-	  std::set<double>::const_iterator mp(m_omitted.begin());
+	  auto mp(m_omitted.begin());
 	  while (mp != m_omitted.end() && 
 		 EPIX_EPSILON < (fabs(tmp_lbl - *mp))) // keep label?
 	    ++mp;
@@ -353,10 +353,9 @@ namespace ePiX {
 	const double denom(std::log((double)m_log_base));
 
 	for (unsigned int i=0; i < m_major_segs; ++i)
-	  for (std::set<double>::const_iterator tp=m_log_tags.begin();
-	       tp != m_log_tags.end(); ++tp)
+	  for (double m_log_tag : m_log_tags)
 	    {
-	      double dx(std::log(*tp)/denom);
+	      double dx(std::log(m_log_tag)/denom);
 	      const P posn(m_tail + (i + dx)*major_step);
 
 	      label_data mk(posn, m_offset,

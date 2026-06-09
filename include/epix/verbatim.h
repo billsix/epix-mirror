@@ -47,15 +47,15 @@ namespace ePiX {
   public:
     verbatim(const std::string& text="");
 
-    verbatim& map_by(const affine&);
-    verbatim& crop_to(const screen_mask&);
+    verbatim& map_by(const affine&) override;
+    verbatim& crop_to(const screen_mask&) override;
 
-    verbatim* clone() const;
+    verbatim* clone() const override;
 
-    bool is_empty() const;
+    bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const;
-    void add_to_palette() const;
+    std::string print_to(const format&, const std::string&) const override;
+    void add_to_palette() const override;
 
   private:
     std::string m_text;

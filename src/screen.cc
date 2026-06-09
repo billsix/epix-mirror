@@ -57,7 +57,7 @@ namespace ePiX {
     return P(arg.x1(), arg.x2(), 0);
   }
 
-  screen::screen() { }
+  screen::screen() = default;
 
   screen::screen(const P& arg1, const P& arg2)
     : m_screen(new screen_data(pair(arg1.x1(), arg1.x2()),

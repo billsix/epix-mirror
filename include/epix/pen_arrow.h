@@ -54,15 +54,15 @@ namespace ePiX {
 	      const pen_data& line, const pen_data& base,
 	      double scale, double sin_th, bool head_seen);
 
-    pen_arrow* clone() const;
+    pen_arrow* clone() const override;
 
-    pen_arrow& map_by(const affine&);
-    pen_arrow& crop_to(const screen_mask&);
+    pen_arrow& map_by(const affine&) override;
+    pen_arrow& crop_to(const screen_mask&) override;
 
-    bool is_empty() const;
+    bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const;
-    void add_to_palette() const;
+    std::string print_to(const format&, const std::string&) const override;
+    void add_to_palette() const override;
 
   private:
     edge2d m_shaft;

@@ -112,9 +112,8 @@ namespace ePiX {
   {
     if (!m_closed)
       {
-	for (std::list<edge3d>::iterator ep=pd.m_data.begin();
-	     ep != pd.m_data.end(); ++ep)
-	  (*ep).reverse();   // swap tails and heads
+	for (auto & ep : pd.m_data)
+	  ep.reverse();   // swap tails and heads
 
 	pd.m_data.reverse(); // reverse list order
 	m_data.splice(m_data.end(), pd.m_data);
@@ -221,7 +220,7 @@ namespace ePiX {
     std::list<edge2d> edges;
     unsigned int edge_ct(0); // don't print filled unless >= 3 non-null edges
 
-    for (std::list<edge3d>::const_iterator p=tmp_data.m_data.begin();
+    for (auto p=tmp_data.m_data.begin();
 	 p != tmp_data.m_data.end(); ++p)
       {
 	edge2d tmp(mycam((*p).tail()), mycam((*p).head()), (*p).is_seen());
@@ -246,7 +245,7 @@ namespace ePiX {
     else if (1 <= edge_ct)
       {
 	// print edges in groups
-	std::list<edge2d>::iterator p(edges.begin());
+	auto p(edges.begin());
 	std::list<edge2d> path_buf;
 
 	int count(0);
@@ -270,7 +269,7 @@ namespace ePiX {
   std::vector<P> path_data::data() const
   {
     std::list<P> tmp;
-    std::list<edge3d>::const_iterator ep(m_data.begin());
+    auto ep(m_data.begin());
 
     // first point is duplicated by constructor
     while (ep != m_data.end())

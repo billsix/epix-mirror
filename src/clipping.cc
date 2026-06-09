@@ -40,7 +40,7 @@
 
 namespace ePiX {
 
-  typedef std::list<halfspace>::const_iterator Hp;
+  using Hp = std::list<halfspace>::const_iterator;
   static const double INF(EPIX_INFTY);
 
   clip_state::clip_state(const P& arg1, const P& arg2)
@@ -94,12 +94,12 @@ namespace ePiX {
 
   bool clip_state::clips(const P& arg) const
   {
-    for (Hp p=m_walls.begin(); p != m_walls.end(); ++p)
-      if ( (*p).clips(arg) )
+    for (const auto & m_wall : m_walls)
+      if ( m_wall.clips(arg) )
 	return true;
 
-    for (Hp p=m_extras.begin(); p != m_extras.end(); ++p)
-      if ( (*p).clips(arg) )
+    for (const auto & m_extra : m_extras)
+      if ( m_extra.clips(arg) )
 	return true;
 
     return false;
@@ -108,29 +108,29 @@ namespace ePiX {
   // return reference to clipped argument
   std::list<edge3d>& clip_state::clip_path(std::list<edge3d>& L) const
   {
-    for (Hp p=m_walls.begin(); p != m_walls.end(); ++p)
-      (*p).clip_path(L);
+    for (const auto & m_wall : m_walls)
+      m_wall.clip_path(L);
 
-    for (Hp p=m_extras.begin(); p != m_extras.end(); ++p)
-      (*p).clip_path(L);
+    for (const auto & m_extra : m_extras)
+      m_extra.clip_path(L);
 
     return L;
   }
 
   std::list<edge3d>& clip_state::clip_loop(std::list<edge3d>& L) const
   {
-    for (Hp p=m_walls.begin(); p != m_walls.end(); ++p)
-      (*p).clip_loop(L);
+    for (const auto & m_wall : m_walls)
+      m_wall.clip_loop(L);
 
-    for (Hp p=m_extras.begin(); p != m_extras.end(); ++p)
-      (*p).clip_loop(L);
+    for (const auto & m_extra : m_extras)
+      m_extra.clip_loop(L);
 
     return L;
   }
 
   clip_state& the_clip_box()
   {
-    static clip_state* the_clip_state(new clip_state());
+    static auto* the_clip_state(new clip_state());
     return *the_clip_state;
   }
 } // end of namespace

@@ -50,7 +50,7 @@ namespace ePiX {
   // used to represent legend items both in "space" and in the screen
   class legend_item {
   public:
-    virtual ~legend_item() { }
+    virtual ~legend_item() = default;
     virtual legend_item* clone() const = 0;
 
     virtual std::string value() const = 0;
@@ -66,12 +66,12 @@ namespace ePiX {
   class fill_item : public legend_item {
   public:
     fill_item(const std::string& text);
-    fill_item* clone() const;
+    fill_item* clone() const override;
 
-    std::string value() const;
+    std::string value() const override;
     std::string key(const format&, double,
 		    const pen_data&,
-		    const std::string& len) const;
+		    const std::string& len) const override;
 
   private:
     Color m_fill;
@@ -83,11 +83,11 @@ namespace ePiX {
   class path_item : public legend_item {
   public:
     path_item(const std::string& text);
-    path_item* clone() const;
+    path_item* clone() const override;
 
-    std::string value() const;
+    std::string value() const override;
     std::string key(const format&, double sz, const pen_data&,
-		    const std::string& len) const;
+		    const std::string& len) const override;
 
   private:
     pen_data m_line;
@@ -101,11 +101,11 @@ namespace ePiX {
   class mark_item : public legend_item {
   public:
     mark_item(epix_mark_type mark, const std::string& text);
-    mark_item* clone() const;
+    mark_item* clone() const override;
 
-    std::string value() const;
+    std::string value() const override;
     std::string key(const format&, double sz, const pen_data&,
-		    const std::string& len) const;
+		    const std::string& len) const override;
 
   private:
     epix_mark_type m_mark;

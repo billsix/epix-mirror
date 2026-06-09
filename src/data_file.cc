@@ -299,9 +299,9 @@ namespace ePiX {
 
     else // apply to all columns, default
       {
-	for (unsigned int j=0; j<m_data.size(); ++j)
+	for (auto & j : m_data)
 	  for (unsigned int i=0; i<rows; ++i)
-	    m_data.at(j).at(i) = f(m_data.at(j).at(i));
+	    j.at(i) = f(j.at(i));
       }
 
     return *this;

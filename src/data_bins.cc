@@ -183,9 +183,8 @@ namespace ePiX {
       m_pop(db.m_pop), m_cut_hits(db.m_cut_hits),
       m_cuts_locked(db.m_cuts_locked), m_cuts(db.m_cuts)
   {
-    for (std::list<d_bin*>::const_iterator p=db.m_bins.begin();
-	 p != db.m_bins.end(); ++p)
-      m_bins.push_back((*p)->clone());
+    for (auto m_bin : db.m_bins)
+      m_bins.push_back(m_bin->clone());
   }
 
   data_bins& data_bins::operator= (const data_bins& db)
@@ -193,9 +192,8 @@ namespace ePiX {
     if (this != &db)
       {
         std::list<d_bin*> tmp;
-        for (std::list<d_bin*>::const_iterator p=db.m_bins.begin();
-             p!=db.m_bins.end(); ++p)
-          tmp.push_back((*p)->clone());
+        for (auto m_bin : db.m_bins)
+          tmp.push_back(m_bin->clone());
 
 	// assign data
 	m_lo_val = db.m_lo_val;
@@ -208,9 +206,8 @@ namespace ePiX {
 	m_cuts_locked = db.m_cuts_locked;
 
         // deallocate memory
-        for (std::list<d_bin*>::iterator p=m_bins.begin();
-             p!=m_bins.end(); ++p)
-          delete *p;
+        for (auto & m_bin : m_bins)
+          delete m_bin;
 
 	m_cuts = db.m_cuts;
 	swap(m_bins, tmp);
@@ -221,8 +218,8 @@ namespace ePiX {
 
   data_bins::~data_bins()
   {
-    for (std::list<d_bin*>::iterator p=m_bins.begin(); p!=m_bins.end(); ++p)
-      delete *p;
+    for (auto & m_bin : m_bins)
+      delete m_bin;
   }
 
 
@@ -247,9 +244,8 @@ namespace ePiX {
 	if (!m_cuts_locked)
 	  initialize();
 
-	for (std::vector<double>::const_iterator p=data.begin();
-	     p != data.end(); ++p)
-	  insert(*p);
+	for (double p : data)
+	  insert(p);
       }
     return *this;
   }
@@ -271,9 +267,8 @@ namespace ePiX {
     // const double denom((m_hi_val - m_lo_val)/m_pop);
     const double adj(scale/m_pop);
 
-    for (std::list<d_bin*>::const_iterator p=m_bins.begin();
-	 p != m_bins.end(); ++p)
-      (*p)->draw_area(adj);
+    for (auto m_bin : m_bins)
+      m_bin->draw_area(adj);
   }
 
   void data_bins::bar_chart(double scale) const
@@ -286,9 +281,8 @@ namespace ePiX {
 
     const double adj(scale/m_pop); // scale=1 -> ht=frac of pop in bin
 
-    for (std::list<d_bin*>::const_iterator p=m_bins.begin();
-	 p != m_bins.end(); ++p)
-      (*p)->draw_ht(adj);
+    for (auto m_bin : m_bins)
+      m_bin->draw_ht(adj);
   }
 
   // piecewise-cubic interpolation of bar_chart
@@ -303,7 +297,7 @@ namespace ePiX {
     // get rectangle corners
     std::vector<P> vertices;
 
-    std::list<d_bin*>::const_iterator bn(m_bins.begin());
+    auto bn(m_bins.begin());
     vertices.push_back(P((*bn)->lo(),0));
 
     for (bn = m_bins.begin(); bn != m_bins.end(); ++bn)
@@ -343,10 +337,10 @@ namespace ePiX {
 	m_cuts_locked=true;
 
 	// allocate d_bins
-	for (std::list<double>::const_iterator curr = m_cuts.begin();
+	for (auto curr = m_cuts.begin();
 	     curr != m_cuts.end(); ++curr)
 	  {
-	    std::list<double>::const_iterator next(curr);
+	    auto next(curr);
 	    ++next;
 
 	    if (next != m_cuts.end() && *curr != *next)
@@ -365,7 +359,7 @@ namespace ePiX {
   {
     ++m_pop;
 
-    std::list<d_bin*>::iterator p(m_bins.begin());
+    auto p(m_bins.begin());
 
     // check end bins first
     if (x <= m_lo_val)

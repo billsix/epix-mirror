@@ -171,7 +171,7 @@ namespace ePiX {
 
   label_state& the_label_style()
   {
-    static label_state* the_label_state(new label_state());
+    static auto* the_label_state(new label_state());
     return *the_label_state;
   }
 } // end of namespace

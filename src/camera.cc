@@ -309,7 +309,7 @@ namespace ePiX {
 
   Camera& cam()
   {
-    static Camera* the_camera(new Camera());
+    static auto* the_camera(new Camera());
     return *the_camera;
   }
 

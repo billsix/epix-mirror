@@ -152,7 +152,7 @@ namespace ePiX {
     : m_segments(new path_data())
   {
     double frac(min(fabs(t_max-t_min)/full_turn(), 1));
-    unsigned int num_pts((unsigned int) max(2, ceil(frac*EPIX_NUM_PTS)));
+    auto num_pts((unsigned int) max(2, ceil(frac*EPIX_NUM_PTS)));
 
     const double dt((t_max - t_min)/num_pts);
 

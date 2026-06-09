@@ -33,6 +33,6 @@
 #include "tile.h"
 
 namespace ePiX {
-  tile::~tile() { }
+  tile::~tile() = default;
 
 } // end of namespace

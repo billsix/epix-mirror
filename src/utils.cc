@@ -56,7 +56,7 @@ namespace ePiX {
       ////// N.B.: Revise this if time format string changes!
       const int max_len = 31;
       char buf[max_len];
-      time_t t=time(0);
+      time_t t=time(nullptr);
 
       // strftime(buf, max_len, "%c", localtime(&t));
 

@@ -43,21 +43,21 @@ namespace ePiX {
     Gray_Color(double dens=0);
     Gray_Color(const RGB_Densities&);
 
-    Gray_Color* clone() const;
+    Gray_Color* clone() const override;
 
-    Gray_Color& filter(const Color_Base&);
+    Gray_Color& filter(const Color_Base&) override;
 
-    Gray_Color& operator*= (double c);
+    Gray_Color& operator*= (double c) override;
 
-    Gray_Color& blend(const Color_Base&, double);
-    Gray_Color& superpose(const Color_Base&);
-    Gray_Color& invert();
+    Gray_Color& blend(const Color_Base&, double) override;
+    Gray_Color& superpose(const Color_Base&) override;
+    Gray_Color& invert() override;
 
-    std::string model() const;
-    std::string name() const;
-    std::vector<double> densities() const;
+    std::string model() const override;
+    std::string name() const override;
+    std::vector<double> densities() const override;
 
-    RGB_Densities to_rgb() const;
+    RGB_Densities to_rgb() const override;
 
   private:
     double m_gray;

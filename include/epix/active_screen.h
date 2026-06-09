@@ -61,8 +61,8 @@ namespace ePiX {
     std::list<screen*> m_screens;
 
     // forbid copying
-    screen_broker(const screen_broker&);
-    screen_broker& operator= (const screen_broker&);
+    screen_broker(const screen_broker&) = delete;
+    screen_broker& operator= (const screen_broker&) = delete;
   };
 
   screen_broker& the_screen_stack();

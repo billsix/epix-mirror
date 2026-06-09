@@ -52,38 +52,38 @@ namespace ePiX {
   public:
     pst();
 
-    pst* clone() const;
+    pst* clone() const override;
 
     std::string print_fill(const std::list<edge2d>& edges,
 			   const pair& offset,
 			   const Color& fill,
 			   const pen_data& line,
-			   const std::string& len) const;
+			   const std::string& len) const override;
 
     std::string print_line(const std::list<edge2d>& edges,
 			   const pair& offset,
 			   const pen_data& line,
 			   const pen_data& base,
 			   const path_state& style,
-			   const std::string& len) const;
+			   const std::string& len) const override;
 
 
     // model, name, densities
     std::string print_color(const std::string&, const std::string&,
 			    double, double,
-			    double) const;
+			    double) const override;
 
     std::string print_color(const std::string&, const std::string&,
 			    double, double,
-			    double, double) const;
+			    double, double) const override;
 
 
     // output file comment
-    std::string print_comment(const std::string&) const;
+    std::string print_comment(const std::string&) const override;
 
-    std::string print_verbatim(const std::string&) const;
+    std::string print_verbatim(const std::string&) const override;
 
-    void reset_state() const;
+    void reset_state() const override;
 
   private:
     mutable Color m_fill;
@@ -94,30 +94,30 @@ namespace ePiX {
     mutable length m_bwidth;
 
     // start, end pspicture, set unit and default linewidth
-    std::string start_picture(const pair&, const pair&) const;
-    std::string end_picture() const;
+    std::string start_picture(const pair&, const pair&) const override;
+    std::string end_picture() const override;
 
-    std::string set_unitlength(const std::string& len) const;
+    std::string set_unitlength(const std::string& len) const override;
 
-    std::string usepackages() const;
+    std::string usepackages() const override;
 
     // string argument for passing attributes local to this path/loop
-    std::string start_open_path(const std::string&) const;
-    std::string end_open_path(const std::string&) const;
+    std::string start_open_path(const std::string&) const override;
+    std::string end_open_path(const std::string&) const override;
 
-    std::string start_closed_path(const std::string&) const;
-    std::string end_closed_path(const std::string&) const;
+    std::string start_closed_path(const std::string&) const override;
+    std::string end_closed_path(const std::string&) const override;
 
     // print declarations to set state of output format
-    std::string set_fill_state(const Color&) const;
-    std::string set_pen_state(const pen_data&) const;
+    std::string set_fill_state(const Color&) const override;
+    std::string set_pen_state(const pen_data&) const override;
 
     // place a LaTeX box of width zero (containing string) at location (pair)
-    std::string put_box(const pair&, const std::string&) const;
+    std::string put_box(const pair&, const std::string&) const override;
 
     std::string print_circle_marker(const pair& here, double diam,
 				    bool fill, const Color& color,
-				    const std::string& len) const;
+				    const std::string& len) const override;
   }; // end of class pst
 } // end of namespace
 

@@ -42,21 +42,21 @@ namespace ePiX {
     RGB_Color(double r=0, double g=0, double b=0);
     RGB_Color(const RGB_Densities&);
 
-    RGB_Color* clone() const;
+    RGB_Color* clone() const override;
 
-    RGB_Color& filter(const Color_Base&);
+    RGB_Color& filter(const Color_Base&) override;
 
-    RGB_Color& operator*= (double c);
+    RGB_Color& operator*= (double c) override;
 
-    RGB_Color& blend(const Color_Base&, double);
-    RGB_Color& superpose(const Color_Base&);
-    RGB_Color& invert();
+    RGB_Color& blend(const Color_Base&, double) override;
+    RGB_Color& superpose(const Color_Base&) override;
+    RGB_Color& invert() override;
 
-    std::string model() const;
-    std::string name() const;
-    std::vector<double> densities() const;
+    std::string model() const override;
+    std::string name() const override;
+    std::vector<double> densities() const override;
 
-    RGB_Densities to_rgb() const;
+    RGB_Densities to_rgb() const override;
 
   private:
     double red;

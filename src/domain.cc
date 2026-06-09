@@ -44,7 +44,7 @@
 
 namespace ePiX {
 
-  typedef std::list<domain>::const_iterator dolci;
+  using dolci = std::list<domain>::const_iterator;
   const double EPS(EPIX_EPSILON);
 
   mesh::mesh(int n1, int n2, int n3)
@@ -362,8 +362,8 @@ namespace ePiX {
   domain_list& domain_list::add(const domain_list& arg)
   {
     // Less efficient than m_list.splice(m_list.end(), arg), but preserves arg
-    for (dolci p=arg.m_list.begin(); p != arg.m_list.end(); ++p)
-      m_list.push_back(*p);
+    for (const auto & p : arg.m_list)
+      m_list.push_back(p);
 
     return *this;
   }

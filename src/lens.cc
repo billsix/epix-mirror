@@ -41,7 +41,7 @@
 
 namespace ePiX {
 
-  Lens::~Lens() { }
+  Lens::~Lens() = default;
 
   pair Perspective::operator()
     (const P& arg, const frame& orient, const P& viewpt,

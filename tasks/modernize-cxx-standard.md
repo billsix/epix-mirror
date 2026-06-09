@@ -1,8 +1,46 @@
 # Task: Investigate updating the C++ standard and modernizing syntax
 
-**Status:** proposed — investigation done 2026-06-09, awaiting go-ahead
+**Status:** complete — Tier 1+2 applied + render oracle 96/97 confirmed 2026-06-09
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
+
+## Decisions (2026-06-09)
+
+- **Standard: C++17** (nanobind's floor — chosen with the Python port in mind),
+  pinned via `default_options: ['cpp_std=c++17']` in `meson.build`.
+- **Scope: Tier 1 + Tier 2** (output-neutral). `enum class` (Tier 3) stays
+  deferred until the bindings A/B decision.
+- **Runtime `-std=c++17`** baked into the `epix`/`flix` compile of user `.xp`
+  (a `DEFAULT_STD` in `epix.in`; inline in `flix.in`), so user figures compile
+  at the same standard as the library; user `$EPIX_MYFLAGS`/`$FLIX_FLAGS` (which
+  come later on the command line) can still override.
+
+## Implementation (2026-06-09)
+
+Done mechanically with **clang-tidy modernize** via the meson compile DB
+(`run-clang-tidy -fix`, header-filter `include/epix/`), which applies the fixes
+correctly (it knows which methods actually override, which `0` are pointers,
+etc.) — far safer than sed/hand-edits:
+
+- **Tier 1** (`use-override`, `use-nullptr`, `use-using`, `use-equals-default`,
+  `use-equals-delete`): **262 `override`**, 11 `typedef`→`using`, 10
+  `=default`/`=delete`, 1 `nullptr`. Compiles clean at c++17.
+- **Tier 2** (`loop-convert`, `use-auto`): **65 range-`for`**, **123 `auto`**
+  (mostly iterator declarations + `new` expressions). Compiles clean.
+
+Verified the library compiles clean at **strict** `c++17` (not just gnu++17) —
+only 1 pre-existing warning remains: `intersections.cc:225` `double
+normal_length();` is a most-vexing-parse (a behavioral oddity, **left alone** —
+out of scope for syntax modernization).
+
+**Verified:** rebuilt the container image (modernized lib at c++17) and
+`make examples` rendered **96/97** — identical to the pre-modernization oracle;
+the image's `epix` bakes `-std=c++17` for the user `.xp` compile. `warning_level`
+left at 0 (mining was done via clang-tidy, not compiler warnings).
+
+**Follow-ons (separate, not in this pass):** Tier 3 `enum class` (gated on the
+bindings A/B decision); optional C++20 revisit; the `intersections.cc:225`
+most-vexing-parse (behavioral, needs author intent).
 
 ## Goal
 
