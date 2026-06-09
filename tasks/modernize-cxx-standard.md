@@ -84,7 +84,7 @@ cost here.** Recommend: pin C++17 now; revisit C++20 after.
 ## Testing
 
 The render oracle is the regression guard: after each tier, local
-`meson compile` must stay clean and `make -f Makefile.docker examples` must still
+`meson compile` must stay clean and `make examples` must still
 render **96/97** (eepic) with byte-similar output, plus the PDF/manual paths.
 Turning **`warning_level` up** during the work (currently 0) surfaces
 modernization targets the compiler can flag (e.g. `-Wsuggest-override`).

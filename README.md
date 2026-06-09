@@ -71,20 +71,20 @@ Options (see `meson_options.txt`): `epix_el` (install the Emacs mode),
 (`g++`) to build the library and to compile figures at runtime; the conversion
 scripts additionally expect `bash`, `latex`, and `ps2epsi` (or `ps2eps`).
 
-### Containerized build (`Makefile.docker`)
+### Containerized build (`Makefile`)
 
 To avoid installing the (large) toolchain on your host, a self-contained
-container build is provided via [`Makefile.docker`](Makefile.docker) — a thin
+container build is provided via [`Makefile`](Makefile) — a thin
 wrapper around `podman` that builds a Fedora image with the full toolchain
-(g++, TeX-Live, ghostscript, ImageMagick) baked in. Invoke targets with `-f`:
+(g++, TeX-Live, ghostscript, ImageMagick) baked in. Targets:
 
 ```sh
-make -f Makefile.docker image                 # build the OCI image
-make -f Makefile.docker shell                  # interactive dev shell
-make -f Makefile.docker build                  # build libepix.a + driver scripts
-make -f Makefile.docker examples               # render samples/+doc/ -> ./output (.eepic)
-make -f Makefile.docker examples RENDER=pdf    # ... also render PDFs
-make -f Makefile.docker examples-anim          # render .flx animations -> ./output/anim
+make image                 # build the OCI image
+make shell                  # interactive dev shell
+make build                  # build libepix.a + driver scripts
+make examples               # render samples/+doc/ -> ./output (.eepic)
+make examples RENDER=pdf    # ... also render PDFs
+make examples-anim          # render .flx animations -> ./output/anim
 ```
 
 Rendered figures land in `./output/` on the host (bind-mounted into the

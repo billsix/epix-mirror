@@ -2,7 +2,7 @@
 #
 # shell.sh -- interactive dev shell entry.  The image already ships epix
 # installed on PATH (epix/elaps/flix/laps); the live source tree is bind-mounted
-# at /epix.  We do NOT auto-build here -- run `make -f Makefile.docker build`
+# at /epix.  We do NOT auto-build here -- run `make build`
 # (or ./build.sh) when you want to rebuild libepix.a from the bind-mounted
 # sources.  Seed a couple of handy commands into history for convenience.
 cd /epix

@@ -70,11 +70,11 @@ Meson is **out-of-source** — everything lands in `build/`, nothing in the tree
 The printable manual builds from `manual.tex` + the **committed** `doc/*.eepic`
 figures (no epix run needed).
 
-### Containerized build (`Makefile.docker`)
+### Containerized build (`Makefile`)
 
-`Makefile.docker` wraps the Meson build in a Fedora `podman` image (full
+`Makefile` wraps the Meson build in a Fedora `podman` image (full
 toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick).
-Targets (invoke with `make -f Makefile.docker <t>`): `image`, `shell`, `build`,
+Targets (invoke with `make <t>`): `image`, `shell`, `build`,
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
 `examples-anim` (`.flx` → `./output/anim`), `clean`. Entrypoint scripts in
 `entrypoint/` are bind-mounted (edit without rebuild). Nested (podman-in-podman)
