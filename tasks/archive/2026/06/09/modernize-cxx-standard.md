@@ -1,6 +1,8 @@
 # Task: Investigate updating the C++ standard and modernizing syntax
 
-**Status:** complete — C++20 + Tier 1/2 + enum-class fix, output identical, 2026-06-09
+**Status:** complete
+**Completed:** 2026-06-09
+**Summary:** C++20 + Tier 1/2 modernization + enum-class fix, output identical
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
