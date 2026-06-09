@@ -28,7 +28,7 @@ DEFAULT_LIB="-L@pkglibdir@"
 COMPILER="@RUNTIME_COMPILER@"
 # Match the C++ standard the library is built with (user flags can override,
 # since $EPIX_MYFLAGS appears later on the command line).
-DEFAULT_STD="-std=c++17"
+DEFAULT_STD="-std=c++20"
 
 # Use default library unless we're called by version number
 LIBS="-lm"

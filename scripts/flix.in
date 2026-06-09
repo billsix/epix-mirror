@@ -403,7 +403,7 @@ function flix_compile_files()
             continue ; }
 
         # Compile executable (-std matches the library; $FLIX_FLAGS can override)
-        TMP_CMD=($COMPILER -std=c++17 "${EPIX_TEMPDIR}/$TEMP_INPUT" $FLIX_WARNS \
+        TMP_CMD=($COMPILER -std=c++20 "${EPIX_TEMPDIR}/$TEMP_INPUT" $FLIX_WARNS \
             "${GXX_DEFINES[@]}" -o "${EPIX_TEMPDIR}/$TEMP_BIN" \
             $HDR_PATH $GXX_INCLUDES $LIB_PATH $GXX_LIBDIRS $GXX_LIBS \
             $GXX_POSTLIBS $FLIX_FLAGS)

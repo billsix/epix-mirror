@@ -14,11 +14,11 @@ int main()
   begin();
 
   font_face("tt");
-  dot(p1, P(0,0), "[l]", l); 
-  label(p1, P(0,0), "[r]", r); 
+  dot(p1, P(0,0), "[l]", epix_label_posn::l); 
+  label(p1, P(0,0), "[r]", epix_label_posn::r); 
 
-  dot(p2, P(0,0), "[t]", t); 
-  label(p2, P(0,0), "[b]", b); 
+  dot(p2, P(0,0), "[t]", epix_label_posn::t); 
+  label(p2, P(0,0), "[b]", epix_label_posn::b); 
 
   end();
 }

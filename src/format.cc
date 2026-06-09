@@ -64,6 +64,8 @@
 #include "format.h"
 
 namespace ePiX {
+  using enum epix_label_posn;
+  using enum epix_mark_type;
   // public, non-virtual
   // LaTeX label-generating commands written in terms of protected interface
   std::string format::print_mark(const pair& here, const pair& offset,

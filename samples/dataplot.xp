@@ -1,6 +1,8 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;
+using enum epix_mark_type;
 
 P F(double x, double y)
 {

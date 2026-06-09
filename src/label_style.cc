@@ -47,6 +47,7 @@
 #include "label_style.h"
 
 namespace ePiX {
+  using enum epix_label_posn;
 
   // Users can only construct the default style, since label angles
   // are specified in current units but stored/returned in degrees.

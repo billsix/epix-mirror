@@ -48,12 +48,12 @@ int main()
   v_axis(4);
 
   font_size("scriptsize");
-  L.draw(canvas().tr(), P(-2,-2), bl);
+  L.draw(canvas().tr(), P(-2,-2), epix_label_posn::bl);
 
   font_size("footnotesize");
-  label(P(xmin(),0), P(0,-5), "$a$", b);
-  label(P(x,0), P(0,-5), "$x$", b);
-  label(P(x+dx,0), P(0,-2), "$x+dx$", br);
+  label(P(xmin(),0), P(0,-5), "$a$", epix_label_posn::b);
+  label(P(x,0), P(0,-5), "$x$", epix_label_posn::b);
+  label(P(x+dx,0), P(0,-2), "$x+dx$", epix_label_posn::br);
 
   pst_format();
 

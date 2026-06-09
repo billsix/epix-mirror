@@ -2,6 +2,7 @@
 // fake 3D by layering
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;
 
 // function to plot
 P F(double u, double v)

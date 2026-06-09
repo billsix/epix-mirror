@@ -58,6 +58,7 @@
 #include "glyph.h"
 
 namespace ePiX {
+  using enum epix_mark_type;
 
   glyph::glyph(const pair& here, const pair& offset,
 	       const std::string& label, const epix_mark_type mark,

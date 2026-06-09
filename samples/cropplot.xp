@@ -22,8 +22,8 @@ int main()
   h_axis(8);
   v_axis(8);
 
-  h_axis_labels(4, P(-1, 2), tl); // align top-left
-  v_axis_labels(4, P(-1, 2), tl);
+  h_axis_labels(4, P(-1, 2), epix_label_posn::tl); // align top-left
+  v_axis_labels(4, P(-1, 2), epix_label_posn::tl);
 
   // Graphs
   plot(f, xmin(), xmax(), 80);

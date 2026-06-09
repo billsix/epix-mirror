@@ -52,6 +52,9 @@
 #include "plots.h"
 
 namespace ePiX {
+  using enum epix_field_type;
+  using enum epix_integral_type;
+  using enum epix_mark_type;
 
   using dolci = std::list<domain>::const_iterator;
 

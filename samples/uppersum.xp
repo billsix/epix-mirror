@@ -1,6 +1,7 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_integral_type;
 
 const int N(12); // Number of rectangles
 
@@ -27,8 +28,8 @@ int main()
   h_axis(xsize());
   v_axis(2*ysize());
 
-  h_axis_labels(xsize(), P(0,-4), b);
-  label(P(2, f(2)), P(4,2), "$y=\\sin x$", tr);
+  h_axis_labels(xsize(), P(0,-4), epix_label_posn::b);
+  label(P(2, f(2)), P(4,2), "$y=\\sin x$", epix_label_posn::tr);
 
   bold(Blue());
   plot(f, xmin(), xmax(), 40);

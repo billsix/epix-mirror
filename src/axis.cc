@@ -59,6 +59,7 @@
 #include "axis.h"
 
 namespace ePiX {
+  using enum epix_label_posn;
 
   // functions to get axis label from position
   double __epix_coord1(const P&);

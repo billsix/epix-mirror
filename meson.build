@@ -2,7 +2,7 @@ project('epix', 'cpp',
   version: '1.2.22',
   license: 'GPL-2.0-or-later',
   meson_version: '>=0.56.0',
-  default_options: ['warning_level=0', 'cpp_std=c++17'])
+  default_options: ['warning_level=0', 'cpp_std=c++20'])
 
 # ePiX build (Meson port — Phase 1: the core build that produces a working
 # libepix.a + epix.h + the four driver scripts, installed to the same layout as

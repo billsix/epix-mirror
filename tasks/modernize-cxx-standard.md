@@ -1,19 +1,18 @@
 # Task: Investigate updating the C++ standard and modernizing syntax
 
-**Status:** complete — Tier 1+2 applied + render oracle 96/97 confirmed 2026-06-09
+**Status:** complete — C++20 + Tier 1/2 + enum-class fix, output identical, 2026-06-09
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
 ## Decisions (2026-06-09)
 
-- **Standard: C++17** (nanobind's floor — chosen with the Python port in mind),
-  pinned via `default_options: ['cpp_std=c++17']` in `meson.build`.
-- **Scope: Tier 1 + Tier 2** (output-neutral). `enum class` (Tier 3) stays
-  deferred until the bindings A/B decision.
-- **Runtime `-std=c++17`** baked into the `epix`/`flix` compile of user `.xp`
-  (a `DEFAULT_STD` in `epix.in`; inline in `flix.in`), so user figures compile
-  at the same standard as the library; user `$EPIX_MYFLAGS`/`$FLIX_FLAGS` (which
-  come later on the command line) can still override.
+- **Standard: C++20** (started at C++17, then bumped — C++20 gives `using enum`,
+  which makes the enum-class fix keep terse call sites; fine for nanobind, which
+  only needs ≥C++17). Pinned via `default_options: ['cpp_std=c++20']` in
+  `meson.build`. Cost: raises the minimum build compiler (~GCC 11+) — fine here.
+- **Scope: Tier 1 + Tier 2 + Tier 3 (`enum class`)** — all output-neutral.
+- **Runtime `-std=c++20`** baked into the `epix`/`flix` compile of user `.xp`
+  (`DEFAULT_STD` in `epix.in`; inline in `flix.in`); user flags still override.
 
 ## Implementation (2026-06-09)
 
@@ -38,11 +37,30 @@ out of scope for syntax modernization).
 the image's `epix` bakes `-std=c++17` for the user `.xp` compile. `warning_level`
 left at 0 (mining was done via clang-tidy, not compiler warnings).
 
-**Follow-ons (separate, not in this pass):** Tier 3 `enum class` (a standalone,
-opt-in, compat-preserving change — **decoupled** from the bindings, since the
-`.xp` samples are kept; see Tier 3 and "Relationship" below); optional C++20
-revisit; the `intersections.cc:225` most-vexing-parse (behavioral, needs author
-intent).
+## Tier 3 — `enum class` (done 2026-06-09, C++20)
+
+Converted all four `enums.h` types to `enum class` (kills the footgun: the
+single-letter `epix_label_posn` values `c/r/t/l/b` no longer leak into user
+scope via `using namespace ePiX;` and can't silently `int`-shadow a `double t`).
+
+**Library:** `using enum <T>;` at namespace scope in the 9 `.cc` that use the
+values (terse, no user pollution); qualified the default-args in the public
+headers (`epix_label_posn POSN=epix_label_posn::none`, etc.).
+
+**Samples + doc (.xp):** purely additive — the `.xp` are kept and still terse.
+22 non-conflict samples got a one-line `using enum`; the rest were qualified
+**only at the exact compiler-flagged occurrences** (so a genuine `double t`
+variable like `log.xp:169` was left untouched). Done with a **clang** pass
+(`-ferror-limit=0` reports *all* occurrences in one shot — gcc suppresses
+repeats, forcing iteration), mapping each undeclared identifier to its enum and
+inserting the qualifier at clang's byte-precise column: **61 sites across 24
+files + 9 in `doc/marker.xp`**, 0 column mismatches.
+
+**Output-identity proof:** rendered every figure to `.eepic` before (baseline)
+and after, stripped the generation-timestamp header, and diffed —
+**96 figures, 0 content differences** (scoped enums keep the same underlying
+values, so geometry is byte-identical). `std_F.xp` is the only non-render (it's
+non-standalone, as always).
 
 ## Goal
 

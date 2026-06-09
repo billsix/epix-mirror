@@ -17,10 +17,10 @@ int main()
   Line(O, E_2);
 
   font_face("tt");
-  dot(O, P(0,0), "[tr]", tr); 
-  label(O, P(0,0), "[tl]", tl);
-  label(O, P(0,0), "[br]", br);
-  label(O, P(0,0), "[bl]", bl);
+  dot(O, P(0,0), "[tr]", epix_label_posn::tr); 
+  label(O, P(0,0), "[tl]", epix_label_posn::tl);
+  label(O, P(0,0), "[br]", epix_label_posn::br);
+  label(O, P(0,0), "[bl]", epix_label_posn::bl);
 
   end();
 }

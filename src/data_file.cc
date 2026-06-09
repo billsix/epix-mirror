@@ -54,6 +54,7 @@
 #include "data_file.h"
 
 namespace ePiX {
+  using enum epix_mark_type;
 
   const std::string default_delim("\t");
   const std::string default_commt("%");

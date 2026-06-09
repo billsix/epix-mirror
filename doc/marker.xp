@@ -37,31 +37,31 @@ int main()
   ddot(P(x5,y3));
 
   label(P(x1,y2), P(12,-4), "{\\tt{PLUS}}");
-  marker(P(x1,y2), PLUS);
+  marker(P(x1,y2), epix_mark_type::PLUS);
 
   label(P(x2,y2), P(12,-4), "{\\tt{OPLUS}}");
-  marker(P(x2,y2), OPLUS);
+  marker(P(x2,y2), epix_mark_type::OPLUS);
 
   label(P(x3,y2), P(12,-4), "{\\tt{TIMES}}");
-  marker(P(x3,y2), TIMES);
+  marker(P(x3,y2), epix_mark_type::TIMES);
 
   label(P(x4,y2), P(12,-4), "{\\tt{OTIMES}}");
-  marker(P(x4,y2), OTIMES);
+  marker(P(x4,y2), epix_mark_type::OTIMES);
 
   label(P(x1,y1), P(12,-4), "{\\tt{DIAMOND}}");
-  marker(P(x1,y1), DIAMOND);
+  marker(P(x1,y1), epix_mark_type::DIAMOND);
 
   label(P(x2,y1), P(12,-4), "{\\tt{UP}}");
-  marker(P(x2,y1),UP);
+  marker(P(x2,y1),epix_mark_type::UP);
 
   label(P(x3,y1), P(12,-4), "{\\tt{DOWN}}");
-  marker(P(x3,y1), DOWN);
+  marker(P(x3,y1), epix_mark_type::DOWN);
 
   label(P(x4,y1), P(12,-4), "{\\tt{BOX}}");
-  marker(P(x4,y1), BOX);
+  marker(P(x4,y1), epix_mark_type::BOX);
 
   label(P(x5,y1), P(12,-4), "{\\tt{BBOX}}");
-  marker(P(x5,y1), BBOX);
+  marker(P(x5,y1), epix_mark_type::BBOX);
 
   end();
 }

@@ -55,6 +55,7 @@
 #include "pen_arrow.h"
 
 namespace ePiX {
+  using enum epix_mark_type;
   pen_arrow::pen_arrow(const pair& tail, const pair& head,
 		       const pen_data& line, const pen_data& base,
 		       double scale, double sin_th, bool head_seen)

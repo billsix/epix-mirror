@@ -86,10 +86,10 @@ int main()
 
   black();
   camera.at(P(0,0,10000));
-  label(P(1.5,0), P(4,16), "Future timelike unit vectors", r);
-  label(P(1.5,0), P(4,0), "Unit spacelike vectors", r);
-  label(P(1.5,0), P(4,-16), "Lightlike vectors", r);
-  label(P(1.5,0), P(4,-32), "Past timelike unit vectors", r);
+  label(P(1.5,0), P(4,16), "Future timelike unit vectors", epix_label_posn::r);
+  label(P(1.5,0), P(4,0), "Unit spacelike vectors", epix_label_posn::r);
+  label(P(1.5,0), P(4,-16), "Lightlike vectors", epix_label_posn::r);
+  label(P(1.5,0), P(4,-32), "Past timelike unit vectors", epix_label_posn::r);
 
   base(White(), "2pt"); 
   bold(Black());

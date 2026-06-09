@@ -73,7 +73,7 @@ namespace ePiX {
     legend& key_size(double);   // size of legend keys in pt
 
     void draw(const P& loc, const P& offset=P(0,0),
-	      epix_label_posn align=tr) const;
+	      epix_label_posn align=epix_label_posn::tr) const;
 
   private:
     Color m_backing;

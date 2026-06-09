@@ -1,6 +1,7 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_mark_type;
 
 double f(double t, double a) { return 2*exp(-0.5*t)*Sin(a*t); }
 
@@ -51,13 +52,13 @@ int main()
   dart(P(0,ymin()), P(0,ymax()+delta));
 
   font_size("scriptsize");
-  h_axis_masklabels(P(xmin()+1,0), P(xmax(),0), xsize()-1, P(0,2), c);
-  v_axis_labels(P(0,ymin()), P(0,ymax()), ysize(), P(-2, 0), l);
+  h_axis_masklabels(P(xmin()+1,0), P(xmax(),0), xsize()-1, P(0,2), epix_label_posn::c);
+  v_axis_labels(P(0,ymin()), P(0,ymax()), ysize(), P(-2, 0), epix_label_posn::l);
 
   font_size("footnotesize");
-  label(P(xmax()+delta,0), P(2,0), "Time (sec)", r);
+  label(P(xmax()+delta,0), P(2,0), "Time (sec)", epix_label_posn::r);
   label_angle(M_PI_2);
-  label(P(0,0), P(-8,0), "Displacement (cm)",l);
+  label(P(0,0), P(-8,0), "Displacement (cm)",epix_label_posn::l);
   label_angle(0);
 
   legend L;
@@ -79,11 +80,11 @@ int main()
     }
 
   black();
-  L.draw(canvas().br(), P(-2,2), tl);
+  L.draw(canvas().br(), P(-2,2), epix_label_posn::tl);
 
   font_face("sc");
   label(P(0.5*(xmin()+xmax()), ymax()), P(0,2),
-	"A damped harmonic oscillator", t);
+	"A damped harmonic oscillator", epix_label_posn::t);
 
   end();
 }

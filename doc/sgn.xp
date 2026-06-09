@@ -22,7 +22,7 @@ int main()
   circ(P(0,-1));
   circ(P(0,1));
 
-  label(P(0,y_min), P(0,-4), "\\code{sgn}", b);
+  label(P(0,y_min), P(0,-4), "\\code{sgn}", epix_label_posn::b);
 
   end();
 }

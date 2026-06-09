@@ -20,7 +20,7 @@ int main()
   h_axis(2);
 
   double x0(2),  x1(x0-f(x0)/df(x0));
-  label(P(x0,0), P(0,-4), "$x_i$", b);
+  label(P(x0,0), P(0,-4), "$x_i$", epix_label_posn::b);
 
   for (int i=0; i < 3; ++i)
     {
@@ -35,9 +35,9 @@ int main()
   bold();
   plot(f, xmin(), xmax()+0.05, 60);
 
-  label(P(1.75, f(1.75)), P(-2,2), "$y=f(x)$", tl);
-  label(P(x1,0), P(0,-4), "$x_{i+1}$", b);
-  label(P(1.75, df(2)*(1.75-x1)), P(0,-4), "Slope $= f'(x_i)$", br);
+  label(P(1.75, f(1.75)), P(-2,2), "$y=f(x)$", epix_label_posn::tl);
+  label(P(x1,0), P(0,-4), "$x_{i+1}$", epix_label_posn::b);
+  label(P(1.75, df(2)*(1.75-x1)), P(0,-4), "Slope $= f'(x_i)$", epix_label_posn::br);
 
   end();
 }

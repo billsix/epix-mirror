@@ -42,14 +42,14 @@ int main() {
   //  grid(P(-3,0,-2), P(3,0,2), 6, 8);
   grid(P(-3,0,-2), P(3,0,2));
 
-  masklabel(observer+E_1, P(2,0), "\\textbf{Sea}", r);
-  masklabel(observer+E_3, P(0,2), "\\textbf{Sky}", t);
-  masklabel(observer-E_2, P(-4,0), "\\textbf{Eye}", l);
+  masklabel(observer+E_1, P(2,0), "\\textbf{Sea}", epix_label_posn::r);
+  masklabel(observer+E_3, P(0,2), "\\textbf{Sky}", epix_label_posn::t);
+  masklabel(observer-E_2, P(-4,0), "\\textbf{Eye}", epix_label_posn::l);
 
-  masklabel(observer, P(-2,0), "Viewpoint", l);
+  masklabel(observer, P(-2,0), "Viewpoint", epix_label_posn::l);
   dot(observer);
 
-  masklabel(P(3,0,2), P(-6,-2), "Canvas", bl);
+  masklabel(P(3,0,2), P(-6,-2), "Canvas", epix_label_posn::bl);
 
   line(observer, target);
 
@@ -68,12 +68,12 @@ int main() {
   triangle(P1, P2, P3);
 
   line(obj_loc, midpt);
-  masklabel(obj_loc, P(0,0), "Object", t);
+  masklabel(obj_loc, P(0,0), "Object", epix_label_posn::t);
 
   line(P(2,0,-1), F(midpt));
-  masklabel(P(2,0,-1), P(0,0), "Shadow", r);
+  masklabel(P(2,0,-1), P(0,0), "Shadow", epix_label_posn::r);
 
-  masklabel(target+dtarg, P(0,0), "Target", t);
+  masklabel(target+dtarg, P(0,0), "Target", epix_label_posn::t);
   arrow(target+dtarg, target+0.1*dtarg, 0.5);
   dot(target);
 

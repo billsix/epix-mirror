@@ -52,6 +52,8 @@
 #include "glyph.h"
 
 namespace ePiX {
+  using enum epix_label_posn;
+  using enum epix_mark_type;
 
   label_data::label_data(const P& here, const P& offset,
 			 const std::string& text, epix_mark_type mark)

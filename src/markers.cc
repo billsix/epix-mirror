@@ -48,6 +48,8 @@
 #include "markers.h"
 
 namespace ePiX {
+  using enum epix_label_posn;
+  using enum epix_mark_type;
 
   static void __epix_label(const P& base, const P& offset,
 			   const std::string& lbl,

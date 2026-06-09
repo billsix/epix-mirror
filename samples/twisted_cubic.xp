@@ -47,7 +47,7 @@ void draw_frame()
   plot(cubic13, -1, 1, 60);
   plain();
   bars(cubic13, cubic);
-  label(cubic13(1), P(0,2), "$x$-$z$", t);
+  label(cubic13(1), P(0,2), "$x$-$z$", epix_label_posn::t);
 
   // (y,z)-plane
   green(0.6);
@@ -55,7 +55,7 @@ void draw_frame()
   plot(cubic23, -1, 1, 60);
   plain();
   bars(cubic23, cubic);
-  label(cubic23(1), P(0,2), "$y$-$z$", t);
+  label(cubic23(1), P(0,2), "$y$-$z$", epix_label_posn::t);
 
   // (x,y)-plane
   magenta();
@@ -63,7 +63,7 @@ void draw_frame()
   plot(cubic12, -1, 1, 60);
   plain();
   bars(cubic12, cubic);
-  label(cubic12(1), P(2,0), "$x$-$y$",r);
+  label(cubic12(1), P(2,0), "$x$-$y$",epix_label_posn::r);
 
   // the cubic
   bold(Red(1.6));
