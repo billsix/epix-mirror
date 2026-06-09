@@ -1,6 +1,7 @@
 # Task: Containerized build tooling for ePiX (Makefile + Dockerfile + entrypoints)
 
-**Status:** complete — implemented + tested nested 2026-06-09 (ready to archive)
+**Status:** complete
+**Completed:** 2026-06-09
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 

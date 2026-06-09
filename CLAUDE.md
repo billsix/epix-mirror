@@ -79,7 +79,7 @@ autotools-generated `Makefile`; **interim until the planned meson port**. Nested
 (podman-in-podman) usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The render
 scripts run each figure from a scratch copy with `epix -I.` so the host tree
 stays clean and sibling `#include`s resolve. See
-`tasks/container-build-tooling.md` for the design + gotchas.
+`tasks/archive/2026/06/09/container-build-tooling.md` for the design + gotchas.
 
 ### Generated / vendored files — do NOT hand-edit
 
