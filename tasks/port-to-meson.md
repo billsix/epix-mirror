@@ -1,6 +1,6 @@
 # Task: Port ePiX's build from GNU autotools to Meson
 
-**Status:** Phases 1–2 DONE + validated 2026-06-09 · Phase 3 pending
+**Status:** COMPLETE — all 3 phases done + validated 2026-06-09 (ready to archive)
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
@@ -55,13 +55,39 @@ samples + `epix.info`, and `manual.pdf` is correctly **absent**. With
 (multi-page, verified). No extra TeX packages were needed beyond the image's
 existing collections.
 
-**Not yet done (Phase 3):** point `Makefile.docker` at Meson (add `meson`+`ninja`
-to the image, swap `./configure && make` → `meson setup/compile/install`),
-update `README.md`/`CLAUDE.md` build sections, and retire the autotools files
-once at parity (keep `make_header` — still the header-list source of truth). The
-`examples-anim`/PDF render paths weren't re-run under Meson but use the same
-generated `epix`/`elaps` already verified by the Phase 1 eepic render + script
-inspection.
+## Phase 3 — DONE (2026-06-09): cutover + autotools retirement
+
+- **`Makefile.docker` → Meson.** Dockerfile now installs `meson`+`ninja-build`
+  (dropped `make`), `COPY . /epix` (trimmed by `.dockerignore`), and builds via
+  `meson setup /tmp/build && meson install`. `entrypoint/build.sh` rebuilds with
+  `meson compile`; `shell.sh` banner updated. The `examples`/`examples-anim`
+  targets are unchanged (they run the installed `epix`).
+- **Shebang substitution.** The four `*.in` first lines became `#!@bashpath@`
+  (safe now that autotools is gone), so `bash_path` is fully wired; generated
+  scripts get `#!/usr/bin/bash`.
+- **Out-of-source win.** Meson keeps everything in `build/`, so the source tree
+  no longer gets littered with `.o`/scripts/`epix.h`. `.gitignore` shrank to
+  just `/output/` + `/build/`.
+- **Autotools retired** (recoverable from git history): `configure`,
+  `configure.ac`, `Makefile.am`, `Makefile.in`, `config.guess`, `config.sub`,
+  `install-sh`, `missing`, `mkinstalldirs`, `depcomp`, and the `samples/`+`doc/`
+  `Makefile.am`/`Makefile.in`. **Kept `make_header`** (still the umbrella-header
+  list source of truth). Docs (`README.md`, `CLAUDE.md`) rewritten for Meson;
+  `meson.build` is now the authoritative source/header manifest.
+
+**Validation:** local `meson setup/compile/install` to a staging dir (shebang
+`#!/usr/bin/bash`, lib in `lib64/epix`, 70 samples + `epix.info` installed);
+then the full container path — `make -f Makefile.docker image` (Meson-based
+Dockerfile) builds, and `make … examples` renders **96/97** (identical oracle),
+`make … build` works (out-of-source `build/`, tree stays clean). The PDF/anim
+paths use the same generated `epix`/`elaps` already verified.
+
+## Outcome
+
+ePiX now builds with Meson only; autotools is gone. `meson setup build &&
+meson compile -C build && meson install -C build` (add `-Dmanual=true` for the
+93-page LaTeX manual). The `Makefile.docker` container wrapper drives the same
+Meson build. Render parity with the old autotools build confirmed (96/97).
 
 ## Goal
 

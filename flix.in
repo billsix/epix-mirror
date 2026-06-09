@@ -1,4 +1,4 @@
-#! /bin/bash
+#!@bashpath@
 #
 # flix: Convert ePiX file(s) to png/mng/gif
 #

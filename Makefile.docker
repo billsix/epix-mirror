@@ -1,9 +1,9 @@
 # Makefile.docker -- containerized build/run wrapper for ePiX.
 #
 # Invoke as:   make -f Makefile.docker <target>
-# Named ".docker" so it does NOT collide with the Makefile that ./configure
-# generates from Makefile.in.  Interim wrapper until the planned meson port;
-# it drives the existing GNU-autotools build inside a Fedora container.
+# Named ".docker" (not "Makefile") to keep it visibly a container wrapper, not
+# the project build.  It drives the Meson build (meson setup/compile/install)
+# inside a Fedora container.
 #
 # Pattern: the host stays clean, all toolchain lives in a pinned OCI image, and
 # this file is a thin UX layer over `podman run`.

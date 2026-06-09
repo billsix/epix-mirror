@@ -1,25 +1,6 @@
 # Rendered examples (Makefile.docker `examples` / `examples-anim` targets).
 /output/
 
-# In-tree build artifacts from ./configure && make (autotools).
-*.o
-libepix.a
-epix.h
-/epix
-/elaps
-/flix
-/laps
-*-local
-.deps/
-config.log
-config.status
-config.cache
-autom4te.cache/
-# generated from *.in (the committed sources are *.in; elaps.1/flix.1/laps.1
-# are committed statics, so only epix.1/epix.el are generated):
-/epix.1
-/epix.el
-# generated, per-build:
-/Makefile
-/samples/Makefile
-/doc/Makefile
+# Meson build directory (`make -f Makefile.docker build`, or `meson setup build`).
+# Meson is out-of-source, so the build never litters the source tree.
+/build/

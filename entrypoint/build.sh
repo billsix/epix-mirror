@@ -1,23 +1,19 @@
 #!/usr/bin/env bash
 #
-# build.sh -- build libepix.a + the driver scripts from the (bind-mounted)
-# source tree, using the committed GNU autotools.  Run inside the container by
-# `make -f Makefile.docker build`.
-#
-# `all-am` is automake's current-directory (non-recursive) build target: it
-# produces libepix.a, the generated umbrella header epix.h, and the four
-# wrapper scripts (epix/elaps/flix/laps + their *-local build-dir variants),
-# WITHOUT recursing into samples/ and doc/ (doc/ would try to build the whole
-# manual).  The image already has epix installed on PATH; this target is for
-# rebuilding after editing the C++ sources.
+# build.sh -- (re)build libepix.a + the generated epix.h + the four driver
+# scripts from the (bind-mounted) source tree with Meson.  Run inside the
+# container by `make -f Makefile.docker build`.  Everything lands in ./build
+# (out-of-source), so the source tree stays clean.  The image already ships
+# epix installed on PATH; this target is for rebuilding after editing sources.
 set -euo pipefail
 
 cd /epix
 
-if [ ! -f config.status ]; then
-    ./configure
+if [ ! -d build ]; then
+    meson setup build --prefix=/usr/local
 fi
-make all-am
+meson compile -C build
 
 echo
-echo "Built: libepix.a + epix/elaps/flix/laps (and *-local).  Headers: epix.h"
+echo "Built (meson): build/libepix.a, build/epix.h, build/{epix,elaps,flix,laps}."
+echo "  meson install -C build   # to install into the prefix"

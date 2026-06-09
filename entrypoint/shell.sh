@@ -8,11 +8,13 @@
 cd /epix
 
 history -s "elaps --pdf samples/hello.xp"
+history -s "meson setup build && ninja -C build"
 history -s "/build.sh"
 
 cat <<'BANNER'
 ePiX dev shell.  Installed tools on PATH: epix  elaps  flix  laps
-  /build.sh                       rebuild libepix.a from bind-mounted sources
+  /build.sh                       (re)build from sources with Meson -> ./build
+  meson setup build && ninja -C build      (equivalently, by hand)
   epix   samples/hello.xp         -> hello.eepic  (LaTeX picture macros)
   elaps --pdf samples/hello.xp    -> hello.pdf
 BANNER

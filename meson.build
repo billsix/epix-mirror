@@ -14,7 +14,7 @@ project('epix', 'cpp',
 
 # ---------------------------------------------------------------------------
 # Programs resolved at configure time and baked into the wrapper scripts.
-# (configure.ac's AC_PATH_PROG + --with-bash / --with-runtime / --with-ps2eps.)
+# (Overridable via the bash_path / runtime_compiler / ps2eps options.)
 # ---------------------------------------------------------------------------
 bash_opt = get_option('bash_path')
 bash_path = bash_opt != '' ? bash_opt : find_program('bash').full_path()
@@ -56,7 +56,9 @@ pkgdatadir_abs = prefix / pkgdatadir_rel
 docdir_abs     = prefix / docdir_rel
 
 # ---------------------------------------------------------------------------
-# The static library (libepix_a_CXXSOURCES from Makefile.am).
+# The static library sources (this list is authoritative — it was migrated from
+# the old autotools libepix_a_CXXSOURCES; note fmt_template.cc is intentionally
+# excluded, as it was there too: it #includes a nonexistent fmt.h).
 # ---------------------------------------------------------------------------
 epix_sources = files(
   'Color.cc', 'Color_Base.cc', 'Color_CMY.cc', 'Color_CMYK.cc', 'Color_Gray.cc',
@@ -123,9 +125,8 @@ epix_h = custom_target('epix-header',
 
 # ---------------------------------------------------------------------------
 # Driver scripts, man page, and Emacs mode from *.in templates.
-# configure_file does the @var@ substitution the Makefile did with sed.
-# (The shebang stays "#! /bin/bash" — substituting it would require editing the
-# templates, which would break the parallel autotools build during transition.)
+# configure_file does the @var@ substitution the Makefile used to do with sed,
+# including the script shebangs (#!@bashpath@ -> the resolved bash).
 # ---------------------------------------------------------------------------
 conf = configuration_data()
 conf.set('RUNTIME_COMPILER', runtime_compiler)
@@ -177,7 +178,7 @@ endif
 # ---------------------------------------------------------------------------
 install_subdir('samples',
   install_dir: docdir_rel,
-  exclude_files: ['Makefile.am', 'Makefile.in', 'meson.build'])
+  exclude_files: ['meson.build'])
 
 subdir('doc')
 
