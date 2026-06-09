@@ -1,6 +1,6 @@
 # Task: Port ePiX's build from GNU autotools to Meson
 
-**Status:** Phase 1 DONE + validated 2026-06-09 · Phases 2–3 pending
+**Status:** Phases 1–2 DONE + validated 2026-06-09 · Phase 3 pending
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
@@ -34,11 +34,34 @@ oracle*). All four generated scripts have **zero leftover `@tokens@`**; `elaps`
 correctly bakes `/usr/local/bin/epix`, `/usr/bin/ps2epsi`, and the
 `epix-lib.sh` path; `epix.1` resolves `@docdir@`.
 
-**Not yet done (Phases 2–3):** `doc/`+`samples/` subdirs and the optional LaTeX
-manual (Phase 2); pointing `Makefile.docker` at Meson + doc updates + retiring
-autotools (Phase 3). The `examples-anim`/PDF paths weren't re-run under Meson but
-use the same generated `epix`/`elaps` already verified by the eepic render +
-script inspection.
+## Phase 2 — DONE (2026-06-09)
+
+Files added: `samples`/`doc` wiring in the top `meson.build` + `doc/meson.build`
++ `build-aux/build_manual.sh`.
+
+- **samples/** → `install_subdir('samples', install_dir: docdir/samples,
+  exclude_files: Makefile.am/Makefile.in/meson.build)` — installs the sample
+  **sources uncompressed** (more useful than the autotools `sample_src.tar.gz`).
+- **doc/epix.info** (committed Texinfo) → `infodir`, always (no makeinfo run).
+- **Printable manual** behind `-Dmanual=true` (default **off**). Key realization:
+  the **29 `.eepic` figures are committed** and `manual.tex` `\input`s them, so
+  the manual builds with **no epix run / no build-local script** — just
+  `latex`×3 → `makeindex` → `dvips` → `ps2pdf` (the pstricks-safe route, in a
+  scratch dir via `build_manual.sh`).
+
+**Validation (container):** with manual **off**, `meson install` stages 70 `.xp`
+samples + `epix.info`, and `manual.pdf` is correctly **absent**. With
+`-Dmanual=true`, `meson compile manual-pdf` produces a **~635 KB manual.pdf**
+(multi-page, verified). No extra TeX packages were needed beyond the image's
+existing collections.
+
+**Not yet done (Phase 3):** point `Makefile.docker` at Meson (add `meson`+`ninja`
+to the image, swap `./configure && make` → `meson setup/compile/install`),
+update `README.md`/`CLAUDE.md` build sections, and retire the autotools files
+once at parity (keep `make_header` — still the header-list source of truth). The
+`examples-anim`/PDF render paths weren't re-run under Meson but use the same
+generated `epix`/`elaps` already verified by the Phase 1 eepic render + script
+inspection.
 
 ## Goal
 

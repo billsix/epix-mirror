@@ -169,9 +169,17 @@ if get_option('epix_el')
   install_data(epix_el, install_dir: docdir_rel / 'config')
 endif
 
-# doc/ and samples/ subdirs are Phase 2:
-#   subdir('samples')
-#   subdir('doc')
+# ---------------------------------------------------------------------------
+# samples/ and doc/ (Phase 2).
+# Samples: install the sample sources (uncompressed) to docdir/samples — more
+# useful than the autotools sample_src.tar.gz tarball.  doc/ installs epix.info
+# and, with -Dmanual=true, builds the printable manual.
+# ---------------------------------------------------------------------------
+install_subdir('samples',
+  install_dir: docdir_rel,
+  exclude_files: ['Makefile.am', 'Makefile.in', 'meson.build'])
+
+subdir('doc')
 
 summary({
     'prefix'           : prefix,
