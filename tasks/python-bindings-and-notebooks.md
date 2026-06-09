@@ -1,10 +1,10 @@
 # Task: Feasibility — Python bindings + percent-format notebooks for ePiX
 
-**Status:** in progress — A + nanobind; **Stage 0 (demo API audit) DONE 2026-06-09**
+**Status:** in progress — A + nanobind; **Phase 0 (demo API audit) DONE 2026-06-09**
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
-## Stage 0 — demo API audit (DONE 2026-06-09): the nanobind bind-list
+## Phase 0 — demo API audit (DONE 2026-06-09): the nanobind bind-list
 
 **Method (accurate, not grep):** compiled each demo to an object file
 (`g++ -std=c++20 -I/usr/local/include -x c++ -c`) and read its **undefined
@@ -49,7 +49,7 @@ above).
 **Implication for nanobind:** ~22 classes + ~156 free functions is a **bounded,
 known** surface — bindable, not open-ended. Build **core-tier first** (renders
 most demos), then widen by tier as demos are ported. Next: the notebook +
-`_repr_png_` render-helper MVP (Forward plan step 2).
+`_repr_png_` render-helper MVP (Phase 1).
 
 ## Question to answer
 
@@ -150,7 +150,7 @@ using nanobind.** (B and C are off the table; kept above only as rationale.)
 Choosing nanobind implies A — it's a C++↔Python binding generator, so the
 codegen/emit path doesn't apply. nanobind needs ≥C++17 and the library is now
 pinned at **C++20**, so it's a clean fit; it's leaner/faster-to-build than
-pybind11, which matters given the large API surface. Stage 0 (the demo API
+pybind11, which matters given the large API surface. Phase 0 (the demo API
 audit) still comes first — it now scopes *how much of `libepix` to bind*, not
 the A/B choice.
 
@@ -190,7 +190,7 @@ This is the high-feasibility half and mirrors the pattern Bill uses elsewhere:
 
 Porting all 81 demos makes this a **multi-stage program, not one task**:
 
-- **Stage 0 — demo API audit** (which functions/classes the 81 demos use):
+- **Phase 0 — demo API audit** (which functions/classes the 81 demos use):
   **~0.5 session.** Bounds everything below.
 - **Notebook + render-helper MVP** (reuse `elaps`, container scaffolding,
   `_repr_png_`): **~1–2 sessions.**
@@ -240,21 +240,23 @@ couplings that were open when this was written:
   `g++`, so the runtime `-std` coupling the modernization task calls out
   disappears for the Python path under A (it remains under B, which still shells
   to `epix`).
-- **Shared audit + locked oracle.** Stage 0 (the demo API audit) is the same
+- **Shared audit + locked oracle.** Phase 0 (the demo API audit) is the same
   public-API inventory the modernization task needs — share it. And the
   per-demo render verification assumes a **frozen** output, so let the
   modernization output-identical work settle first.
 - Minor: `normalize-repo-structure.md`'s `include/epix/` layout makes the
   bindings' includes/packaging cleaner — structure-first is mildly favorable.
 
-**Forward plan (modernize done; A + nanobind chosen):**
-1. **Stage 0 — demo API audit** ✅ DONE (2026-06-09): the `libepix` surface the 81 demos
-   collectively use → the concrete nanobind bind-list.
-2. **Notebook + render-helper MVP**: `_repr_png_`/`_repr_svg_` via the existing
-   `elaps` pipeline; jupytext percent flow; reuse the `Makefile` container.
-3. **nanobind bindings** for the audited surface + the `Figure`/`tix` shims.
-4. **Port the 81 demos** to notebooks, each verified against the locked render
-   oracle (output already frozen by the completed modernize work).
+**Forward plan (modernize done; A + nanobind chosen).** Phases, single scheme:
+- **Phase 0 — demo API audit** ✅ DONE (2026-06-09): the `libepix` surface the 81
+  demos use → the concrete nanobind bind-list (see "Phase 0" section above).
+- **Phase 1 — notebook + render-helper MVP**: a `Figure` object with
+  `_repr_png_`/`_repr_svg_` rendering via the existing `elaps` pipeline; jupytext
+  percent flow; reuse the `Makefile` container `jupyter` scaffolding.
+- **Phase 2 — nanobind bindings** for the audited surface (core tier first) +
+  the `Figure`/`tix` shims.
+- **Phase 3 — port the 81 demos** to notebooks, each verified against the locked
+  render oracle (output frozen by the completed modernize work).
 
 ## Out of scope (this task)
 
