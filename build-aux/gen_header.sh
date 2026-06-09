@@ -16,5 +16,7 @@ case "$out" in
   *)  out="$PWD/$out" ;;      # relative to the build-dir CWD Meson invoked us in
 esac
 
-cd "$srcdir"
-exec ./make_header "$out"
+# make_header reads its bare-named header list from CWD, so run it from the
+# public-header dir; it now lives in build-aux/.
+cd "$srcdir/include/epix"
+exec "$srcdir/build-aux/make_header" "$out"

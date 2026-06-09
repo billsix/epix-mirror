@@ -1,9 +1,9 @@
-# Makefile.docker -- containerized build/run wrapper for ePiX.
+# Makefile -- containerized build/run wrapper for ePiX.
 #
-# Invoke as:   make -f Makefile.docker <target>
-# Named ".docker" (not "Makefile") to keep it visibly a container wrapper, not
-# the project build.  It drives the Meson build (meson setup/compile/install)
-# inside a Fedora container.
+# Invoke as:   make <target>     (make help for the list)
+# This is NOT the project build (ePiX builds with Meson: meson setup build).
+# It's a thin convenience wrapper that drives the Meson build inside a Fedora
+# `podman` image, so you don't need the toolchain on your host.
 #
 # Pattern: the host stays clean, all toolchain lives in a pinned OCI image, and
 # this file is a thin UX layer over `podman run`.
@@ -19,7 +19,7 @@ OUTPUT_DIR ?= $(CURDIR)/output
 # Appended to every inner `podman run` / `podman build`.  Empty by default
 # (correct on a normal host).  Running nested inside the claudecontainer
 # sandbox needs --cgroups=disabled, e.g.:
-#     make -f Makefile.docker examples PODMAN_RUN_FLAGS=--cgroups=disabled
+#     make examples PODMAN_RUN_FLAGS=--cgroups=disabled
 PODMAN_RUN_FLAGS   ?=
 PODMAN_BUILD_FLAGS ?=
 

@@ -109,7 +109,7 @@ This is the high-feasibility half and mirrors the pattern Bill uses elsewhere:
   (eepic → latex → dvips → ps → png/svg) and returns the bytes. The renderer is
   the one genuinely new piece; it reuses logic the repo already ships.
 - **Packaging + container.** A `pyproject.toml` with `notebooks` / `jupyter`
-  optional extras, and reuse of the **`Makefile.docker` container pattern** — a
+  optional extras, and reuse of the **`Makefile` container pattern** — a
   `jupyter` target + `jupyter.sh`/`percentToIpynb.sh` entrypoints — so the whole
   thing runs in the pinned image that already has the TeX/ghostscript toolchain.
 
@@ -153,7 +153,7 @@ Net: a working *pipeline* (bindings/emit + render + one ported notebook) is
 2. **Binding tech** — pybind11 (mature) vs nanobind (leaner)?
 3. **Scope** — core-subset MVP first (recommended) vs aim broad?
 4. **Inline format** — PNG (simple raster) vs SVG (vector)?
-5. **Container/jupyter scaffolding** — mirror the `Makefile.docker` jupyter
+5. **Container/jupyter scaffolding** — mirror the `Makefile` jupyter
    target + jupytext flow now, or just a local `pyproject` first?
 
 ## Relationship to other tasks

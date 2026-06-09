@@ -244,15 +244,15 @@ doesn't do decompression,
   gunzip -c epix-x.y.z.tar.gz | tar -xvf -
   bzcat epix-x.y.z.tar.bz2 | tar -xvf -
 \end{verbatim}
-\code{cd} to the source directory, \filename{epix-x.y.z}.  The
-\filename{INSTALL} file contains detailed installation instructions.
-If you're impatient, the short of it is \code{./configure [--options];
-  make; make install}.  Run \code{./configure --help} for a list of
-options.
+\code{cd} to the source directory, \filename{epix-x.y.z}.  \ePiX\ builds
+with \emph{Meson}: the short of it is \code{meson setup build; meson
+  compile -C build; meson install -C build}.  Run \code{meson configure
+  build} for a list of options (e.g.\ \code{-Dmanual=true} to build this
+manual).
 
 By default, \ePiX\ installs in subdirectories of
-\filename{/usr/local}; if you want to install elsewhere, supply
-\code{./configure} with the appropriate \code{--prefix}. You may also
+\filename{/usr/local}; if you want to install elsewhere, pass
+\code{meson setup} the appropriate \code{--prefix}. You may also
 want to consult \filename{POST-INSTALL} for information on setting
 your \code{PATH} variable so your shell can find \ePiX.  The manual
 and sample files are in \filename{/usr/local/share/doc/epix}.
@@ -314,8 +314,8 @@ snippets that complete intelligently when the first part of a command
 is one of the shell scripts. For example, if command completion is
 active, typing \code{epix} \Key{TAB} prints only names of \code{epix}
 input files. To use this feature, you must install Ian MacDonald's
-\code{bash completion} package. The \filename{INSTALL} and
-\filename{POST\_INSTALL} files contain details.
+\code{bash completion} package. The \filename{POST-INSTALL} file and
+\filename{scripts/bash\_completions} contain details.
 
 
 \subsection*{Shell Scripts}
@@ -4583,10 +4583,9 @@ from the project pages and distributed to interested users.
 There are no formal requirements for external packages, but in the
 interest of uniformity contributed code should follow the GNU Coding
 Standards~\cite{GNUCoding}. At a minimum, an external package should
-build with the standard \code{./configure; make; make install}
-commands, and the \code{configure} script should accept an option
-\code{--with-epix} for the user to specify a non-default \ePiX\
-install directory.
+build and install cleanly with a standard build system (\ePiX\ itself
+uses \emph{Meson}), and should provide a way for the user to specify a
+non-default \ePiX\ install directory.
 
 If an external package builds a static library, it should provide a
 single header containing all the package's entry points, and enclose

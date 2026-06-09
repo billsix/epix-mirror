@@ -4,9 +4,8 @@ Last Change: September 12, 2007
 
 Please consult the following files as appropriate:
 
-INSTALL -- Detailed installation instructions
 NEWS (this file) -- Recent major changes (see ChangeLog for code changes)
-README -- General overview and information
+README.md -- General overview and installation (Meson build)
 
 
 If you are new to ePiX, you may safely ignore this file.

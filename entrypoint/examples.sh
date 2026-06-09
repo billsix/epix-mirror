@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # examples.sh -- render the sample figures into /output (a host folder
-# bind-mounted by `make -f Makefile.docker examples`).
+# bind-mounted by `make examples`).
 #
 #   * Always emits .eepic (LaTeX picture macros) via `epix` -- needs g++ plus a
 #     latex (ePiX runs latex to measure label sizes, even for eepic output).

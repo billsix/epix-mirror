@@ -60,7 +60,7 @@ docdir_abs     = prefix / docdir_rel
 # the old autotools libepix_a_CXXSOURCES; note fmt_template.cc is intentionally
 # excluded, as it was there too: it #includes a nonexistent fmt.h).
 # ---------------------------------------------------------------------------
-epix_sources = files(
+_epix_cc = [
   'Color.cc', 'Color_Base.cc', 'Color_CMY.cc', 'Color_CMYK.cc', 'Color_Gray.cc',
   'Color_Neutral.cc', 'Color_RGB.cc', 'Color_Sep.cc', 'Color_Utils.cc', 'Complex.cc',
   'Sline.cc', 'active_screen.cc', 'affine.cc', 'angle_units.cc', 'arrow_data.cc',
@@ -77,9 +77,19 @@ epix_sources = files(
   'screen.cc', 'screen_crop.cc', 'screen_data.cc', 'screen_mask.cc', 'segment.cc',
   'sphere.cc', 'spline.cc', 'state.cc', 'surface.cc', 'tikz.cc',
   'tile.cc', 'triples.cc', 'utils.cc', 'verbatim.cc',
-)
+]
+_src_paths = []
+foreach _f : _epix_cc
+  _src_paths += 'src' / _f
+endforeach
+epix_sources = files(_src_paths)
+
+# Sources are in src/ but use quote-includes ("triples.h"); the public headers
+# live in include/epix/, so put that on the include path.
+epix_inc = include_directories('include/epix')
 
 libepix = static_library('epix', epix_sources,
+  include_directories: epix_inc,
   install: true,
   install_dir: pkglibdir_rel)
 
@@ -88,7 +98,7 @@ libepix = static_library('epix', epix_sources,
 # plus 9 header-only files.  Excludes debug.h and fmt_template.h (internal/dead —
 # fmt_template.cc isn't in the library either; it #includes a nonexistent fmt.h).
 # ---------------------------------------------------------------------------
-epix_headers = files(
+_epix_h = [
   'Color.h', 'Color_Base.h', 'Color_CMY.h', 'Color_CMYK.h', 'Color_Gray.h',
   'Color_Neutral.h', 'Color_RGB.h', 'Color_Sep.h', 'Color_Utils.h', 'Complex.h',
   'Sline.h', 'active_screen.h', 'affine.h', 'angle_units.h', 'arrow_data.h',
@@ -107,7 +117,12 @@ epix_headers = files(
   'screen_crop.h', 'screen_data.h', 'screen_mask.h', 'segment.h', 'sphere.h',
   'spline.h', 'spline_data.h', 'state.h', 'surface.h', 'tikz.h',
   'tile.h', 'triples.h', 'utils.h', 'verbatim.h',
-)
+]
+_hdr_paths = []
+foreach _f : _epix_h
+  _hdr_paths += 'include/epix' / _f
+endforeach
+epix_headers = files(_hdr_paths)
 install_headers(epix_headers, subdir: 'epix')
 
 # ---------------------------------------------------------------------------
@@ -141,7 +156,7 @@ conf.set('bashpath', bash_path)
 
 foreach s : ['epix', 'elaps', 'flix', 'laps']
   configure_file(
-    input: s + '.in',
+    input: 'scripts' / (s + '.in'),
     output: s,
     configuration: conf,
     install: true,
@@ -150,23 +165,23 @@ foreach s : ['epix', 'elaps', 'flix', 'laps']
 endforeach
 
 # man pages: epix.1 is generated; elaps/flix/laps.1 are ".so man1/epix.1" stubs.
-epix_man = configure_file(input: 'epix.1.in', output: 'epix.1', configuration: conf)
-install_man(epix_man, 'elaps.1', 'flix.1', 'laps.1')
+epix_man = configure_file(input: 'man/epix.1.in', output: 'epix.1', configuration: conf)
+install_man(epix_man, 'man/elaps.1', 'man/flix.1', 'man/laps.1')
 
 # ---------------------------------------------------------------------------
 # Data: the epix-lib.sh helper (pkgdata), notes, and config files.
 # (Parity with the autotools install + install-data-local hook.)
 # ---------------------------------------------------------------------------
-install_data('epix-lib.sh', install_dir: pkgdatadir_rel)
+install_data('scripts/epix-lib.sh', install_dir: pkgdatadir_rel)
 
 install_data(
-  ['AUTHORS', 'BUGS', 'ChangeLog', 'COPYING', 'INSTALL', 'NEWS',
+  ['AUTHORS', 'BUGS', 'ChangeLog', 'COPYING', 'NEWS',
    'POST-INSTALL', 'README.md', 'THANKS', 'VERSION'],
   install_dir: docdir_rel / 'notes')
 
-install_data('bash_completions', install_dir: docdir_rel / 'config')
+install_data('scripts/bash_completions', install_dir: docdir_rel / 'config')
 if get_option('epix_el')
-  epix_el = configure_file(input: 'epix.el.in', output: 'epix.el', configuration: conf)
+  epix_el = configure_file(input: 'scripts/epix.el.in', output: 'epix.el', configuration: conf)
   install_data(epix_el, install_dir: docdir_rel / 'config')
 endif
 

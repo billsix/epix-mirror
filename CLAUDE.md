@@ -70,11 +70,11 @@ Meson is **out-of-source** — everything lands in `build/`, nothing in the tree
 The printable manual builds from `manual.tex` + the **committed** `doc/*.eepic`
 figures (no epix run needed).
 
-### Containerized build (`Makefile.docker`)
+### Containerized build (`Makefile`)
 
-`Makefile.docker` wraps the Meson build in a Fedora `podman` image (full
+`Makefile` wraps the Meson build in a Fedora `podman` image (full
 toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick).
-Targets (invoke with `make -f Makefile.docker <t>`): `image`, `shell`, `build`,
+Targets (invoke with `make <t>`): `image`, `shell`, `build`,
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
 `examples-anim` (`.flx` → `./output/anim`), `clean`. Entrypoint scripts in
 `entrypoint/` are bind-mounted (edit without rebuild). Nested (podman-in-podman)
@@ -97,7 +97,10 @@ lists in `meson.build` (now the authoritative manifest).
 
 ## Code layout
 
-~79 `.cc` + ~89 `.h` at the repo root (~30k LOC), all in `namespace ePiX`.
+Conventional layout: **78 `.cc` in `src/`**, **87 public headers in
+`include/epix/`** (~30k LOC, all in `namespace ePiX`); wrapper-script templates
+in `scripts/`, man pages in `man/`, build helpers in `build-aux/`. Sources use
+quote-includes resolved via `include_directories('include/epix')`.
 Rough functional grouping:
 
 - **Core math/value types:** `triples.{h,cc}` — `P`, the ordered-triple /
@@ -150,7 +153,7 @@ code/ChangeLog wins:
 
 - Don't "fix" generated files (above) — change the source they're built from.
 - This is a faithful mirror; keep upstream-authored prose (`NEWS`, `BUGS`,
-  `THANKS`, `AUTHORS`, `INSTALL`, `ChangeLog`) intact unless asked otherwise.
+  `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise.
 - Bill commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
   `tasks/<slug>.md` doc — see `tasks/` for in-flight items and
   `tasks/archive/` for finished ones.
