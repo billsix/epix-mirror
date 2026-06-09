@@ -8,5 +8,6 @@
 # Python front-end (python/) + notebooks: generated artifacts.
 __pycache__/
 *.egg-info/
+*.so
 /notebooks/*.ipynb
 .ipynb_checkpoints/

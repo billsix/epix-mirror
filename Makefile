@@ -84,6 +84,20 @@ examples-anim: ## Render .flx animations -> $(OUTPUT_DIR)/anim (FMT=mng|gif)
 		-e FMT=$(FMT) \
 		$(CONTAINER_NAME) /examples-anim.sh
 
+.PHONY: py-ext
+py-ext: ## Build the nanobind extension (python/epix/_epix*.so) against libepix
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/build_py.sh:/build_py.sh:Z \
+		$(CONTAINER_NAME) /build_py.sh
+
+.PHONY: asan
+asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (remove last phase)
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/asan_check.sh:/asan_check.sh:Z \
+		$(CONTAINER_NAME) /asan_check.sh
+
 .PHONY: jupyter
 jupyter: ## Launch JupyterLab (port 8888) with the epix package + notebooks
 	$(RUN) -it \

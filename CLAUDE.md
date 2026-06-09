@@ -73,15 +73,22 @@ figures (no epix run needed).
 ### Containerized build (`Makefile`)
 
 `Makefile` wraps the Meson build in a Fedora `podman` image (full
-toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick).
+toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick, plus
+the Python/Jupyter stack for the bindings work — see below).
 Targets (invoke with `make <t>`): `image`, `shell`, `build`,
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
-`examples-anim` (`.flx` → `./output/anim`), `clean`. Entrypoint scripts in
-`entrypoint/` are bind-mounted (edit without rebuild). Nested (podman-in-podman)
-usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The render scripts run each
-figure from a scratch copy with `epix -I.` so the host tree stays clean and
-sibling `#include`s resolve. See
+`examples-anim` (`.flx` → `./output/anim`), `clean`; and for the Python layer:
+`py-ext` (build the nanobind extension), `jupyter` (JupyterLab on :8888),
+`notebooks` (jupytext → `.ipynb`), `asan` (**dev-only** sanitizer smoke).
+Entrypoint scripts in `entrypoint/` are bind-mounted (edit without rebuild).
+Nested (podman-in-podman) usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The
+render scripts run each figure from a scratch copy with `epix -I.` so the host
+tree stays clean and sibling `#include`s resolve. See
 `tasks/archive/2026/06/09/container-build-tooling.md` for the design + gotchas.
+
+**Nested-podman caveat:** the inner image store is a small (~8 GB) tmpfs;
+repeated full `make image` rebuilds fill it and fail with "no space left on
+device". Run `podman image prune -f` between rebuilds.
 
 ### Generated files — do NOT hand-edit
 
@@ -95,12 +102,74 @@ sibling `#include`s resolve. See
 To add or remove a library source/header, edit the `epix_sources` / `epix_headers`
 lists in `meson.build` (now the authoritative manifest).
 
+## Python bindings + notebooks (`python/`, `notebooks/`) — in progress
+
+A second front-end is being built: **real nanobind bindings over `libepix`** plus
+a notebook layer, so you write a figure in Python the way the `.xp` samples are
+written in C++, rendered inline. Goal: port all ~81 `samples/` to percent-format
+notebooks, each **byte-identical** to the C++ original. The C++ samples stay as
+the permanent oracle — this is purely additive. **Authoritative status + full
+history: `tasks/python-bindings-and-notebooks.md`.** (Tech chosen: nanobind →
+architecture A, real bindings; C++20.)
+
+Layout:
+- `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
+  (`.xp`/`.eepic` → png via `elaps`+ghostscript; `Figure` with `_repr_png_`),
+  `figure.py` (the Pythonic scene API + `figure()`/`render()` context helpers +
+  `animate()`/`Animation`). `__init__.py` does `from ._epix import *` so the API
+  grows automatically. `pyproject.toml` alongside.
+- `notebooks/*.py` — jupytext percent-format notebooks (`make notebooks` → ipynb).
+
+How it works:
+- ePiX's global-state model maps to module-level functions; `figure()` is a
+  context manager wrapping `picture()`/`begin()`. Capture is via
+  **`print_eepic(file)`** (a clean named-file output — not stdout) → read back →
+  render with `elaps` (which also accepts an `.eepic`, not just `.xp`).
+- Extension build (`entrypoint/build_py.sh`, `make py-ext`): standalone g++ of
+  `_epix.cc` + nanobind's `nb_combined.cpp`, statically linking libepix. Needs
+  `python3-devel` + `nanobind` + nanobind's `ext/robin_map/include`.
+
+**Gotchas / hard-won lessons (read before extending the bindings):**
+- **Bind only symbols *defined* in libepix.** Some methods are declared in
+  headers but never compiled (e.g. `axis::dec()`); binding one makes the *whole
+  module* fail at import with an undefined-symbol error. Check first:
+  `nm -C /usr/local/lib64/epix/libepix.a | grep ' T '`.
+- **Function-pointer args need a trampoline.** `plot`/`surface`/`backplot_N`/etc.
+  take raw C function pointers (`P f(double)`, `P F(double,double)`, two- and
+  three-function forms). Bind via a module-global `nb::callable` + a C trampoline
+  that calls it (one call at a time — fine for figures). See the `tramp_*` /
+  `g_fn*` globals in `_epix.cc`.
+- **Animations must `fork()` per frame.** ePiX accumulates per-render global
+  state with *no public reset* — notably the color palette
+  (`picture_data::m_palette`). A naive in-process frame loop leaks state into
+  later frames. `animate()` forks per frame (build + `print_eepic` in the child,
+  parent renders), matching how `flix` runs a fresh process per frame. (`fork()`
+  inside a threaded Jupyter kernel is a runtime caveat to watch.)
+- **Verify every port against the oracle.** Render the Python scene's eepic and
+  `diff` it (strip the `%% Generated …` timestamp line) against the C++ original
+  — `epix samples/foo.xp` for a figure, or compile+run a `.flx` with
+  `(frame, total)` argv for each animation frame. Target is byte-identical.
+
+**A libepix bug fixed here (independent of the bindings, worth keeping):**
+`screen::screen()` left the pimpl pointer `m_screen` uninitialized — latent UB
+that only "worked" because the canvas lives in zero-initialized static storage.
+Fixed with a default member initializer `screen_data* m_screen = nullptr;` in
+`screen.h`. Found via AddressSanitizer; the binding's call pattern exposed it.
+
+**DEV-ONLY, remove when the bindings task completes** (see the task doc's cleanup
+checklist): `libasan` (Dockerfile), `entrypoint/asan_check.sh`,
+`build-aux/asan_smoke.cc`, the `asan` Makefile target. `make asan` builds an
+ASan libepix and runs the smoke test (which mirrors the bound surface) to catch
+latent libepix memory bugs as coverage grows — keep mirroring new bindings into
+`asan_smoke.cc` until removal.
+
 ## Code layout
 
 Conventional layout: **78 `.cc` in `src/`**, **87 public headers in
 `include/epix/`** (~30k LOC, all in `namespace ePiX`); wrapper-script templates
-in `scripts/`, man pages in `man/`, build helpers in `build-aux/`. Sources use
-quote-includes resolved via `include_directories('include/epix')`.
+in `scripts/`, man pages in `man/`, build helpers in `build-aux/`; the Python
+front-end in `python/` + `notebooks/` (see above). Sources use quote-includes
+resolved via `include_directories('include/epix')`.
 Rough functional grouping:
 
 - **Core math/value types:** `triples.{h,cc}` — `P`, the ordered-triple /

@@ -1,13 +1,10 @@
-"""Render ePiX figures to images for inline display in notebooks.
+"""Render ePiX output to images for inline notebook display.
 
-Phase 1: render an existing ``.xp`` source via the installed ePiX toolchain
-(``elaps``: epix -> eepic -> latex -> dvips -> eps), then ghostscript eps->png.
-Phase 2 (nanobind scene API) will produce eepic in-process and feed it to the
-same eps/png backend, so this module is where inline display lives regardless of
-how the figure was built.
-
-The heavy lifting (latex etc.) runs in the container image that already ships
-the TeX-Live + ghostscript toolchain; these helpers just shell out to it.
+`elaps` accepts either a `.xp` source or an existing `.eepic`, so the same
+backend serves both: Phase-1 `render_xp` (a source file) and Phase-2
+`render_eepic` (what the nanobind scene API emits via `print_eepic`). Pipeline:
+elaps -> eps -> ghostscript png. Runs in the container image that ships the
+TeX-Live + ghostscript toolchain.
 """
 from __future__ import annotations
 
@@ -40,16 +37,12 @@ def _eps_to_png(eps: str, png: str, dpi: int) -> None:
     )
 
 
-def render_xp(xp_path: str, dpi: int = 150) -> Figure:
-    """Render an ePiX ``.xp`` file to a :class:`Figure` (PNG).
-
-    Renders in a scratch dir so the source tree stays clean. ``elaps`` derives
-    its temp paths from the input, so we copy the file in and run it there.
-    """
-    xp_path = os.path.abspath(xp_path)
-    name = os.path.basename(xp_path)
+def _render_via_elaps(src_path: str, dpi: int) -> Figure:
+    """Render a `.xp` or `.eepic` file to a Figure, in a scratch dir."""
+    src_path = os.path.abspath(src_path)
+    name = os.path.basename(src_path)
     with tempfile.TemporaryDirectory() as d:
-        shutil.copy(xp_path, os.path.join(d, name))
+        shutil.copy(src_path, os.path.join(d, name))
         eps = os.path.join(d, "fig.eps")
         subprocess.run(["elaps", "-o", eps, name],
                        cwd=d, check=True, capture_output=True, text=True)
@@ -57,10 +50,26 @@ def render_xp(xp_path: str, dpi: int = 150) -> Figure:
         _eps_to_png(eps, png, dpi)
         with open(png, "rb") as f:
             data = f.read()
+        # for a .xp, elaps leaves the eepic intermediate; for eepic input use the source
         eepic_path = os.path.join(d, "fig.eepic")
-        eepic = open(eepic_path).read() if os.path.exists(eepic_path) else None
+        if os.path.exists(eepic_path):
+            eepic = open(eepic_path).read()
+        elif name.endswith(".eepic"):
+            eepic = open(os.path.join(d, name)).read()
+        else:
+            eepic = None
         return Figure(data, eepic)
 
 
-# convenience alias for notebook use: epix.show("foo.xp")
+def render_xp(xp_path: str, dpi: int = 150) -> Figure:
+    """Render an ePiX ``.xp`` source file to a :class:`Figure` (PNG)."""
+    return _render_via_elaps(xp_path, dpi)
+
+
+def render_eepic(eepic_path: str, dpi: int = 150) -> Figure:
+    """Render an existing ``.eepic`` file (e.g. from ``print_eepic``) to a Figure."""
+    return _render_via_elaps(eepic_path, dpi)
+
+
+# convenience alias for rendering an existing .xp: epix.show("foo.xp")
 show = render_xp

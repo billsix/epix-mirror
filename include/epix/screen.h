@@ -166,7 +166,13 @@ namespace ePiX {
     double v_avg()  const;
 
   private:
-    screen_data* m_screen;
+    // Default member initializer: the default ctor (`= default`) and the old
+    // empty `{}` ctor both leave this raw pointer indeterminate. A default
+    // screen (e.g. picture_data::the_canvas before picture() assigns it) then
+    // gets `delete`d in operator=, which is UB on garbage — it only "worked"
+    // when the object lived in zero-initialized static storage. nullptr makes
+    // `delete m_screen` a safe no-op deterministically.
+    screen_data* m_screen = nullptr;
 
   }; // end of class screen
 

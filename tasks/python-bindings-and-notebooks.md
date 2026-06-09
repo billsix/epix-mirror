@@ -1,6 +1,6 @@
 # Task: Feasibility — Python bindings + percent-format notebooks for ePiX
 
-**Status:** in progress — A + nanobind; Phases 0–1 DONE 2026-06-09 (Phase 2 = bindings next)
+**Status:** in progress — A + nanobind; Phases 0–1 done, Phase 2 first increment done (round-trip stable, eepic-identical) 2026-06-09
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
@@ -262,10 +262,135 @@ couplings that were open when this was written:
   jupyter scaffolding mirrored. The interactive UI is Bill-verified per the
   build-vs-runtime split.) Sibling-`#include` samples (`-I.`) + raw-eepic input
   (Phase 2 output) are small follow-ons in the render helper.
-- **Phase 2 — nanobind bindings** for the audited surface (core tier first) +
-  the `Figure`/`tix` shims.
+- **Phase 2 — nanobind bindings** — first increment ✅ DONE (2026-06-09):
+  `python/epix/_epix.cc` (nanobind module: `P`, `picture`, `begin`, `font_size`,
+  `label`, `print_eepic`); `python/epix/figure.py` (Pythonic scene API +
+  `render()` + a `figure()` context manager; captures via `print_eepic` and
+  renders through the Phase-1 helper, which now also takes `.eepic`). Built
+  standalone (`entrypoint/build_py.sh` + `make py-ext`: g++ compiles the binding
+  with nanobind's `nb_combined.cpp`, statically linking libepix); Dockerfile adds
+  `python3-devel` + nanobind. **Verified:** Python builds the `hello` scene →
+  eepic **byte-identical to the C++ baseline**, renders to PNG, **8/8 stable
+  runs**.
+  - **Latent libepix bug found + fixed (ASan):** `screen::screen()` left the
+    pimpl pointer `m_screen` **uninitialized**; `picture()` does
+    `the_canvas = screen(...)` → `delete m_screen` on garbage. It only "worked"
+    because the canvas lives in zero-initialized static storage (`m_screen` →
+    `nullptr`, `delete nullptr` safe); the binding context didn't grant that, so
+    it segfaulted nondeterministically. Repro'd deterministically in plain C++
+    under ASan; **pre-existing** (the old `screen::screen() {}` was equally
+    uninitialized). Fix: default member initializer `screen_data* m_screen =
+    nullptr;` in `screen.h`. Independent libepix bugfix, worth keeping.
+  - **Core tier bound ✅ (2026-06-09):** expanded `_epix.cc` to the core surface
+    — `P` arithmetic (`+ - * ^` cross / `dot` / `norm`), `Color` + the color
+    constructors (`RGB`/`Black`/`Red`/`Green`/`Blue`/`Yellow`/`Cyan`/`Magenta`),
+    `pen`/`fill`/`nofill`/`bold`/`plain`, `line`, `grid`, `h_axis`/`v_axis`,
+    `xmin`/`xmax`/`ymin`/`ymax`/`tix`, `Sin`/`Cos`, and **`plot`**. `plot` takes a
+    raw C function pointer, so it's bound via a **trampoline** (module-global
+    Python callable + a `P`/`double` probe to pick the parametric vs graph
+    overload) — accepts an ordinary Python lambda. `__init__.py` now does
+    `from ._epix import *`, so the scene API scales automatically. **Verified:** a
+    Python parabola (`plot(lambda t: P(t, t*t), …)` + axes + colors) renders to a
+    PNG and its eepic is **byte-identical to the equivalent C++**, 5/5 stable.
+    `notebooks/build.py` demos building figures in Python.
+  - **Mid-tier 2D batch bound ✅ (2026-06-09):** the scoped enums
+    `epix_mark_type` → `MarkType` and `epix_label_posn` → `LabelPos` (nanobind
+    `enum_`); markers (`marker`, `dot`, `box`, `arrow`); shapes (`circle`,
+    `rect`, `triangle`, `ellipse`, `dart`); the aligned `label(at, offset, text,
+    align)` overload; angle modes (`radians`/`degrees`/`revolutions`); 3-D
+    `viewpoint`; line styles (`solid`/`dashed`/`dotted`/`line_style`); clipping
+    (`clip_box`/`clip`/`set_crop`/`crop`). **Verified:** a Python scene using
+    circle/marker(enum)/arrow/rect/aligned-label renders, eepic **byte-identical
+    to C++**, 5/5 stable, **ASan-clean** (no new uninitialized-pimpl bugs).
+    **Pimpl-bug audit done:** of the raw-pointer pimpls, only `screen` had the
+    uninitialized-default-ctor bug; `Color`/`picture_data`/`path` all initialize
+    their pointers in the default ctor — no siblings to fix.
+  - **3-D parametric surface bound ✅ (2026-06-09):** `mesh` + `domain` value
+    classes and `surface(F(u,v) -> P, domain, cull=0)` via a **2-variable
+    trampoline** (same idea as `plot`). **Verified:** a Python saddle
+    `surface(lambda u, v: P(u, v, u*u - v*v), domain(...))` + `viewpoint`
+    renders the mesh, eepic **byte-identical to C++**, 5/5 stable, ASan-clean.
+  - **ASan tooling (DEV-ONLY — must be removed in the final cleanup phase):**
+    `libasan` added to the image, `build-aux/asan_smoke.cc` exercises the bound
+    libepix surface, `entrypoint/asan_check.sh` + **`make asan`** build an
+    AddressSanitizer libepix and run the smoke test in-container. This exists
+    only to catch latent libepix memory bugs (like the `screen` one) while the
+    bindings are written. **Final-phase cleanup checklist:** drop `libasan` from
+    the Dockerfile, delete `entrypoint/asan_check.sh` + `build-aux/asan_smoke.cc`,
+    remove the `asan` Makefile target. (Keep mirroring new bindings into
+    `asan_smoke.cc` until then.)
+  - **`axis` class + `bold/bbold/plain(Color)` bound ✅ (2026-06-09):** the
+    annotated `axis` class — ctor + `draw()` + chained `unmark`/`frac`/`trig`/
+    `sci`/`log`/`align`/`align_labels`/`subdivide`/`precision`/`tick_ratio`
+    (returning `axis&`, bound `rv_policy::reference`). **Caution learned:** bind
+    only methods that are *defined* in libepix — `axis::dec()` is declared but
+    has no definition, and an unresolved symbol breaks the whole module at import
+    (`nm -C libepix.a | grep ' T '` to check). Driven by the first real demo
+    port (below) — i.e. **bind-on-demand**, the intended workflow.
+  - **`legend` class + axis factories + Deriv/Integral bound ✅ (2026-06-09):**
+    `top_axis`/`bottom_axis`/`left_axis`/`right_axis` (return a chainable `axis`);
+    `axis::draw_labels`/`draw_ticks`; the `legend` class (`path_item`/`fill_item`/
+    `mark_item`/`border`/`item_border`/`backing`/`draw`, chained); and
+    `plot_deriv`/`plot_integral` (the `Deriv`/`Integral` function-wrappers via the
+    scalar trampoline — `plot_deriv(f, …)`, `plot_integral(f, x0, …)`). All
+    driven by the calculus port below.
+  - **3-D camera + sphere batch bound ✅ (2026-06-09):** the global `camera`
+    object + `Camera` class (`at`/`look_at`/`range`), `sphere()`,
+    `latitude`/`longitude`, and `backplot_N`/`frontplot_N` (hidden/visible
+    plotting — each takes **two** scalar functions, so a two-function trampoline).
+    Driven by the sphere port.
+  - **Remaining for Phase 2 (bind on demand during porting):** `surface` over
+    `domain_list` + the 3-arg `F(x,y,z)` form, more `Camera` controls, data
+    plotting (`data_file`/`data_bins`), the geometric-object *classes*
+    (Circle/Sphere/Plane/Segment + intersections), and the `tix()`-driven
+    **animation** flow for `.flx`. ASan-check each (`make asan`).
 - **Phase 3 — port the 81 demos** to notebooks, each verified against the locked
   render oracle (output frozen by the completed modernize work).
+  - **First faithful port ✅ (2026-06-09): `parabola.xp` → `notebooks/parabola.py`.**
+    The Python notebook's eepic is **byte-identical** to the original sample
+    (`epix samples/parabola.xp`), 3/3 stable. Natural Python form: C++
+    `double f(double)` → a plain Python function; `using enum` → `epix.LabelPos.b`;
+    axis-method chaining preserved (`Ay.unmark(0).draw()`). Proves the whole
+    pipeline (bindings → build-in-Python → render → oracle-match) end to end. The
+    bind-on-demand loop (port → hit a missing symbol → bind it → verify) works.
+  - **Second port ✅ (2026-06-09): `calculus.xp` → `notebooks/calculus.py`** —
+    **byte-identical**, 3/3 stable. A meatier demo: boxed `legend`, trig-labelled
+    axis factories, and numerical `Deriv`/`Integral` plots. Confirms the workflow
+    scales past the trivial case.
+  - **Third port ✅ (2026-06-09): `sphere.xp` → `notebooks/sphere.py`** —
+    **byte-identical**, 3/3 stable, 778 eepic lines. A full 3-D demo: loxodromes
+    with hidden/visible plotting, lat/long grid, perspective `camera`. Unlocks the
+    3-D demo class. (Gotcha to remember in ports: `epix.Cos`/`Sin` honour
+    `degrees()` mode — use them, not `math.cos`.)
+  - **Fourth port ✅ — the animation mechanism (2026-06-09): `cube.flx` →
+    `notebooks/cube.py`.** First `.flx`: a rotating wireframe cube + angle
+    "clock". `epix.animate(build, count=N)` renders N frames (each with `tix()`
+    set to `i/N`) and assembles a looping gif (`_repr_html_` shows it inline).
+    All **4 test frames byte-identical** to the C++ original.
+    - **Key finding — in-process state accumulation:** ePiX accumulates
+      per-render global state with **no public reset** — notably the color
+      palette (`picture_data::m_palette`, a private `std::set<Color>`), so a naive
+      in-process frame loop leaks state (frame N's eepic carries earlier frames'
+      colors/paths). This is *why* `flix` runs a fresh process per frame.
+      `animate()` does the same: it **`fork()`s per frame**, building the scene +
+      `print_eepic` in the child (fresh copy of the parent's clean state), then
+      the parent renders each eepic→png. Result: byte-identical frames. *(Caveat:
+      `fork()` inside a threaded Jupyter kernel is a runtime detail Bill should
+      sanity-check; the mechanism itself is proven.)*
+    - Bindings added on demand: coordinate ctors (`xyz`/`polar`/`sph`/`cyl`),
+      `label_angle`, `red(d)`, 2-arg `ellipse`, `plot(f(x,y,z), domain)` (3-var
+      trampoline), `set_tix`.
+  - **Fifth port ✅ (2026-06-09): `conic.xp` → `notebooks/conic.py`** —
+    **byte-identical** (314 lines), 3/3 stable. Projective parabola/circle: the
+    tangent-line `envelope`, the line at infinity, a pulled-back camera. Bindings
+    added on demand: `border()`, `pen(Color, width-string)`, region
+    `grid(P, P, n1, n2)`, `envelope` (P-valued trampoline), `Line`, `masklabel`.
+  - **Ports so far (5/81):** `parabola`, `calculus`, `sphere`, `cube` (animation),
+    `conic`. All four demo *classes* (2-D graph, legend/calculus, 3-D, animation)
+    proven byte-identical. **Remaining 76 are mechanical** — port → bind the long
+    tail on demand → verify against the frozen oracle. A sustained grind, not new
+    risk. (Decide how many to do now vs. leave as the documented repeatable
+    process.)
 
 ## Out of scope (this task)
 
