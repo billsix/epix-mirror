@@ -70,6 +70,28 @@ You need a C++ compiler (`g++`) to build the library and to compile figures at
 runtime; the conversion scripts additionally expect `bash`, `latex`, and
 `ps2epsi` (or `ps2eps`).
 
+### Containerized build (`Makefile.docker`)
+
+To avoid installing the (large) toolchain on your host, a self-contained
+container build is provided via [`Makefile.docker`](Makefile.docker) — a thin
+wrapper around `podman` that builds a Fedora image with the full toolchain
+(g++, TeX-Live, ghostscript, ImageMagick) baked in. Invoke targets with `-f`:
+
+```sh
+make -f Makefile.docker image                 # build the OCI image
+make -f Makefile.docker shell                  # interactive dev shell
+make -f Makefile.docker build                  # build libepix.a + driver scripts
+make -f Makefile.docker examples               # render samples/+doc/ -> ./output (.eepic)
+make -f Makefile.docker examples RENDER=pdf    # ... also render PDFs
+make -f Makefile.docker examples-anim          # render .flx animations -> ./output/anim
+```
+
+Rendered figures land in `./output/` on the host (bind-mounted into the
+container). The build scripts live in [`entrypoint/`](entrypoint/). This is an
+interim convenience; the underlying build remains GNU autotools (a migration to
+**meson** is planned). When running nested inside another container, append
+`PODMAN_RUN_FLAGS=--cgroups=disabled`.
+
 ## Documentation
 
 The full manual lives in [`doc/`](doc/) as LaTeX source (`manual.tex`) and GNU

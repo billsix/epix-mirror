@@ -1,8 +1,47 @@
 # Task: Containerized build tooling for ePiX (Makefile + Dockerfile + entrypoints)
 
-**Status:** ready to implement — decisions resolved 2026-06-09, awaiting "go"
+**Status:** complete — implemented + tested nested 2026-06-09 (ready to archive)
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
+
+## Implementation notes & bugs found while testing (2026-06-09)
+
+Built and exercised entirely nested (podman-in-podman, `--cgroups=disabled`).
+Files created: `Dockerfile`, `.dockerignore`, `.gitignore`, `Makefile.docker`,
+`entrypoint/{entrypoint,shell,build,examples,examples-anim}.sh`; `README.md`
+gained a "Containerized build" section. Five real bugs surfaced and were fixed:
+
+1. **`install-data-local` / README mismatch.** `make install-am` runs the
+   notefiles hook, which the committed `Makefile.in` still names `README` (the
+   mirror renamed it to README.md without regenerating Makefile.in), and the
+   notefiles weren't in the build context. Fixed by installing only the specific
+   component targets we need — `install-binSCRIPTS install-pkgdataDATA
+   install-pkglibLIBRARIES install-includeHEADERS install-pkgincludeHEADERS` —
+   instead of `install-am`.
+2. **Missing `epix-lib.sh`.** First cut skipped `install-pkgdataDATA`, so the
+   installed `epix` couldn't source its function library and silently no-op'd
+   (exit 0, no output). Added `install-pkgdataDATA`. Also hardened the render
+   scripts to verify a **non-empty output file** rather than trusting exit code.
+3. **Absolute-path temp bug.** `epix`/`flix` derive their temp compile path from
+   the input path; an absolute input makes them build `epix-PID//epix/...exe`
+   (nonexistent nested dirs). Fixed by rendering from a **scratch copy** of each
+   source dir with a **bare relative name** (also keeps epix's temp files and
+   latex transcripts out of the bind-mounted host tree, and lets sibling
+   `#include`s resolve).
+4. **PSTricks dvips headers.** `texlive-pstricks` lacks the runtime `.pro`
+   prologues (`pst-tools.pro`) dvips needs; PSTricks samples rendered 0-byte
+   PDFs. Switched to `texlive-collection-pstricks`.
+5. **Sibling-include samples.** `lighting.flx` (and friends) `#include` a sibling
+   header; added `-I.` to the epix/elaps/flix invocations (the files document
+   this requirement themselves).
+
+**Test results (nested):** image builds (1.48 GB). `build` rebuilds the lib +
+scripts. `examples` (eepic): **96/97**; `examples RENDER=pdf`: **96/97**, valid
+1-page PDFs incl. PSTricks; `examples-anim`: **11/11** `.mng`. The lone
+`examples` failure is `samples/std_F.xp` — genuinely non-standalone (needs a
+pre-built external library, per samples/README), correctly reported, not a
+tooling gap. Host source tree stays clean across runs; artifacts land in
+`./output/{samples,doc,anim}/`.
 
 ## Goal
 

@@ -67,6 +67,20 @@ make install       # installs lib, headers to $(prefix)/include/epix, scripts, d
 also produces `epix-local`, `elaps-local`, etc. — variants wired to the build
 directory, used to render the figures in `doc/`.
 
+### Containerized build (`Makefile.docker`)
+
+`Makefile.docker` wraps the autotools build in a Fedora `podman` image (full
+toolchain baked in: g++, TeX-Live, ghostscript, ImageMagick). Targets (invoke
+with `make -f Makefile.docker <t>`): `image`, `shell`, `build`, `examples`
+(samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs), `examples-anim`
+(`.flx` → `./output/anim`), `clean`. Entrypoint scripts in `entrypoint/` are
+bind-mounted (edit without rebuild). Named `.docker` to avoid colliding with the
+autotools-generated `Makefile`; **interim until the planned meson port**. Nested
+(podman-in-podman) usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The render
+scripts run each figure from a scratch copy with `epix -I.` so the host tree
+stays clean and sibling `#include`s resolve. See
+`tasks/container-build-tooling.md` for the design + gotchas.
+
 ### Generated / vendored files — do NOT hand-edit
 
 Treat these as build artifacts; changes belong upstream or in the `.in`/`.am`
