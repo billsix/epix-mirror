@@ -84,6 +84,21 @@ examples-anim: ## Render .flx animations -> $(OUTPUT_DIR)/anim (FMT=mng|gif)
 		-e FMT=$(FMT) \
 		$(CONTAINER_NAME) /examples-anim.sh
 
+.PHONY: jupyter
+jupyter: ## Launch JupyterLab (port 8888) with the epix package + notebooks
+	$(RUN) -it \
+		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
+		-v $(CURDIR)/entrypoint/jupyter.sh:/usr/local/bin/jupyter.sh:Z \
+		-p 8888:8888 \
+		$(CONTAINER_NAME) /usr/local/bin/jupyter.sh
+
+.PHONY: notebooks
+notebooks: ## Convert notebooks/*.py (jupytext percent) to .ipynb
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/percentToIpynb.sh:/usr/local/bin/percentToIpynb.sh:Z \
+		$(CONTAINER_NAME) /usr/local/bin/percentToIpynb.sh
+
 .PHONY: clean
 clean: ## Remove the host $(OUTPUT_DIR) folder
 	rm -rf $(OUTPUT_DIR)

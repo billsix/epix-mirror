@@ -4,3 +4,9 @@
 # Meson build directory (`make build`, or `meson setup build`).
 # Meson is out-of-source, so the build never litters the source tree.
 /build/
+
+# Python front-end (python/) + notebooks: generated artifacts.
+__pycache__/
+*.egg-info/
+/notebooks/*.ipynb
+.ipynb_checkpoints/

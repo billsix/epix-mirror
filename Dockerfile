@@ -19,6 +19,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
     dnf install -y \
         meson ninja-build gcc-c++ binutils \
         findutils sed which diffutils bash \
+        python3 python3-pip \
         ghostscript ImageMagick \
         texlive-collection-basic \
         texlive-collection-latexrecommended \
@@ -29,6 +30,12 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
         texlive-dvips \
         texlive-collection-pstricks \
         texlive-pgf
+
+# Python notebook stack (Phase 1: inline display + jupytext percent notebooks).
+# The epix Python package itself is bind-mounted at runtime (PYTHONPATH), so only
+# the environment is baked here.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --break-system-packages jupyterlab jupytext ipython ipykernel
 
 # Whole source tree (trimmed by .dockerignore).  At runtime `make shell`/`build`
 # bind-mount the live host tree over /epix, so this copy only feeds the in-image

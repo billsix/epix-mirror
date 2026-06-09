@@ -1,0 +1,24 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "epix"
+version = "1.2.22"
+description = "Python front-end for ePiX — build/figures for LaTeX, with inline notebook display"
+requires-python = ">=3.9"
+license = { text = "GPL-2.0-or-later" }
+# Phase 1 has no runtime deps: render shells out to the installed `elaps`/`gs`
+# toolchain (baked into the container image). Phase 2 adds the nanobind
+# extension module (built via meson-python) so figures are built in-process.
+dependencies = []
+
+[project.optional-dependencies]
+# percent-format notebooks (jupytext) + inline display
+notebooks = ["jupytext", "ipython"]
+# the interactive JupyterLab environment to run them
+jupyter = ["jupyterlab", "jupytext", "ipython"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["epix*"]

@@ -1,6 +1,6 @@
 # Task: Feasibility — Python bindings + percent-format notebooks for ePiX
 
-**Status:** in progress — A + nanobind; **Phase 0 (demo API audit) DONE 2026-06-09**
+**Status:** in progress — A + nanobind; Phases 0–1 DONE 2026-06-09 (Phase 2 = bindings next)
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
@@ -250,9 +250,18 @@ couplings that were open when this was written:
 **Forward plan (modernize done; A + nanobind chosen).** Phases, single scheme:
 - **Phase 0 — demo API audit** ✅ DONE (2026-06-09): the `libepix` surface the 81
   demos use → the concrete nanobind bind-list (see "Phase 0" section above).
-- **Phase 1 — notebook + render-helper MVP**: a `Figure` object with
-  `_repr_png_`/`_repr_svg_` rendering via the existing `elaps` pipeline; jupytext
-  percent flow; reuse the `Makefile` container `jupyter` scaffolding.
+- **Phase 1 — notebook + render-helper MVP** ✅ DONE (2026-06-09). `python/epix/`
+  package (`Figure` with `_repr_png_`; `render_xp`/`show` shell to the installed
+  `elaps` → eps → ghostscript png, in a scratch dir). `python/pyproject.toml`
+  (extras: `notebooks`, `jupyter`). `notebooks/hello.py` (jupytext percent).
+  `entrypoint/jupyter.sh` + `percentToIpynb.sh`; Dockerfile bakes
+  jupyterlab/jupytext/ipython; `make jupyter` (port 8888) + `make notebooks`.
+  **Verified:** `epix.show("samples/hello.xp")` → valid 318×152 PNG;
+  `make notebooks` converts to `.ipynb`; JupyterLab launches at :8888.
+  (Decisions taken: inline = **PNG** for now, SVG an easy follow-on; container
+  jupyter scaffolding mirrored. The interactive UI is Bill-verified per the
+  build-vs-runtime split.) Sibling-`#include` samples (`-I.`) + raw-eepic input
+  (Phase 2 output) are small follow-ons in the render helper.
 - **Phase 2 — nanobind bindings** for the audited surface (core tier first) +
   the `Figure`/`tix` shims.
 - **Phase 3 — port the 81 demos** to notebooks, each verified against the locked
