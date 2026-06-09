@@ -1,8 +1,32 @@
 # Task: Reorganize the flat repo into a conventional source layout
 
-**Status:** proposed — investigation done 2026-06-09, awaiting go-ahead
+**Status:** complete — implemented + validated 2026-06-09 (ready to archive)
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
+
+## Done (2026-06-09)
+
+Layout now: **`src/`** (78 `.cc`), **`include/epix/`** (87 headers), **`scripts/`**
+(epix/elaps/flix/laps `.in` + epix.el.in + epix-lib.sh + bash_completions),
+**`man/`** (epix.1.in + the 3 `.so` stubs), **`build-aux/`** (gen_header.sh,
+build_manual.sh, make_header). Per the decisions: **deleted** `fmt_template.cc`,
+`fmt_template.h`, `debug.h` (dead) and `files` + `INSTALL` (obsolete);
+kept `TODO`. All via `git mv`/`git rm` (history preserved).
+
+Build updates (single root `meson.build`): `_epix_cc`/`_epix_h` name lists
+prefixed to `src/`…/`include/epix/`… via a `foreach`; added
+`include_directories('include/epix')` to the library (sources use quote-includes);
+`configure_file` inputs point at `scripts/`/`man/`; `install_data` at
+`scripts/`; dropped `INSTALL` from the notefiles; `gen_header.sh` now `cd`s into
+`include/epix` and runs `build-aux/make_header`. Docs (`README.md`, `CLAUDE.md`)
+updated.
+
+**Validation:** local `meson setup/compile/install` to staging — compile clean
+(src↔include split resolves), `epix.h` regenerates (3946 lines), **identical
+install layout** (4 scripts `#!/usr/bin/bash`, `lib64/epix/libepix.a`, 87
+headers, epix-lib.sh, 70 samples, epix.info, **9 notes** (INSTALL gone), 4 man,
+**0 unsubstituted tokens**). Container: `make -f Makefile.docker image` rebuilds
+from the new tree and `examples` renders **96/97** — identical oracle.
 
 ## Goal
 

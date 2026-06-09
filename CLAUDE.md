@@ -97,7 +97,10 @@ lists in `meson.build` (now the authoritative manifest).
 
 ## Code layout
 
-~79 `.cc` + ~89 `.h` at the repo root (~30k LOC), all in `namespace ePiX`.
+Conventional layout: **78 `.cc` in `src/`**, **87 public headers in
+`include/epix/`** (~30k LOC, all in `namespace ePiX`); wrapper-script templates
+in `scripts/`, man pages in `man/`, build helpers in `build-aux/`. Sources use
+quote-includes resolved via `include_directories('include/epix')`.
 Rough functional grouping:
 
 - **Core math/value types:** `triples.{h,cc}` — `P`, the ordered-triple /
