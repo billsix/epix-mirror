@@ -1,6 +1,7 @@
 # Task: Study ePiX and write orientation docs
 
-Status: **complete** (2026-06-09) — ready to archive
+**Status:** complete
+**Completed:** 2026-06-09
 Owner: Bill (via Claude)
 
 ## Goal
