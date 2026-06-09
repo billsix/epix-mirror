@@ -1,9 +1,55 @@
 # Task: Feasibility — Python bindings + percent-format notebooks for ePiX
 
-**Status:** approved — approach **A (real bindings) + nanobind** chosen 2026-06-09;
-ready to start with Stage 0 (demo API audit)
+**Status:** in progress — A + nanobind; **Stage 0 (demo API audit) DONE 2026-06-09**
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
+
+## Stage 0 — demo API audit (DONE 2026-06-09): the nanobind bind-list
+
+**Method (accurate, not grep):** compiled each demo to an object file
+(`g++ -std=c++20 -I/usr/local/include -x c++ -c`) and read its **undefined
+`ePiX::` symbols** (`nm -uC`) — i.e. exactly what each demo *links* from
+`libepix`. Aggregated across **105 of 108** demos (the 3 misses —
+`lighting.flx`, `riemann.flx`, `stereo_proj.flx` — need `-I.`/`-D` and use the
+same API).
+
+**Result: 331 unique `ePiX` symbols = ~156 free functions + ~242 method symbols
+across ~22 classes.** That is the bind-list.
+
+**Classes to wrap (unique method *names*; sizes each wrapper):**
+`screen` 16 · `legend` 11 · `path` 10 · `affine` 9 · `scenery` 8 · `domain` 8 ·
+`axis` 8 · `Camera` 7 · `P` 6 · `data_file` 5 · `data_bins` 5 · `mesh` 3 ·
+`Segment` 3 · `Plane` 3 · `Deriv` 3 · `frame` 2 · `Sphere` 2 · `Integral` 2 ·
+`Color` 2 · `Circle` 2 · `Complex`/`pair`/`domain_list` 1.
+(By call-volume the hot ones are `P`, `Color`, `domain`, `Camera`, `screen`,
+`legend`, `mesh`, `axis`, `path`, `scenery`. `std_F` appears but is a *sample's
+own* helper, not ePiX — exclude.)
+
+**Top free functions (by # demos):** `picture` / `begin` / `end_picture`
+(all 105) · `bold` 57 · `plot` 54 · `label` 46 · `Black` 44 · `fill` 41 ·
+`pen` 36 · `plain` 35 · `Sin`/`Red` 32 · `pst_format` 31 · `line` 29 ·
+`xmax`/`Blue` 26 · `grid` 25 · `xmin`/`revolutions`/`Cos` 24 · then the color
+constructors (`RGB`/`Green`/`White`/`Yellow`/`rgb`/…), axes (`h_axis`/`v_axis`),
+`surface`, `arrow`, `font_size`, `clip_box`, `inset`, `activate`/`deactivate`, …
+
+**Priority tiers (of the 331 symbols, = MVP→long-tail):**
+- **Core — 34 symbols used by ≥20 demos.** Binding these (P, Color + the basic
+  color fns, picture/begin/end, plot, label, line, pen/fill/bold/plain, Sin/Cos,
+  xmin/xmax/…, grid, axes) already renders a large fraction of demos.
+- **Mid — 77 symbols (5–19 demos).** surfaces/mesh, legend, clipping, domains.
+- **Tail — 108 (2–4 demos) + 112 (1 demo only).** bind on demand as those
+  specific demos are ported.
+
+**Caveats:** `nm -u` captures the *non-inline* (libepix-compiled) surface; a few
+header-only/inline helpers and operator overloads won't appear and must be
+added when a demo needs them. The 3 uncompiled `.flx` add nothing new in
+principle. Raw data was in `/tmp/audit/allsyms.txt` (regenerate with the method
+above).
+
+**Implication for nanobind:** ~22 classes + ~156 free functions is a **bounded,
+known** surface — bindable, not open-ended. Build **core-tier first** (renders
+most demos), then widen by tier as demos are ported. Next: the notebook +
+`_repr_png_` render-helper MVP (Forward plan step 2).
 
 ## Question to answer
 
@@ -202,7 +248,7 @@ couplings that were open when this was written:
   bindings' includes/packaging cleaner — structure-first is mildly favorable.
 
 **Forward plan (modernize done; A + nanobind chosen):**
-1. **Stage 0 — demo API audit** (read-only): the `libepix` surface the 81 demos
+1. **Stage 0 — demo API audit** ✅ DONE (2026-06-09): the `libepix` surface the 81 demos
    collectively use → the concrete nanobind bind-list.
 2. **Notebook + render-helper MVP**: `_repr_png_`/`_repr_svg_` via the existing
    `elaps` pipeline; jupytext percent flow; reuse the `Makefile` container.
