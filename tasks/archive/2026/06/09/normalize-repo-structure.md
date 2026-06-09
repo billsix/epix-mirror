@@ -1,6 +1,7 @@
 # Task: Reorganize the flat repo into a conventional source layout
 
-**Status:** complete — implemented + validated 2026-06-09 (ready to archive)
+**Status:** complete
+**Completed:** 2026-06-09
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
