@@ -1,6 +1,7 @@
 # Task: Port ePiX's build from GNU autotools to Meson
 
-**Status:** COMPLETE — all 3 phases done + validated 2026-06-09 (ready to archive)
+**Status:** complete
+**Completed:** 2026-06-09
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
