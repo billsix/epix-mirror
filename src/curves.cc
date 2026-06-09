@@ -292,7 +292,7 @@ namespace ePiX {
   {
     // EPIX_NUM_PTS pts = one full turn; scale accordingly
     double frac(fabs(t_max-t_min)/full_turn());
-    unsigned int num_pts((unsigned int) max(2, ceil(frac*EPIX_NUM_PTS)));
+    auto num_pts((unsigned int) max(2, ceil(frac*EPIX_NUM_PTS)));
 
     const double dt((t_max - t_min)/num_pts);
 

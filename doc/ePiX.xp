@@ -39,8 +39,8 @@ void diagram(const std::string& prog)
 
   arrow(P(0,1), P(1,1));
 
-  dot(P(0,1), P(0,4), "\\texttt{xp}, \\texttt{flx}", t);
-  dot(P(1,1), P(2,4), "\\texttt{eepic}", t);
+  dot(P(0,1), P(0,4), "\\texttt{xp}, \\texttt{flx}", epix_label_posn::t);
+  dot(P(1,1), P(2,4), "\\texttt{eepic}", epix_label_posn::t);
   restore(prog);
 
   if (prog != "epix")
@@ -50,8 +50,8 @@ void diagram(const std::string& prog)
   arrow(P(1.5,0.5), P(2,0.5));
   arrow(P(2,0.5), P(3,0.5));
 
-  dot(P(2,0.5), P(0,4), "\\texttt{dvi}", t);
-  dot(P(3,0.5), P(-2,2), "\\texttt{ps}", tl);
+  dot(P(2,0.5), P(0,4), "\\texttt{dvi}", epix_label_posn::t);
+  dot(P(3,0.5), P(-2,2), "\\texttt{ps}", epix_label_posn::tl);
   restore(prog);
 
   if(prog == "laps")
@@ -59,14 +59,14 @@ void diagram(const std::string& prog)
 
   spline(P(1,0), P(1.2,0), P(1.3,0.5), P(1.5,0.5));
 
-  dot(P(1,0), P(2,-4), "\\texttt{tex}", b);
+  dot(P(1,0), P(2,-4), "\\texttt{tex}", epix_label_posn::b);
 
   if (prog == "elaps") // and laps
     emph(prog);
 
   arrow(P(3,0.5), P(3.5,0), P(4,0));
 
-  dot(P(4,0), P(4,0), "\\texttt{pdf}", r);
+  dot(P(4,0), P(4,0), "\\texttt{pdf}", epix_label_posn::r);
   restore(prog);
 
   if (prog == "elaps" || prog == "flix")
@@ -74,7 +74,7 @@ void diagram(const std::string& prog)
 
   arrow(P(3,0.5), P(3.5,1), P(4,1));
 
-  dot(P(4,1), P(-2,4), "\\texttt{eps}", t);
+  dot(P(4,1), P(-2,4), "\\texttt{eps}", epix_label_posn::t);
   restore(prog);
 
   if(prog == "flix")
@@ -83,7 +83,7 @@ void diagram(const std::string& prog)
   arrow(P(4,1), P(5,1));
 
   dot(P(5,1), P(4,0),
-      "\\begin{minipage}{0.225in}\\texttt{png mng gif}\\end{minipage}", r);
+      "\\begin{minipage}{0.225in}\\texttt{png mng gif}\\end{minipage}", epix_label_posn::r);
   restore(prog);
 
   if (prog != "all")

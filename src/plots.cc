@@ -52,8 +52,11 @@
 #include "plots.h"
 
 namespace ePiX {
+  using enum epix_field_type;
+  using enum epix_integral_type;
+  using enum epix_mark_type;
 
-  typedef std::list<domain>::const_iterator dolci;
+  using dolci = std::list<domain>::const_iterator;
 
   // f:R -> R^3
   void plot(P f(double), double t_min, double t_max, unsigned int num_pts)
@@ -134,8 +137,8 @@ namespace ePiX {
   {
     surface_map phi(f);
 
-    for (dolci p=R.m_list.begin(); p != R.m_list.end(); ++p)
-      plot_map_dom(phi, *p);
+    for (const auto & p : R.m_list)
+      plot_map_dom(phi, p);
   }
 
 
@@ -149,8 +152,8 @@ namespace ePiX {
   {
     space_map phi(f);
 
-    for (dolci p=R.m_list.begin(); p != R.m_list.end(); ++p)
-      plot_map_dom(phi, *p);
+    for (const auto & p : R.m_list)
+      plot_map_dom(phi, p);
   }
 
 

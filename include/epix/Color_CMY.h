@@ -44,21 +44,21 @@ namespace ePiX {
     explicit CMY_Color(double c=1, double m=1, double y=1);
     CMY_Color(const RGB_Densities&);
 
-    CMY_Color* clone() const;
+    CMY_Color* clone() const override;
 
-    CMY_Color& filter(const Color_Base&);
+    CMY_Color& filter(const Color_Base&) override;
 
-    CMY_Color& operator*= (double c);
+    CMY_Color& operator*= (double c) override;
 
-    CMY_Color& blend(const Color_Base&, double);
-    CMY_Color& superpose(const Color_Base&);
-    CMY_Color& invert();
+    CMY_Color& blend(const Color_Base&, double) override;
+    CMY_Color& superpose(const Color_Base&) override;
+    CMY_Color& invert() override;
 
-    std::string model() const;
-    std::string name() const;
-    std::vector<double> densities() const;
+    std::string model() const override;
+    std::string name() const override;
+    std::vector<double> densities() const override;
 
-    RGB_Densities to_rgb() const;
+    RGB_Densities to_rgb() const override;
 
     // These need to call our private constructor
     friend Color Cyan(double);

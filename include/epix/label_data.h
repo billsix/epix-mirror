@@ -60,17 +60,17 @@ namespace ePiX {
   class label_data {
   public:
     label_data(const P& here, const P& offset,
-	       const std::string& text, epix_mark_type mark=TEXT);
+	       const std::string& text, epix_mark_type mark=epix_mark_type::TEXT);
 
     // generate label text from user-specified function of 2 or 3 variables
     label_data(const P& here, const P& offset,
-	       std::string f(double,double), epix_mark_type mark=TEXT);
+	       std::string f(double,double), epix_mark_type mark=epix_mark_type::TEXT);
 
     label_data(const P& here, const P& offset,
-	       std::string f(double,double,double), epix_mark_type mark=TEXT);
+	       std::string f(double,double,double), epix_mark_type mark=epix_mark_type::TEXT);
 
     // marker; alignment affects only TICK marks
-    label_data(const P& here, epix_mark_type mark, epix_label_posn align=c);
+    label_data(const P& here, epix_mark_type mark, epix_label_posn align=epix_label_posn::c);
 
     // pass through to m_style
     label_data& text_color(const Color&);

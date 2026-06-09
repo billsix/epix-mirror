@@ -58,15 +58,15 @@ namespace ePiX {
     pen_fill(const Color&, const pen_data&, double theta,
 	     const std::list<edge2d>&);
 
-    pen_fill* clone() const;
+    pen_fill* clone() const override;
 
-    pen_fill& map_by(const affine&);
-    pen_fill& crop_to(const screen_mask&);
+    pen_fill& map_by(const affine&) override;
+    pen_fill& crop_to(const screen_mask&) override;
 
-    bool is_empty() const;
+    bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const;
-    void add_to_palette() const;
+    std::string print_to(const format&, const std::string&) const override;
+    void add_to_palette() const override;
 
   private:
     Color    m_tint;

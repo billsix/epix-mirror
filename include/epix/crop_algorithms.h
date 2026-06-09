@@ -76,7 +76,7 @@ namespace ePiX {
   template <typename PT>
     std::list<edge_data<PT> >& cull(std::list<edge_data<PT> >& edges)
     {
-      typename std::list<edge_data<PT> >::iterator ep(edges.begin());
+      auto ep(edges.begin());
 
       while (ep != edges.end())
 	{
@@ -96,7 +96,7 @@ namespace ePiX {
       if (edges.begin() == edges.end())
 	return edges;
 
-      typename std::list<edge_data<PT> >::iterator ep(edges.begin());
+      auto ep(edges.begin());
       bool in_path(false); // currently in a visible sublist?
 
       // After first pass, ep points to first visible edge
@@ -120,7 +120,7 @@ namespace ePiX {
 	  in_path=true;
 	  if (ep != edges.begin()) // join our tail to previous head
 	    {
-	      typename std::list<edge_data<PT> >::iterator prev(ep);
+	      auto prev(ep);
 	      --prev;
 	      ep = edges.insert(ep, edge_data<PT>((*prev).head(),
 						  (*ep).tail(),
@@ -158,7 +158,7 @@ namespace ePiX {
     std::list<edge_data<PT> >& chop_path(const PT& perp, const PT& base,
 					 std::list<edge_data<PT> >& edges)
     {
-      typename std::list<edge_data<PT> >::iterator ep(edges.begin());
+      auto ep(edges.begin());
 
       while(ep != edges.end())
 	{

@@ -38,6 +38,6 @@ int main()
   plot(Integral(f, 0), xmin(), xmax(), 90); // definite integral from 0
   L.path_item("$y=\\int_0^x t\\sin t\\,dt$");
 
-  L.draw(P(0,2*M_PI), P(2,-2), br);
+  L.draw(P(0,2*M_PI), P(2,-2), epix_label_posn::br);
   end();
 }

@@ -154,7 +154,7 @@ namespace ePiX {
 
   path_state& the_path_style()
   {
-    static path_state* the_path_state(new path_state());
+    static auto* the_path_state(new path_state());
     return *the_path_state;
   }
 } // end of namespace

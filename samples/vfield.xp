@@ -17,7 +17,7 @@ int main()
   begin();
   border();
 
-  label(P(0, ymax()), P(0,-4), "$F(x,y,z)=-(x+2y, y-2x, 1+z)$",b);
+  label(P(0, ymax()), P(0,-4), "$F(x,y,z)=-(x+2y, y-2x, 1+z)$",epix_label_posn::b);
 
   camera.at(P(11,8,5));
 
@@ -54,18 +54,18 @@ int main()
   degrees();
 
   label_angle(30); // adjusted visually; could calculate from camera position
-  label(P(1+DX, -1, -1), P(-4,-2), "$y=-1$", bl);
-  label(P(1+DX,  0, -1), P(-4,-2), "$y=0$", bl);
-  label(P(1+DX,  1, -1), P(-4,-2), "$y=1$", bl);
+  label(P(1+DX, -1, -1), P(-4,-2), "$y=-1$", epix_label_posn::bl);
+  label(P(1+DX,  0, -1), P(-4,-2), "$y=0$", epix_label_posn::bl);
+  label(P(1+DX,  1, -1), P(-4,-2), "$y=1$", epix_label_posn::bl);
 
   label_angle(-15);
-  label(P(-1, 1+DX, -1), P(4,0), "$x=-1$", br);
-  label(P( 0, 1+DX, -1), P(4,0), "$x=0$", br);
-  label(P( 1, 1+DX, -1), P(4,0), "$x=1$", br);
+  label(P(-1, 1+DX, -1), P(4,0), "$x=-1$", epix_label_posn::br);
+  label(P( 0, 1+DX, -1), P(4,0), "$x=0$", epix_label_posn::br);
+  label(P( 1, 1+DX, -1), P(4,0), "$x=1$", epix_label_posn::br);
 
-  label(P( 1, -1-DX, -1), P(-4,0), "$z=-1$", tl);
-  label(P( 1, -1-DX,  0), P(-4,0), "$z=0$", tl);
-  label(P( 1, -1-DX,  1), P(-4,0), "$z=1$", tl);
+  label(P( 1, -1-DX, -1), P(-4,0), "$z=-1$", epix_label_posn::tl);
+  label(P( 1, -1-DX,  0), P(-4,0), "$z=0$", epix_label_posn::tl);
+  label(P( 1, -1-DX,  1), P(-4,0), "$z=1$", epix_label_posn::tl);
 
   end();
 }

@@ -1,6 +1,7 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;
 
 const P pt1(2,-1);
 const P pt2(1,2);

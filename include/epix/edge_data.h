@@ -75,8 +75,8 @@ namespace ePiX {
     bool m_seen;
   };
 
-  typedef edge_data<P>    edge3d;
-  typedef edge_data<pair> edge2d;
+  using edge3d = edge_data<P>;
+  using edge2d = edge_data<pair>;
 } // end of namespace
 
 #endif /* EPIX_EDGE_DATA */

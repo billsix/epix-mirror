@@ -1,6 +1,7 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;
 
 const double mult(1.0/sqrt(M_PI));
 

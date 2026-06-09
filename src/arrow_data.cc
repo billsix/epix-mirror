@@ -89,7 +89,7 @@ namespace ePiX {
       tmp_data.clip_to(mycam.clip_plane());
 
     std::list<edge2d> edges;
-    for (std::list<edge3d>::const_iterator p=tmp_data.m_shaft.begin();
+    for (auto p=tmp_data.m_shaft.begin();
 	 p != tmp_data.m_shaft.end(); ++p)
       {
 	edge2d tmp(mycam((*p).tail()), mycam((*p).head()), (*p).is_seen());

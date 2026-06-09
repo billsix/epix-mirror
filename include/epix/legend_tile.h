@@ -61,17 +61,17 @@ namespace ePiX {
 
     legend_tile(const legend_tile&);
     legend_tile& operator= (const legend_tile&);
-    ~legend_tile();
+    ~legend_tile() override;
 
-    legend_tile& map_by(const affine&);
-    legend_tile& crop_to(const screen_mask&);
+    legend_tile& map_by(const affine&) override;
+    legend_tile& crop_to(const screen_mask&) override;
 
-    legend_tile* clone() const;
+    legend_tile* clone() const override;
 
-    bool is_empty() const;
+    bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const;
-    void add_to_palette() const;
+    std::string print_to(const format&, const std::string&) const override;
+    void add_to_palette() const override;
 
   private:
     pair m_here;

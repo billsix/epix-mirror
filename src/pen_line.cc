@@ -52,7 +52,7 @@
 
 namespace ePiX {
 
-  typedef std::list<edge2d>::const_iterator ep2;
+  using ep2 = std::list<edge2d>::const_iterator;
 
   pen_line::pen_line()
     : m_line(the_paint_style().line_pen()),
@@ -76,7 +76,7 @@ namespace ePiX {
 
     std::list<edge2d> bord;
 
-    for (ep2 p=m_border.begin(); p!=m_border.end(); ++p)
+    for (auto p=m_border.begin(); p!=m_border.end(); ++p)
       bord.push_back(edge2d(f(p->tail()), f(p->head()), (*p).is_seen()));
 
     swap(m_border, bord);

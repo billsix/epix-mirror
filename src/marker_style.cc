@@ -73,7 +73,7 @@ namespace ePiX {
 
   marker_sizes& the_mark_size()
   {
-    static marker_sizes* the_mark_size(new marker_sizes());
+    static auto* the_mark_size(new marker_sizes());
     return *the_mark_size;
   }
 } // end of namespace

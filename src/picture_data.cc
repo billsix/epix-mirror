@@ -123,7 +123,7 @@ namespace ePiX {
 				   xmin(), xmax(), ymin(), ymax(),
 				   the_page.h_size(), the_page.v_size());
 
-    for (std::list<verbatim>::const_iterator p = m_pre_writes.begin();
+    for (auto p = m_pre_writes.begin();
 	 p != m_pre_writes.end(); ++p)
       std::cout << (*p).print_to(fmt, the_unitlength.units());
 
@@ -138,7 +138,7 @@ namespace ePiX {
 
 	      << fmt.pic_footer();
 
-    for (std::list<verbatim>::const_iterator p = m_post_writes.begin();
+    for (auto p = m_post_writes.begin();
 	 p != m_post_writes.end(); ++p)
       std::cout << (*p).print_to(fmt, the_unitlength.units());
   }
@@ -165,7 +165,7 @@ namespace ePiX {
 				xmin(), xmax(), ymin(), ymax(),
 				the_page.h_size(), the_page.v_size());
 
-    for (std::list<verbatim>::const_iterator p = m_pre_writes.begin();
+    for (auto p = m_pre_writes.begin();
 	 p != m_pre_writes.end(); ++p)
       output << (*p).print_to(fmt, the_unitlength.units());
 
@@ -180,7 +180,7 @@ namespace ePiX {
 
 	      << fmt.pic_footer();
 
-    for (std::list<verbatim>::const_iterator p = m_post_writes.begin();
+    for (auto p = m_post_writes.begin();
 	 p != m_post_writes.end(); ++p)
       output << (*p).print_to(fmt, the_unitlength.units());
 

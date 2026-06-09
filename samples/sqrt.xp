@@ -40,9 +40,9 @@ int main()
   arrow(P(0,0,0), 2*E_2);
   arrow(P(0,0,0), 1.5*E_3);
 
-  masklabel(2*E_1, P(0,0), "$\\mathrm{Re}\\,z$", r);
-  label(2*E_2, P(0,0), "$\\mathrm{Im}\\,z$", r);
-  label(1.5*E_3, P(2,0), "$\\mathrm{Re}\\,\\sqrt{z}$", r);
+  masklabel(2*E_1, P(0,0), "$\\mathrm{Re}\\,z$", epix_label_posn::r);
+  label(2*E_2, P(0,0), "$\\mathrm{Im}\\,z$", epix_label_posn::r);
+  label(1.5*E_3, P(2,0), "$\\mathrm{Re}\\,\\sqrt{z}$", epix_label_posn::r);
 
   bold(Red());
   plot(g, -1.25, 1.25, 40);

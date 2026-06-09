@@ -69,34 +69,34 @@ namespace ePiX {
 
   void circ(const P& posn, const P& offset=P(0,0),
 	    const std::string& label_text="",
-	    epix_label_posn align=none); // filled white circ
+	    epix_label_posn align=epix_label_posn::none); // filled white circ
 
   void ring(const P& posn, const P& offset=P(0,0),
 	    const std::string& label_text="",
-	    epix_label_posn align=none); // unfilled circ 
+	    epix_label_posn align=epix_label_posn::none); // unfilled circ 
 
   void spot(const P& posn, const P& offset=P(0,0),
 	    const std::string& label_text="",
-	    epix_label_posn align=none);
+	    epix_label_posn align=epix_label_posn::none);
 
   void dot(const P& posn, const P& offset=P(0,0),
 	   const std::string& label_text="",
-	   epix_label_posn align=none);
+	   epix_label_posn align=epix_label_posn::none);
 
   void ddot(const P& posn, const P& offset=P(0,0),
 	    const std::string& label_text="",
-	    epix_label_posn align=none);
+	    epix_label_posn align=epix_label_posn::none);
 
   void box(const P& posn, const P& offset=P(0,0),
 	   const std::string& label_text="",
-	   epix_label_posn align=none);
+	   epix_label_posn align=epix_label_posn::none);
 
   void bbox(const P& posn, const P& offset=P(0,0),
 	    const std::string& label_text="",
-	    epix_label_posn align=none);
+	    epix_label_posn align=epix_label_posn::none);
 
-  void h_axis_tick(const P& location, epix_label_posn align=c);
-  void v_axis_tick(const P& location, epix_label_posn align=c);
+  void h_axis_tick(const P& location, epix_label_posn align=epix_label_posn::c);
+  void v_axis_tick(const P& location, epix_label_posn align=epix_label_posn::c);
 
   // Arrow with aligned label at tail
   void arrow(const P& tail, const P& head, const P& offset,

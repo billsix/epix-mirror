@@ -97,7 +97,7 @@ namespace ePiX {
 
   arrowhead_state& the_arrowhead_style()
   {
-    static arrowhead_state* the_arrowhead_state(new arrowhead_state());
+    static auto* the_arrowhead_state(new arrowhead_state());
     return *the_arrowhead_state;
   }
 } // end of namespace

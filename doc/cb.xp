@@ -16,7 +16,7 @@ int main()
   bold();
   plot(cb, x_min, x_max, 4);
 
-  label(P(0,y_min), P(0,-4), "\\code{cb}", b);
+  label(P(0,y_min), P(0,-4), "\\code{cb}", epix_label_posn::b);
 
   end();
 }

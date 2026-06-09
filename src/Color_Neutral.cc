@@ -40,7 +40,7 @@
 
 namespace ePiX {
 
-  Neutral_Color::Neutral_Color() { }
+  Neutral_Color::Neutral_Color() = default;
 
   Color_Base::RGB_Densities Neutral_Color::to_rgb() const
   {

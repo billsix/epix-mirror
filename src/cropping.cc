@@ -82,7 +82,7 @@ namespace ePiX {
   crop_state& the_crop_box()
   {
     const pair M(EPIX_INFTY, EPIX_INFTY);
-    static crop_state* current_crop_box(new crop_state(mask_rectangle(-M,M)));
+    static auto* current_crop_box(new crop_state(mask_rectangle(-M,M)));
     return *current_crop_box;
   }
 } // end of namespace

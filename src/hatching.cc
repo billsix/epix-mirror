@@ -110,7 +110,7 @@ namespace ePiX {
 
     const double x(J(m_perp)|crossing.loc());
 
-    std::list<cut>::iterator p(m_cuts.begin());
+    auto p(m_cuts.begin());
 
     while (p != m_cuts.end() && (J(m_perp)|(*p).loc()) < x)
       ++p;
@@ -122,7 +122,7 @@ namespace ePiX {
   // add scans to value
   void scan_line::draw(std::vector<edge2d>& value) const
   {
-    std::list<cut>::const_iterator p(m_cuts.begin());
+    auto p(m_cuts.begin());
 
     if (p == m_cuts.end()) // redundant guard
       return;
@@ -162,7 +162,7 @@ namespace ePiX {
     const pair vert(J(horiz));
 
     // initialize loop with first edge
-    std::list<edge2d>::iterator p(polygon.begin());
+    auto p(polygon.begin());
 
     // first pass: Get min, max vertex heights; remove horizontal edges
     double min_ht((*p).tail()|vert);
@@ -189,7 +189,7 @@ namespace ePiX {
       }
 
     // compute subdivision heights, initialize vector of scan_lines
-    unsigned int num_cuts((unsigned int) ceil((max_ht - min_ht)/sep));
+    auto num_cuts((unsigned int) ceil((max_ht - min_ht)/sep));
     const double true_sep((max_ht - min_ht)/num_cuts);
 
     // initialize hatch lines
@@ -200,22 +200,21 @@ namespace ePiX {
       }
 
     // Second pass: add scan line cuts
-    for (std::list<bd_edge>::iterator ep=m_edges.begin();
-	 ep != m_edges.end(); ++ep)
+    for (auto & m_edge : m_edges)
       {
 	// indices of scan lines we cross
-	unsigned int i_min((unsigned int)  ceil(((*ep).lo()-min_ht)/true_sep));
-	unsigned int i_max((unsigned int) floor(((*ep).hi()-min_ht)/true_sep));
+	auto i_min((unsigned int)  ceil((m_edge.lo()-min_ht)/true_sep));
+	auto i_max((unsigned int) floor((m_edge.hi()-min_ht)/true_sep));
 
 	// compute parameters once per edge
-	const pair tl((*ep).tail());
-	const pair dir((*ep).dir());
+	const pair tl(m_edge.tail());
+	const pair dir(m_edge.dir());
 
 	// relative heights of endpoints
-	const double ht_hd((*ep).head()|vert);
+	const double ht_hd(m_edge.head()|vert);
 	const double ht_tl(tl|vert);
 
-	const int up((*ep).orient());
+	const int up(m_edge.orient());
 
 	for (unsigned int i = i_min; i <= i_max; ++i)
 	  {
@@ -250,8 +249,8 @@ namespace ePiX {
   {
     std::vector<edge2d> value;
 
-    for (unsigned int i=0; i < m_scans.size(); ++i)
-      m_scans.at(i).draw(value);
+    for (const auto & m_scan : m_scans)
+      m_scan.draw(value);
 
     return value;
   }

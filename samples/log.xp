@@ -180,7 +180,7 @@ int main() {
   degrees();
   //  label_angle(90);
   label(P(0, ymin()), P(0,4), 
-	"$z=\\mathrm{Re}\\,\\log(x+iy) + \\mathrm{Im}\\,\\log(x+iy)$", t);
+	"$z=\\mathrm{Re}\\,\\log(x+iy) + \\mathrm{Im}\\,\\log(x+iy)$", epix_label_posn::t);
   radians();
   //  label_angle(0);
 
@@ -204,14 +204,14 @@ int main() {
     mesh_data.at(i).draw();
 
   dot_color();
-  marker(C_log(0,-2), BOX);
-  marker(C_log(0, 0), BOX);
-  marker(C_log(0, 2), BOX);
+  marker(C_log(0,-2), epix_mark_type::BOX);
+  marker(C_log(0, 0), epix_mark_type::BOX);
+  marker(C_log(0, 2), epix_mark_type::BOX);
 
   label_color();
-  label(C_log(0,-2), P(6, 0), "$-2\\pi i$", r);
-  label(C_log(0, 0), P(6, 0), "$0$", r);
-  label(C_log(0, 2), P(-6, 0), "$2\\pi i$", l);
+  label(C_log(0,-2), P(6, 0), "$-2\\pi i$", epix_label_posn::r);
+  label(C_log(0, 0), P(6, 0), "$0$", epix_label_posn::r);
+  label(C_log(0, 2), P(-6, 0), "$2\\pi i$", epix_label_posn::l);
 
   end();
 }

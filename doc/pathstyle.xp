@@ -6,7 +6,7 @@ void dash_sample(double ht, std::string pattern)
 {
   line_style(pattern);
   line(P(0,ht), P(3,ht));
-  label(P(3, ht), P(4,0), "\\code{line\\_style(\""+pattern+"\")}", r);
+  label(P(3, ht), P(4,0), "\\code{line\\_style(\""+pattern+"\")}", epix_label_posn::r);
 }
 
 int main() {

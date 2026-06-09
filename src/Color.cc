@@ -341,31 +341,31 @@ namespace ePiX {
   /* * * Neutral filters * * */
   Color Neutral()
   {
-    static Neutral_Color* neutral(new Neutral_Color());
+    static auto* neutral(new Neutral_Color());
     return Color(*neutral);
   }
 
   Color RGB_Neutral()
   {
-    static RGB_Color* rgb_neutral(new RGB_Color(1, 1, 1));
+    static auto* rgb_neutral(new RGB_Color(1, 1, 1));
     return Color(*rgb_neutral);
   }
 
   Color CMY_Neutral()
   {
-    static CMY_Color* cmy_neutral(new CMY_Color(0, 0, 0, true));
+    static auto* cmy_neutral(new CMY_Color(0, 0, 0, true));
     return Color(*cmy_neutral);
   }
 
   Color CMYK_Neutral()
   {
-    static CMYK_Color* cmyk_neutral(new CMYK_Color(0, 0, 0, 0, true));
+    static auto* cmyk_neutral(new CMYK_Color(0, 0, 0, 0, true));
     return Color(*cmyk_neutral);
   }
 
   Color Gray_Neutral()
   {
-    static Gray_Color* gray_neutral(new Gray_Color(1));
+    static auto* gray_neutral(new Gray_Color(1));
     return Color(*gray_neutral);
   }
 } // end of namespace

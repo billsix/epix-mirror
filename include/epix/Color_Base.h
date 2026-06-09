@@ -50,7 +50,7 @@ namespace ePiX {
     };
 
   public:
-    virtual ~Color_Base() { }
+    virtual ~Color_Base() = default;
     virtual Color_Base* clone() const = 0;
 
     // blending (all non-const)

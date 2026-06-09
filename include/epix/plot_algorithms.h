@@ -64,7 +64,7 @@
 
 namespace ePiX {
 
-  typedef std::list<domain>::const_iterator dolci;
+  using dolci = std::list<domain>::const_iterator;
 
   const double INF(EPIX_INFTY);
 
@@ -180,8 +180,8 @@ namespace ePiX {
   // plot over a list of domains
   template<class T> void plot_map_domlist(const T& map, const domain_list& R)
     {
-      for (dolci p=R.m_list.begin(); p != R.m_list.end(); ++p)
-	plot_map_dom(map, *p);
+      for (const auto & p : R.m_list)
+	plot_map_dom(map, p);
     }
 
   // paths

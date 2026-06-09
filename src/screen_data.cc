@@ -62,7 +62,7 @@
 
 namespace ePiX {
 
-  typedef std::list<tile*>::const_iterator Tp;
+  using Tp = std::list<tile*>::const_iterator;
 
   // constructor
   screen_data::screen_data(const pair& arg1, const pair& arg2)
@@ -82,8 +82,8 @@ namespace ePiX {
       m_backing(scr.m_backing->clone()),
       m_crop(scr.m_crop)
   {
-    for(Tp p=scr.m_tiles.begin(); p!= scr.m_tiles.end(); ++p)
-      add_tile(*p);
+    for(auto m_tile : scr.m_tiles)
+      add_tile(m_tile);
   }
 
   // copy assignment
@@ -93,8 +93,8 @@ namespace ePiX {
       {
 	// copy scr's tiles before freeing ours
 	std::list<tile*> tmp;
-	for(Tp p=scr.m_tiles.begin(); p!= scr.m_tiles.end(); ++p)
-	  add_tile(*p);
+	for(auto m_tile : scr.m_tiles)
+	  add_tile(m_tile);
 
 	screen_mask* tmp_mask(scr.m_mask->clone());
 
@@ -114,7 +114,7 @@ namespace ePiX {
 	delete m_backing;
 	m_backing = tmp_backing;
 
-	for (Tp p=m_tiles.begin(); p!=m_tiles.end(); ++p)
+	for (auto p=m_tiles.begin(); p!=m_tiles.end(); ++p)
 	  delete *p;
 
 	swap(m_tiles, tmp);
@@ -131,7 +131,7 @@ namespace ePiX {
     delete m_border;
     delete m_backing;
 
-    for(Tp p=m_tiles.begin(); p!= m_tiles.end(); ++p)
+    for(auto p=m_tiles.begin(); p!= m_tiles.end(); ++p)
       delete *p;
   }
 
@@ -164,9 +164,9 @@ namespace ePiX {
 	  }
 
 	// tiles
-	for(Tp p=child.m_tiles.begin(); p!= child.m_tiles.end(); ++p)
+	for(auto m_tile : child.m_tiles)
 	  {
-	    tile* temp((*p)->clone());
+	    tile* temp(m_tile->clone());
 	    add_tile(temp->map_by(af));
 	  }
 
@@ -203,9 +203,9 @@ namespace ePiX {
 	  }
 
 	// tiles
-	for(Tp p=child.m_tiles.begin(); p!= child.m_tiles.end(); ++p)
+	for(auto m_tile : child.m_tiles)
 	  {
-	    tile* temp((*p)->clone());
+	    tile* temp(m_tile->clone());
 	    add_tile(temp->map_by(af));
 	  }
 
@@ -244,7 +244,7 @@ namespace ePiX {
     if (!m_backing->is_empty())
       m_backing->crop_to(mask);
 
-    for (Tp curr=m_tiles.begin(); curr!=m_tiles.end(); ++curr)
+    for (auto curr=m_tiles.begin(); curr!=m_tiles.end(); ++curr)
       {
 	(*curr)->crop_to(mask);
 
@@ -281,8 +281,8 @@ namespace ePiX {
     screen_data value(arg1, arg2);
     value.set_crop(true);
 
-    for (Tp curr=m_tiles.begin(); curr!=m_tiles.end(); ++curr)
-      value.add_tile(*curr);
+    for (auto m_tile : m_tiles)
+      value.add_tile(m_tile);
 
     return value;
   }
@@ -294,8 +294,8 @@ namespace ePiX {
 
     value.set_mask(mask_diamond(arg1, arg2)).set_crop(true);
 
-    for (Tp curr=m_tiles.begin(); curr!=m_tiles.end(); ++curr)
-      value.add_tile(*curr);
+    for (auto m_tile : m_tiles)
+      value.add_tile(m_tile);
 
     return value;
   }
@@ -307,8 +307,8 @@ namespace ePiX {
 
     value.set_mask(mask_ellipse(arg1, arg2)).set_crop(true);
 
-    for (Tp curr=m_tiles.begin(); curr!=m_tiles.end(); ++curr)
-      value.add_tile(*curr);
+    for (auto m_tile : m_tiles)
+      value.add_tile(m_tile);
 
     return value;
   }
@@ -378,7 +378,7 @@ namespace ePiX {
   // affine operations on contents (not border, backing)
   void screen_data::apply(const affine& af)
   {
-    for (Tp curr=m_tiles.begin(); curr!=m_tiles.end(); ++curr)
+    for (auto curr=m_tiles.begin(); curr!=m_tiles.end(); ++curr)
       (*curr)->map_by(af);
   }
 
@@ -549,11 +549,11 @@ namespace ePiX {
 	obuf << m_backing->print_to(fmt, len.units());
       }
 
-    for (Tp curr = m_tiles.begin(); curr != m_tiles.end(); ++curr)
+    for (auto m_tile : m_tiles)
       {
-	(*curr)->add_to_palette();
+	m_tile->add_to_palette();
 
-	obuf << (*curr)->print_to(fmt, len.units());
+	obuf << m_tile->print_to(fmt, len.units());
       }
 
     if (!m_border->is_empty())

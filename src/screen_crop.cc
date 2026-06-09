@@ -38,7 +38,7 @@
 
 namespace ePiX {
 
-  typedef std::list<edge2d>::const_iterator CLI;
+  using CLI = std::list<edge2d>::const_iterator;
 
   static pair unit_perp(const edge2d& E)
   {
@@ -50,8 +50,8 @@ namespace ePiX {
   std::list<edge2d>& crop_path_2nd(const std::list<edge2d>& bord,
 				   std::list<edge2d>& edge_list)
   {
-    for (CLI ep=bord.begin(); ep != bord.end(); ++ep)
-      chop_path<pair>(unit_perp(*ep), (*ep).tail(), edge_list);
+    for (const auto & ep : bord)
+      chop_path<pair>(unit_perp(ep), ep.tail(), edge_list);
 
     return cull<pair>(edge_list);
   }
@@ -59,9 +59,9 @@ namespace ePiX {
   std::list<edge2d>& crop_loop_2nd(const std::list<edge2d>& bord,
 				   std::list<edge2d>& edge_list)
   {
-    for (CLI ep=bord.begin(); ep != bord.end(); ++ep)
+    for (const auto & ep : bord)
       {
-	chop_path<pair>(unit_perp(*ep), (*ep).tail(), edge_list);
+	chop_path<pair>(unit_perp(ep), ep.tail(), edge_list);
 	loopify<pair>(edge_list);
       }
 

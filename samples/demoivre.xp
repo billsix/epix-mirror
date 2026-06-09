@@ -1,6 +1,7 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;
 
 const int N(24);
 const double theta(0.875*M_PI);

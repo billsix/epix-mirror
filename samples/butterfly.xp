@@ -119,17 +119,17 @@ int main() {
   //  plot(Phi23, -tmin, tmin, 20);
 
   label_color(Black());
-  label(P(8,0,-8), P(0,-4), "$x$", b);
-  label(P(0,8,-8), P(4,0), "$y$", r);
+  label(P(8,0,-8), P(0,-4), "$x$", epix_label_posn::b);
+  label(P(0,8,-8), P(4,0), "$y$", epix_label_posn::r);
 
   pen(light);
   label_border(light, "0.4pt");
   solid();
   label_tag(Phi(-2,-2)+P(0,2,6), Phi(-1.75,-1.75),
-	 "$y=\\frac{3}{32}(z^3-2xz)$", t);
+	 "$y=\\frac{3}{32}(z^3-2xz)$", epix_label_posn::t);
 
   label_tag(cubic(-1)+P(0,2,3), cubic(-1),
-	 "$(x,y,z)=(6t^2, -\\frac{3}{2}t^3, 2t)$", t);
+	 "$(x,y,z)=(6t^2, -\\frac{3}{2}t^3, 2t)$", epix_label_posn::t);
 
   pst_format();
   end();

@@ -37,15 +37,15 @@
 
 namespace ePiX {
 
-  enum epix_mark_type {PATH, CIRC, SPOT, RING, DOT, DDOT, PLUS, OPLUS, 
-		       TIMES, OTIMES, DIAMOND, UP, DOWN, BOX, BBOX, 
+  enum class epix_mark_type {PATH, CIRC, SPOT, RING, DOT, DDOT, PLUS, OPLUS,
+		       TIMES, OTIMES, DIAMOND, UP, DOWN, BOX, BBOX,
 		       HTICK, VTICK, TEXT};
 
-  enum epix_label_posn {none, c, r, tr, rt, t, tl, lt, l, bl, lb, b, br, rb};
+  enum class epix_label_posn {none, c, r, tr, rt, t, tl, lt, l, bl, lb, b, br, rb};
 
-  enum epix_integral_type {LEFT, RIGHT, UPPER, LOWER, TRAP, MIDPT};
+  enum class epix_integral_type {LEFT, RIGHT, UPPER, LOWER, TRAP, MIDPT};
 
-  enum epix_field_type {SLOPE, DART, VECTOR};
+  enum class epix_field_type {SLOPE, DART, VECTOR};
 
 } // end of namespace
 

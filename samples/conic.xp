@@ -35,11 +35,11 @@ int main()
   bbold(Blue());
   Line(P(-100, INFTY, 0), P(100, INFTY, 0));
 
-  masklabel(P(0,0), P(0,2), "$(0,0)$", t);
-  label(P(0,INFTY), P(0,-2), "$(0,\\infty)$", b);
-  label(P(-0.25*INFTY,INFTY), P(0, 2), "Horizon", t);
+  masklabel(P(0,0), P(0,2), "$(0,0)$", epix_label_posn::t);
+  label(P(0,INFTY), P(0,-2), "$(0,\\infty)$", epix_label_posn::b);
+  label(P(-0.25*INFTY,INFTY), P(0, 2), "Horizon", epix_label_posn::t);
 
-  masklabel(P(x0, x0*x0), P(-4,0), "$y=x^2$", l);
+  masklabel(P(x0, x0*x0), P(-4,0), "$y=x^2$", epix_label_posn::l);
 
   box(P(0,0));
   box(P(0,INFTY));
@@ -49,7 +49,7 @@ int main()
 
   camera.at(0,0,1000);
   masklabel(P(0, ymin()), P(0,0), 
-	"Projective equivalence of a parabola and a circle", t);
+	"Projective equivalence of a parabola and a circle", epix_label_posn::t);
 
   end();
 }

@@ -69,7 +69,7 @@ namespace ePiX {
   // global functions
   screen_broker& the_screen_stack()
   {
-    static screen_broker* the_screen_broker(new screen_broker());
+    static auto* the_screen_broker(new screen_broker());
     return *the_screen_broker;
   }
 

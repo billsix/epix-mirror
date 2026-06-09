@@ -139,7 +139,7 @@ namespace ePiX {
 
   paint_state& the_paint_style()
   {
-    static paint_state* the_paint_state(new paint_state());
+    static auto* the_paint_state(new paint_state());
     return *the_paint_state;
   }
 } // end of namespace

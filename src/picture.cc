@@ -60,50 +60,50 @@ namespace ePiX {
   // static objects
   picture_data& the_picture()
   {
-    static picture_data* the_root_picture(new picture_data());
+    static auto* the_root_picture(new picture_data());
     return *the_root_picture;
   }
 
   double& xmin()
   {
-    static double* the_x_min(new double);
+    static auto* the_x_min(new double);
     return *the_x_min;
   }
 
   double& xmax()
   {
-    static double* the_x_max(new double);
+    static auto* the_x_max(new double);
     return *the_x_max;
   }
 
   double& xsize()
   {
-    static double* the_x_size(new double);
+    static auto* the_x_size(new double);
     return *the_x_size;
   }
 
   double& ymin()
   {
-    static double* the_y_min(new double);
+    static auto* the_y_min(new double);
     return *the_y_min;
   }
 
   double& ymax()
   {
-    static double* the_y_max(new double);
+    static auto* the_y_max(new double);
     return *the_y_max;
   }
 
   double& ysize()
   {
-    static double* the_y_size(new double);
+    static auto* the_y_size(new double);
     return *the_y_size;
   }
 
 
   double & tix()
   {
-    static double* the_tix(new double);
+    static auto* the_tix(new double);
     return *the_tix;
   }
 

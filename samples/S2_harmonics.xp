@@ -1,6 +1,7 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;
 
 double P_n(double z)
 {

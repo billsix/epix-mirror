@@ -64,6 +64,8 @@
 #include "format.h"
 
 namespace ePiX {
+  using enum epix_label_posn;
+  using enum epix_mark_type;
   // public, non-virtual
   // LaTeX label-generating commands written in terms of protected interface
   std::string format::print_mark(const pair& here, const pair& offset,
@@ -259,23 +261,22 @@ namespace ePiX {
 	double pattern_size(style.separation()); // in pt
 
 	// split each edge into pattern_size chunks if necessary
-	for (std::list<edge2d>::const_iterator ep = edges.begin();
-	     ep != edges.end(); ++ep)
+	for (const auto & edge : edges)
 	  {
-	    double curr_len(((*ep).length())*in_pt);
+	    double curr_len((edge.length())*in_pt);
 
 	    // number of dash patterns *ep can hold
-	    unsigned int N((unsigned int) ceil(curr_len/pattern_size));
+	    auto N((unsigned int) ceil(curr_len/pattern_size));
 	    if (N == 1)
-	      obuf << print_edge((*ep), offset, style.breakpts(),
+	      obuf << print_edge(edge, offset, style.breakpts(),
 				 lw.magnitude(), line.color(), attribs, len);
 
 	    if (N > 1)
 	      {
-		pair T((*ep).tail()), dir((1.0/N)*((*ep).head() - T));
+		pair T(edge.tail()), dir((1.0/N)*(edge.head() - T));
 		for (unsigned int i=0; i<N; ++i)
 		  obuf << print_edge(edge2d(T+i*dir, T+(i+1)*dir,
-					    (*ep).is_seen()),
+					    edge.is_seen()),
 				     offset, style.breakpts(),
 				     lw.magnitude(), line.color(),
 				     attribs, len);
@@ -358,9 +359,8 @@ namespace ePiX {
   {
     std::stringstream obuf;
 
-    for (std::set<Color>::const_iterator cp=palette.begin();
-	 cp!=palette.end(); ++cp)
-      obuf << print_color((*cp).model(), (*cp).name(), (*cp).densities());
+    for (const auto & cp : palette)
+      obuf << print_color(cp.model(), cp.name(), cp.densities());
 
     return obuf.str();
   }
@@ -434,7 +434,7 @@ namespace ePiX {
   {
     std::stringstream obuf;
 
-    std::list<edge2d>::const_iterator ep(edges.begin());
+    auto ep(edges.begin());
 
     const pair shift(pt_to_len(offset, len));
 

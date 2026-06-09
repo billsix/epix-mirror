@@ -17,7 +17,7 @@ int main()
   bold();
   plot(sinx, x_min, x_max, 60);
 
-  label(P(0,y_min), P(0,-4), "\\code{sinx}", b);
+  label(P(0,y_min), P(0,-4), "\\code{sinx}", epix_label_posn::b);
 
   end();
 }

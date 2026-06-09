@@ -45,7 +45,7 @@ namespace ePiX {
   class axis {
   public:
     axis(const P&, const P&, unsigned int n,
-	 const P& offset = P(0,0), epix_label_posn POSN=none);
+	 const P& offset = P(0,0), epix_label_posn POSN=epix_label_posn::none);
 
     // attribute-setting
     axis& dec();  // default
@@ -113,73 +113,73 @@ namespace ePiX {
 
   // axes along sides of bounding box, ticks automatically aligned
   axis top_axis(unsigned int n, const P& offset=P(0,0),
-		epix_label_posn POSN=t);
+		epix_label_posn POSN=epix_label_posn::t);
   axis bottom_axis(unsigned int n, const P& offset=P(0,0),
-		   epix_label_posn POSN=b);
+		   epix_label_posn POSN=epix_label_posn::b);
   axis left_axis(unsigned int n, const P& offset=P(0,0),
-		 epix_label_posn POSN=l);
+		 epix_label_posn POSN=epix_label_posn::l);
   axis right_axis(unsigned int n, const P& offset=P(0,0),
-		  epix_label_posn POSN=r);
+		  epix_label_posn POSN=epix_label_posn::r);
 
 
   // Global functions from Version 1.0
   void h_axis_labels(const P& tail, const P& head, unsigned int n, 
-		     const P& offset, epix_label_posn POSN=none);
+		     const P& offset, epix_label_posn POSN=epix_label_posn::none);
 
   void v_axis_labels(const P& tail, const P& head, unsigned int n, 
-		     const P& offset, epix_label_posn POSN=none);
+		     const P& offset, epix_label_posn POSN=epix_label_posn::none);
 
   void h_axis_masklabels(const P& tail, const P& head, unsigned int n, 
-			 const P& offset, epix_label_posn POSN=none);
+			 const P& offset, epix_label_posn POSN=epix_label_posn::none);
 
   void v_axis_masklabels(const P& tail, const P& head, unsigned int n, 
-			 const P& offset, epix_label_posn POSN=none);
+			 const P& offset, epix_label_posn POSN=epix_label_posn::none);
 
   // Axis labels with default endpoints
   void h_axis_labels(unsigned int n, const P& offset, 
-		     epix_label_posn POSN=none);
+		     epix_label_posn POSN=epix_label_posn::none);
   void h_axis_masklabels(unsigned int n, const P& offset,
-			 epix_label_posn POSN=none);
+			 epix_label_posn POSN=epix_label_posn::none);
 
   void v_axis_labels(unsigned int n, const P& offset,
-		     epix_label_posn POSN=none);
+		     epix_label_posn POSN=epix_label_posn::none);
   void v_axis_masklabels(unsigned int n, const P& offset,
-			 epix_label_posn POSN=none);
+			 epix_label_posn POSN=epix_label_posn::none);
 
   //// logarithmic labels ////
   // labels written $k x base^i$ at i + log_b(k)
   void h_axis_log_labels(const P& tail, const P& head, unsigned int n,
-			 const P& offset, epix_label_posn POSN=none,
+			 const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			 unsigned int base=10);
 
   void v_axis_log_labels(const P& tail, const P& head, unsigned int n,
-			 const P& offset, epix_label_posn POSN=none,
+			 const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			 unsigned int base=10);
 
   // labels written $base^i$ at coord i
   void h_axis_log_labels(const P& tail, const P& head,
-			 const P& offset, epix_label_posn POSN=none,
+			 const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			 unsigned int base=10);
 
   void v_axis_log_labels(const P& tail, const P& head,
-			 const P& offset, epix_label_posn POSN=none,
+			 const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			 unsigned int base=10);
 
 
   void h_axis_log_masklabels(const P& tail, const P& head, unsigned int n,
-			     const P& offset, epix_label_posn POSN=none,
+			     const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			     unsigned int base=10);
 
   void v_axis_log_masklabels(const P& tail, const P& head, unsigned int n,
-			     const P& offset, epix_label_posn POSN=none,
+			     const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			     unsigned int base=10);
 
   void h_axis_log_masklabels(const P& tail, const P& head,
-			     const P& offset, epix_label_posn POSN=none,
+			     const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			     unsigned int base=10);
 
   void v_axis_log_masklabels(const P& tail, const P& head,
-			     const P& offset, epix_label_posn POSN=none,
+			     const P& offset, epix_label_posn POSN=epix_label_posn::none,
 			     unsigned int base=10);
 
 
@@ -188,19 +188,19 @@ namespace ePiX {
 
   // n subintervals
   void h_axis(const P& tail, const P& head, unsigned int n,
-	      epix_label_posn align=c);
+	      epix_label_posn align=epix_label_posn::c);
   void v_axis(const P& tail, const P& head, unsigned int n,
-	      epix_label_posn align=c);
+	      epix_label_posn align=epix_label_posn::c);
 
   // Default endpoints (xmin(), 0), xmax(), 0), etc.
-  void h_axis(unsigned int n = xsize(), epix_label_posn align=c);
-  void v_axis(unsigned int n = ysize(), epix_label_posn align=c);
+  void h_axis(unsigned int n = xsize(), epix_label_posn align=epix_label_posn::c);
+  void v_axis(unsigned int n = ysize(), epix_label_posn align=epix_label_posn::c);
 
   void h_log_axis(const P& tail, const P& head, unsigned int segs,
-		  epix_label_posn align=c, unsigned int base=10);
+		  epix_label_posn align=epix_label_posn::c, unsigned int base=10);
 
   void v_log_axis(const P& tail, const P& head, unsigned int segs,
-		  epix_label_posn align=c, unsigned int base=10);
+		  epix_label_posn align=epix_label_posn::c, unsigned int base=10);
 
 } // end of namespace
 

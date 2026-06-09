@@ -22,7 +22,7 @@ int main()
   h_axis(4);
   v_axis(P(0,0), P(0,1), 1);
 
-  h_axis_labels(4, P(0,-4), b);
+  h_axis_labels(4, P(0,-4), epix_label_posn::b);
   red(-1);
   line(P(-2,1), P(-1,1));
   line(P(-1,1), P(0,0));

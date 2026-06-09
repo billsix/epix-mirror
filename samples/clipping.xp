@@ -1,6 +1,7 @@
 /* -*-ePiX-*- */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;
 /*
  * This file, a monkey saddle sliced by two vertical planes showing
  * the definition and geometric meaning of partial derivatives,

@@ -54,44 +54,44 @@ namespace ePiX {
   class Perspective : public Lens {
   public:
     pair operator()
-      (const P&, const frame&, const P&, double) const;
+      (const P&, const frame&, const P&, double) const override;
 
-    bool is_linear() const;
-    bool needs_clip() const;
-    Perspective* clone() const;
+    bool is_linear() const override;
+    bool needs_clip() const override;
+    Perspective* clone() const override;
   }; // end of class Perspective
 
 
   class Orthog : public Lens {
   public:
     pair operator()
-      (const P&, const frame&, const P&, double) const;
+      (const P&, const frame&, const P&, double) const override;
 
-    bool is_linear() const;
-    bool needs_clip() const;
-    Orthog* clone() const;
+    bool is_linear() const override;
+    bool needs_clip() const override;
+    Orthog* clone() const override;
   }; // end of class Orthog
 
 
   class Fisheye : public Lens {
   public:
     pair operator()
-      (const P&, const frame&, const P&, double) const;
+      (const P&, const frame&, const P&, double) const override;
 
-    bool is_linear() const;
-    bool needs_clip() const;
-    Fisheye* clone() const;
+    bool is_linear() const override;
+    bool needs_clip() const override;
+    Fisheye* clone() const override;
   }; // end of class Fisheye
 
 
   class Bubble : public Lens {
   public:
     pair operator()
-      (const P&, const frame&, const P&, double) const;
+      (const P&, const frame&, const P&, double) const override;
 
-    bool is_linear() const;
-    bool needs_clip() const;
-    Bubble* clone() const;
+    bool is_linear() const override;
+    bool needs_clip() const override;
+    Bubble* clone() const override;
   }; // end of class Bubble
 
 } // end of namespace

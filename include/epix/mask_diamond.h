@@ -56,26 +56,26 @@ namespace ePiX {
     // mask_diamond() { }
     mask_diamond(const pair& arg1, const pair& arg2);
 
-    mask_diamond* clone() const;
-    double h_min()  const;
-    double h_max()  const;
-    double h_size() const;
-    double h_avg()  const;
+    mask_diamond* clone() const override;
+    double h_min()  const override;
+    double h_max()  const override;
+    double h_size() const override;
+    double h_avg()  const override;
 
-    double v_min()  const;
-    double v_max()  const;
-    double v_size() const;
-    double v_avg()  const;
+    double v_min()  const override;
+    double v_max()  const override;
+    double v_size() const override;
+    double v_avg()  const override;
 
-    bool crops(const pair& arg) const; // false if arg visible
-    std::list<edge2d>& crop_path(std::list<edge2d>&) const;
-    std::list<edge2d>& crop_loop(std::list<edge2d>&) const;
+    bool crops(const pair& arg) const override; // false if arg visible
+    std::list<edge2d>& crop_path(std::list<edge2d>&) const override;
+    std::list<edge2d>& crop_loop(std::list<edge2d>&) const override;
 
-    pen_line  border(const Color&, const length&) const;
-    pen_fill backing(const Color&) const;
+    pen_line  border(const Color&, const length&) const override;
+    pen_fill backing(const Color&) const override;
 
-    pen_line  border() const;
-    pen_fill backing() const;
+    pen_line  border() const override;
+    pen_fill backing() const override;
 
   private:
     double m_hmin, m_hmax;

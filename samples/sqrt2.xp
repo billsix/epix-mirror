@@ -26,7 +26,7 @@ int main() {
   set_crop();
 
   revolutions();
-  label(P(xmin(), ymax()), P(2,-2), "Branches of $\\sqrt{z}$", br);
+  label(P(xmin(), ymax()), P(2,-2), "Branches of $\\sqrt{z}$", epix_label_posn::br);
 
   camera.at(6, -2, 2);
   camera.range(4);
@@ -53,8 +53,8 @@ int main() {
   arrow(P(0,0,0), P(0,2,0));
 
   label_color(Blue());
-  label(P(2,0,0), P(0,-4), "$\\mathrm{Re}\\,z$", b);
-  label(P(0,2,0), P(4, 0), "$\\mathrm{Im}\\,z$", r);
+  label(P(2,0,0), P(0,-4), "$\\mathrm{Re}\\,z$", epix_label_posn::b);
+  label(P(0,2,0), P(4, 0), "$\\mathrm{Im}\\,z$", epix_label_posn::r);
 
   bbold(Yellow());
   plot(sqrt_re, 0, MAX, 30);

@@ -18,7 +18,7 @@ void my_grid(const P& loc, int N1, int N2, std::string lab)
 	line(loc+P(-1,2*i*dy), loc+P(1,2*i*dy));
     }
 
-  label(loc, P(0,-4), "\\code{"+lab+"}", b);
+  label(loc, P(0,-4), "\\code{"+lab+"}", epix_label_posn::b);
 }
 
 int main() 

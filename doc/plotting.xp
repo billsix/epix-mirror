@@ -16,7 +16,7 @@ int main()
   h_axis(16);
   v_axis(4);
 
-  h_axis_labels(4, P(0,-4), b); // shift labels down 4pt, align below
+  h_axis_labels(4, P(0,-4), epix_label_posn::b); // shift labels down 4pt, align below
 
   revolutions(); // set angle units
   red();
