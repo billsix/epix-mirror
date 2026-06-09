@@ -1,0 +1,15 @@
+# Trim the build context (COPY . /epix in the Dockerfile).
+.git
+tasks
+output
+build
+
+# render outputs / stray generated files (the committed doc/*.eepic figures are
+# only needed for the -Dmanual build, which the image does not run)
+*.o
+libepix.a
+epix.h
+*-local
+*.eepic
+*.eps
+*.pdf

@@ -1,4 +1,4 @@
-#! /bin/bash
+#!@bashpath@
 #
 # epix: wrapper script for ePiX
 #

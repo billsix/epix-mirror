@@ -1,6 +1,8 @@
 #!/bin/sh
 #
-HEADER_FILE="epix.h"
+# Optional $1 = output path (default "epix.h" for the autotools build, which
+# calls this with no argument; the Meson port passes an explicit build-dir path).
+HEADER_FILE="${1:-epix.h}"
 
 HEADERS="enums.h length.h interval.h triples.h Complex.h functions.h pairs.h \
      affine.h Color.h state.h frame.h domain.h camera.h screen.h picture.h \

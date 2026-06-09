@@ -1,4 +1,4 @@
-#! /bin/bash
+#!@bashpath@
 # 
 # elaps: Convert an epix file to encapsulated Postscript, i.e. epix2eps
 # 

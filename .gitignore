@@ -1,0 +1,6 @@
+# Rendered examples (Makefile.docker `examples` / `examples-anim` targets).
+/output/
+
+# Meson build directory (`make -f Makefile.docker build`, or `meson setup build`).
+# Meson is out-of-source, so the build never litters the source tree.
+/build/
