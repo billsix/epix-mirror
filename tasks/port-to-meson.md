@@ -1,8 +1,44 @@
 # Task: Port ePiX's build from GNU autotools to Meson
 
-**Status:** proposed — investigation done 2026-06-09, awaiting go-ahead to implement
+**Status:** Phase 1 DONE + validated 2026-06-09 · Phases 2–3 pending
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
+
+## Phase 1 — DONE (2026-06-09)
+
+Files added: `meson.build`, `meson_options.txt`, `build-aux/gen_header.sh`; plus a
+one-line backward-compatible tweak to `make_header` (`HEADER_FILE="${1:-epix.h}"`
+so Meson can pass an output path — the autotools build still calls it with no
+arg). The autotools build is **left intact and parallel** (no `.in` template edits;
+shebang kept as `#! /bin/bash`).
+
+**What it builds/installs:** `libepix.a` → `libdir/epix`; the 87 public headers →
+`includedir/epix`; generated `epix.h` → `includedir`; the four scripts (via
+`configure_file` @var@ substitution) → `bindir`; `epix.1` (+ the three `.so`
+stubs) man pages; `epix-lib.sh` → `datadir/epix`; notes → `docdir/notes`;
+`bash_completions`+`epix.el` → `docdir/config`. Options mirror the autotools
+switches (`epix_el`, `bash_path`, `runtime_compiler`, `ps2eps`, + a `manual`
+stub for Phase 2). The vestigial autoconf feature checks are dropped.
+
+**Key gotcha found:** `ls *.cc` ≠ the library source set. **`fmt_template.cc` is
+in the tree but NOT in `libepix_a_CXXSOURCES`** (it `#include`s a nonexistent
+`fmt.h` — dead/incomplete code). The authoritative lists come from `Makefile.am`:
+**78 sources**, **87 headers** (the install set also excludes `debug.h` +
+`fmt_template.h`). Don't derive these from `ls`.
+
+**Validation (nested, in the `epix` container image + meson/ninja):**
+`meson setup && compile && install` over `/usr/local` succeeds; `epix --version`
+→ ePiX 1.2.22; layout + 87 headers correct; **eepic render = 96/97** (only the
+genuinely non-standalone `samples/std_F.xp` fails — *identical to the autotools
+oracle*). All four generated scripts have **zero leftover `@tokens@`**; `elaps`
+correctly bakes `/usr/local/bin/epix`, `/usr/bin/ps2epsi`, and the
+`epix-lib.sh` path; `epix.1` resolves `@docdir@`.
+
+**Not yet done (Phases 2–3):** `doc/`+`samples/` subdirs and the optional LaTeX
+manual (Phase 2); pointing `Makefile.docker` at Meson + doc updates + retiring
+autotools (Phase 3). The `examples-anim`/PDF paths weren't re-run under Meson but
+use the same generated `epix`/`elaps` already verified by the eepic render +
+script inspection.
 
 ## Goal
 

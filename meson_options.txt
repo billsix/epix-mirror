@@ -1,0 +1,17 @@
+# ePiX build options (Meson port — Phase 1).
+# Mirror the autotools --enable/--with switches from configure.ac.
+
+option('epix_el', type: 'boolean', value: true,
+       description: 'Install the Emacs mode (epix.el)')
+
+option('bash_path', type: 'string', value: '',
+       description: 'Path to bash baked into the wrapper scripts (empty: autodetect)')
+
+option('runtime_compiler', type: 'string', value: '',
+       description: 'Compiler epix invokes at runtime to build .xp files (empty: autodetect g++)')
+
+option('ps2eps', type: 'string', value: '',
+       description: 'ps2epsi / ps2eps program for elaps (empty: autodetect ps2epsi)')
+
+option('manual', type: 'boolean', value: false,
+       description: 'Build the LaTeX manual under doc/ (Phase 2 — not yet wired up)')
