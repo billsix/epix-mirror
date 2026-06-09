@@ -1,6 +1,7 @@
 # Task: Feasibility — Python bindings + percent-format notebooks for ePiX
 
-**Status:** proposed — feasibility investigation done 2026-06-09, awaiting go-ahead
+**Status:** approved — approach **A (real bindings) + nanobind** chosen 2026-06-09;
+ready to start with Stage 0 (demo API audit)
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
 
@@ -98,13 +99,14 @@ fastest to a working demo, "works like the example programs" literally (it
 drifts from the library. **Not recommended** (Pyepix already shows the cost, and
 it went stale).
 
-*Recommendation:* given the **all-81-demos** goal, the choice is closer than for
-an MVP. **A** is the faithful answer (one source of truth) but must cover the
-demo-audited surface. **B** can reach **full natural-syntax demo coverage
-faster** — a Python free-function API that mirrors the `.xp` idioms ports each
-demo near-mechanically and decouples from the C++ ABI. Suggest deciding A vs B
-**after Stage 0 (the demo API audit)**, when the real coverage requirement is
-known.
+**DECIDED (Bill, 2026-06-09): Approach A — real C++ bindings over `libepix`,
+using nanobind.** (B and C are off the table; kept above only as rationale.)
+Choosing nanobind implies A — it's a C++↔Python binding generator, so the
+codegen/emit path doesn't apply. nanobind needs ≥C++17 and the library is now
+pinned at **C++20**, so it's a clean fit; it's leaner/faster-to-build than
+pybind11, which matters given the large API surface. Stage 0 (the demo API
+audit) still comes first — it now scopes *how much of `libepix` to bind*, not
+the A/B choice.
 
 ## The notebook + inline-render layer (independent of A/B/C)
 
@@ -134,8 +136,9 @@ This is the high-feasibility half and mirrors the pattern Bill uses elsewhere:
    notebooks; cache rendered images.
 4. **Binding drift** — bindings must track the C++ API as it changes; a codegen
    step that reads the headers could help but is its own project.
-5. **Build coupling** — pybind11 + Meson + a Python interpreter dependency added
-   to the image (small).
+5. **Build coupling** — nanobind + Meson + a Python interpreter dependency added
+   to the image (nanobind itself is small/header-light; Meson has nanobind
+   support via `dependency('nanobind')` / the nanobind module).
 
 ## Rough effort
 
@@ -145,11 +148,9 @@ Porting all 81 demos makes this a **multi-stage program, not one task**:
   **~0.5 session.** Bounds everything below.
 - **Notebook + render-helper MVP** (reuse `elaps`, container scaffolding,
   `_repr_png_`): **~1–2 sessions.**
-- **Bindings to cover the audited surface** + the `Figure`/`tix` shims:
+- **nanobind bindings to cover the audited surface** + the `Figure`/`tix` shims:
   **several sessions** (scales with the audit; the demos need broad coverage,
-  not a core subset). *If `natural-Python ports of all demos` is the priority,
-  option B (codegen/emit) may reach full coverage faster, since a Python API
-  that mirrors the free functions ports each demo near-mechanically.*
+  not a core subset).
 - **Porting the 81 demos** to notebooks + verifying each renders to its original
   figure: **the bulk of the work**, parallelizable per demo once the API +
   render helper exist.
@@ -157,24 +158,28 @@ Porting all 81 demos makes this a **multi-stage program, not one task**:
 Net: a working *pipeline* (bindings/emit + render + one ported notebook) is
 **~3–4 sessions**; the full 81-demo port is a sustained effort on top.
 
-## Decisions for Bill (when/if this proceeds)
+## Decisions
 
-1. **Binding approach** — real C++ bindings (A, recommended) vs codegen/emit (B)?
-2. **Binding tech** — pybind11 (mature) vs nanobind (leaner)?
-3. **Scope** — core-subset MVP first (recommended) vs aim broad?
-4. **Inline format** — PNG (simple raster) vs SVG (vector)?
-5. **Container/jupyter scaffolding** — mirror the `Makefile` jupyter
+1. **Binding approach** — ✅ **A, real C++ bindings over `libepix`** (Bill, 2026-06-09).
+2. **Binding tech** — ✅ **nanobind** (Bill, 2026-06-09).
+3. **Scope** — *open.* Core-subset MVP first (recommended) vs aim broad. (The
+   all-81-demos goal means it grows to the full demo-audited surface regardless;
+   the question is just the starting increment.)
+4. **Inline format** — *open.* PNG (simple raster) vs SVG (vector).
+5. **Container/jupyter scaffolding** — *open.* Mirror the `Makefile` `jupyter`
    target + jupytext flow now, or just a local `pyproject` first?
 
 ## Relationship to other tasks
 
-This couples with `modernize-cxx-standard.md`; decide the overlapping points
-together:
+`modernize-cxx-standard.md` is now **complete** (archived), which resolves the
+couplings that were open when this was written:
 
-- **Binding tech is gated on the C++ standard.** `nanobind` needs **C++17**;
-  `pybind11` works at C++11+. So the "pybind11 vs nanobind" choice depends on
-  what the modernization task pins (`cpp_std`). The binding module also compiles
-  at that pinned standard.
+- **C++ standard — RESOLVED.** Pinned at **C++20** ≥ nanobind's C++17 floor;
+  the binding module compiles at C++20 too. (This is partly *why* nanobind was
+  chosen.)
+- **`enum class` — RESOLVED + DONE** (in the modernize task): the C++ enums are
+  already scoped. So the Python layer's scoped enums (`LabelPos.t`-style) line
+  up naturally with the C++ side, and nothing here needs to touch them.
 - **Approach A vs B and `enum class` (corrected 2026-06-09).** Because the port
   is **additive** — the C++ `.xp` samples stay and must keep compiling
   unchanged — a breaking C++ API change like `enum class` is **NOT** something
@@ -196,12 +201,14 @@ together:
 - Minor: `normalize-repo-structure.md`'s `include/epix/` layout makes the
   bindings' includes/packaging cleaner — structure-first is mildly favorable.
 
-**Suggested order if all proceed:** C++17 modernization Tier 1+2 (**done** —
-output-neutral, oracle 96/97) → shared API/demo audit (Stage 0) → choose A/B +
-pybind11/nanobind → build the binding/emit + render pipeline → port the 81 demos
-against the locked oracle. **No C++ API-breaking step in this sequence** —
-`enum class` is decoupled (additive port keeps the `.xp` samples), so it's not
-on the bindings path.
+**Forward plan (modernize done; A + nanobind chosen):**
+1. **Stage 0 — demo API audit** (read-only): the `libepix` surface the 81 demos
+   collectively use → the concrete nanobind bind-list.
+2. **Notebook + render-helper MVP**: `_repr_png_`/`_repr_svg_` via the existing
+   `elaps` pipeline; jupytext percent flow; reuse the `Makefile` container.
+3. **nanobind bindings** for the audited surface + the `Figure`/`tix` shims.
+4. **Port the 81 demos** to notebooks, each verified against the locked render
+   oracle (output already frozen by the completed modernize work).
 
 ## Out of scope (this task)
 
