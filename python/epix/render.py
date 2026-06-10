@@ -22,8 +22,8 @@ class Figure:
         self.png = png
         self.eepic = eepic
 
-    def _repr_png_(self) -> bytes:  # IPython/Jupyter inline display hook
-        return self.png
+    def _repr_png_(self):  # IPython/Jupyter inline display hook
+        return self.png or None  # None when the figure was too large to rasterize
 
     def save(self, path: str) -> None:
         with open(path, "wb") as f:

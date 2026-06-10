@@ -43,10 +43,10 @@ def frame():
     R = epix.domain(P(-2, -2, -2), P(2, 2, 2), epix.mesh(1, 1, 1))
     epix.camera.at(epix.sph(10, t, -0.05))
     epix.plain(epix.Cyan())
-    epix.plot(epix.xyz, R)  # the cube
+    epix.plot(lambda x, y, z: epix.P(x, y, z), R)  # the cube
     epix.camera.at(epix.sph(10, 0.01 + t, -0.05))
     epix.red(1.4)
-    epix.plot(epix.xyz, R)  # second, slightly-rotated copy
+    epix.plot(lambda x, y, z: epix.P(x, y, z), R)  # second, slightly-rotated copy
 
 
 # %%

@@ -110,7 +110,14 @@ def main():
         print(f"{name}: FAIL ({type(e).__name__}: {e})")
         sys.exit(1)
     print(f"{name}: {'PASS' if ok else 'FAIL (' + why + ')'}")
-    sys.exit(0 if ok else 1)
+    # collect notebook-namespace reference cycles (e.g. a scenery holding a
+    # callable whose __globals__ points back) so nanobind's shutdown leak-check
+    # stays quiet; cosmetic, doesn't affect the result.
+    import gc
+
+    gc.collect()
+    sys.stdout.flush()
+    os._exit(0 if ok else 1)
 
 
 if __name__ == "__main__":

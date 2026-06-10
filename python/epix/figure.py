@@ -31,12 +31,22 @@ from .render import Figure, render_eepic
 
 
 def render(dpi: int = 150) -> Figure:
-    """Capture the current ePiX picture (via ``print_eepic``) and render to PNG."""
+    """Capture the current ePiX picture (via ``print_eepic``) and render to PNG.
+
+    The eepic is always captured; the PNG is best-effort. A few demos produce an
+    enormous eepic (tens of thousands of colored facets) that exceeds LaTeX's
+    memory when rasterized — those still return a valid ``Figure`` (with the
+    eepic) but an empty PNG rather than raising, so the notebook doesn't crash.
+    """
     fd, path = tempfile.mkstemp(suffix=".eepic")
     os.close(fd)
     try:
         _epix.print_eepic(path)
-        return render_eepic(path, dpi=dpi)
+        try:
+            return render_eepic(path, dpi=dpi)
+        except subprocess.CalledProcessError:
+            with open(path) as f:
+                return Figure(b"", f.read())
     finally:
         os.unlink(path)
 

@@ -398,10 +398,139 @@ couplings that were open when this was written:
     `pst_format`, `arc`/`polar_grid`, `h_axis_labels`/`v_axis_labels`, `xsize`/
     `ysize`, `Atan`/`Atan2`, and the field/polar trampolines `polarplot`/
     `tan_field`/`dart_field`/`ode_plot`.
-  - **Ports so far (13/81):** the 5 above + batch 1. All four demo *classes*
-    proven byte-identical; the harness makes each subsequent demo a tight
-    port→verify loop. **Remaining 68 are mechanical** — bind the long tail on
-    demand as each needs it.
+  - **Batch 2 ✅ (2026-06-10), 7 demos:** `planes` (the `Plane` class),
+    `geomsum`, `uppersum` (`riemann_sum` + `IntegralType` enum), `torus`
+    (`domain` `resize`/`slice` + 2-var `plot(F, domain)`), `weierstrass`, `denom`,
+    `demoivre` (the `pair` complex-like type) — all byte-identical. Bound:
+    `Plane`/`pair` classes, `IntegralType` + `riemann_sum`, `domain.resize1/2` +
+    `slice1/2`, `white`/`ddot`/`dot_size`/`tikz_format`/`cb`/`cis`, `E_1/E_2/E_3`.
+    - **Gotcha — overload by callable arity.** `plot(f, domain)` has two forms
+      (`f(u,v)` surface-wireframe vs `f(x,y,z)` box). Disambiguated by a
+      **try-call probe** (`f(0,0)` → 2-var, else 3-var). `inspect.signature` is
+      *unreliable* — nanobind functions report `(args, kwargs)` → arity 2 — and a
+      function with a defaulted 3rd arg (`xyz(x,y,z=0)`) is callable with 2 args,
+      so ports pass a **strict-arity lambda** (`lambda x, y, z: P(x, y, z)`) when
+      they want the 3-var form.
+    - **Gotcha — match C++ default args exactly.** `h_axis_labels` default align
+      is `none`, not `b`; binding the wrong default silently breaks demos that
+      rely on it (weierstrass). Check the header's `= ...` defaults.
+  - **Batch 3 ✅ (2026-06-10), 7 demos:** `cropplot` (poles at sample points —
+    `g` guards `1/0 → inf` to match C++ double division), `plotting3`, `sqrt`,
+    `wheel`/`layout`/`layout2` (the **`screen`** class + `activate`/`inset`/
+    `deactivate` for multi-panel layouts), `pascal` (the **`Segment`** class,
+    intersections via `*`). Bound: `screen`, `Segment`, `activate`/`deactivate`/
+    `inset`(2 forms)/`border(Color,str)`, 4-arg `dot`.
+  - **Deferred:** `koch.xp` (`screen` is now bound, but it also needs `fractal`
+    with a C int-array seed — bind a list→array shim when revisited); `newton.xp`
+    (uses `Deriv(f)(t)` as a functor for the slope — needs a `Deriv` callable or a
+    `slope(f, t)` helper).
+  - **Batch 4 ✅ (2026-06-10), 3 demos:** `saddle` (half-space clipping —
+    `clip_face`/`clip_restore`/`label_color`), `surface_shade` + `densityplot`
+    (surface with a per-position color function). Bound: `label_color`,
+    `clip_face`/`clip_restore`, `base`, `backing`, and `surface(f, domain, color)`
+    (2-var `f` + 3-var color trampolines).
+    - **`render()` made resilient:** the eepic is always captured; the PNG is
+      best-effort. `surface_shade`'s eepic is **129 K lines** and exceeds LaTeX's
+      memory when rasterized (the C++ original sidesteps this via PSTricks), so
+      `render()` now returns a `Figure` with the correct eepic + an *empty* PNG
+      instead of crashing the notebook (`_repr_png_` → `None`). The byte-identity
+      check (the real correctness criterion) still passes. *(Bumping LaTeX's
+      `main_memory` in the image would let these giant figures rasterize too —
+      future polish.)*
+  - **Batch 6 ✅ (2026-06-10), 2 (un-deferred):** `newton` — bound `deriv(f, t)`
+    (atomic `Deriv(tramp_d)(P(t))`, returns the P whose `.x2()` is the slope);
+    `bowl` — bound the **`scenery`** surface object via a Python-side wrapper
+    (`PyScenery` holds the callable + domain; `draw()` builds the C++ `scenery`
+    and renders atomically with the trampoline live). The wrapper holds a Python
+    callable → a GC cycle that nanobind's *shutdown* leak-check flags (benign;
+    invisible in a live kernel); the harness now `gc.collect()`s + `os._exit`s to
+    keep that quiet.
+  - **Still deferred:** `koch` (`fractal` + C int-array seed), `hyperboloid`
+    (`surface_rev` + the `frame` class).
+  - **Batch 5 ✅ (2026-06-10), 3 demos:** `pole` (already covered), `vfield` +
+    `lorenz` (3-D vector fields). Bound the **3-var field forms** — `ode_plot`
+    (`F(x,y,z)`, 5-arg), `dart_field`/`vector_field` over a domain — each sharing
+    the Python signature with its 2-var sibling, so dispatched by the same
+    try-call arity probe (`F(0,0)` → 2-var, else 3-var). `lorenz` also exercises
+    the `screen` stereo-pair + `inset(screen, …)`.
+  - **Ports so far (54/81):** + `tori`, `twisted_cubic`, `sqrt2`. Refactored `scenery` to build eagerly (per-surface fill captured correctly) + `add()` for multi-surface; fixes the GC-cycle leak. Bound `magenta`/`Neutral`/`RGB_Neutral`/`clip_box(P)`/`camera.filter`. `trig`, `coord_tricks`, `R_demo` (`axis_break`/`recip`/`shadeplot`), `artifacts`, + batch 9 (`dipole`/`medians`/`symmetries`/`contour`/`inverse` — `path`/`affine`/screen-transforms/`flow`/`J`/`circ`/`right_angle`/etc.). Arity probe switched to `inspect.signature` (robust to callables that raise at the probe point, e.g. `1/0`). `spherical`, `oscillator` (`scenery.add` 3-var via lambda-wrap, `arrow_fill`/`v_error_bar`/`h_axis_masklabels`/`slice3`/screen-corners). `steiner2` (4th animation; `camera.eye`/`clip_slice`). `riemann`/`steiner2`/`house` (animations; fixed broken `riemann.flx` enum, bound `camera.eye`/`clip_slice`/`ring`/`gray`). `pendulum` (6th animation; `slope_field`/`integral_eval`).
+  - **Batch 10 ✅ (2026-06-10, session 2), 9 demos → 63/81:** `butterfly`,
+    `shadeplot`, `clipping`, `legend`, `minkowski`, `decorate`, `log`, `extract`,
+    `S2_harmonics` — all byte-identical (butterfly 3/3 stable), regressions clean
+    across the whole set (re-verified after a `make format` clang-format/ruff pass
+    + rebuild). Bound on demand: `label_border`(Color / +double / +str),
+    `label_mask`(Color / no-arg), `CMY_Neutral`, `sgn`,
+    `arrow(tail, head, scale)` (the plain curves.h form — **no default on
+    `scale`** so a 2-arg `arrow()` still resolves to the existing labelled-marker
+    form; registration order keeps old ports unaffected), `camera.viewpt()`,
+    `quad(a,b,c,d)`, `path(list, closed, filled)` (added
+    `<nanobind/stl/vector.h>` for the list→`std::vector<P>` conversion),
+    `picture(P)` (single-P width×height form), `yellow(d)`, `deriv_eval(f, t)`
+    (scalar `Deriv(f).eval(t)`), `Line(pt, slope)`, `screen.extract_ellipse`/
+    `.backing`/`.border`/`.c()` (lens/magnification + screen center),
+    `Color.__mul__`/`__rmul__` (scale intensity — for `RGB(...) *= d`). **Painter-
+    sort demos confirmed safe:** `decorate`'s `std::sort` showed no float-tie
+    divergence vs Python's Timsort, and `log`'s `stable_sort` matches Python's
+    stable sort by construction. **Figure idiom:** the
+    `bounding_box`+`unitlength`+`picture(w,h)` / `picture(P)` demos (minkowski,
+    log) use the manual `epix.begin()` … `fig = epix.render()` form (like
+    `contour`), not the `figure()` context manager (which only wraps
+    `picture(sw, ne, size)`).
+  - **`histogram` is BLOCKED (not just unbound):** it reads `samples/binom.dat`,
+    which **does not exist** in the repo (the sample's own comment says generate
+    it via `binom.cc`). The C++ oracle itself can't run without it, so there's
+    nothing to verify against. Skip until/unless `binom.dat` is produced.
+    `dataplot` is the *other* data demo and IS viable (it generates its data from
+    `Cos`/`Sin`) but needs the meatier `data_file(f1, f2, t_min, t_max, n)`
+    two-function-trampoline ctor + `transform(P f(u,v))` + `DF.plot(MarkType,…)`
+    scatter + the `data_bins` class (`read`/`bar_chart`/`pop`).
+  - **Remaining 18 — precise handoff** (each = same port→verify loop; grouped by the
+    one new binding/subsystem it needs). Resume by porting any item, binding the
+    listed piece, and running `build-aux/verify_ports.py NAME`:
+    - **lighting model** (`light()`/`facet`/`model_*` — a shading subsystem):
+      `lighting`, `helicoid`, `stereo_proj`. These also have bare-enum compile
+      breakage like `riemann.flx` did — add `using enum epix_label_posn;` to make
+      the oracle compile.
+    - **`Sphere`/`Circle` classes + `Sphere*Sphere`→`Circle` intersection:**
+      `mirrorball`. (`camera.viewpt()` already bound in batch 10.)
+    - **`data_file`/`data_bins`** subsystem: `dataplot` (viable — generates data
+      from `Cos`/`Sin`; needs the 2-function-trampoline `data_file` ctor +
+      `transform` + scatter `plot` + `data_bins`). `histogram` is **BLOCKED** —
+      `samples/binom.dat` is missing from the repo (see batch-10 note above).
+    - **`Complex` + `rootC`** (complex n-th roots): `cubic_cutaway`.
+    - **`surface_rev` + `frame` class:** `hyperboloid`.
+    - **`fractal` (takes a C `int[]` seed — bind a Python-list→array shim):**
+      `koch`.
+    - **CMYK colour separation** (`CMYK_Neutral`/`C_Process`/`M_Process`/…
+      camera filters): `color_sep`.
+    - **`domain_list` + `slices2()`/`slices3()` + `plot(f, P, P, mesh, mesh)`
+      region form:** `levelset`, `levelset2`, `levelset3`.
+    - **small setters only** (`label_border`/`label_mask` already bound in batch
+      10; still need `base_color`/`base_pen`/`fill_color`/`line_color`/
+      `label_pad`/`set_border`, then it's mechanical): `line_debug`, `label_debug`
+      (large internal debug harnesses).
+    - **mostly-covered, just larger** (read + translate; bind a stray fn or two):
+      `std_F` (needs the sample's own `std_F.h` helpers reimplemented in Python),
+      `polyhedra` (uses `-D` variants). (`decorate`, `butterfly`, `log`,
+      `S2_harmonics` done in batch 10; `extract` done — `Deriv.eval`/lens bound.)
+    - **not previously grouped, done in batch 10:** `clipping`, `legend`,
+      `shadeplot`, `minkowski` (needed no new subsystem beyond the batch-10
+      bindings).
+  - **Session 2 (2026-06-10) continued the grind to a clean, harness-verified
+    63/81** (batch 10 above). Everything remaining is a pure continuation — no
+    rework, no new risk; the bindings + `verify_ports.py` make each remaining demo
+    a tight loop. Note: the image store is an ephemeral tmpfs, so a session must
+    `make image` first (≈ several min for the TeX-Live layer), then iterate with
+    `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled` + a container loop over
+    `verify_ports.py`.
+  - **Outstanding (ASan cleanup):** the **batch-10 bindings are not yet mirrored
+    into `build-aux/asan_smoke.cc`** (the standing "keep mirroring until removal"
+    rule). The session-2 churn there is only clang-format reformatting, *not* new
+    coverage. Risk is low — the new bindings (`path` list-ctor, `quad`,
+    `screen.extract_ellipse`, `deriv_eval`, …) exercise already-covered libepix
+    code, and all 9 ports ran clean — but mirror them (and run `make asan`) before
+    the final dev-tooling teardown so the smoke test still covers the bound
+    surface.
 
 ## Out of scope (this task)
 

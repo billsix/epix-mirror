@@ -111,8 +111,14 @@ a notebook layer, so you write a figure in Python the way the `.xp` samples are
 written in C++, rendered inline. Goal: port all ~81 `samples/` to percent-format
 notebooks, each **byte-identical** to the C++ original. The C++ samples stay as
 the permanent oracle — this is purely additive. **Authoritative status + full
-history: `tasks/python-bindings-and-notebooks.md`.** (Tech chosen: nanobind →
-architecture A, real bindings; C++20.)
+history (incl. the precise remaining-work list): `tasks/python-bindings-and-notebooks.md`.**
+(Tech chosen: nanobind → architecture A, real bindings; C++20.) **Status: 63 of
+81 demos ported byte-identically** as of 2026-06-10; the remaining 18 each need a
+specific subsystem (lighting model, `Sphere`/`Circle` intersections, the
+`data_file`/`data_bins` subsystem, `Complex`/`rootC`, `surface_rev`, `fractal`,
+CMYK separation, `domain_list`, plus a few small-setter/larger read-and-translate
+demos). Note `histogram` is **blocked** — its `samples/binom.dat` is absent — see
+the task doc.
 
 Layout:
 - `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
@@ -147,10 +153,68 @@ How it works:
   later frames. `animate()` forks per frame (build + `print_eepic` in the child,
   parent renders), matching how `flix` runs a fresh process per frame. (`fork()`
   inside a threaded Jupyter kernel is a runtime caveat to watch.)
-- **Verify every port against the oracle.** Render the Python scene's eepic and
-  `diff` it (strip the `%% Generated …` timestamp line) against the C++ original
-  — `epix samples/foo.xp` for a figure, or compile+run a `.flx` with
-  `(frame, total)` argv for each animation frame. Target is byte-identical.
+- **Verify every port with the harness, not by hand.** `build-aux/verify_ports.py
+  NAME` execs `notebooks/NAME.py`, grabs its `fig`/`anim`, and diffs the eepic
+  against the sample **compiled with `-DEPIX_FMT_EEPIC`** (forces eepic so
+  in-file `pst_format()`/`tikz_format()` don't change the oracle) — per-frame for
+  `.flx`. Run one name per process (libepix accumulates state). Loop in the shell
+  for a batch; `PASS`/`FAIL` per demo. This is the inner loop of the whole port
+  effort.
+- **The per-session dev loop (operational).** The container image store is an
+  *ephemeral tmpfs*, so a fresh session rebuilds it: `make image` (~minutes — the
+  TeX-Live layer). Then iterate: after each `_epix.cc` change run
+  `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled`, and run the harness in the
+  container —
+  `podman run --rm --cgroups=disabled -v /epix:/epix:Z -e PYTHONPATH=/epix/python
+  epix -c 'for n in NAME …; do python3 /epix/build-aux/verify_ports.py $n; done'`.
+  Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),
+  **not** the TeX/ghostscript render path — that's only for the inline PNGs.
+- **Dispatch 2-var vs 3-var callables by `inspect.signature`, never a trial
+  call.** Several functions (`plot(f,domain)`, `ode_plot`, `dart_field`,
+  `surface(...,color)`) have 2- and 3-argument forms sharing one Python
+  signature. Count params via `inspect.signature` — a trial call (`f(0,0)`) can't
+  tell "wrong arity" from "the function raised at the probe point" (e.g. `1/0` in
+  `dipole`). Caveat: nanobind functions report `(args, kwargs)`→2, so when a
+  *nanobind* function needs the 3-var form, the port passes a strict-arity lambda
+  (`lambda x,y,z: epix.P(x,y,z)`). See `callable_takes_two` in `_epix.cc`.
+- **Objects that hold a function pointer build eagerly.** `scenery` samples its
+  surface (and captures the current fill state) at construction/`add()` time, so
+  the Python wrapper builds the C++ object immediately (trampoline set→sample→
+  cleared), holding no callable — correct per-surface colors and no GC cycle.
+- **The bind-on-demand workflow:** port a demo → it fails on a missing symbol →
+  `nm`-check + bind that one thing → re-verify. Don't try to bind the whole API
+  up front. `tasks/python-bindings-and-notebooks.md` tracks status + a precise
+  remaining-work list (grouped by the subsystem each demo still needs).
+- **Three `.flx` are broken upstream** (`lighting`, `helicoid`, `stereo_proj`,
+  and `riemann` — now fixed): they use bare enum names (`tr`, …) without
+  `using enum`, so they don't even compile under enum-class. Add
+  `using enum epix_label_posn;` to make the oracle build before porting.
+- **Byte-identity needs the same float *expression structure*, not just the same
+  math.** The harness compares eepic byte-for-byte, so floating-point rounding
+  must match C++ exactly: (a) reproduce precomputed constants as the source
+  writes them — `5*M_PI_4` is `5*(math.pi/4)`, **not** `5*math.pi/4` (the two
+  products round to different last bits); (b) preserve addition associativity /
+  grouping — `0.25*(pt1+(pt3+(pt5+pt7)))` must keep that nesting, not be
+  re-associated to a flat sum; (c) Python's `^` (the bound cross product) binds
+  *looser* than `+`/`-`, so a normal `(b-a)^(d-a)` needs explicit parens. A
+  mismatch here is a silent eepic diff, not an error.
+- **Figure setup has two idioms.** `figure()` (the context manager) wraps only
+  `picture(sw, ne, size)`. Demos that instead use `bounding_box(...)` +
+  `unitlength(...)` + `picture(w,h)` / `picture(P)` build the scene with the
+  manual lower-level form: `epix.bounding_box(...)`, `epix.unitlength(...)`,
+  `epix.picture(...)`, `epix.begin()`, … , `fig = epix.render()` — as
+  `notebooks/contour.py` / `minkowski.py` / `log.py` do.
+- **Painter's-algorithm demos port faithfully.** Demos that build a list of
+  facets/patches and draw them back-to-front (`decorate`, `log`, …) sort by
+  distance: Python's stable `list.sort(reverse=True)` matches C++ `stable_sort`
+  with `>` by construction, and even unstable `std::sort` showed no float-tie
+  divergence in practice. Mirror the build/sort/draw order exactly and the eepic
+  matches.
+- **Adding an overload that could shadow an existing one?** nanobind tries
+  overloads in *registration order*. To add `arrow(tail, head, scale)` without
+  disturbing the existing 2-arg `arrow(tail, head)` (which routes to the
+  labelled-marker form), register the new one *after* it and give `scale` **no
+  default**, so a 2-arg call can't fall into the 3-arg overload.
 
 **A libepix bug fixed here (independent of the bindings, worth keeping):**
 `screen::screen()` left the pimpl pointer `m_screen` uninitialized — latent UB
