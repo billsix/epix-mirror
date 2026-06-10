@@ -99,6 +99,8 @@ NB_MODULE(_epix, m) {
     m.def("xmax", []() { return xmax(); });
     m.def("ymin", []() { return ymin(); });
     m.def("ymax", []() { return ymax(); });
+    m.def("xsize", []() { return xsize(); });
+    m.def("ysize", []() { return ysize(); });
     m.def("tix",  []() { return tix(); });
     m.def("set_tix", [](double t) { tix() = t; }, nb::arg("t"));  // animation frame param
 
@@ -322,6 +324,47 @@ NB_MODULE(_epix, m) {
         g_fn2 = nb::callable();
     }, nb::arg("f"), nb::arg("domain"), nb::arg("cull") = 0);
 
+    // ===== more state setters, shapes, axis labels, and field/polar plots =====
+    m.def("black", &black, nb::arg("d") = 1.0);     // set pen color to a tint
+    m.def("blue", &blue, nb::arg("d") = 1.0);
+    m.def("green", &green, nb::arg("d") = 1.0);
+    m.def("rgb", static_cast<void (*)(double, double, double)>(&rgb),
+          nb::arg("r"), nb::arg("g"), nb::arg("b"));
+    m.def("arrow_inset", &arrow_inset, nb::arg("inset") = 0.0);
+    m.def("arrow_width", &arrow_width, nb::arg("w") = 3.0);
+
+    m.def("picture", static_cast<void (*)(double, double)>(&picture),
+          nb::arg("width"), nb::arg("height"));
+    m.def("bounding_box", &bounding_box, nb::arg("sw"), nb::arg("ne"));
+    m.def("unitlength", &unitlength, nb::arg("units"));
+    m.def("pst_format", &pst_format);
+
+    m.def("arc", &arc, nb::arg("center"), nb::arg("r"), nb::arg("start"), nb::arg("finish"));
+    m.def("polar_grid", static_cast<void (*)(double, unsigned int, unsigned int)>(&polar_grid),
+          nb::arg("r"), nb::arg("n1"), nb::arg("n2"));
+    m.def("h_axis_labels",
+          static_cast<void (*)(unsigned int, const P&, epix_label_posn)>(&h_axis_labels),
+          nb::arg("n"), nb::arg("offset"), nb::arg("align") = epix_label_posn::b);
+    m.def("v_axis_labels",
+          static_cast<void (*)(unsigned int, const P&, epix_label_posn)>(&v_axis_labels),
+          nb::arg("n"), nb::arg("offset"), nb::arg("align") = epix_label_posn::l);
+
+    // function-pointer plots/fields (trampolines)
+    m.def("polarplot", [](nb::callable f, double a, double b, unsigned int n) {
+        g_fn = f; polarplot(tramp_d, a, b, n); g_fn = nb::callable();
+    }, nb::arg("f"), nb::arg("t_min"), nb::arg("t_max"), nb::arg("n") = 200);
+    m.def("tan_field", [](nb::callable f, double a, double b, unsigned int n) {
+        g_fn = f; tan_field(tramp_P, a, b, n); g_fn = nb::callable();
+    }, nb::arg("f"), nb::arg("t_min"), nb::arg("t_max"), nb::arg("n"));
+    m.def("dart_field",
+          [](nb::callable F, const P& p, const P& q, unsigned int n1, unsigned int n2) {
+              g_fn2 = F; dart_field(tramp_P2, p, q, n1, n2); g_fn2 = nb::callable();
+          }, nb::arg("F"), nb::arg("sw"), nb::arg("ne"), nb::arg("n1"), nb::arg("n2"));
+    m.def("ode_plot", [](nb::callable F, const P& start, double t_max, unsigned int n) {
+        g_fn2 = F; ode_plot(tramp_P2, start, t_max, n); g_fn2 = nb::callable();
+    }, nb::arg("F"), nb::arg("start"), nb::arg("t_max"), nb::arg("n"));
+
     // ---- functions ----
     m.def("Sin", &Sin); m.def("Cos", &Cos);
+    m.def("Atan", &Atan); m.def("Atan2", &Atan2, nb::arg("y"), nb::arg("x"));
 }

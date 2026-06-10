@@ -70,6 +70,17 @@ int main() {
   Line(P(-1, 0), P(1, 0));
   masklabel(P(0, 0), P(0, 1), "m", epix_label_posn::t);
 
+  // more state setters, shapes, axis labels
+  black(0.5); blue(0.5); green(0.5); rgb(0.1, 0.2, 0.3);
+  arrow_inset(0.1); arrow_width(2);
+  arc(P(0, 0), 1, 0, 1); polar_grid(1, 2, 8);
+  h_axis_labels(4, P(0, -4), epix_label_posn::b);
+  // function-pointer plots / fields (trampolines)
+  polarplot(sq, 0, 1, 10);
+  tan_field(para, 0, 1, 10);
+  dart_field(saddle, P(-1, -1), P(1, 1), 3, 3);
+  ode_plot(saddle, P(0.1, 0.1), 2, 20);
+
   // coordinate ctors + plot over a 3-D domain + animation/tix
   tix() = 0.5;
   line(polar(1, 0.25), sph(2, 0.1, 0.2));

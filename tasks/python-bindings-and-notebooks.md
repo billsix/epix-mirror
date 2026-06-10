@@ -385,12 +385,23 @@ couplings that were open when this was written:
     tangent-line `envelope`, the line at infinity, a pulled-back camera. Bindings
     added on demand: `border()`, `pen(Color, width-string)`, region
     `grid(P, P, n1, n2)`, `envelope` (P-valued trampoline), `Line`, `masklabel`.
-  - **Ports so far (5/81):** `parabola`, `calculus`, `sphere`, `cube` (animation),
-    `conic`. All four demo *classes* (2-D graph, legend/calculus, 3-D, animation)
-    proven byte-identical. **Remaining 76 are mechanical** — port → bind the long
-    tail on demand → verify against the frozen oracle. A sustained grind, not new
-    risk. (Decide how many to do now vs. leave as the documented repeatable
-    process.)
+  - **Verification harness ✅ `build-aux/verify_ports.py`:** execs a notebook
+    (percent `.py` is valid Python), grabs its `fig`/`anim`, and diffs the eepic
+    against the sample compiled with **eepic forced** (`-DEPIX_FMT_EEPIC`, so
+    in-file `pst_format()`/`tikz_format()` don't change the oracle backend) — for
+    `.flx`, per frame with `(i, count)` argv. Run one name per process (libepix
+    accumulates state). `PASS`/`FAIL` per demo.
+  - **Batch 1 ✅ (2026-06-09), 8 demos:** `plotting`, `lissajous`, `golden_rect`,
+    `polar`, `semicirc`, `slopefield`, `plotting2`, `objects` — all
+    byte-identical. Bound on demand: color setters (`black`/`blue`/`green`/`rgb`),
+    `arrow_inset`/`arrow_width`, `picture(w,h)`/`bounding_box`/`unitlength`/
+    `pst_format`, `arc`/`polar_grid`, `h_axis_labels`/`v_axis_labels`, `xsize`/
+    `ysize`, `Atan`/`Atan2`, and the field/polar trampolines `polarplot`/
+    `tan_field`/`dart_field`/`ode_plot`.
+  - **Ports so far (13/81):** the 5 above + batch 1. All four demo *classes*
+    proven byte-identical; the harness makes each subsequent demo a tight
+    port→verify loop. **Remaining 68 are mechanical** — bind the long tail on
+    demand as each needs it.
 
 ## Out of scope (this task)
 
