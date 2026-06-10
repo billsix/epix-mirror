@@ -10,6 +10,10 @@
 
 .DEFAULT_GOAL := help
 
+# This wrapper drives heavy, ordered `podman run` steps; never parallelize them
+# (e.g. `build: lib py-ext` must run lib before py-ext links its output).
+.NOTPARALLEL:
+
 CONTAINER_CMD  = podman
 CONTAINER_NAME = epix
 
@@ -61,11 +65,14 @@ shell: ## Interactive dev shell (live tree bind-mounted; epix/elaps/flix on PATH
 		$(GITCONFIG_MOUNT) $(TMUX_MOUNT) \
 		$(CONTAINER_NAME) /shell.sh
 
-.PHONY: build
-build: ## Build libepix.a + driver scripts from the bind-mounted sources
+.PHONY: lib
+lib: ## Build libepix.a + driver scripts (meson) from the bind-mounted sources
 	$(RUN) \
 		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
 		$(CONTAINER_NAME) /build.sh
+
+.PHONY: build
+build: lib py-ext ## Full build: libepix.a + the Python extension (reflects edited sources)
 
 .PHONY: examples
 examples: ## Render samples/+doc/ figures -> $(OUTPUT_DIR) (.eepic; add RENDER=pdf for PDF)
@@ -86,7 +93,7 @@ examples-anim: ## Render .flx animations -> $(OUTPUT_DIR)/anim (FMT=mng|gif)
 		$(CONTAINER_NAME) /examples-anim.sh
 
 .PHONY: py-ext
-py-ext: ## Build the nanobind extension (python/epix/_epix*.so) against libepix
+py-ext: ## Build the nanobind extension (_epix*.so); links build/libepix.a if present, else installed
 	$(RUN) \
 		$(SRC_MOUNT) \
 		-v $(CURDIR)/entrypoint/build_py.sh:/build_py.sh:Z \
@@ -100,7 +107,7 @@ asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (remove las
 		$(CONTAINER_NAME) /asan_check.sh
 
 .PHONY: jupyter
-jupyter: ## Launch JupyterLab (port 8888) with the epix package + notebooks
+jupyter: py-ext ## Launch JupyterLab (:8888) with the epix package; builds the extension first
 	$(RUN) -it \
 		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
 		-v $(CURDIR)/entrypoint/jupyter.sh:/usr/local/bin/jupyter.sh:Z \

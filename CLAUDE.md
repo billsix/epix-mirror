@@ -75,10 +75,15 @@ figures (no epix run needed).
 `Makefile` wraps the Meson build in a Fedora `podman` image (full
 toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick, plus
 the Python/Jupyter stack for the bindings work — see below).
-Targets (invoke with `make <t>`): `image`, `shell`, `build`,
+Targets (invoke with `make <t>`): `image`, `shell`, `lib` (libepix.a + driver
+scripts via meson), `build` (**full build** = `lib` + `py-ext`, so the Python
+extension reflects edited C++ sources),
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
 `examples-anim` (`.flx` → `./output/anim`), `clean`; and for the Python layer:
-`py-ext` (build the nanobind extension), `jupyter` (JupyterLab on :8888),
+`py-ext` (build the nanobind extension — links the bind-mounted `build/libepix.a`
+when present, else the installed copy; skips relinking when the `.so` is
+up-to-date, `FORCE=1` to override), `jupyter` (JupyterLab on :8888 — **depends on
+`py-ext`**, so it always builds the extension first),
 `notebooks` (jupytext → `.ipynb`), `asan` (**dev-only** sanitizer smoke),
 `format` (clang-format C++ + ruff Python — also runs automatically on `make
 shell` exit, via `entrypoint/format.sh`).
@@ -162,8 +167,11 @@ How it works:
 - **The per-session dev loop (operational).** The container image store is an
   *ephemeral tmpfs*, so a fresh session rebuilds it: `make image` (~minutes — the
   TeX-Live layer). Then iterate: after each `_epix.cc` change run
-  `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled`, and run the harness in the
-  container —
+  `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled` (it relinks only when needed;
+  `FORCE=1` to force). Note `py-ext` links the bind-mounted `build/libepix.a`, so
+  after editing *libepix* C++ sources (`src/`/`include/`) run `make build` (or
+  `make lib`) first — otherwise the extension links a stale library. Run the
+  harness in the container —
   `podman run --rm --cgroups=disabled -v /epix:/epix:Z -e PYTHONPATH=/epix/python
   epix -c 'for n in NAME …; do python3 /epix/build-aux/verify_ports.py $n; done'`.
   Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),

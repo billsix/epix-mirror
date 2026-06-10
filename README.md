@@ -81,12 +81,13 @@ wrapper around `podman` that builds a Fedora image with the full toolchain
 ```sh
 make image                 # build the OCI image
 make shell                  # interactive dev shell
-make build                  # build libepix.a + driver scripts
+make lib                    # build libepix.a + driver scripts (meson)
+make build                  # full build: libepix.a + Python extension
 make examples               # render samples/+doc/ -> ./output (.eepic)
 make examples RENDER=pdf    # ... also render PDFs
 make examples-anim          # render .flx animations -> ./output/anim
-make py-ext                 # build the Python (nanobind) extension (see below)
-make jupyter                # JupyterLab on :8888 with the epix package
+make py-ext                 # build just the Python (nanobind) extension (see below)
+make jupyter                # JupyterLab on :8888 (builds the extension first)
 make notebooks              # convert notebooks/*.py (jupytext) -> .ipynb
 ```
 
@@ -115,8 +116,9 @@ with epix.figure(epix.P(-1, -1), epix.P(1, 1), "2x1in") as fig:
 fig                      # displays inline in a notebook
 ```
 
-Build the extension with `make py-ext`, then `make jupyter` for a notebook
-environment (or `make notebooks` to convert the `.py` notebooks to `.ipynb`).
+`make jupyter` gives a notebook environment (it builds the extension first via
+`make py-ext`; or run `make py-ext` on its own, and `make notebooks` to convert
+the `.py` notebooks to `.ipynb`).
 This is purely additive — the C++ library and the `.xp`/`.flx` workflow are
 unchanged. Design and status:
 [`tasks/python-bindings-and-notebooks.md`](tasks/python-bindings-and-notebooks.md).
