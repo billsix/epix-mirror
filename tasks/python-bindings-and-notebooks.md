@@ -536,3 +536,9 @@ couplings that were open when this was written:
 
 - Any implementation — this is the feasibility read only.
 - Choosing the final API shape / naming for the Python layer.
+- **Pythonic cleanup / clearer variable names** — the ported notebooks
+  deliberately mirror the C++ source's names + structure while porting (keeps the
+  verify loop and the oracle diff clean). A post-completion readability pass is
+  tracked separately in **`tasks/pythonic-cleanup.md`** (deferred until this task
+  is done; harness-guarded so it stays byte-identical). Keyword-argument
+  readability is in `tasks/notebook-keyword-args.md`.
