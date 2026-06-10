@@ -1,14 +1,14 @@
-/* 
+/*
  * data_mask.h -- ePiX::data_mask, for selective row removal from data_file
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.6
  * Last Change: July 3, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -40,27 +40,26 @@
 
 namespace ePiX {
 
-  class data_mask {
-  public:
-    data_mask(std::string);
-    data_mask(std::string, double f(double));
+class data_mask {
+ public:
+  data_mask(std::string);
+  data_mask(std::string, double f(double));
 
-    data_mask(const interval& range);
-    data_mask(const interval& range, double f(double));
+  data_mask(const interval& range);
+  data_mask(const interval& range, double f(double));
 
-    data_mask(double range_min, double range_max);
-    data_mask(double range_min, double range_max,
-	      double f(double));
+  data_mask(double range_min, double range_max);
+  data_mask(double range_min, double range_max, double f(double));
 
-    data_mask& reverse(); // negate mask criterion
-    bool masks(double) const; // true if we mask arg 
+  data_mask& reverse();      // negate mask criterion
+  bool masks(double) const;  // true if we mask arg
 
-  private:
-    interval m_range;
-    double (*m_filter)(double); // filter criterion
-    bool m_reverse;
+ private:
+  interval m_range;
+  double (*m_filter)(double);  // filter criterion
+  bool m_reverse;
 
-  }; // end of data_mask
-} // end of namespace
+};  // end of data_mask
+}  // namespace ePiX
 
 #endif /* EPIX_DATA_MASK */

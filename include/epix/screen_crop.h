@@ -1,13 +1,13 @@
-/* 
+/*
  * screen_crop.h -- ePiX functions for cropping 2D paths and loops
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 17, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,12 +38,10 @@
 
 namespace ePiX {
 
-  // return reference to second argument
-  std::list<edge2d>& crop_path_2nd(const std::list<edge2d>&,
-				   std::list<edge2d>&);
+// return reference to second argument
+std::list<edge2d>& crop_path_2nd(const std::list<edge2d>&, std::list<edge2d>&);
 
-  std::list<edge2d>& crop_loop_2nd(const std::list<edge2d>&,
-				   std::list<edge2d>&);
-} // end of namespace
+std::list<edge2d>& crop_loop_2nd(const std::list<edge2d>&, std::list<edge2d>&);
+}  // namespace ePiX
 
 #endif /* EPIX_SCREEN_CROP */

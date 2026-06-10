@@ -1,14 +1,14 @@
-/* 
+/*
  * lens.cc -- ePiX::lens functions
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.22
  * Last Change: September 24, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -41,122 +41,75 @@
 
 namespace ePiX {
 
-  Lens::~Lens() = default;
+Lens::~Lens() = default;
 
-  pair Perspective::operator()
-    (const P& arg, const frame& orient, const P& viewpt,
-     double dist) const
-  {
-    P arg_vector(arg - viewpt);
+pair Perspective::operator()(const P& arg, const frame& orient, const P& viewpt,
+                             double dist) const {
+  P arg_vector(arg - viewpt);
 
-    // get arg's location in our coordinates
-    double u1(orient.sea()|arg_vector);
-    double u2(orient.sky()|arg_vector);
-    double u3(orient.eye()|arg_vector);
+  // get arg's location in our coordinates
+  double u1(orient.sea() | arg_vector);
+  double u2(orient.sky() | arg_vector);
+  double u3(orient.eye() | arg_vector);
 
-    return (-dist/u3)*pair(u1, u2);
-  } // end of Camera::Perspective::operator()
+  return (-dist / u3) * pair(u1, u2);
+}  // end of Camera::Perspective::operator()
 
-  bool Perspective::is_linear() const
-  {
-    return true;
-  }
+bool Perspective::is_linear() const { return true; }
 
-  bool Perspective::needs_clip() const
-  {
-    return true;
-  }
+bool Perspective::needs_clip() const { return true; }
 
-  Perspective* Perspective::clone() const
-  {
-    return new Perspective(*this);
-  }
+Perspective* Perspective::clone() const { return new Perspective(*this); }
 
+pair Orthog::operator()(const P& arg, const frame& orient, const P& viewpt,
+                        double dist) const {
+  P arg_vector(arg - viewpt);
+  double u1(orient.sea() | arg_vector);
+  double u2(orient.sky() | arg_vector);
 
-  pair Orthog::operator()
-    (const P& arg, const frame& orient, const P& viewpt,
-     double dist) const
-  {
-    P arg_vector(arg - viewpt);
-    double u1(orient.sea()|arg_vector);
-    double u2(orient.sky()|arg_vector);
+  return pair(u1, u2);
+}  // end of Camera::Orthog::operator()
 
-    return pair(u1, u2);
-  } // end of Camera::Orthog::operator()
+bool Orthog::is_linear() const { return true; }
 
-  bool Orthog::is_linear() const
-  {
-    return true;
-  }
+bool Orthog::needs_clip() const { return true; }
 
-  bool Orthog::needs_clip() const
-  {
-    return true;
-  }
+Orthog* Orthog::clone() const { return new Orthog(*this); }
 
-  Orthog* Orthog::clone() const
-  {
-    return new Orthog(*this);
-  }
+pair Fisheye::operator()(const P& arg, const frame& orient, const P& viewpt,
+                         double dist) const {
+  P arg_vector(arg - viewpt);
+  arg_vector *= 1.0 / (norm(arg_vector));
 
+  double u1(orient.sea() | arg_vector);
+  double u2(orient.sky() | arg_vector);
 
-  pair Fisheye::operator()
-    (const P& arg, const frame& orient, const P& viewpt,
-     double dist) const
-  {
-    P arg_vector(arg - viewpt);
-    arg_vector *= 1.0/(norm(arg_vector));
+  // radial projection to camera sphere, then orthogonal projection
+  return dist * pair(u1, u2);
+}  // end of Camera::Fisheye::operator()
 
-    double u1(orient.sea()|arg_vector);
-    double u2(orient.sky()|arg_vector);
+bool Fisheye::is_linear() const { return false; }
 
-    // radial projection to camera sphere, then orthogonal projection
-    return dist*pair(u1, u2);
-  } // end of Camera::Fisheye::operator()
+bool Fisheye::needs_clip() const { return false; }
 
-  bool Fisheye::is_linear() const
-  {
-    return false;
-  }
+Fisheye* Fisheye::clone() const { return new Fisheye(*this); }
 
-  bool Fisheye::needs_clip() const
-  {
-    return false;
-  }
+pair Bubble::operator()(const P& arg, const frame& orient, const P& viewpt,
+                        double dist) const {
+  P arg_vector(arg - viewpt);
+  arg_vector *= 1.0 / (norm(arg_vector));
 
-  Fisheye* Fisheye::clone() const
-  {
-    return new Fisheye(*this);
-  }
+  double u1(orient.sea() | arg_vector);
+  double u2(orient.sky() | arg_vector);
+  double u3(orient.eye() | arg_vector);
 
+  // radial projection to camera sphere, then stereographic projection
+  return (2.0 * dist / (1 - u3)) * pair(u1, u2);
+}  // end of Camera::Bubble::operator()
 
-  pair Bubble::operator()
-    (const P& arg, const frame& orient, const P& viewpt,
-     double dist) const
-  {
-    P arg_vector(arg - viewpt);
-    arg_vector *= 1.0/(norm(arg_vector));
+bool Bubble::is_linear() const { return false; }
 
-    double u1(orient.sea()|arg_vector);
-    double u2(orient.sky()|arg_vector);
-    double u3(orient.eye()|arg_vector);
+bool Bubble::needs_clip() const { return false; }
 
-    // radial projection to camera sphere, then stereographic projection
-    return (2.0*dist/(1-u3))*pair(u1, u2);
-  } // end of Camera::Bubble::operator()
-
-  bool Bubble::is_linear() const
-  {
-    return false;
-  }
-
-  bool Bubble::needs_clip() const
-  {
-    return false;
-  }
-
-  Bubble* Bubble::clone() const
-  {
-    return new Bubble(*this);
-  }
-} // end of namespace
+Bubble* Bubble::clone() const { return new Bubble(*this); }
+}  // namespace ePiX

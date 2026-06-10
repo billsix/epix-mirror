@@ -1,14 +1,14 @@
-/* 
+/*
  * frame.h -- Orthonormal basis
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a preprocessor for creating high-quality
+ * line figures in LaTeX
  *
  * Version 1.0.15
  * Last Change: October 10, 2006
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -53,30 +53,30 @@
 
 namespace ePiX {
 
-  class frame {
-  public:
-    // standard basis
-    frame();
+class frame {
+ public:
+  // standard basis
+  frame();
 
-    // Gram-Schmidt
-    frame(P arg1, P arg2, P arg3); // need args by value
+  // Gram-Schmidt
+  frame(P arg1, P arg2, P arg3);  // need args by value
 
-    // frame elements
-    P sea() const;
-    P sky() const;
-    P eye() const;
+  // frame elements
+  P sea() const;
+  P sky() const;
+  P eye() const;
 
-    // rotations about frame elements
-    frame& rot1(double angle);
-    frame& rot2(double angle);
-    frame& rot3(double angle);
+  // rotations about frame elements
+  frame& rot1(double angle);
+  frame& rot2(double angle);
+  frame& rot3(double angle);
 
-  private:
-    P m_e1; // sea
-    P m_e2; // sky
-    P m_e3; // eye
-  }; // end of class frame
+ private:
+  P m_e1;  // sea
+  P m_e2;  // sky
+  P m_e3;  // eye
+};  // end of class frame
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_FRAME */

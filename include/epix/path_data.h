@@ -1,14 +1,14 @@
-/* 
+/*
  * path_data.h -- ePiX implementation classes for polygons and paths
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.2
  * Last Change5: May 04, 2008
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -42,62 +42,62 @@
 
 namespace ePiX {
 
-  class Camera;
-  class Color;
-  class halfspace;
-  class pen_data;
-  class screen;
-  class Sphere;
+class Camera;
+class Color;
+class halfspace;
+class pen_data;
+class screen;
+class Sphere;
 
-  // sequence of vertices
-  class path_data {
-  public:
-    path_data();
-    path_data(const std::vector<P>&, bool closed=false, bool filled=false);
-    path_data(const std::list<edge3d>&, bool closed=false, bool filled=false);
+// sequence of vertices
+class path_data {
+ public:
+  path_data();
+  path_data(const std::vector<P>&, bool closed = false, bool filled = false);
+  path_data(const std::list<edge3d>&, bool closed = false, bool filled = false);
 
-    path_data* clone() const;
+  path_data* clone() const;
 
-    // add points
-    path_data& pt(const P&);
+  // add points
+  path_data& pt(const P&);
 
-    // concatenate path_data segments
-    path_data& operator+= (path_data);
+  // concatenate path_data segments
+  path_data& operator+=(path_data);
 
-    // concatenate, reversing second sequence
-    path_data& operator-= (path_data);
+  // concatenate, reversing second sequence
+  path_data& operator-=(path_data);
 
-    bool is_closed() const;
-    bool is_filled() const;
+  bool is_closed() const;
+  bool is_filled() const;
 
-    // make loop and prevent subsequent additions of points
-    path_data& close();
+  // make loop and prevent subsequent additions of points
+  path_data& close();
 
-    // (un)set fill flag if closed
-    path_data&  fill(const bool arg=true);
+  // (un)set fill flag if closed
+  path_data& fill(const bool arg = true);
 
-    path_data& clip();
-    path_data& clip_to(const halfspace&);
+  path_data& clip();
+  path_data& clip_to(const halfspace&);
 
-    // assumes path already lies on sphere
-    path_data& clip_to(const Sphere&, const P& viewpt, bool back=false);
+  // assumes path already lies on sphere
+  path_data& clip_to(const Sphere&, const P& viewpt, bool back = false);
 
-    void photo(screen&, const Camera&, const Color& fill,
-	       const pen_data& line, const pen_data& base) const;
+  void photo(screen&, const Camera&, const Color& fill, const pen_data& line,
+             const pen_data& base) const;
 
-    std::vector<P> data() const;
+  std::vector<P> data() const;
 
-    void draw() const;
-    void draw(const Color&, const pen_data&) const;
+  void draw() const;
+  void draw(const Color&, const pen_data&) const;
 
-  private:
-    bool m_closed;
-    bool m_filled;
+ private:
+  bool m_closed;
+  bool m_filled;
 
-    std::list<edge3d> m_data;
+  std::list<edge3d> m_data;
 
-  }; // end of class path_data
+};  // end of class path_data
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PATH_DATA */

@@ -14,11 +14,19 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
 #     (ps2epsi/ps2pdf) + epstopdf.  ePiX's default backend is eepic, but some
 #     samples emit PSTricks/TikZ, so those packages are included too.
 #   Animations (flix): ImageMagick `convert` (eps->png, png->mng/gif).
+#   libasan: DEV-ONLY runtime for AddressSanitizer builds (`make asan`), used to
+#     catch latent libepix memory bugs while the Python bindings are written.
+#     REMOVE in the final cleanup phase (see python-bindings task doc).
+#   clang-tools-extra: clang-format + clang-tidy for `make format` / `make tidy`
+#     (the C++ formatter/linter; pairs with .clang-format / .clang-tidy). Permanent.
 RUN --mount=type=cache,target=/var/cache/libdnf5 \
     --mount=type=cache,target=/var/lib/dnf \
     dnf install -y \
         meson ninja-build gcc-c++ binutils \
+        libasan \
+        clang-tools-extra \
         findutils sed which diffutils bash \
+        python3 python3-pip python3-devel \
         ghostscript ImageMagick \
         texlive-collection-basic \
         texlive-collection-latexrecommended \
@@ -29,6 +37,12 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
         texlive-dvips \
         texlive-collection-pstricks \
         texlive-pgf
+
+# Python notebook stack (Phase 1: inline display + jupytext percent notebooks).
+# The epix Python package itself is bind-mounted at runtime (PYTHONPATH), so only
+# the environment is baked here.
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --break-system-packages jupyterlab jupytext ipython ipykernel nanobind ruff
 
 # Whole source tree (trimmed by .dockerignore).  At runtime `make shell`/`build`
 # bind-mount the live host tree over /epix, so this copy only feeds the in-image

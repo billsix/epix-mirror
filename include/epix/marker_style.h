@@ -1,14 +1,14 @@
-/* 
+/*
  * marker_style.h -- ePiX's dot size and tick mark length
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.19
  * Last Change: September 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -37,23 +37,23 @@
 
 namespace ePiX {
 
-  class marker_sizes {
-  public:
-    marker_sizes();
+class marker_sizes {
+ public:
+  marker_sizes();
 
-    marker_sizes& dot_size(double diam);
-    marker_sizes& tick_size(double len);
+  marker_sizes& dot_size(double diam);
+  marker_sizes& tick_size(double len);
 
-    double  dot_size() const;
-    double tick_size() const;
+  double dot_size() const;
+  double tick_size() const;
 
-  private:
-    double the_dotsize;  // size of dots,  1  -- 36 pt
-    double the_ticksize; // (half-)size of tick marks, 1 -- 8 pt
-  };
+ private:
+  double the_dotsize;   // size of dots,  1  -- 36 pt
+  double the_ticksize;  // (half-)size of tick marks, 1 -- 8 pt
+};
 
-  marker_sizes& the_mark_size();
+marker_sizes& the_mark_size();
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_MARKER_STYLE */

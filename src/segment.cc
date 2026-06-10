@@ -1,14 +1,14 @@
-/* 
+/*
  * segment.cc -- ePiX::Segment class and mathematical operators
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.2.5
  * Last Change: May 04, 2008
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,73 +39,55 @@
 
 namespace ePiX {
 
-  Segment::Segment(const P& p1, const P& p2)
-    : m_endpt1(p1), m_endpt2(p2), m_malformed(false) { }
+Segment::Segment(const P& p1, const P& p2)
+    : m_endpt1(p1), m_endpt2(p2), m_malformed(false) {}
 
-  Segment::Segment(bool tag) : m_malformed(true) { }
+Segment::Segment(bool tag) : m_malformed(true) {}
 
-  P Segment::end1() const
-  {
-    return m_endpt1;
+P Segment::end1() const { return m_endpt1; }
+
+P Segment::end2() const { return m_endpt2; }
+
+bool Segment::malformed() const { return m_malformed; }
+
+// translate
+Segment& Segment::shift(const P& arg) {
+  if (!m_malformed) {
+    m_endpt1 += arg;
+    m_endpt2 += arg;
   }
+  return *this;
+}
 
-  P Segment::end2() const
-  {
-    return m_endpt2;
+Segment& Segment::move_to(const P& arg) {
+  if (!m_malformed) {
+    const P dX(arg - 0.5 * (m_endpt1 + m_endpt2));
+    m_endpt1 += dX;
+    m_endpt2 += dX;
   }
+  return *this;
+}
 
-  bool Segment::malformed() const
-  {
-    return m_malformed;
+Segment& Segment::scale(double c) {
+  if (!m_malformed) {
+    const P ctr(0.5 * (m_endpt1 + m_endpt2));
+
+    m_endpt1 = ctr + c * (m_endpt1 - ctr);
+    m_endpt2 = ctr + c * (m_endpt2 - ctr);
   }
+  return *this;
+}
 
-  // translate
-  Segment& Segment::shift(const P& arg)
-  {
-    if (!m_malformed)
-      {
-	m_endpt1 += arg;
-	m_endpt2 += arg;
-      }
-    return *this;
-  }
+P Segment::midpoint(double t) const {
+  return m_endpt1 + t * (m_endpt2 - m_endpt1);
+}
 
-  Segment& Segment::move_to(const P& arg)
-  {
-    if (!m_malformed)
-      {
-	const P dX(arg - 0.5*(m_endpt1 + m_endpt2));
-	m_endpt1 += dX;
-	m_endpt2 += dX;
-      }
-    return *this;
-  }
+void Segment::draw(double stretch) const {
+  if (m_malformed) return;
 
-  Segment& Segment::scale(double c)
-  {
-    if (!m_malformed)
-      {
-	const P ctr(0.5*(m_endpt1 + m_endpt2));
+  // else
+  path temp(m_endpt1, m_endpt2, stretch);
 
-	m_endpt1 = ctr + c*(m_endpt1 - ctr);
-	m_endpt2 = ctr + c*(m_endpt2 - ctr);
-      }
-    return *this;
-  }
-
-  P Segment::midpoint(double t) const
-  {
-    return m_endpt1 + t*(m_endpt2 - m_endpt1);
-  }
-
-  void Segment::draw(double stretch) const
-  {
-    if (m_malformed)
-      return;
-
-    // else
-    path temp(m_endpt1, m_endpt2, stretch);
-
-    temp.draw();
-  }
-} // end of namespace
+  temp.draw();
+}
+}  // namespace ePiX

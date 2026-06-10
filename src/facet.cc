@@ -47,459 +47,399 @@
 
 namespace ePiX {
 
-  facet::facet(P f(double, double),
-	       double u0, double v0,
-	       double du, double dv,
-	       const unsigned int N1, const unsigned int N2)
+facet::facet(P f(double, double), double u0, double v0, double du, double dv,
+             const unsigned int N1, const unsigned int N2)
     : m_tint(the_paint_style().fill_color()),
       m_line(the_paint_style().line_pen()),
       m_fill(the_paint_style().fill_flag()),
-      pt1(f(u0,         v0)),
-      pt2(f(u0 + N1*du, v0)),
-      pt3(f(u0 + N1*du, v0 + N2*dv)),
-      pt4(f(u0,         v0 + N2*dv)),
-      center(0.25*(pt1 + pt2 + pt3 + pt4)),
-      direction(center-cam().viewpt()),
-      distance(norm(direction))
-  {
-    perp = ((pt1 - center)*(pt2 - center));
+      pt1(f(u0, v0)),
+      pt2(f(u0 + N1 * du, v0)),
+      pt3(f(u0 + N1 * du, v0 + N2 * dv)),
+      pt4(f(u0, v0 + N2 * dv)),
+      center(0.25 * (pt1 + pt2 + pt3 + pt4)),
+      direction(center - cam().viewpt()),
+      distance(norm(direction)) {
+  perp = ((pt1 - center) * (pt2 - center));
 
-    if (norm(perp) < EPIX_EPSILON)
-      perp = (pt3 - center)*(pt4 - center);
+  if (norm(perp) < EPIX_EPSILON) perp = (pt3 - center) * (pt4 - center);
 
-    perp *= recip(norm(perp));
+  perp *= recip(norm(perp));
 
-    // bottom edge
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + i*du, v0));
+  // bottom edge
+  for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0 + i * du, v0));
 
-    // right edge
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0 + N1*du, v0 + j*dv));
+  // right edge
+  for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0 + N1 * du, v0 + j * dv));
 
-    // top edge (backward)
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + (N1-i)*du, v0 + N2*dv));
+  // top edge (backward)
+  for (unsigned int i = 0; i < N1; ++i)
+    bd.pt(f(u0 + (N1 - i) * du, v0 + N2 * dv));
 
-    // left edge (downward)
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0, v0 + (N2-j)*dv));
+  // left edge (downward)
+  for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0 + (N2 - j) * dv));
 
-    bd.close().fill(!m_tint.is_unset());
-  }
+  bd.close().fill(!m_tint.is_unset());
+}
 
-
-  // facet constructor for f(double, double, double)
-  facet::facet(P f(double, double, double),
-	       double u0, double v0, double w0,
-	       double du, double dv, double dw,
-	       const unsigned int N1, const unsigned int N2)
+// facet constructor for f(double, double, double)
+facet::facet(P f(double, double, double), double u0, double v0, double w0,
+             double du, double dv, double dw, const unsigned int N1,
+             const unsigned int N2)
     : m_tint(the_paint_style().fill_color()),
       m_line(the_paint_style().line_pen()),
       m_fill(the_paint_style().fill_flag()),
-      pt1(f(u0, v0, w0))
+      pt1(f(u0, v0, w0)) {
+  if (du == 0)  // (y,z)
   {
-    if (du == 0) // (y,z)
-      {
-	// bottom edge
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0, v0 + i*dv, w0));
+    // bottom edge
+    for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0, v0 + i * dv, w0));
 
-	// right edge
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0 + N1*dv, w0 + j*dw));
+    // right edge
+    for (unsigned int j = 0; j < N2; ++j)
+      bd.pt(f(u0, v0 + N1 * dv, w0 + j * dw));
 
-	// top edge (backward)
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0, v0 + (N1-i)*dv, w0 + N2*dw));
+    // top edge (backward)
+    for (unsigned int i = 0; i < N1; ++i)
+      bd.pt(f(u0, v0 + (N1 - i) * dv, w0 + N2 * dw));
 
-	// left edge (downward)
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0, w0 + (N2-j)*dw));
+    // left edge (downward)
+    for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0, w0 + (N2 - j) * dw));
 
-	// use corners to approximate distance to camera
-	pt2 = f(u0, v0 + N1*dv, w0);
-	pt3 = f(u0, v0 + N1*dv, w0 + N2*dw);
-	pt4 = f(u0, v0,         w0 + N2*dw);
-      }
+    // use corners to approximate distance to camera
+    pt2 = f(u0, v0 + N1 * dv, w0);
+    pt3 = f(u0, v0 + N1 * dv, w0 + N2 * dw);
+    pt4 = f(u0, v0, w0 + N2 * dw);
+  }
 
-    else if (dv == 0) // (x,z)
-      {
-	// bottom edge
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + i*du, v0, w0));
+  else if (dv == 0)  // (x,z)
+  {
+    // bottom edge
+    for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0 + i * du, v0, w0));
 
-	// right edge
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0 + N1*du, v0, w0 + j*dw));
+    // right edge
+    for (unsigned int j = 0; j < N2; ++j)
+      bd.pt(f(u0 + N1 * du, v0, w0 + j * dw));
 
-	// top edge (backward)
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + (N1-i)*du, v0, w0 + N2*dw));
+    // top edge (backward)
+    for (unsigned int i = 0; i < N1; ++i)
+      bd.pt(f(u0 + (N1 - i) * du, v0, w0 + N2 * dw));
 
-	// left edge (downward)
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0, w0 + (N2-j)*dw));
+    // left edge (downward)
+    for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0, w0 + (N2 - j) * dw));
 
-	// use corners to approximate distance to camera
-	pt2 = f(u0 + N1*du, v0, w0);
-	pt3 = f(u0 + N1*du, v0, w0 + N2*dw);
-	pt4 = f(u0,         v0, w0 + N2*dw);
-      }
+    // use corners to approximate distance to camera
+    pt2 = f(u0 + N1 * du, v0, w0);
+    pt3 = f(u0 + N1 * du, v0, w0 + N2 * dw);
+    pt4 = f(u0, v0, w0 + N2 * dw);
+  }
 
-    else if (dw == 0) // (x,y)
-      {
-	// bottom edge
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + i*du, v0, w0));
+  else if (dw == 0)  // (x,y)
+  {
+    // bottom edge
+    for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0 + i * du, v0, w0));
 
-	// right edge
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0 + N1*du, v0 + j*dv, w0));
+    // right edge
+    for (unsigned int j = 0; j < N2; ++j)
+      bd.pt(f(u0 + N1 * du, v0 + j * dv, w0));
 
-	// top edge (backward)
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + (N1-i)*du, v0 + N2*dv, w0));
+    // top edge (backward)
+    for (unsigned int i = 0; i < N1; ++i)
+      bd.pt(f(u0 + (N1 - i) * du, v0 + N2 * dv, w0));
 
-	// left edge (downward)
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0 + (N2-j)*dv, w0));
+    // left edge (downward)
+    for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0 + (N2 - j) * dv, w0));
 
-	// use corners to approximate distance to camera
-	pt2 = f(u0 + N1*du, v0,         w0);
-	pt3 = f(u0 + N1*du, v0 + N2*dv, w0);
-	pt4 = f(u0,         v0 + N2*dv, w0);
-      }
+    // use corners to approximate distance to camera
+    pt2 = f(u0 + N1 * du, v0, w0);
+    pt3 = f(u0 + N1 * du, v0 + N2 * dv, w0);
+    pt4 = f(u0, v0 + N2 * dv, w0);
+  }
 
-    else
-      epix_error("Bad call to facet constructor"); // exits
+  else
+    epix_error("Bad call to facet constructor");  // exits
 
-    bd.close().fill(!m_tint.is_unset());
+  bd.close().fill(!m_tint.is_unset());
 
-    center = 0.25*(pt1 + pt2 + pt3 + pt4);
+  center = 0.25 * (pt1 + pt2 + pt3 + pt4);
 
-    direction = center-cam().viewpt();
-    distance = norm(direction);
+  direction = center - cam().viewpt();
+  distance = norm(direction);
 
-    perp = ((pt1 - center)*(pt2 - center));
+  perp = ((pt1 - center) * (pt2 - center));
 
-    if (norm(perp) < EPIX_EPSILON)
-      perp = (pt3 - center)*(pt4 - center);
+  if (norm(perp) < EPIX_EPSILON) perp = (pt3 - center) * (pt4 - center);
 
-    perp *= recip(norm(perp));
+  perp *= recip(norm(perp));
 
-  } // end of facet(f(double, double, double), ...)
+}  // end of facet(f(double, double, double), ...)
 
-
-  // for surface of rotation
-  facet::facet(double f(double), double g(double),
-	       double u0, double v0,
-	       double du, double dv,
-	       const unsigned int N1, const unsigned int N2,
-	       const frame& coords)
+// for surface of rotation
+facet::facet(double f(double), double g(double), double u0, double v0,
+             double du, double dv, const unsigned int N1, const unsigned int N2,
+             const frame& coords)
     : m_tint(the_paint_style().fill_color()),
       m_line(the_paint_style().line_pen()),
       m_fill(the_paint_style().fill_flag()),
-      pt1(f(u0)*coords.sea() +
-	  g(u0)*Cos(v0)*coords.sky() +
-	  g(u0)*Sin(v0)*coords.eye()),
-      pt2(f(u0 + N1*du)*coords.sea() +
-	  g(u0 + N1*du)*Cos(v0)*coords.sky() +
-	  g(u0 + N1*du)*Sin(v0)*coords.eye()),
-      pt3(f(u0 + N1*du)*coords.sea() +
-	  g(u0 + N1*du)*Cos(v0 + N2*dv)*coords.sky() +
-	  g(u0 + N1*du)*Sin(v0 + N2*dv)*coords.eye()),
-      pt4(f(u0)*coords.sea() +
-	  g(u0)*Cos(v0 + N2*dv)*coords.sky() +
-	  g(u0)*Sin(v0 + N2*dv)*coords.eye()),
-      center(0.25*(pt1 + pt2 + pt3 + pt4)),
-      direction(center-cam().viewpt()), distance(norm(direction))
+      pt1(f(u0) * coords.sea() + g(u0) * Cos(v0) * coords.sky() +
+          g(u0) * Sin(v0) * coords.eye()),
+      pt2(f(u0 + N1 * du) * coords.sea() +
+          g(u0 + N1 * du) * Cos(v0) * coords.sky() +
+          g(u0 + N1 * du) * Sin(v0) * coords.eye()),
+      pt3(f(u0 + N1 * du) * coords.sea() +
+          g(u0 + N1 * du) * Cos(v0 + N2 * dv) * coords.sky() +
+          g(u0 + N1 * du) * Sin(v0 + N2 * dv) * coords.eye()),
+      pt4(f(u0) * coords.sea() + g(u0) * Cos(v0 + N2 * dv) * coords.sky() +
+          g(u0) * Sin(v0 + N2 * dv) * coords.eye()),
+      center(0.25 * (pt1 + pt2 + pt3 + pt4)),
+      direction(center - cam().viewpt()),
+      distance(norm(direction)) {
+  perp = ((pt1 - center) * (pt2 - center));
+
+  if (norm(perp) < EPIX_EPSILON) perp = (pt3 - center) * (pt4 - center);
+
+  perp *= recip(norm(perp));
+
+  // bottom edge
+  for (unsigned int i = 0; i < N1; ++i)
+    bd.pt(f(u0 + i * du) * coords.sea() +
+          g(u0 + i * du) * Cos(v0) * coords.sky() +
+          g(u0 + i * du) * Sin(v0) * coords.eye());
+
+  // right edge
+  for (unsigned int j = 0; j < N2; ++j)
+    bd.pt(f(u0 + N1 * du) * coords.sea() +
+          g(u0 + N1 * du) * Cos(v0 + j * dv) * coords.sky() +
+          g(u0 + N1 * du) * Sin(v0 + j * dv) * coords.eye());
+
+  // top edge (backward)
+  for (unsigned int i = 0; i < N1; ++i)
+    bd.pt(f(u0 + (N1 - i) * du) * coords.sea() +
+          g(u0 + (N1 - i) * du) * Cos(v0 + N2 * dv) * coords.sky() +
+          g(u0 + (N1 - i) * du) * Sin(v0 + N2 * dv) * coords.eye());
+
+  // left edge (downward)
+  for (unsigned int j = 0; j < N2; ++j)
+    bd.pt(f(u0) * coords.sea() +
+          g(u0) * Cos(v0 + (N2 - j) * dv) * coords.sky() +
+          g(u0) * Sin(v0 + (N2 - j) * dv) * coords.eye());
+
+  bd.close().fill(!m_tint.is_unset());
+}
+
+//// Color-dependent constructors
+facet::facet(P f(double, double), double u0, double v0, double du, double dv,
+             const unsigned int N1, const unsigned int N2, const Color& tint)
+    : m_tint(tint),
+      m_line(the_paint_style().line_pen()),
+      m_fill(the_paint_style().fill_flag()),
+      pt1(f(u0, v0)),
+      pt2(f(u0 + N1 * du, v0)),
+      pt3(f(u0 + N1 * du, v0 + N2 * dv)),
+      pt4(f(u0, v0 + N2 * dv)),
+      center(0.25 * (pt1 + pt2 + pt3 + pt4)),
+      direction(center - cam().viewpt()),
+      distance(norm(direction)) {
+  perp = ((pt1 - center) * (pt2 - center));
+
+  if (norm(perp) < EPIX_EPSILON) perp = (pt3 - center) * (pt4 - center);
+
+  perp *= recip(norm(perp));
+
+  // bottom edge
+  for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0 + i * du, v0));
+
+  // right edge
+  for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0 + N1 * du, v0 + j * dv));
+
+  // top edge (backward)
+  for (unsigned int i = 0; i < N1; ++i)
+    bd.pt(f(u0 + (N1 - i) * du, v0 + N2 * dv));
+
+  // left edge (downward)
+  for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0 + (N2 - j) * dv));
+
+  bd.close().fill(!m_tint.is_unset());
+}
+
+// facet constructor for f(double, double, double)
+facet::facet(P f(double, double, double), double u0, double v0, double w0,
+             double du, double dv, double dw, const unsigned int N1,
+             const unsigned int N2, const Color& tint)
+    : m_tint(tint),
+      m_line(the_paint_style().line_pen()),
+      m_fill(the_paint_style().fill_flag()),
+      pt1(f(u0, v0, w0)) {
+  if (du == 0)  // (y,z)
   {
-    perp = ((pt1 - center)*(pt2 - center));
-
-    if (norm(perp) < EPIX_EPSILON)
-      perp = (pt3 - center)*(pt4 - center);
-
-    perp *= recip(norm(perp));
-
     // bottom edge
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + i*du)*coords.sea() +
-	    g(u0 + i*du)*Cos(v0)*coords.sky() +
-	    g(u0 + i*du)*Sin(v0)*coords.eye());
+    for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0, v0 + i * dv, w0));
 
     // right edge
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0 + N1*du)*coords.sea() +
-	    g(u0 + N1*du)*Cos(v0 + j*dv)*coords.sky() +
-	    g(u0 + N1*du)*Sin(v0 + j*dv)*coords.eye());
+    for (unsigned int j = 0; j < N2; ++j)
+      bd.pt(f(u0, v0 + N1 * dv, w0 + j * dw));
 
     // top edge (backward)
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + (N1-i)*du)*coords.sea() +
-	    g(u0 + (N1-i)*du)*Cos(v0 + N2*dv)*coords.sky() +
-	    g(u0 + (N1-i)*du)*Sin(v0 + N2*dv)*coords.eye());
+    for (unsigned int i = 0; i < N1; ++i)
+      bd.pt(f(u0, v0 + (N1 - i) * dv, w0 + N2 * dw));
 
     // left edge (downward)
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0)*coords.sea() +
-	    g(u0)*Cos(v0 + (N2-j)*dv)*coords.sky() +
-	    g(u0)*Sin(v0 + (N2-j)*dv)*coords.eye());
+    for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0, w0 + (N2 - j) * dw));
 
-    bd.close().fill(!m_tint.is_unset());
+    // use corners to approximate distance to camera
+    pt2 = f(u0, v0 + N1 * dv, w0);
+    pt3 = f(u0, v0 + N1 * dv, w0 + N2 * dw);
+    pt4 = f(u0, v0, w0 + N2 * dw);
   }
 
-  //// Color-dependent constructors
-  facet::facet(P f(double, double),
-	       double u0, double v0,
-	       double du, double dv,
-	       const unsigned int N1, const unsigned int N2,
-	       const Color& tint)
-    : m_tint(tint), m_line(the_paint_style().line_pen()),
-      m_fill(the_paint_style().fill_flag()),
-      pt1(f(u0,         v0)),
-      pt2(f(u0 + N1*du, v0)),
-      pt3(f(u0 + N1*du, v0 + N2*dv)),
-      pt4(f(u0,         v0 + N2*dv)),
-      center(0.25*(pt1 + pt2 + pt3 + pt4)),
-      direction(center-cam().viewpt()),
-      distance(norm(direction))
+  else if (dv == 0)  // (x,z)
   {
-    perp = ((pt1 - center)*(pt2 - center));
-
-    if (norm(perp) < EPIX_EPSILON)
-      perp = (pt3 - center)*(pt4 - center);
-
-    perp *= recip(norm(perp));
-
     // bottom edge
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + i*du, v0));
+    for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0 + i * du, v0, w0));
 
     // right edge
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0 + N1*du, v0 + j*dv));
+    for (unsigned int j = 0; j < N2; ++j)
+      bd.pt(f(u0 + N1 * du, v0, w0 + j * dw));
 
     // top edge (backward)
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + (N1-i)*du, v0 + N2*dv));
+    for (unsigned int i = 0; i < N1; ++i)
+      bd.pt(f(u0 + (N1 - i) * du, v0, w0 + N2 * dw));
 
     // left edge (downward)
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0, v0 + (N2-j)*dv));
+    for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0, w0 + (N2 - j) * dw));
 
-    bd.close().fill(!m_tint.is_unset());
+    // use corners to approximate distance to camera
+    pt2 = f(u0 + N1 * du, v0, w0);
+    pt3 = f(u0 + N1 * du, v0, w0 + N2 * dw);
+    pt4 = f(u0, v0, w0 + N2 * dw);
   }
 
-
-  // facet constructor for f(double, double, double)
-  facet::facet(P f(double, double, double),
-	       double u0, double v0, double w0,
-	       double du, double dv, double dw,
-	       const unsigned int N1, const unsigned int N2,
-	       const Color& tint)
-    : m_tint(tint), m_line(the_paint_style().line_pen()),
-      m_fill(the_paint_style().fill_flag()),
-      pt1(f(u0, v0, w0))
+  else if (dw == 0)  // (x,y)
   {
-    if (du == 0) // (y,z)
-      {
-	// bottom edge
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0, v0 + i*dv, w0));
-
-	// right edge
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0 + N1*dv, w0 + j*dw));
-
-	// top edge (backward)
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0, v0 + (N1-i)*dv, w0 + N2*dw));
-
-	// left edge (downward)
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0, w0 + (N2-j)*dw));
-
-	// use corners to approximate distance to camera
-	pt2 = f(u0, v0 + N1*dv, w0);
-	pt3 = f(u0, v0 + N1*dv, w0 + N2*dw);
-	pt4 = f(u0, v0,         w0 + N2*dw);
-      }
-
-    else if (dv == 0) // (x,z)
-      {
-	// bottom edge
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + i*du, v0, w0));
-
-	// right edge
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0 + N1*du, v0, w0 + j*dw));
-
-	// top edge (backward)
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + (N1-i)*du, v0, w0 + N2*dw));
-
-	// left edge (downward)
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0, w0 + (N2-j)*dw));
-
-	// use corners to approximate distance to camera
-	pt2 = f(u0 + N1*du, v0, w0);
-	pt3 = f(u0 + N1*du, v0, w0 + N2*dw);
-	pt4 = f(u0,         v0, w0 + N2*dw);
-      }
-
-    else if (dw == 0) // (x,y)
-      {
-	// bottom edge
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + i*du, v0, w0));
-
-	// right edge
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0 + N1*du, v0 + j*dv, w0));
-
-	// top edge (backward)
-	for (unsigned int i=0; i<N1; ++i)
-	  bd.pt(f(u0 + (N1-i)*du, v0 + N2*dv, w0));
-
-	// left edge (downward)
-	for (unsigned int j=0; j<N2; ++j)
-	  bd.pt(f(u0, v0 + (N2-j)*dv, w0));
-
-	// use corners to approximate distance to camera
-	pt2 = f(u0 + N1*du, v0,         w0);
-	pt3 = f(u0 + N1*du, v0 + N2*dv, w0);
-	pt4 = f(u0,         v0 + N2*dv, w0);
-      }
-
-    else
-      epix_error("Bad call to facet constructor"); // exits
-
-    bd.close().fill(!m_tint.is_unset());
-
-    center = 0.25*(pt1 + pt2 + pt3 + pt4);
-
-    direction = center-cam().viewpt();
-    distance = norm(direction);
-
-    perp = ((pt1 - center)*(pt2 - center));
-
-    if (norm(perp) < EPIX_EPSILON)
-      perp = (pt3 - center)*(pt4 - center);
-
-    perp *= recip(norm(perp));
-
-  } // end of facet(f(double, double, double), ...)
-
-
-  // for surface of rotation
-  facet::facet(double f(double), double g(double),
-	       double u0, double v0,
-	       double du, double dv,
-	       const unsigned int N1, const unsigned int N2,
-	       const Color& tint, const frame& coords)
-    : m_tint(tint), m_line(the_paint_style().line_pen()),
-      m_fill(the_paint_style().fill_flag()),
-      pt1(f(u0)*coords.sea() +
-	  g(u0)*Cos(v0)*coords.sky() +
-	  g(u0)*Sin(v0)*coords.eye()),
-      pt2(f(u0 + N1*du)*coords.sea() +
-	  g(u0 + N1*du)*Cos(v0)*coords.sky() +
-	  g(u0 + N1*du)*Sin(v0)*coords.eye()),
-      pt3(f(u0 + N1*du)*coords.sea() +
-	  g(u0 + N1*du)*Cos(v0 + N2*dv)*coords.sky() +
-	  g(u0 + N1*du)*Sin(v0 + N2*dv)*coords.eye()),
-      pt4(f(u0)*coords.sea() +
-	  g(u0)*Cos(v0 + N2*dv)*coords.sky() +
-	  g(u0)*Sin(v0 + N2*dv)*coords.eye()),
-      center(0.25*(pt1 + pt2 + pt3 + pt4)),
-      direction(center-cam().viewpt()), distance(norm(direction))
-  {
-    perp = ((pt1 - center)*(pt2 - center));
-
-    if (norm(perp) < EPIX_EPSILON)
-      perp = (pt3 - center)*(pt4 - center);
-
-    perp *= recip(norm(perp));
-
     // bottom edge
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + i*du)*coords.sea() +
-	    g(u0 + i*du)*Cos(v0)*coords.sky() +
-	    g(u0 + i*du)*Sin(v0)*coords.eye());
+    for (unsigned int i = 0; i < N1; ++i) bd.pt(f(u0 + i * du, v0, w0));
 
     // right edge
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0 + N1*du)*coords.sea() +
-	    g(u0 + N1*du)*Cos(v0 + j*dv)*coords.sky() +
-	    g(u0 + N1*du)*Sin(v0 + j*dv)*coords.eye());
+    for (unsigned int j = 0; j < N2; ++j)
+      bd.pt(f(u0 + N1 * du, v0 + j * dv, w0));
 
     // top edge (backward)
-    for (unsigned int i=0; i<N1; ++i)
-      bd.pt(f(u0 + (N1-i)*du)*coords.sea() +
-	    g(u0 + (N1-i)*du)*Cos(v0 + N2*dv)*coords.sky() +
-	    g(u0 + (N1-i)*du)*Sin(v0 + N2*dv)*coords.eye());
+    for (unsigned int i = 0; i < N1; ++i)
+      bd.pt(f(u0 + (N1 - i) * du, v0 + N2 * dv, w0));
 
     // left edge (downward)
-    for (unsigned int j=0; j<N2; ++j)
-      bd.pt(f(u0)*coords.sea() +
-	    g(u0)*Cos(v0 + (N2-j)*dv)*coords.sky() +
-	    g(u0)*Sin(v0 + (N2-j)*dv)*coords.eye());
+    for (unsigned int j = 0; j < N2; ++j) bd.pt(f(u0, v0 + (N2 - j) * dv, w0));
 
-    bd.close().fill(!m_tint.is_unset());
+    // use corners to approximate distance to camera
+    pt2 = f(u0 + N1 * du, v0, w0);
+    pt3 = f(u0 + N1 * du, v0 + N2 * dv, w0);
+    pt4 = f(u0, v0 + N2 * dv, w0);
   }
 
+  else
+    epix_error("Bad call to facet constructor");  // exits
 
-  facet* facet::clone() const
-  {
-    return new facet(*this);
+  bd.close().fill(!m_tint.is_unset());
+
+  center = 0.25 * (pt1 + pt2 + pt3 + pt4);
+
+  direction = center - cam().viewpt();
+  distance = norm(direction);
+
+  perp = ((pt1 - center) * (pt2 - center));
+
+  if (norm(perp) < EPIX_EPSILON) perp = (pt3 - center) * (pt4 - center);
+
+  perp *= recip(norm(perp));
+
+}  // end of facet(f(double, double, double), ...)
+
+// for surface of rotation
+facet::facet(double f(double), double g(double), double u0, double v0,
+             double du, double dv, const unsigned int N1, const unsigned int N2,
+             const Color& tint, const frame& coords)
+    : m_tint(tint),
+      m_line(the_paint_style().line_pen()),
+      m_fill(the_paint_style().fill_flag()),
+      pt1(f(u0) * coords.sea() + g(u0) * Cos(v0) * coords.sky() +
+          g(u0) * Sin(v0) * coords.eye()),
+      pt2(f(u0 + N1 * du) * coords.sea() +
+          g(u0 + N1 * du) * Cos(v0) * coords.sky() +
+          g(u0 + N1 * du) * Sin(v0) * coords.eye()),
+      pt3(f(u0 + N1 * du) * coords.sea() +
+          g(u0 + N1 * du) * Cos(v0 + N2 * dv) * coords.sky() +
+          g(u0 + N1 * du) * Sin(v0 + N2 * dv) * coords.eye()),
+      pt4(f(u0) * coords.sea() + g(u0) * Cos(v0 + N2 * dv) * coords.sky() +
+          g(u0) * Sin(v0 + N2 * dv) * coords.eye()),
+      center(0.25 * (pt1 + pt2 + pt3 + pt4)),
+      direction(center - cam().viewpt()),
+      distance(norm(direction)) {
+  perp = ((pt1 - center) * (pt2 - center));
+
+  if (norm(perp) < EPIX_EPSILON) perp = (pt3 - center) * (pt4 - center);
+
+  perp *= recip(norm(perp));
+
+  // bottom edge
+  for (unsigned int i = 0; i < N1; ++i)
+    bd.pt(f(u0 + i * du) * coords.sea() +
+          g(u0 + i * du) * Cos(v0) * coords.sky() +
+          g(u0 + i * du) * Sin(v0) * coords.eye());
+
+  // right edge
+  for (unsigned int j = 0; j < N2; ++j)
+    bd.pt(f(u0 + N1 * du) * coords.sea() +
+          g(u0 + N1 * du) * Cos(v0 + j * dv) * coords.sky() +
+          g(u0 + N1 * du) * Sin(v0 + j * dv) * coords.eye());
+
+  // top edge (backward)
+  for (unsigned int i = 0; i < N1; ++i)
+    bd.pt(f(u0 + (N1 - i) * du) * coords.sea() +
+          g(u0 + (N1 - i) * du) * Cos(v0 + N2 * dv) * coords.sky() +
+          g(u0 + (N1 - i) * du) * Sin(v0 + N2 * dv) * coords.eye());
+
+  // left edge (downward)
+  for (unsigned int j = 0; j < N2; ++j)
+    bd.pt(f(u0) * coords.sea() +
+          g(u0) * Cos(v0 + (N2 - j) * dv) * coords.sky() +
+          g(u0) * Sin(v0 + (N2 - j) * dv) * coords.eye());
+
+  bd.close().fill(!m_tint.is_unset());
+}
+
+facet* facet::clone() const { return new facet(*this); }
+
+double facet::how_far() const { return distance; }
+
+bool facet::front_facing() const { return (-direction | perp) > -EPIX_EPSILON; }
+
+// N.B. We assume the fill state is stored by our caller
+void facet::draw(int cull) const {
+  if ((cull == 1 && front_facing()) || (cull == -1 && !front_facing())) return;
+
+  // else
+  Color paint(m_tint);
+  if (paint.is_unset()) paint = White();
+
+  Color ink(m_line.color());
+  if (ink.is_unset()) ink = paint;
+
+  if (m_fill) {
+    // calculate cosine^2 of normal angle
+    // Magic formula (simulated ambient lighting)
+    const double dens(0.5 * (1 + pow(perp | (recip(distance) * direction), 2)));
+
+    paint *= dens;
+    ink *= dens;
   }
 
-  double facet::how_far() const { return distance; }
+  bd.draw(paint, pen_data(ink, m_line.width()));
+}  // end of facet::draw(bool, int)
 
-  bool facet::front_facing() const
-  {
-    return (-direction|perp) > -EPIX_EPSILON;
-  }
+bool by_distance::operator()(const facet& arg1, const facet& arg2) {
+  return arg1.how_far() > arg2.how_far();
+}
 
-  // N.B. We assume the fill state is stored by our caller
-  void facet::draw(int cull) const
-  {
-    if (( cull ==  1 && front_facing() ) || ( cull == -1 && !front_facing() ))
-      return;
-
-    // else
-    Color paint(m_tint);
-    if (paint.is_unset())
-      paint = White();
-
-    Color ink(m_line.color());
-    if (ink.is_unset())
-      ink = paint;
-
-    if (m_fill)
-      {
-	// calculate cosine^2 of normal angle
-	// Magic formula (simulated ambient lighting)
-	const double dens(0.5*(1+pow(perp|(recip(distance)*direction), 2)));
-
-	paint *= dens;
-	ink   *= dens;
-      }
-
-    bd.draw(paint, pen_data(ink, m_line.width()));
-  } // end of facet::draw(bool, int)
-
-
-  bool by_distance::operator() (const facet& arg1, const facet& arg2)
-  {
-    return arg1.how_far() > arg2.how_far();
-  }
-
-  bool by_distance::operator() (const facet* arg1, const facet* arg2)
-  {
-    return arg1->how_far() > arg2->how_far();
-  }
-} // end of namespace
+bool by_distance::operator()(const facet* arg1, const facet* arg2) {
+  return arg1->how_far() > arg2->how_far();
+}
+}  // namespace ePiX

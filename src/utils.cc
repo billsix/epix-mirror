@@ -8,7 +8,7 @@
  * Last Change: June 18, 2008
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -41,84 +41,72 @@
 
 namespace ePiX {
 
-  const std::string epix_version()
-  {
-    return "1.2.22";
+const std::string epix_version() { return "1.2.22"; }
+
+double truncate(double arg) {
+  return fabs(arg) < 0.0001 ? 0 : arg;  // 10^-4, avoid exponential notation
+}
+
+std::string date_and_time() {
+  ////// N.B.: Revise this if time format string changes!
+  const int max_len = 31;
+  char buf[max_len];
+  time_t t = time(nullptr);
+
+  // strftime(buf, max_len, "%c", localtime(&t));
+
+  // Sat Jul  1 23:25:39 2006 (GMT)
+  strftime(buf, max_len, "%a %b %d %X %Y (%Z)", gmtime(&t));
+  return std::string(buf);
+}
+
+// remove everything from arg except chars in srch
+std::string get_chars(std::string arg, const std::string& srch) {
+  std::string::size_type curr(0);
+  std::string::size_type next(arg.find_first_of(srch));
+
+  while (next != std::string::npos) {
+    arg.erase(curr, next - curr);
+
+    curr = arg.find_first_not_of(srch);
+    next = arg.find_first_of(srch, curr);
   }
 
-  double truncate(double arg)
-  {
-    return fabs(arg) < 0.0001 ? 0 : arg; // 10^-4, avoid exponential notation
-  }
+  if (next != curr) arg.erase(curr, next);
 
-  std::string date_and_time()
-    {
-      ////// N.B.: Revise this if time format string changes!
-      const int max_len = 31;
-      char buf[max_len];
-      time_t t=time(nullptr);
+  return arg;
+}
 
-      // strftime(buf, max_len, "%c", localtime(&t));
+// add linebreaks before opening parentheses to make lines at most
+// FILE_WIDTH characters long; return reference to arg
+std::string break_lines(std::string arg, const std::string& path_break) {
+  std::string value;  // append here; swap with arg at end
 
-      // Sat Jul  1 23:25:39 2006 (GMT)
-      strftime(buf, max_len, "%a %b %d %X %Y (%Z)", gmtime(&t));
-      return std::string(buf);
+  // initialize markers prev, curr, next
+  std::string::size_type prev(0);  // position of last line break
+  std::string::size_type next(arg.find_first_of("("));
+  std::string::size_type curr(next);
+
+  unsigned int pbk_sz(path_break.size());
+
+  while (next != std::string::npos) {
+    // seek next break points
+    while (next - prev <= EPIX_FILE_WIDTH - pbk_sz) {
+      curr = next;
+      next = arg.find_first_of("(", ++next);
     }
 
-
-  // remove everything from arg except chars in srch
-  std::string get_chars(std::string arg, const std::string& srch)
-  {
-    std::string::size_type curr(0);
-    std::string::size_type next(arg.find_first_of(srch));
-
-    while (next != std::string::npos)
-      {
-	arg.erase(curr, next-curr);
-
-	curr = arg.find_first_not_of(srch);
-	next = arg.find_first_of(srch, curr);
-      }
-
-    if (next != curr)
-      arg.erase(curr, next);
-
-    return arg;
+    value.append(arg, prev, curr - prev);  // append current line
+    // Magic number 20 (greater than width of a printed pair)
+    if (next - prev <= 20 + EPIX_FILE_WIDTH)  // not at end of data
+      value += path_break;                    // and formatting string
+    prev = curr;                              // update front of line
   }
 
-  // add linebreaks before opening parentheses to make lines at most
-  // FILE_WIDTH characters long; return reference to arg
-  std::string break_lines(std::string arg, const std::string& path_break)
-  {
-    std::string value; // append here; swap with arg at end
+  // get remaining characters
+  value.append(arg, prev, next - prev);
 
-    // initialize markers prev, curr, next
-    std::string::size_type prev(0); // position of last line break
-    std::string::size_type next(arg.find_first_of("("));
-    std::string::size_type curr(next);
-
-    unsigned int pbk_sz(path_break.size());
-
-    while (next != std::string::npos)
-      {
-	// seek next break points
-	while (next-prev <= EPIX_FILE_WIDTH - pbk_sz)
-	  {
-	    curr = next;
-	    next = arg.find_first_of("(", ++next);
-	  }
-
-	value.append(arg, prev, curr-prev); // append current line
-	// Magic number 20 (greater than width of a printed pair)
-	if (next - prev <= 20+EPIX_FILE_WIDTH) // not at end of data
-	  value += path_break;              // and formatting string
-	prev = curr;                        // update front of line
-      }
-
-    // get remaining characters
-    value.append(arg, prev, next-prev);
-
-    swap(arg, value);
-    return arg;
-  }
-} // end of namespace
+  swap(arg, value);
+  return arg;
+}
+}  // namespace ePiX

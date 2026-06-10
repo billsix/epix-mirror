@@ -1,13 +1,13 @@
-/* 
+/*
  * tile.cc -- ePiX::tile destructor
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.0.23
  * Last Change: January 14, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -33,6 +33,6 @@
 #include "tile.h"
 
 namespace ePiX {
-  tile::~tile() = default;
+tile::~tile() = default;
 
-} // end of namespace
+}  // namespace ePiX

@@ -1,14 +1,14 @@
-/* 
+/*
  * markers.cc -- ePiX axes, grids, markers, and labels
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.19
  * Last Change: September 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -48,263 +48,224 @@
 #include "markers.h"
 
 namespace ePiX {
-  using enum epix_label_posn;
-  using enum epix_mark_type;
+using enum epix_label_posn;
+using enum epix_mark_type;
 
-  static void __epix_label(const P& base, const P& offset,
-			   const std::string& lbl,
-			   epix_label_posn POSN, bool masked)
-  {
-    label_data val(base, offset, lbl);
+static void __epix_label(const P& base, const P& offset, const std::string& lbl,
+                         epix_label_posn POSN, bool masked) {
+  label_data val(base, offset, lbl);
 
-    if (masked)
-      {
-	// get mask color
-	Color my_mask(the_label_style().mask_color());
+  if (masked) {
+    // get mask color
+    Color my_mask(the_label_style().mask_color());
 
-	if (my_mask.is_unset())
-	  my_mask = White();
+    if (my_mask.is_unset()) my_mask = White();
 
-	val.mask_color(my_mask);
-      }
-
-    else // !masked
-      val.mask_color(Neutral());
-
-    val.align_to(POSN).draw();
+    val.mask_color(my_mask);
   }
 
-  // label -- put POSN-aligned string <label_text> 
-  // at Cartesian position <base> translated by <offset> true points.
-  void label(const P& base, const P& offset, const std::string& lbl,
-	     epix_label_posn POSN)
-  {
-    __epix_label(base, offset, lbl, POSN, the_label_style().is_masked());
-  }
+  else  // !masked
+    val.mask_color(Neutral());
 
-  // mask color comes from global style, falls back to White()
-  void masklabel(const P& base, const P& offset, const std::string& lbl,
-		 epix_label_posn POSN)
-  {
-    __epix_label(base, offset, lbl, POSN, true);
-  }
+  val.align_to(POSN).draw();
+}
 
-  void label(const P& base, const P& offset, const std::string& lbl)
-  {
-    __epix_label(base, offset, lbl, none, the_label_style().is_masked());
-  }
+// label -- put POSN-aligned string <label_text>
+// at Cartesian position <base> translated by <offset> true points.
+void label(const P& base, const P& offset, const std::string& lbl,
+           epix_label_posn POSN) {
+  __epix_label(base, offset, lbl, POSN, the_label_style().is_masked());
+}
 
-  void masklabel(const P& base, const P& offset, const std::string& lbl)
-  {
-    __epix_label(base, offset, lbl, none, true);
-  }
+// mask color comes from global style, falls back to White()
+void masklabel(const P& base, const P& offset, const std::string& lbl,
+               epix_label_posn POSN) {
+  __epix_label(base, offset, lbl, POSN, true);
+}
 
-  // centered labels
-  void label(const P& base, const std::string& lbl)
-  {
-    __epix_label(base, P(0,0), lbl, c, the_label_style().is_masked());
-  }
+void label(const P& base, const P& offset, const std::string& lbl) {
+  __epix_label(base, offset, lbl, none, the_label_style().is_masked());
+}
 
-  void masklabel(const P& base, const std::string& lbl)
-  {
-    __epix_label(base, P(0,0), lbl, c, true);
-  }
+void masklabel(const P& base, const P& offset, const std::string& lbl) {
+  __epix_label(base, offset, lbl, none, true);
+}
 
-  // Marker aliases
-  void marker(const P& arg, epix_mark_type TYPE)
-  {
-    label_data(arg, TYPE).draw();
-  }
+// centered labels
+void label(const P& base, const std::string& lbl) {
+  __epix_label(base, P(0, 0), lbl, c, the_label_style().is_masked());
+}
 
-  // Markers with labels
-  void circ(const P& posn, const P& offset, const std::string& label_text,
-	    epix_label_posn POSN)
-  {
-    if (label_text != "")
-      label(posn, offset, label_text, POSN);
-    label_data mk(posn, CIRC);
-    mk.draw();
-  }
+void masklabel(const P& base, const std::string& lbl) {
+  __epix_label(base, P(0, 0), lbl, c, true);
+}
 
-  void ring(const P& posn, const P& offset, const std::string& label_text,
-	    epix_label_posn POSN)
-  {
-    if (label_text != "")
-      label(posn, offset, label_text, POSN);
-    label_data mk(posn, RING);
-    mk.draw();
-  }
+// Marker aliases
+void marker(const P& arg, epix_mark_type TYPE) { label_data(arg, TYPE).draw(); }
 
-  void spot(const P& posn, const P& offset, const std::string& label_text,
-	    epix_label_posn POSN)
-  {
-    if (label_text != "")
-      label(posn, offset, label_text, POSN);
-    label_data mk(posn, SPOT);
-    mk.draw();
-  }
+// Markers with labels
+void circ(const P& posn, const P& offset, const std::string& label_text,
+          epix_label_posn POSN) {
+  if (label_text != "") label(posn, offset, label_text, POSN);
+  label_data mk(posn, CIRC);
+  mk.draw();
+}
 
-  void dot(const P& posn, const P& offset, const std::string& label_text,
-	   epix_label_posn POSN)
-  {
-    if (label_text != "")
-      label(posn, offset, label_text, POSN);
-    label_data mk(posn, DOT);
-    mk.draw();
-  }
+void ring(const P& posn, const P& offset, const std::string& label_text,
+          epix_label_posn POSN) {
+  if (label_text != "") label(posn, offset, label_text, POSN);
+  label_data mk(posn, RING);
+  mk.draw();
+}
 
-  void ddot(const P& posn, const P& offset, const std::string& label_text,
-	    epix_label_posn POSN)
-  {
-    if (label_text != "")
-      label(posn, offset, label_text, POSN);
-    label_data mk(posn, DDOT);
-    mk.draw();
-  }
+void spot(const P& posn, const P& offset, const std::string& label_text,
+          epix_label_posn POSN) {
+  if (label_text != "") label(posn, offset, label_text, POSN);
+  label_data mk(posn, SPOT);
+  mk.draw();
+}
 
-  void box(const P& posn, const P& offset, const std::string& label_text,
-	   epix_label_posn POSN)
-  {
-    if (label_text != "")
-      label(posn, offset, label_text, POSN);
-    label_data mk(posn, BOX);
-    mk.draw();
-  }
+void dot(const P& posn, const P& offset, const std::string& label_text,
+         epix_label_posn POSN) {
+  if (label_text != "") label(posn, offset, label_text, POSN);
+  label_data mk(posn, DOT);
+  mk.draw();
+}
 
-  void bbox(const P& posn, const P& offset, const std::string& label_text,
-	    epix_label_posn POSN)
-  {
-    if (label_text != "")
-      label(posn, offset, label_text, POSN);
-    label_data mk(posn, BBOX);
-    mk.draw();
-  }
+void ddot(const P& posn, const P& offset, const std::string& label_text,
+          epix_label_posn POSN) {
+  if (label_text != "") label(posn, offset, label_text, POSN);
+  label_data mk(posn, DDOT);
+  mk.draw();
+}
 
-  // Axis ticks (h_tick = tall, thin rectangle, for a *horizontal* axis)
-  void h_axis_tick(const P& arg, epix_label_posn POSN)
-  { 
-    label_data mk(arg, HTICK, POSN);
-    mk.draw();
-  }
+void box(const P& posn, const P& offset, const std::string& label_text,
+         epix_label_posn POSN) {
+  if (label_text != "") label(posn, offset, label_text, POSN);
+  label_data mk(posn, BOX);
+  mk.draw();
+}
 
-  void v_axis_tick(const P& arg, epix_label_posn POSN)
-  { 
-    label_data mk(arg, VTICK, POSN);
-    mk.draw();
-  }
+void bbox(const P& posn, const P& offset, const std::string& label_text,
+          epix_label_posn POSN) {
+  if (label_text != "") label(posn, offset, label_text, POSN);
+  label_data mk(posn, BBOX);
+  mk.draw();
+}
 
+// Axis ticks (h_tick = tall, thin rectangle, for a *horizontal* axis)
+void h_axis_tick(const P& arg, epix_label_posn POSN) {
+  label_data mk(arg, HTICK, POSN);
+  mk.draw();
+}
 
-  //// Curve-like elements
-  // arrow with label
-  void arrow(const P& tail, const P& head, const P& offset,
-	     const std::string& label_text,
-	     epix_label_posn POSN, double scale)
-  {
-    arrow(tail, head, scale);
-    label(tail, offset, label_text, POSN);
-  }
+void v_axis_tick(const P& arg, epix_label_posn POSN) {
+  label_data mk(arg, VTICK, POSN);
+  mk.draw();
+}
 
-  // fixed-size elements
-  void right_angle(const P& loc, P leg1, P leg2, double scale)
-  {
-    const double norm1(norm(leg1));
-    const double norm2(norm(leg2));
+//// Curve-like elements
+// arrow with label
+void arrow(const P& tail, const P& head, const P& offset,
+           const std::string& label_text, epix_label_posn POSN, double scale) {
+  arrow(tail, head, scale);
+  label(tail, offset, label_text, POSN);
+}
 
-    if (norm1 < EPIX_EPSILON || norm2 < EPIX_EPSILON)
-      return;
+// fixed-size elements
+void right_angle(const P& loc, P leg1, P leg2, double scale) {
+  const double norm1(norm(leg1));
+  const double norm2(norm(leg2));
 
-    //else
-    const double mult(pt_to_screen(scale));
-    leg1 *= mult/norm1;
-    leg2 *= mult/norm2;
+  if (norm1 < EPIX_EPSILON || norm2 < EPIX_EPSILON) return;
 
-    path bd;
-    bd.pt(loc + leg1).pt(loc + leg1 + leg2).pt(loc + leg2);
-    bd.draw();
-  }
+  // else
+  const double mult(pt_to_screen(scale));
+  leg1 *= mult / norm1;
+  leg2 *= mult / norm2;
 
-  // the *acute* angle
-  void arc_measure(const P& loc, P leg1, P leg2, const P& offset,
-		   const std::string& text, epix_label_posn align,
-		   double scale)
-  {
-    const double norm1(norm(leg1));
-    const double norm2(norm(leg2));
+  path bd;
+  bd.pt(loc + leg1).pt(loc + leg1 + leg2).pt(loc + leg2);
+  bd.draw();
+}
 
-    if (norm1 < EPIX_EPSILON || norm2 < EPIX_EPSILON)
-      return;
+// the *acute* angle
+void arc_measure(const P& loc, P leg1, P leg2, const P& offset,
+                 const std::string& text, epix_label_posn align, double scale) {
+  const double norm1(norm(leg1));
+  const double norm2(norm(leg2));
 
-    //else normalize
-    leg1 *= 1.0/norm1;
-    leg2 *= 1.0/norm2;
+  if (norm1 < EPIX_EPSILON || norm2 < EPIX_EPSILON) return;
 
-    // check for parllelity
-    P perp(leg1*leg2);
-    const double norm3(norm(perp));
+  // else normalize
+  leg1 *= 1.0 / norm1;
+  leg2 *= 1.0 / norm2;
 
-    if (norm3 < EPIX_EPSILON)
-      return;
+  // check for parllelity
+  P perp(leg1 * leg2);
+  const double norm3(norm(perp));
 
-    // else get small angle
-    const double th(Acos(leg1|leg2));
+  if (norm3 < EPIX_EPSILON) return;
 
-    perp *= 1.0/norm3;
-    leg1 *= pt_to_screen(scale);
+  // else get small angle
+  const double th(Acos(leg1 | leg2));
 
-    perp *= leg1; // perp to leg1 in plane of legs
+  perp *= 1.0 / norm3;
+  leg1 *= pt_to_screen(scale);
 
-    ellipse(loc, leg1, perp, 0, th);
+  perp *= leg1;  // perp to leg1 in plane of legs
 
-    if (text != "")
-      label(loc + Cos(0.5*th)*leg1 + Sin(0.5*th)*perp, offset,
-	    text, align);
-  }
+  ellipse(loc, leg1, perp, 0, th);
 
-  void arc_measure(const P& loc, P leg1, P leg2, double scale)
-  {
-    arc_measure(loc, leg1, leg2, P(0,0), "", none, scale);
-  }
+  if (text != "")
+    label(loc + Cos(0.5 * th) * leg1 + Sin(0.5 * th) * perp, offset, text,
+          align);
+}
 
-  void axis_break(const P& tail, const P& head, double scale)
-  {
-    const P midpt(0.5*(head+tail));
+void arc_measure(const P& loc, P leg1, P leg2, double scale) {
+  arc_measure(loc, leg1, leg2, P(0, 0), "", none, scale);
+}
 
-    P dir((head-tail)%E_3); // project to (x1,x2)-plane
+void axis_break(const P& tail, const P& head, double scale) {
+  const P midpt(0.5 * (head + tail));
 
-    if (norm(dir) < EPIX_EPSILON)
-      return;
+  P dir((head - tail) % E_3);  // project to (x1,x2)-plane
 
-    // else
-    dir *= pt_to_screen(0.25*scale)/norm(dir); // zag is scale pt long
+  if (norm(dir) < EPIX_EPSILON) return;
 
-    path bd;
-    bd.pt(tail).pt(midpt-2*dir).pt(midpt-dir+1.5*J(dir))
-      .pt(midpt+dir-1.5*J(dir)).pt(midpt+2*dir).pt(head);
+  // else
+  dir *= pt_to_screen(0.25 * scale) / norm(dir);  // zag is scale pt long
 
-    bd.draw();
-  }
+  path bd;
+  bd.pt(tail)
+      .pt(midpt - 2 * dir)
+      .pt(midpt - dir + 1.5 * J(dir))
+      .pt(midpt + dir - 1.5 * J(dir))
+      .pt(midpt + 2 * dir)
+      .pt(head);
 
-  void h_error_bar(const P& loc, double err, epix_mark_type mk, double ht)
-  {
-    const P dy(0, pt_to_screen(0.5*ht));
-    const P bot(loc - P(err,0));
-    const P top(loc + P(err,0));
+  bd.draw();
+}
 
-    line(bot, top);
-    line(bot - dy, bot + dy);
-    line(top - dy, top + dy);
-    marker(loc, mk);
-  }
+void h_error_bar(const P& loc, double err, epix_mark_type mk, double ht) {
+  const P dy(0, pt_to_screen(0.5 * ht));
+  const P bot(loc - P(err, 0));
+  const P top(loc + P(err, 0));
 
-  void v_error_bar(const P& loc, double err, epix_mark_type mk, double wd)
-  {
-    const P dx(pt_to_screen(0.5*wd), 0);
-    const P bot(loc - P(0,err));
-    const P top(loc + P(0,err));
+  line(bot, top);
+  line(bot - dy, bot + dy);
+  line(top - dy, top + dy);
+  marker(loc, mk);
+}
 
-    line(bot, top);
-    line(bot - dx, bot + dx);
-    line(top - dx, top + dx);
-    marker(loc, mk);
-  }
-} // end of namespace
+void v_error_bar(const P& loc, double err, epix_mark_type mk, double wd) {
+  const P dx(pt_to_screen(0.5 * wd), 0);
+  const P bot(loc - P(0, err));
+  const P top(loc + P(0, err));
+
+  line(bot, top);
+  line(bot - dx, bot + dx);
+  line(top - dx, top + dx);
+  marker(loc, mk);
+}
+}  // namespace ePiX

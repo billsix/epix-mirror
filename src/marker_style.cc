@@ -1,14 +1,14 @@
-/* 
+/*
  * marker_style.cc -- ePiX's dot size and tick length
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.9
  * Last Change: July 29, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,42 +38,32 @@
 
 namespace ePiX {
 
-  marker_sizes::marker_sizes()
-    : the_dotsize(AVG_DOT), the_ticksize(AVG_TICK) { }
+marker_sizes::marker_sizes() : the_dotsize(AVG_DOT), the_ticksize(AVG_TICK) {}
 
-  marker_sizes& marker_sizes::dot_size(double diam)
-  {
-    if (0 < diam)
-      the_dotsize = snip_to(diam, MIN_DOT, MAX_DOT);
-    else
-      the_dotsize = AVG_DOT;
+marker_sizes& marker_sizes::dot_size(double diam) {
+  if (0 < diam)
+    the_dotsize = snip_to(diam, MIN_DOT, MAX_DOT);
+  else
+    the_dotsize = AVG_DOT;
 
-    return *this;
-  }
+  return *this;
+}
 
-  marker_sizes& marker_sizes::tick_size(double len)
-  {
-    if (0 < len)
-      the_ticksize = snip_to(len, MIN_TICK, MAX_TICK);
-    else
-      the_ticksize = AVG_TICK;
+marker_sizes& marker_sizes::tick_size(double len) {
+  if (0 < len)
+    the_ticksize = snip_to(len, MIN_TICK, MAX_TICK);
+  else
+    the_ticksize = AVG_TICK;
 
-    return *this;
-  }
+  return *this;
+}
 
-  double marker_sizes::dot_size()  const
-  {
-    return the_dotsize;
-  }
+double marker_sizes::dot_size() const { return the_dotsize; }
 
-  double marker_sizes::tick_size()  const
-  {
-    return the_ticksize;
-  }
+double marker_sizes::tick_size() const { return the_ticksize; }
 
-  marker_sizes& the_mark_size()
-  {
-    static auto* the_mark_size(new marker_sizes());
-    return *the_mark_size;
-  }
-} // end of namespace
+marker_sizes& the_mark_size() {
+  static auto* the_mark_size(new marker_sizes());
+  return *the_mark_size;
+}
+}  // namespace ePiX

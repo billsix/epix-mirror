@@ -1,14 +1,14 @@
-/* 
+/*
  * paint_style.h -- ePiX's current line and fill style.
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.3
  * Last Change: March 04, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -51,53 +51,53 @@
 
 namespace ePiX {
 
-  class Camera;
-  class length;
+class Camera;
+class length;
 
-  class paint_state {
-  public:
-    paint_state();
+class paint_state {
+ public:
+  paint_state();
 
-    paint_state* clone() const;
+  paint_state* clone() const;
 
-    // set
-    void line_pen(const pen_data& pen);
-    void line_color(const Color& col);
-    void line_width(const length& len);
+  // set
+  void line_pen(const pen_data& pen);
+  void line_color(const Color& col);
+  void line_width(const length& len);
 
-    void base_pen(const pen_data& pen);
-    void base_color(const Color& col);
-    void base_width(const length& len);
+  void base_pen(const pen_data& pen);
+  void base_color(const Color& col);
+  void base_width(const length& len);
 
-    void fill_color(const Color& col);
-    void fill_flag(bool fill);
+  void fill_color(const Color& col);
+  void fill_flag(bool fill);
 
-    // get
-    pen_data line_pen() const;
-    Color  line_color() const;
-    length line_width() const;
+  // get
+  pen_data line_pen() const;
+  Color line_color() const;
+  length line_width() const;
 
-    pen_data base_pen() const;
-    Color  base_color() const;
-    length base_width() const;
+  pen_data base_pen() const;
+  Color base_color() const;
+  length base_width() const;
 
-    Color  fill_color() const;
-    bool    fill_flag() const;
+  Color fill_color() const;
+  bool fill_flag() const;
 
-    paint_state seen_through(const Camera& cam) const;
+  paint_state seen_through(const Camera& cam) const;
 
-  private:
-    pen_data m_line;
-    pen_data m_base;
+ private:
+  pen_data m_line;
+  pen_data m_base;
 
-    Color  m_tint;
-    bool   m_filling;
+  Color m_tint;
+  bool m_filling;
 
-    paint_state(const pen_data&, const pen_data&, const Color&, bool fill);
-  }; // end of class paint_state
+  paint_state(const pen_data&, const pen_data&, const Color&, bool fill);
+};  // end of class paint_state
 
-  paint_state& the_paint_style();
+paint_state& the_paint_style();
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PAINT_STYLE */

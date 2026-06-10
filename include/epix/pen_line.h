@@ -1,13 +1,13 @@
-/* 
+/*
  * pen_line.h -- ePiX::pen_line class, for line-like objects
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
+ * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
  * Version 1.1.3
  * Last Change: March 04, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -43,37 +43,37 @@
 
 namespace ePiX {
 
-  class length;
-  class affine;
-  class screen_mask;
+class length;
+class affine;
+class screen_mask;
 
-  class pen_line : public tile {
-  public:
-    pen_line();
-    pen_line(const pen_data&, const pen_data&, const std::list<edge2d>&);
+class pen_line : public tile {
+ public:
+  pen_line();
+  pen_line(const pen_data&, const pen_data&, const std::list<edge2d>&);
 
-    pen_line* clone() const override;
+  pen_line* clone() const override;
 
-    pen_line& map_by(const affine&) override;
-    pen_line& crop_to(const screen_mask&) override;
+  pen_line& map_by(const affine&) override;
+  pen_line& crop_to(const screen_mask&) override;
 
-    bool is_empty() const override;
+  bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const override;
-    void add_to_palette() const override;
+  std::string print_to(const format&, const std::string&) const override;
+  void add_to_palette() const override;
 
-    void add(const edge2d&);
+  void add(const edge2d&);
 
-  private:
-    pen_data m_line;
-    pen_data m_base;
+ private:
+  pen_data m_line;
+  pen_data m_base;
 
-    path_state m_style;
+  path_state m_style;
 
-    std::list<edge2d> m_border;
+  std::list<edge2d> m_border;
 
-  }; // end of class pen_line
+};  // end of class pen_line
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PEN_LINE */

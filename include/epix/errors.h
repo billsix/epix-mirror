@@ -1,14 +1,14 @@
 /*
  * errors.h -- ePiX warning/error functions
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a preprocessor for creating high-quality
+ * line figures in LaTeX
  *
  * Version 1.2.3
  * Last Change: March 09, 2008
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -41,16 +41,14 @@
 
 namespace ePiX {
 
-  inline void epix_warning(std::string msg)
-  {
-    std::cerr << "ePiX WARNING: " << msg << std::endl;
-  } 
+inline void epix_warning(std::string msg) {
+  std::cerr << "ePiX WARNING: " << msg << std::endl;
+}
 
-  inline void epix_error(std::string msg)
-  {
-    std::cerr << "ePiX ERROR: " << msg << std::endl;
-    exit(1);
-  } 
-} // end of namespace
+inline void epix_error(std::string msg) {
+  std::cerr << "ePiX ERROR: " << msg << std::endl;
+  exit(1);
+}
+}  // namespace ePiX
 
 #endif /* EPIX_ERRORS */

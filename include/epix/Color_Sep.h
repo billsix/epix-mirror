@@ -1,13 +1,13 @@
 /*
  * Color_Sep.h -- ePiX CMYK Color separation classes
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.17
  * Last Change: September 13, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,96 +38,96 @@
 
 namespace ePiX {
 
-  class Cyan_Layer : public Color_Base {
-  public:
-    Cyan_Layer(double dens=1);
-    // Return Cyan channel of input
-    Cyan_Layer& filter(const Color_Base&) override;
+class Cyan_Layer : public Color_Base {
+ public:
+  Cyan_Layer(double dens = 1);
+  // Return Cyan channel of input
+  Cyan_Layer& filter(const Color_Base&) override;
 
-    Cyan_Layer* clone() const override;
-    RGB_Densities to_rgb() const override; // returns RGB(0,1,1)
+  Cyan_Layer* clone() const override;
+  RGB_Densities to_rgb() const override;  // returns RGB(0,1,1)
 
-    std::string model() const override;
-    std::string name() const override;
-    std::vector<double> densities() const override;
+  std::string model() const override;
+  std::string name() const override;
+  std::vector<double> densities() const override;
 
-  private:
-    double m_dens;
+ private:
+  double m_dens;
 
-    // null operations
-    Cyan_Layer& operator*= (double) override;
-    Cyan_Layer& blend(const Color_Base&, double) override;
-    Cyan_Layer& superpose(const Color_Base&) override;
-    Cyan_Layer& invert() override;
-  };
+  // null operations
+  Cyan_Layer& operator*=(double) override;
+  Cyan_Layer& blend(const Color_Base&, double) override;
+  Cyan_Layer& superpose(const Color_Base&) override;
+  Cyan_Layer& invert() override;
+};
 
-  class Magenta_Layer : public Color_Base {
-  public:
-    Magenta_Layer(double dens=1);
-    // Return Magenta channel of input
-    Magenta_Layer& filter(const Color_Base&) override;
+class Magenta_Layer : public Color_Base {
+ public:
+  Magenta_Layer(double dens = 1);
+  // Return Magenta channel of input
+  Magenta_Layer& filter(const Color_Base&) override;
 
-    Magenta_Layer* clone() const override;
-    RGB_Densities to_rgb() const override; // returns RGB(0,1,1)
+  Magenta_Layer* clone() const override;
+  RGB_Densities to_rgb() const override;  // returns RGB(0,1,1)
 
-    std::string model() const override;
-    std::string name() const override;
-    std::vector<double> densities() const override;
+  std::string model() const override;
+  std::string name() const override;
+  std::vector<double> densities() const override;
 
-  private:
-    double m_dens;
+ private:
+  double m_dens;
 
-    // null operations
-    Magenta_Layer& operator*= (double) override;
-    Magenta_Layer& blend(const Color_Base&, double) override;
-    Magenta_Layer& superpose(const Color_Base&) override;
-    Magenta_Layer& invert() override;
-  };
+  // null operations
+  Magenta_Layer& operator*=(double) override;
+  Magenta_Layer& blend(const Color_Base&, double) override;
+  Magenta_Layer& superpose(const Color_Base&) override;
+  Magenta_Layer& invert() override;
+};
 
-  class Yellow_Layer : public Color_Base {
-  public:
-    Yellow_Layer(double dens=1);
-    // Return Yellow channel of input
-    Yellow_Layer& filter(const Color_Base&) override;
+class Yellow_Layer : public Color_Base {
+ public:
+  Yellow_Layer(double dens = 1);
+  // Return Yellow channel of input
+  Yellow_Layer& filter(const Color_Base&) override;
 
-    Yellow_Layer* clone() const override;
-    RGB_Densities to_rgb() const override; // returns RGB(0,1,1)
+  Yellow_Layer* clone() const override;
+  RGB_Densities to_rgb() const override;  // returns RGB(0,1,1)
 
-    std::string model() const override;
-    std::string name() const override;
-    std::vector<double> densities() const override;
+  std::string model() const override;
+  std::string name() const override;
+  std::vector<double> densities() const override;
 
-  private:
-    double m_dens;
+ private:
+  double m_dens;
 
-    // null operations
-    Yellow_Layer& operator*= (double) override;
-    Yellow_Layer& blend(const Color_Base&, double) override;
-    Yellow_Layer& superpose(const Color_Base&) override;
-    Yellow_Layer& invert() override;
-  };
+  // null operations
+  Yellow_Layer& operator*=(double) override;
+  Yellow_Layer& blend(const Color_Base&, double) override;
+  Yellow_Layer& superpose(const Color_Base&) override;
+  Yellow_Layer& invert() override;
+};
 
-  class Black_Layer : public Color_Base {
-  public:
-    Black_Layer(double dens=1);
-    // Return Black channel of input
-    Black_Layer& filter(const Color_Base&) override;
+class Black_Layer : public Color_Base {
+ public:
+  Black_Layer(double dens = 1);
+  // Return Black channel of input
+  Black_Layer& filter(const Color_Base&) override;
 
-    Black_Layer* clone() const override;
-    RGB_Densities to_rgb() const override; // returns RGB(0,1,1)
+  Black_Layer* clone() const override;
+  RGB_Densities to_rgb() const override;  // returns RGB(0,1,1)
 
-    std::string model() const override;
-    std::string name() const override;
-    std::vector<double> densities() const override;
+  std::string model() const override;
+  std::string name() const override;
+  std::vector<double> densities() const override;
 
-  private:
-    double m_dens;
+ private:
+  double m_dens;
 
-    // null operations
-    Black_Layer& operator*= (double) override;
-    Black_Layer& blend(const Color_Base&, double) override;
-    Black_Layer& superpose(const Color_Base&) override;
-    Black_Layer& invert() override;
-  };
-} // end of namespace
+  // null operations
+  Black_Layer& operator*=(double) override;
+  Black_Layer& blend(const Color_Base&, double) override;
+  Black_Layer& superpose(const Color_Base&) override;
+  Black_Layer& invert() override;
+};
+}  // namespace ePiX
 #endif /* EPIX_COLOR_SEP */

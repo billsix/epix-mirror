@@ -73,15 +73,29 @@ figures (no epix run needed).
 ### Containerized build (`Makefile`)
 
 `Makefile` wraps the Meson build in a Fedora `podman` image (full
-toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick).
-Targets (invoke with `make <t>`): `image`, `shell`, `build`,
+toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick, plus
+the Python/Jupyter stack for the bindings work — see below).
+Targets (invoke with `make <t>`): `image`, `shell`, `lib` (libepix.a + driver
+scripts via meson), `build` (**full build** = `lib` + `py-ext`, so the Python
+extension reflects edited C++ sources),
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
-`examples-anim` (`.flx` → `./output/anim`), `clean`. Entrypoint scripts in
-`entrypoint/` are bind-mounted (edit without rebuild). Nested (podman-in-podman)
-usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The render scripts run each
-figure from a scratch copy with `epix -I.` so the host tree stays clean and
-sibling `#include`s resolve. See
+`examples-anim` (`.flx` → `./output/anim`), `clean`; and for the Python layer:
+`py-ext` (build the nanobind extension — links the bind-mounted `build/libepix.a`
+when present, else the installed copy; skips relinking when the `.so` is
+up-to-date, `FORCE=1` to override), `jupyter` (JupyterLab on :8888 — **depends on
+`py-ext`**, so it always builds the extension first),
+`notebooks` (jupytext → `.ipynb`), `asan` (**dev-only** sanitizer smoke),
+`format` (clang-format C++ + ruff Python — also runs automatically on `make
+shell` exit, via `entrypoint/format.sh`).
+Entrypoint scripts in `entrypoint/` are bind-mounted (edit without rebuild).
+Nested (podman-in-podman) usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The
+render scripts run each figure from a scratch copy with `epix -I.` so the host
+tree stays clean and sibling `#include`s resolve. See
 `tasks/archive/2026/06/09/container-build-tooling.md` for the design + gotchas.
+
+**Nested-podman caveat:** the inner image store is a small (~8 GB) tmpfs;
+repeated full `make image` rebuilds fill it and fail with "no space left on
+device". Run `podman image prune -f` between rebuilds.
 
 ### Generated files — do NOT hand-edit
 
@@ -95,12 +109,140 @@ sibling `#include`s resolve. See
 To add or remove a library source/header, edit the `epix_sources` / `epix_headers`
 lists in `meson.build` (now the authoritative manifest).
 
+## Python bindings + notebooks (`python/`, `notebooks/`) — in progress
+
+A second front-end is being built: **real nanobind bindings over `libepix`** plus
+a notebook layer, so you write a figure in Python the way the `.xp` samples are
+written in C++, rendered inline. Goal: port all ~81 `samples/` to percent-format
+notebooks, each **byte-identical** to the C++ original. The C++ samples stay as
+the permanent oracle — this is purely additive. **Authoritative status + full
+history (incl. the precise remaining-work list): `tasks/python-bindings-and-notebooks.md`.**
+(Tech chosen: nanobind → architecture A, real bindings; C++20.) **Status: 80 of
+81 demos ported byte-identically** as of 2026-06-10 — **effectively complete.** The
+single remaining demo, `histogram`, is **blocked** (its `samples/binom.dat` data
+file is absent from the repo; the C++ oracle can't run either), not a porting gap.
+See the task doc — post-port follow-ups (Pythonic cleanup, keyword args, dir
+grouping, distro packaging, ASan teardown) are now unblocked.
+
+Layout:
+- `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
+  (`.xp`/`.eepic` → png via `elaps`+ghostscript; `Figure` with `_repr_png_`),
+  `figure.py` (the Pythonic scene API + `figure()`/`render()` context helpers +
+  `animate()`/`Animation`). `__init__.py` does `from ._epix import *` so the API
+  grows automatically. `pyproject.toml` alongside.
+- `notebooks/*.py` — jupytext percent-format notebooks (`make notebooks` → ipynb).
+
+How it works:
+- ePiX's global-state model maps to module-level functions; `figure()` is a
+  context manager wrapping `picture()`/`begin()`. Capture is via
+  **`print_eepic(file)`** (a clean named-file output — not stdout) → read back →
+  render with `elaps` (which also accepts an `.eepic`, not just `.xp`).
+- Extension build (`entrypoint/build_py.sh`, `make py-ext`): standalone g++ of
+  `_epix.cc` + nanobind's `nb_combined.cpp`, statically linking libepix. Needs
+  `python3-devel` + `nanobind` + nanobind's `ext/robin_map/include`.
+
+**Gotchas / hard-won lessons (read before extending the bindings):**
+- **Bind only symbols *defined* in libepix.** Some methods are declared in
+  headers but never compiled (e.g. `axis::dec()`); binding one makes the *whole
+  module* fail at import with an undefined-symbol error. Check first:
+  `nm -C /usr/local/lib64/epix/libepix.a | grep ' T '`.
+- **Function-pointer args need a trampoline.** `plot`/`surface`/`backplot_N`/etc.
+  take raw C function pointers (`P f(double)`, `P F(double,double)`, two- and
+  three-function forms). Bind via a module-global `nb::callable` + a C trampoline
+  that calls it (one call at a time — fine for figures). See the `tramp_*` /
+  `g_fn*` globals in `_epix.cc`.
+- **Animations must `fork()` per frame.** ePiX accumulates per-render global
+  state with *no public reset* — notably the color palette
+  (`picture_data::m_palette`). A naive in-process frame loop leaks state into
+  later frames. `animate()` forks per frame (build + `print_eepic` in the child,
+  parent renders), matching how `flix` runs a fresh process per frame. (`fork()`
+  inside a threaded Jupyter kernel is a runtime caveat to watch.)
+- **Verify every port with the harness, not by hand.** `build-aux/verify_ports.py
+  NAME` execs `notebooks/NAME.py`, grabs its `fig`/`anim`, and diffs the eepic
+  against the sample **compiled with `-DEPIX_FMT_EEPIC`** (forces eepic so
+  in-file `pst_format()`/`tikz_format()` don't change the oracle) — per-frame for
+  `.flx`. Run one name per process (libepix accumulates state). Loop in the shell
+  for a batch; `PASS`/`FAIL` per demo. This is the inner loop of the whole port
+  effort.
+- **The per-session dev loop (operational).** The container image store is an
+  *ephemeral tmpfs*, so a fresh session rebuilds it: `make image` (~minutes — the
+  TeX-Live layer). Then iterate: after each `_epix.cc` change run
+  `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled` (it relinks only when needed;
+  `FORCE=1` to force). Note `py-ext` links the bind-mounted `build/libepix.a`, so
+  after editing *libepix* C++ sources (`src/`/`include/`) run `make build` (or
+  `make lib`) first — otherwise the extension links a stale library. Run the
+  harness in the container —
+  `podman run --rm --cgroups=disabled -v /epix:/epix:Z -e PYTHONPATH=/epix/python
+  epix -c 'for n in NAME …; do python3 /epix/build-aux/verify_ports.py $n; done'`.
+  Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),
+  **not** the TeX/ghostscript render path — that's only for the inline PNGs.
+- **Dispatch 2-var vs 3-var callables by `inspect.signature`, never a trial
+  call.** Several functions (`plot(f,domain)`, `ode_plot`, `dart_field`,
+  `surface(...,color)`) have 2- and 3-argument forms sharing one Python
+  signature. Count params via `inspect.signature` — a trial call (`f(0,0)`) can't
+  tell "wrong arity" from "the function raised at the probe point" (e.g. `1/0` in
+  `dipole`). Caveat: nanobind functions report `(args, kwargs)`→2, so when a
+  *nanobind* function needs the 3-var form, the port passes a strict-arity lambda
+  (`lambda x,y,z: epix.P(x,y,z)`). See `callable_takes_two` in `_epix.cc`.
+- **Objects that hold a function pointer build eagerly.** `scenery` samples its
+  surface (and captures the current fill state) at construction/`add()` time, so
+  the Python wrapper builds the C++ object immediately (trampoline set→sample→
+  cleared), holding no callable — correct per-surface colors and no GC cycle.
+- **The bind-on-demand workflow:** port a demo → it fails on a missing symbol →
+  `nm`-check + bind that one thing → re-verify. Don't try to bind the whole API
+  up front. `tasks/python-bindings-and-notebooks.md` tracks status + a precise
+  remaining-work list (grouped by the subsystem each demo still needs).
+- **Three `.flx` are broken upstream** (`lighting`, `helicoid`, `stereo_proj`,
+  and `riemann` — now fixed): they use bare enum names (`tr`, …) without
+  `using enum`, so they don't even compile under enum-class. Add
+  `using enum epix_label_posn;` to make the oracle build before porting.
+- **Byte-identity needs the same float *expression structure*, not just the same
+  math.** The harness compares eepic byte-for-byte, so floating-point rounding
+  must match C++ exactly: (a) reproduce precomputed constants as the source
+  writes them — `5*M_PI_4` is `5*(math.pi/4)`, **not** `5*math.pi/4` (the two
+  products round to different last bits); (b) preserve addition associativity /
+  grouping — `0.25*(pt1+(pt3+(pt5+pt7)))` must keep that nesting, not be
+  re-associated to a flat sum; (c) Python's `^` (the bound cross product) binds
+  *looser* than `+`/`-`, so a normal `(b-a)^(d-a)` needs explicit parens. A
+  mismatch here is a silent eepic diff, not an error.
+- **Figure setup has two idioms.** `figure()` (the context manager) wraps only
+  `picture(sw, ne, size)`. Demos that instead use `bounding_box(...)` +
+  `unitlength(...)` + `picture(w,h)` / `picture(P)` build the scene with the
+  manual lower-level form: `epix.bounding_box(...)`, `epix.unitlength(...)`,
+  `epix.picture(...)`, `epix.begin()`, … , `fig = epix.render()` — as
+  `notebooks/contour.py` / `minkowski.py` / `log.py` do.
+- **Painter's-algorithm demos port faithfully.** Demos that build a list of
+  facets/patches and draw them back-to-front (`decorate`, `log`, …) sort by
+  distance: Python's stable `list.sort(reverse=True)` matches C++ `stable_sort`
+  with `>` by construction, and even unstable `std::sort` showed no float-tie
+  divergence in practice. Mirror the build/sort/draw order exactly and the eepic
+  matches.
+- **Adding an overload that could shadow an existing one?** nanobind tries
+  overloads in *registration order*. To add `arrow(tail, head, scale)` without
+  disturbing the existing 2-arg `arrow(tail, head)` (which routes to the
+  labelled-marker form), register the new one *after* it and give `scale` **no
+  default**, so a 2-arg call can't fall into the 3-arg overload.
+
+**A libepix bug fixed here (independent of the bindings, worth keeping):**
+`screen::screen()` left the pimpl pointer `m_screen` uninitialized — latent UB
+that only "worked" because the canvas lives in zero-initialized static storage.
+Fixed with a default member initializer `screen_data* m_screen = nullptr;` in
+`screen.h`. Found via AddressSanitizer; the binding's call pattern exposed it.
+
+**DEV-ONLY, remove when the bindings task completes** (see the task doc's cleanup
+checklist): `libasan` (Dockerfile), `entrypoint/asan_check.sh`,
+`build-aux/asan_smoke.cc`, the `asan` Makefile target. `make asan` builds an
+ASan libepix and runs the smoke test (which mirrors the bound surface) to catch
+latent libepix memory bugs as coverage grows — keep mirroring new bindings into
+`asan_smoke.cc` until removal.
+
 ## Code layout
 
 Conventional layout: **78 `.cc` in `src/`**, **87 public headers in
 `include/epix/`** (~30k LOC, all in `namespace ePiX`); wrapper-script templates
-in `scripts/`, man pages in `man/`, build helpers in `build-aux/`. Sources use
-quote-includes resolved via `include_directories('include/epix')`.
+in `scripts/`, man pages in `man/`, build helpers in `build-aux/`; the Python
+front-end in `python/` + `notebooks/` (see above). Sources use quote-includes
+resolved via `include_directories('include/epix')`.
 Rough functional grouping:
 
 - **Core math/value types:** `triples.{h,cc}` — `P`, the ordered-triple /
@@ -153,7 +295,13 @@ code/ChangeLog wins:
 
 - Don't "fix" generated files (above) — change the source they're built from.
 - This is a faithful mirror; keep upstream-authored prose (`NEWS`, `BUGS`,
-  `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise.
+  `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise. **Exception
+  (Bill, 2026-06-10): code formatting.** `make format` / `entrypoint/format.sh`
+  applies `clang-format` (google style, `.clang-format`) tree-wide — *including*
+  the upstream `src/`/`include/` sources — and `ruff` to the Python
+  (`python/pyproject.toml [tool.ruff]`, covering `notebooks/` too). So formatting
+  churn on upstream files is expected and intended, not a violation of the mirror
+  rule. (`.clang-tidy` + `make`-able clang-tidy are available too.)
 - Bill commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
   `tasks/<slug>.md` doc — see `tasks/` for in-flight items and
   `tasks/archive/` for finished ones.

@@ -1,14 +1,14 @@
-/* 
+/*
  * active_screen.cc -- ePiX screen_broker class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.11
  * Last Change: August 15, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,43 +38,29 @@
 
 namespace ePiX {
 
-  screen_broker::screen_broker()
-  {
-    m_screens.push_front(&the_picture().the_canvas);
-  }
+screen_broker::screen_broker() {
+  m_screens.push_front(&the_picture().the_canvas);
+}
 
-  screen* screen_broker::active() const
-  {
-    return *(m_screens.begin());
-  }
+screen* screen_broker::active() const { return *(m_screens.begin()); }
 
-  void screen_broker::push(screen& scr)
-  {
-    m_screens.push_front(&scr);
-  }
+void screen_broker::push(screen& scr) { m_screens.push_front(&scr); }
 
-  screen* screen_broker::pop()
-  {
-    std::list<screen*>::const_iterator sp(m_screens.begin());
+screen* screen_broker::pop() {
+  std::list<screen*>::const_iterator sp(m_screens.begin());
 
-    screen* val(*sp);
+  screen* val(*sp);
 
-    if (++sp != m_screens.end())
-      m_screens.pop_front();
+  if (++sp != m_screens.end()) m_screens.pop_front();
 
-    return val;
-  }
+  return val;
+}
 
+// global functions
+screen_broker& the_screen_stack() {
+  static auto* the_screen_broker(new screen_broker());
+  return *the_screen_broker;
+}
 
-  // global functions
-  screen_broker& the_screen_stack()
-  {
-    static auto* the_screen_broker(new screen_broker());
-    return *the_screen_broker;
-  }
-
-  screen* active_screen()
-  {
-    return the_screen_stack().active();
-  }
-} // end of namespace
+screen* active_screen() { return the_screen_stack().active(); }
+}  // namespace ePiX

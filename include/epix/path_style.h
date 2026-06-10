@@ -1,14 +1,14 @@
-/* 
+/*
  * path_style.h -- ePiX's class for solid/dashed/dotted paths
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.7
  * Last Change: July 13, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -55,29 +55,29 @@
 
 namespace ePiX {
 
-  class path_state {
-  public:
-    path_state();
-    path_state(std::string);
+class path_state {
+ public:
+  path_state();
+  path_state(std::string);
 
-    path_state& separation(double len); // dist in pt between adjacent elements
+  path_state& separation(double len);  // dist in pt between adjacent elements
 
-    double separation() const;
-    unsigned int natural_length() const;
-    std::vector<double> breakpts() const;
+  double separation() const;
+  unsigned int natural_length() const;
+  std::vector<double> breakpts() const;
 
-    bool is_solid() const;
+  bool is_solid() const;
 
-  private:
-    double m_separation;    // true length of pattern
-    std::vector<double> m_breakpoints; // subdivision of [0,1]
+ private:
+  double m_separation;                // true length of pattern
+  std::vector<double> m_breakpoints;  // subdivision of [0,1]
 
-    unsigned int m_natural_length; // number of chars in defining string
-    bool m_solid;
-  }; // end of class path_state
+  unsigned int m_natural_length;  // number of chars in defining string
+  bool m_solid;
+};  // end of class path_state
 
-  path_state& the_path_style();
+path_state& the_path_style();
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PATH_STYLE */

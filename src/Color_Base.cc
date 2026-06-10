@@ -17,7 +17,7 @@
  * Worcester, MA, 01610-2395, USA
  *
  */
- 
+
 /*
  * ePiX is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
@@ -38,15 +38,12 @@
 
 namespace ePiX {
 
-  Color_Base::RGB_Densities::RGB_Densities(double r,
-					   double g,
-					   double b)
-    : m_dens_red  (make_r(r, g, b)),
+Color_Base::RGB_Densities::RGB_Densities(double r, double g, double b)
+    : m_dens_red(make_r(r, g, b)),
       m_dens_green(make_g(r, g, b)),
-      m_dens_blue (make_b(r, g, b)) { }
+      m_dens_blue(make_b(r, g, b)) {}
 
-  bool Color_Base::operator== (const Color_Base& col) const
-  {
-    return (name() == col.name());
-  }
-} // end of namespace
+bool Color_Base::operator==(const Color_Base& col) const {
+  return (name() == col.name());
+}
+}  // namespace ePiX

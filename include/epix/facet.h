@@ -42,64 +42,54 @@
 
 namespace ePiX {
 
-  class facet {
-  public:
-    // create quasi-planar region bounded by path segments in f(R)
-    facet(P f(double, double),
-	  double u0, double v0, double du, double dv,
-	  const unsigned int N1, const unsigned int N2);
+class facet {
+ public:
+  // create quasi-planar region bounded by path segments in f(R)
+  facet(P f(double, double), double u0, double v0, double du, double dv,
+        const unsigned int N1, const unsigned int N2);
 
-    facet(P f(double, double, double),
-	  double u0, double v0, double w0,
-	  double du, double dv, double dw,
-	  const unsigned int N1, const unsigned int N2);
+  facet(P f(double, double, double), double u0, double v0, double w0, double du,
+        double dv, double dw, const unsigned int N1, const unsigned int N2);
 
-    // for surfaces of rotation
-    facet(double f(double), double g(double),
-	  double u0, double v0, double du, double dv,
-	  const unsigned int N1, const unsigned int N2,
-	  const frame& coords=frame());
+  // for surfaces of rotation
+  facet(double f(double), double g(double), double u0, double v0, double du,
+        double dv, const unsigned int N1, const unsigned int N2,
+        const frame& coords = frame());
 
+  facet(P f(double, double), double u0, double v0, double du, double dv,
+        const unsigned int N1, const unsigned int N2, const Color&);
 
-    facet(P f(double, double),
-	  double u0, double v0, double du, double dv,
-	  const unsigned int N1, const unsigned int N2, const Color&);
+  facet(P f(double, double, double), double u0, double v0, double w0, double du,
+        double dv, double dw, const unsigned int N1, const unsigned int N2,
+        const Color&);
 
-    facet(P f(double, double, double),
-	  double u0, double v0, double w0,
-	  double du, double dv, double dw,
-	  const unsigned int N1, const unsigned int N2, const Color&);
+  // for surfaces of rotation
+  facet(double f(double), double g(double), double u0, double v0, double du,
+        double dv, const unsigned int N1, const unsigned int N2, const Color&,
+        const frame& coords = frame());
 
-    // for surfaces of rotation
-    facet(double f(double), double g(double),
-	  double u0, double v0, double du, double dv,
-	  const unsigned int N1, const unsigned int N2, const Color&,
-	  const frame& coords=frame());
+  facet* clone() const;
 
+  double how_far() const;
 
-    facet* clone() const;
+  bool front_facing() const;
 
-    double how_far() const;
- 
-    bool front_facing() const;
+  void draw(int cull) const;
 
-    void draw(int cull) const;
+ private:
+  Color m_tint;
+  pen_data m_line;
+  bool m_fill;
 
-  private:
-    Color m_tint;
-    pen_data m_line;
-    bool m_fill;
+  P pt1, pt2, pt3, pt4, center, direction, perp;
+  double distance;
 
-    P pt1, pt2, pt3, pt4, center, direction, perp;
-    double distance;
+  path bd;
+};
 
-    path bd;
-  };
-
-
-  class by_distance {
-  public:
-    bool operator() (const facet&, const facet&);
-    bool operator() (const facet*, const facet*);
-  };
-} // end of namespace
+class by_distance {
+ public:
+  bool operator()(const facet&, const facet&);
+  bool operator()(const facet*, const facet*);
+};
+}  // namespace ePiX

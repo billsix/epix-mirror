@@ -1,14 +1,14 @@
-/* 
+/*
  * frac.h -- ePiX::rational number class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.10
  * Last Change: August 07, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -36,46 +36,46 @@
 
 namespace ePiX {
 
-  class frac {
-  public:
-    frac(const int n, const unsigned int d=1);
-    explicit frac(double);
+class frac {
+ public:
+  frac(const int n, const unsigned int d = 1);
+  explicit frac(double);
 
-    // increment operators
-    frac& operator += (const frac& arg);
-    frac& operator -= (const frac& arg);
-    frac& operator *= (const frac& arg);
-    frac& operator /= (const frac& arg);
+  // increment operators
+  frac& operator+=(const frac& arg);
+  frac& operator-=(const frac& arg);
+  frac& operator*=(const frac& arg);
+  frac& operator/=(const frac& arg);
 
-    frac& reduce();
-    double eval() const;
+  frac& reduce();
+  double eval() const;
 
-    int num() const;
-    unsigned int denom() const;
+  int num() const;
+  unsigned int denom() const;
 
-    bool is_int() const;
+  bool is_int() const;
 
-  private:
-    int m_num;
-    unsigned int m_denom;
-  }; // end of class frac
+ private:
+  int m_num;
+  unsigned int m_denom;
+};  // end of class frac
 
-  frac operator+ (frac arg1, const frac& arg2);
-  frac operator- (frac arg1);
-  frac operator- (frac arg1, const frac& arg2);
-  frac operator* (frac arg1, const frac& arg2);
-  frac operator/ (frac arg1, const frac& arg2);
+frac operator+(frac arg1, const frac& arg2);
+frac operator-(frac arg1);
+frac operator-(frac arg1, const frac& arg2);
+frac operator*(frac arg1, const frac& arg2);
+frac operator/(frac arg1, const frac& arg2);
 
-  // (in)equality
-  bool operator == (const frac& u, const frac& v);
-  bool operator != (const frac& u, const frac& v);
+// (in)equality
+bool operator==(const frac& u, const frac& v);
+bool operator!=(const frac& u, const frac& v);
 
-  bool operator < (const frac& u, const frac& v);
-  bool operator > (const frac& u, const frac& v);
+bool operator<(const frac& u, const frac& v);
+bool operator>(const frac& u, const frac& v);
 
-  bool operator <= (const frac& u, const frac& v);
-  bool operator >= (const frac& u, const frac& v);
+bool operator<=(const frac& u, const frac& v);
+bool operator>=(const frac& u, const frac& v);
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_FRACTION */

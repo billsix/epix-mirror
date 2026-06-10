@@ -1,14 +1,14 @@
-/* 
+/*
  * pen_arrow.cc -- ePiX::pen_arrow class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
+ * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 19, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -44,40 +44,39 @@
 
 namespace ePiX {
 
-  class affine;
-  class screen_mask;
+class affine;
+class screen_mask;
 
-  // arrowhead tile class
-  class pen_arrow : public tile {
-  public:
-    pen_arrow(const pair& tail, const pair& head,
-	      const pen_data& line, const pen_data& base,
-	      double scale, double sin_th, bool head_seen);
+// arrowhead tile class
+class pen_arrow : public tile {
+ public:
+  pen_arrow(const pair& tail, const pair& head, const pen_data& line,
+            const pen_data& base, double scale, double sin_th, bool head_seen);
 
-    pen_arrow* clone() const override;
+  pen_arrow* clone() const override;
 
-    pen_arrow& map_by(const affine&) override;
-    pen_arrow& crop_to(const screen_mask&) override;
+  pen_arrow& map_by(const affine&) override;
+  pen_arrow& crop_to(const screen_mask&) override;
 
-    bool is_empty() const override;
+  bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const override;
-    void add_to_palette() const override;
+  std::string print_to(const format&, const std::string&) const override;
+  void add_to_palette() const override;
 
-  private:
-    edge2d m_shaft;
+ private:
+  edge2d m_shaft;
 
-    pen_data m_line;
-    pen_data m_base;
+  pen_data m_line;
+  pen_data m_base;
 
-    double m_scale;   // overall scale of head
-    double m_shorten; // foreshortening factor
+  double m_scale;    // overall scale of head
+  double m_shorten;  // foreshortening factor
 
-    bool m_head_seen;
+  bool m_head_seen;
 
-    arrowhead_state m_style;
-  }; // end of class pen_arrow
+  arrowhead_state m_style;
+};  // end of class pen_arrow
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PEN_ARROW */

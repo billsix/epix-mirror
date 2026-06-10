@@ -17,6 +17,12 @@ ePiX dev shell.  Installed tools on PATH: epix  elaps  flix  laps
   meson setup build && ninja -C build      (equivalently, by hand)
   epix   samples/hello.xp         -> hello.eepic  (LaTeX picture macros)
   elaps --pdf samples/hello.xp    -> hello.pdf
+
+On exit, the tree is auto-formatted (clang-format + ruff); run /format.sh by hand any time.
 BANNER
 
-exec bash
+# Interactive shell; on exit, format the tree (C++ + Python). Not `exec`, so we
+# regain control to run the formatter when the user leaves the shell.
+bash
+echo "formatting on exit ..."
+/format.sh || true

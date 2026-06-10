@@ -17,7 +17,7 @@
  * Worcester, MA, 01610-2395, USA
  *
  */
- 
+
 /*
  * ePiX is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
@@ -54,318 +54,215 @@
 
 namespace ePiX {
 
-  Color::Color() 
-    : m_color(Neutral().m_color), m_alpha(1) { }
+Color::Color() : m_color(Neutral().m_color), m_alpha(1) {}
 
-  Color::Color(const Color_Base& col)
-    : m_color(col.clone()), m_alpha(1) { }
+Color::Color(const Color_Base& col) : m_color(col.clone()), m_alpha(1) {}
 
-  Color::Color(const Color_Base* col)
-    : m_color(col->clone()), m_alpha(1) { }
+Color::Color(const Color_Base* col) : m_color(col->clone()), m_alpha(1) {}
 
+Color::Color(const Color& col)
+    : m_color(col.m_color->clone()), m_alpha(col.m_alpha) {}
 
-  Color::Color(const Color& col)
-    : m_color(col.m_color->clone()), m_alpha(col.m_alpha) { }
-
-
-  Color& Color::operator= (const Color& col)
-  {
-    if (*this != col)
-      {
-	Color_Base* tmp(col.m_color->clone());
-	delete m_color;
-
-	m_color = tmp;
-	m_alpha = col.m_alpha;
-      }
-
-    return *this;
-  }
-
-  Color::~Color()
-  {
+Color& Color::operator=(const Color& col) {
+  if (*this != col) {
+    Color_Base* tmp(col.m_color->clone());
     delete m_color;
+
+    m_color = tmp;
+    m_alpha = col.m_alpha;
   }
 
-  const Color_Base* Color::operator->() const
-  {
-    return m_color;
+  return *this;
+}
+
+Color::~Color() { delete m_color; }
+
+const Color_Base* Color::operator->() const { return m_color; }
+
+double Color::alpha() const { return m_alpha; }
+
+bool Color::is_unset() const {
+  // we're Neutral()
+  return (name() == "");
+}
+
+// no effect if we or col are Neutral
+Color Color::filter(const Color& col) const {
+  if (m_color->name() == "" || col.is_unset())
+    return col;
+
+  else {
+    Color_Base* fil(m_color->clone());
+    fil->filter(*(col.m_color));
+
+    Color val(fil);
+    delete fil;
+    return val;
   }
+}
 
-  double Color::alpha() const
-  {
-    return m_alpha;
-  }
+Color& Color::operator*=(double c) {
+  (*m_color) *= c;
 
-  bool Color::is_unset() const
-  {
-    // we're Neutral()
-    return (name() == "");
-  }
+  return *this;
+}
 
+// Blending with Unset has no effect
+Color& Color::blend(const Color& col, double d) {
+  if (!col.is_unset()) m_color->blend(*(col.m_color), d);
 
-  // no effect if we or col are Neutral
-  Color Color::filter(const Color& col) const
-  {
-    if (m_color->name() == "" || col.is_unset())
-      return col;
+  return *this;
+}
 
-    else
-      {
-	Color_Base* fil(m_color->clone());
-	fil->filter(*(col.m_color));
+Color& Color::superpose(const Color& col) {
+  if (!col.is_unset()) m_color->superpose(*(col.m_color));
 
-	Color val(fil);
-	delete fil;
-	return val;
-      }
-  }
+  return *this;
+}
 
-  Color& Color::operator*= (double c)
-  {
-    (*m_color) *= c;
+Color& Color::invert() {
+  m_color->invert();
 
-    return *this;
-  }
+  return *this;
+}
 
-  // Blending with Unset has no effect
-  Color& Color::blend(const Color& col, double d)
-  {
-    if (!col.is_unset())
-      m_color->blend(*(col.m_color), d);
+Color& Color::alpha(double t) {
+  m_alpha = t;
+  return *this;
+}
 
-    return *this;
-  }
+std::string Color::model() const { return m_color->model(); }
 
-  Color& Color::superpose(const Color& col)
-  {
-    if (!col.is_unset())
-      m_color->superpose(*(col.m_color));
+std::string Color::name() const { return m_color->name(); }
 
-    return *this;
-  }
+std::vector<double> Color::densities() const { return m_color->densities(); }
 
-  Color& Color::invert()
-  {
-    m_color->invert();
+// non-member operators
+Color operator*(double c, const Color& col) {
+  Color tmp(col);
+  return tmp *= c;
+}
 
-    return *this;
-  }
+const bool operator==(const Color& col1, const Color& col2) {
+  return col1.name() == col2.name();
+}
 
-  Color& Color::alpha(double t)
-  {
-    m_alpha = t;
-    return *this;
-  }
+const bool operator!=(const Color& col1, const Color& col2) {
+  return col1.name() != col2.name();
+}
 
+const bool operator<(const Color& col1, const Color& col2) {
+  return col1.name() < col2.name();
+}
 
-  std::string Color::model() const
-  {
-    return m_color->model();
-  }
+// Named constructors
+Color RGB(double r, double g, double b) { return Color(RGB_Color(r, g, b)); }
 
-  std::string Color::name() const
-  {
-    return m_color->name();
-  }
+Color CMY(double c, double m, double y) { return Color(CMY_Color(c, m, y)); }
 
-  std::vector<double> Color::densities() const
-  {
-    return m_color->densities();
-  }
+Color CMYK(double c, double m, double y, double k) {
+  return Color(CMYK_Color(c, m, y, k));
+}
 
+Color Gray(double d) { return Color(Gray_Color(d)); }
 
-  // non-member operators
-  Color operator* (double c, const Color& col)
-  {
-    Color tmp(col);
-    return tmp *= c;
-  }
+/* * * Extended primaries in the global namespace * * */
+Color Red(double d) { return RGB(clippy(d), clippy(-d), clippy(-d)); }
 
-  const bool operator== (const Color& col1, const Color& col2)
-  {
-    return col1.name() == col2.name();
-  }
+Color Green(double d) { return RGB(clippy(-d), clippy(d), clippy(-d)); }
 
-  const bool operator!= (const Color& col1, const Color& col2)
-  {
-    return col1.name() != col2.name();
-  }
+Color Blue(double d) { return RGB(clippy(-d), clippy(-d), clippy(d)); }
 
-  const bool operator<  (const Color& col1, const Color& col2)
-  {
-    return col1.name() < col2.name();
-  }
+Color White(double d) { return RGB(clippy(d), clippy(d), clippy(d)); }
 
+Color Black(double d) {
+  return RGB(clippy(1 - d), clippy(1 - d), clippy(1 - d));
+}
 
+/* * * CMY * * */
+Color Cyan(double d) {
+  return CMY_Color(clippy(d), clippy(-d), clippy(-d), true);
+}
 
-  // Named constructors
-  Color RGB(double r, double g, double b)
-  {
-    return Color(RGB_Color(r, g, b));
-  }
+Color Magenta(double d) {
+  return CMY_Color(clippy(-d), clippy(d), clippy(-d), true);
+}
 
-  Color CMY(double c, double m, double y)
-  {
-    return Color(CMY_Color(c, m, y));
-  }
+Color Yellow(double d) {
+  return CMY_Color(clippy(-d), clippy(-d), clippy(d), true);
+}
 
-  Color CMYK(double c, double m, double y, double k)
-  {
-    return Color(CMYK_Color(c, m, y, k));
-  }
+Color CMY_White(double d) {
+  return CMY_Color(clippy(1 - d), clippy(1 - d), clippy(1 - d), true);
+}
 
-  Color Gray(double d)
-  {
-    return Color(Gray_Color(d));
-  }
+Color CMY_Black(double d) {
+  return CMY_Color(clippy(d), clippy(d), clippy(d), true);
+}
 
+/* * * CMYK * * */
+Color CyanK(double d) {
+  double c(clippy(d));
+  double m(clippy(-d));
+  double y(m);               // [sic]
+  double k(std::min(c, m));  // y=m
 
-  /* * * Extended primaries in the global namespace * * */
-  Color Red(double d)
-  {
-    return RGB(clippy(d), clippy(-d), clippy(-d));
-  }
+  return CMYK_Color(c - k, m - k, y - k, k, true);
+}
 
-  Color Green(double d)
-  {
-    return RGB(clippy(-d), clippy(d), clippy(-d));
-  }
+Color MagentaK(double d) {
+  double c(clippy(-d));
+  double m(clippy(d));
+  double y(c);
+  double k(std::min(c, m));  // y=c
 
-  Color Blue(double d)
-  {
-    return RGB(clippy(-d), clippy(-d), clippy(d));
-  }
+  return CMYK_Color(c - k, m - k, y - k, k, true);
+}
 
-  Color White(double d)   
-  {
-    return RGB(clippy(d), clippy(d), clippy(d)); 
-  }
+Color YellowK(double d) {
+  double c(clippy(-d));
+  double m(c);
+  double y(clippy(d));
+  double k(std::min(c, y));  // m=c
 
-  Color Black(double d)
-  { 
-    return RGB(clippy(1-d), clippy(1-d), clippy(1-d));
-  }
+  return CMYK_Color(c - k, m - k, y - k, k, true);
+}
 
+Color CMYK_White(double d) { return CMYK_Color(0, 0, 0, clippy(1 - d), true); }
 
-  /* * * CMY * * */
-  Color Cyan(double d)
-  { 
-    return CMY_Color(clippy(d), clippy(-d), clippy(-d), true);
-  }
+Color CMYK_Black(double d) { return CMYK_Color(0, 0, 0, clippy(d), true); }
 
-  Color Magenta(double d)
-  { 
-    return CMY_Color(clippy(-d), clippy(d), clippy(-d), true);
-  }
+Color C_Process(double d) { return Cyan_Layer(d); }
 
-  Color Yellow(double d)
-  { 
-    return CMY_Color(clippy(-d), clippy(-d), clippy(d), true);
-  }
+Color M_Process(double d) { return Magenta_Layer(d); }
 
-  Color CMY_White(double d)
-  {
-    return CMY_Color(clippy(1-d), clippy(1-d), clippy(1-d), true);
-  }
+Color Y_Process(double d) { return Yellow_Layer(d); }
 
-  Color CMY_Black(double d)
-  {
-    return CMY_Color(clippy(d), clippy(d), clippy(d), true);
-  }
+Color K_Process(double d) { return Black_Layer(d); }
 
+/* * * Neutral filters * * */
+Color Neutral() {
+  static auto* neutral(new Neutral_Color());
+  return Color(*neutral);
+}
 
-  /* * * CMYK * * */
-  Color CyanK(double d)
-  {
-    double c(clippy(d));
-    double m(clippy(-d));
-    double y(m);        // [sic]
-    double k(std::min(c,m)); // y=m
+Color RGB_Neutral() {
+  static auto* rgb_neutral(new RGB_Color(1, 1, 1));
+  return Color(*rgb_neutral);
+}
 
-    return CMYK_Color(c-k, m-k, y-k, k, true);
-  }
+Color CMY_Neutral() {
+  static auto* cmy_neutral(new CMY_Color(0, 0, 0, true));
+  return Color(*cmy_neutral);
+}
 
-  Color MagentaK(double d)
-  { 
-    double c(clippy(-d));
-    double m(clippy(d));
-    double y(c);
-    double k(std::min(c,m)); // y=c
+Color CMYK_Neutral() {
+  static auto* cmyk_neutral(new CMYK_Color(0, 0, 0, 0, true));
+  return Color(*cmyk_neutral);
+}
 
-    return CMYK_Color(c-k, m-k, y-k, k, true);
-  }
-
-  Color YellowK(double d)
-  { 
-    double c(clippy(-d));
-    double m(c);
-    double y(clippy(d));
-    double k(std::min(c,y)); // m=c
-
-    return CMYK_Color(c-k, m-k, y-k, k, true);
-  }
-
-  Color CMYK_White(double d)   
-  {
-    return CMYK_Color(0, 0, 0, clippy(1-d), true);
-  }
-
-  Color CMYK_Black(double d)
-  {
-    return CMYK_Color(0, 0, 0, clippy(d), true);
-  }
-
-
-  Color C_Process(double d)
-  {
-    return Cyan_Layer(d);
-  }
-
-  Color M_Process(double d)
-  {
-    return Magenta_Layer(d);
-  }
-
-  Color Y_Process(double d)
-  {
-    return Yellow_Layer(d);
-  }
-
-  Color K_Process(double d)
-  {
-    return Black_Layer(d);
-  }
-
-
-  /* * * Neutral filters * * */
-  Color Neutral()
-  {
-    static auto* neutral(new Neutral_Color());
-    return Color(*neutral);
-  }
-
-  Color RGB_Neutral()
-  {
-    static auto* rgb_neutral(new RGB_Color(1, 1, 1));
-    return Color(*rgb_neutral);
-  }
-
-  Color CMY_Neutral()
-  {
-    static auto* cmy_neutral(new CMY_Color(0, 0, 0, true));
-    return Color(*cmy_neutral);
-  }
-
-  Color CMYK_Neutral()
-  {
-    static auto* cmyk_neutral(new CMYK_Color(0, 0, 0, 0, true));
-    return Color(*cmyk_neutral);
-  }
-
-  Color Gray_Neutral()
-  {
-    static auto* gray_neutral(new Gray_Color(1));
-    return Color(*gray_neutral);
-  }
-} // end of namespace
+Color Gray_Neutral() {
+  static auto* gray_neutral(new Gray_Color(1));
+  return Color(*gray_neutral);
+}
+}  // namespace ePiX

@@ -1,13 +1,13 @@
-/* 
+/*
  * screen_crop.cc -- ePiX functions for cropping 2D paths and loops
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 17, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,33 +38,29 @@
 
 namespace ePiX {
 
-  using CLI = std::list<edge2d>::const_iterator;
+using CLI = std::list<edge2d>::const_iterator;
 
-  static pair unit_perp(const edge2d& E)
-  {
-    pair N(J(E.head() - E.tail()));
-    return N *= recip(norm(N));
+static pair unit_perp(const edge2d& E) {
+  pair N(J(E.head() - E.tail()));
+  return N *= recip(norm(N));
+}
+
+// O(n^2) algorithm seems necessary since edge_list needn't be convex
+std::list<edge2d>& crop_path_2nd(const std::list<edge2d>& bord,
+                                 std::list<edge2d>& edge_list) {
+  for (const auto& ep : bord)
+    chop_path<pair>(unit_perp(ep), ep.tail(), edge_list);
+
+  return cull<pair>(edge_list);
+}
+
+std::list<edge2d>& crop_loop_2nd(const std::list<edge2d>& bord,
+                                 std::list<edge2d>& edge_list) {
+  for (const auto& ep : bord) {
+    chop_path<pair>(unit_perp(ep), ep.tail(), edge_list);
+    loopify<pair>(edge_list);
   }
 
-  // O(n^2) algorithm seems necessary since edge_list needn't be convex
-  std::list<edge2d>& crop_path_2nd(const std::list<edge2d>& bord,
-				   std::list<edge2d>& edge_list)
-  {
-    for (const auto & ep : bord)
-      chop_path<pair>(unit_perp(ep), ep.tail(), edge_list);
-
-    return cull<pair>(edge_list);
-  }
-
-  std::list<edge2d>& crop_loop_2nd(const std::list<edge2d>& bord,
-				   std::list<edge2d>& edge_list)
-  {
-    for (const auto & ep : bord)
-      {
-	chop_path<pair>(unit_perp(ep), ep.tail(), edge_list);
-	loopify<pair>(edge_list);
-      }
-
-    return cull<pair>(edge_list);
-  }
-} // end of namespace
+  return cull<pair>(edge_list);
+}
+}  // namespace ePiX

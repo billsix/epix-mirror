@@ -1,14 +1,14 @@
-/* 
+/*
  * path.h -- ePiX user class for polygons and paths
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.2.5
  * Last Change: May 04, 2008
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,100 +38,95 @@
 
 namespace ePiX {
 
-  class Camera;
-  class Color;
-  class P;
-  class path_data;
-  class pen_data;
-  class screen;
-  class Sphere;
+class Camera;
+class Color;
+class P;
+class path_data;
+class pen_data;
+class screen;
+class Sphere;
 
-  class path {
-    friend class facet;
-  public:
+class path {
+  friend class facet;
 
-    // path was visible to users, but is now implemented as a p_impl.
-    path(const path&);
-    path& operator= (const path&);
-    ~path();
+ public:
+  // path was visible to users, but is now implemented as a p_impl.
+  path(const path&);
+  path& operator=(const path&);
+  ~path();
 
-    // Interface dictated by backward compatibility
-    path(const std::vector<P>& data, bool closed, bool filled);
-    path();
+  // Interface dictated by backward compatibility
+  path(const std::vector<P>& data, bool closed, bool filled);
+  path();
 
-    // line constructors
-    path(const P& tail, const P& head, double expand=0);
-    path(const P&, const P&, double expand, unsigned int num_pts);
+  // line constructors
+  path(const P& tail, const P& head, double expand = 0);
+  path(const P&, const P&, double expand, unsigned int num_pts);
 
+  // Constructors that specify the number of points have two prototypes
+  // rather than accepting a default argument. This hides the global
+  // (but user-inaccessible) default number of points (see constants.h).
 
-    // Constructors that specify the number of points have two prototypes
-    // rather than accepting a default argument. This hides the global
-    // (but user-inaccessible) default number of points (see constants.h).
+  // ellipse
+  path(const P& center, const P& axis1, const P& axis2, double t_min,
+       double t_max, unsigned int num_pts);
 
-    // ellipse
-    path(const P& center, const P& axis1, const P& axis2, 
-	 double t_min, double t_max,
-	 unsigned int num_pts);
+  path(const P& center, const P& axis1, const P& axis2, double t_min,
+       double t_max);
 
-    path(const P& center, const P& axis1, const P& axis2, 
-	 double t_min, double t_max);
+  // spline
+  path(const P& p1, const P& p2, const P& p3, unsigned int n);
+  path(const P& p1, const P& p2, const P& p3);
 
+  path(const P& p1, const P& p2, const P& p3, const P& p4, unsigned int n);
+  path(const P& p1, const P& p2, const P& p3, const P& p4);
 
-    // spline
-    path(const P& p1, const P& p2, const P& p3, unsigned int n);
-    path(const P& p1, const P& p2, const P& p3);
+  // parametric path
+  path(P f(double), double t_min, double t_max, unsigned int num_pts);
+  path(P f(double), double t_min, double t_max);
 
-    path(const P& p1, const P& p2, const P& p3, const P& p4, unsigned int n);
-    path(const P& p1, const P& p2, const P& p3, const P& p4);
+  // function graph
+  path(double f(double), double t_min, double t_max, unsigned int num_pts);
+  path(double f(double), double t_min, double t_max);
 
+  // append a point
+  path& pt(double, double, double = 0);
+  path& pt(const P&);
 
-    // parametric path
-    path(P f(double), double t_min, double t_max, unsigned int num_pts);
-    path(P f(double), double t_min, double t_max);
+  // concatenate path segments
+  path& operator+=(const path&);
+  // concatenate, reversing second sequence
+  path& operator-=(const path&);
 
-    // function graph
-    path(double f(double), double t_min, double t_max, unsigned int num_pts);
-    path(double f(double), double t_min, double t_max);
+  bool is_closed() const;
+  bool is_filled() const;
 
-    // append a point
-    path& pt(double, double, double=0);
-    path& pt(const P&);
+  // set attributes
+  path& close();
+  path& fill(const bool arg = true);
 
-    // concatenate path segments
-    path& operator+= (const path&);
-    // concatenate, reversing second sequence
-    path& operator-= (const path&);
+  void clip();
 
-    bool is_closed() const;
-    bool is_filled() const;
+  // assumes path lies on sphere
+  void clip_to(const Sphere&, const P& viewpt, bool back = false);
 
-    // set attributes
-    path& close();
-    path&  fill(const bool arg=true);
+  std::vector<P> data() const;
 
+  void draw() const;
+  void draw(const Color&, const pen_data&) const;
 
-    void clip();
+ private:
+  path_data* m_segments;
 
-    // assumes path lies on sphere
-    void clip_to(const Sphere&, const P& viewpt, bool back=false);
+};  // end of class path
 
-    std::vector<P> data() const;
+/*
+  Slated for removal
+  // polygon/polyline with variable number of vertices
+  path polygon(unsigned int num_pts ...);
+  path polyline(unsigned int num_pts ...);
+*/
 
-    void draw() const;
-    void draw(const Color&, const pen_data&) const;
-
-  private:
-    path_data*   m_segments;
-
-  }; // end of class path
-
-  /*
-    Slated for removal
-    // polygon/polyline with variable number of vertices
-    path polygon(unsigned int num_pts ...);
-    path polyline(unsigned int num_pts ...);
-  */
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PATHS */

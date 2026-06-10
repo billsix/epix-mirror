@@ -1,14 +1,14 @@
-/* 
+/*
  * paint_style.cc -- ePiX's current line and fill style.
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.21
  * Last Change: September 22, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,108 +38,55 @@
 
 namespace ePiX {
 
-  // Magic numbers: initialization constants
-  paint_state::paint_state() 
-    : m_line(pen_data()), m_base(Xfine()),
-      m_tint(Neutral()), m_filling(false) { }
+// Magic numbers: initialization constants
+paint_state::paint_state()
+    : m_line(pen_data()),
+      m_base(Xfine()),
+      m_tint(Neutral()),
+      m_filling(false) {}
 
-  paint_state* paint_state::clone() const
-  {
-    return new paint_state(*this);
-  }
+paint_state* paint_state::clone() const { return new paint_state(*this); }
 
-  // set
-  void paint_state::line_pen(const pen_data& pen)
-  {
-    m_line = pen;
-  }
+// set
+void paint_state::line_pen(const pen_data& pen) { m_line = pen; }
 
-  void paint_state::line_color(const Color& col)
-  {
-    m_line.color(col);
-  }
+void paint_state::line_color(const Color& col) { m_line.color(col); }
 
-  void paint_state::line_width(const length& len)
-  {
-    m_line.width(len);
-  }
+void paint_state::line_width(const length& len) { m_line.width(len); }
 
-  void paint_state::base_pen(const pen_data& pen)
-  {
-    m_base = pen;
-  }
+void paint_state::base_pen(const pen_data& pen) { m_base = pen; }
 
-  void paint_state::base_color(const Color& col)
-  {
-    m_base.color(col);
-  }
+void paint_state::base_color(const Color& col) { m_base.color(col); }
 
-  void paint_state::base_width(const length& len)
-  {
-    m_base.width(len);
-  }
+void paint_state::base_width(const length& len) { m_base.width(len); }
 
-  void paint_state::fill_color(const Color& col)
-  {
-    m_tint = col;
-  }
+void paint_state::fill_color(const Color& col) { m_tint = col; }
 
-  void paint_state::fill_flag(bool fill)
-  {
-    m_filling = fill;
-  }
+void paint_state::fill_flag(bool fill) { m_filling = fill; }
 
+// get
+pen_data paint_state::line_pen() const { return m_line; }
+Color paint_state::line_color() const { return m_line.color(); }
+length paint_state::line_width() const { return m_line.width(); }
 
-  // get
-  pen_data paint_state::line_pen() const
-  {
-    return m_line;
-  }
-  Color  paint_state::line_color() const
-  {
-    return m_line.color();
-  }
-  length paint_state::line_width() const
-  {
-    return m_line.width();
-  }
+pen_data paint_state::base_pen() const { return m_base; }
+Color paint_state::base_color() const { return m_base.color(); }
+length paint_state::base_width() const { return m_base.width(); }
 
-  pen_data paint_state::base_pen() const
-  {
-    return m_base;
-  }
-  Color  paint_state::base_color() const
-  {
-    return m_base.color();
-  }
-  length paint_state::base_width() const
-  {
-    return m_base.width();
-  }
+Color paint_state::fill_color() const { return m_tint; }
+bool paint_state::fill_flag() const { return m_filling; }
 
-  Color  paint_state::fill_color() const
-  {
-    return m_tint;
-  }
-  bool    paint_state::fill_flag() const
-  {
-    return m_filling;
-  }
+paint_state paint_state::seen_through(const Camera& mycam) const {
+  return paint_state(m_line.seen_through(mycam), m_base.seen_through(mycam),
+                     mycam(m_tint), m_filling);
+}
 
-  paint_state paint_state::seen_through(const Camera& mycam) const
-  {
-    return paint_state(m_line.seen_through(mycam), m_base.seen_through(mycam),
-		       mycam(m_tint), m_filling);
-  }
+paint_state::paint_state(const pen_data& lp, const pen_data& bp,
+                         const Color& fc, bool ff)
+    : m_line(lp), m_base(bp), m_tint(fc), m_filling(ff) {}
 
-  paint_state::paint_state(const pen_data& lp, const pen_data& bp,
-			   const Color& fc, bool ff)
-    : m_line(lp), m_base(bp), m_tint(fc), m_filling(ff) { }
-
-
-  paint_state& the_paint_style()
-  {
-    static auto* the_paint_state(new paint_state());
-    return *the_paint_state;
-  }
-} // end of namespace
+paint_state& the_paint_style() {
+  static auto* the_paint_state(new paint_state());
+  return *the_paint_state;
+}
+}  // namespace ePiX

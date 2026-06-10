@@ -1,14 +1,14 @@
-/* 
+/*
  * enums.h -- ePiX's user-visible enumeration types
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.0.23
  * Last Change: January 10, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -37,16 +37,48 @@
 
 namespace ePiX {
 
-  enum class epix_mark_type {PATH, CIRC, SPOT, RING, DOT, DDOT, PLUS, OPLUS,
-		       TIMES, OTIMES, DIAMOND, UP, DOWN, BOX, BBOX,
-		       HTICK, VTICK, TEXT};
+enum class epix_mark_type {
+  PATH,
+  CIRC,
+  SPOT,
+  RING,
+  DOT,
+  DDOT,
+  PLUS,
+  OPLUS,
+  TIMES,
+  OTIMES,
+  DIAMOND,
+  UP,
+  DOWN,
+  BOX,
+  BBOX,
+  HTICK,
+  VTICK,
+  TEXT
+};
 
-  enum class epix_label_posn {none, c, r, tr, rt, t, tl, lt, l, bl, lb, b, br, rb};
+enum class epix_label_posn {
+  none,
+  c,
+  r,
+  tr,
+  rt,
+  t,
+  tl,
+  lt,
+  l,
+  bl,
+  lb,
+  b,
+  br,
+  rb
+};
 
-  enum class epix_integral_type {LEFT, RIGHT, UPPER, LOWER, TRAP, MIDPT};
+enum class epix_integral_type { LEFT, RIGHT, UPPER, LOWER, TRAP, MIDPT };
 
-  enum class epix_field_type {SLOPE, DART, VECTOR};
+enum class epix_field_type { SLOPE, DART, VECTOR };
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_ENUMS */

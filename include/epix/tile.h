@@ -1,13 +1,13 @@
-/* 
+/*
  * tile.h -- ePiX::screen object base class (tile)
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.0.23
  * Last Change: January 14, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -36,27 +36,27 @@
 
 namespace ePiX {
 
-  class format;
-  class length;
-  class affine;
-  class screen;
-  class screen_mask;
+class format;
+class length;
+class affine;
+class screen;
+class screen_mask;
 
-  class tile {
-  public:
-    virtual ~tile();
+class tile {
+ public:
+  virtual ~tile();
 
-    virtual tile* clone() const = 0;
-    virtual tile& map_by(const affine&) = 0;
-    virtual tile& crop_to(const screen_mask&) = 0;
+  virtual tile* clone() const = 0;
+  virtual tile& map_by(const affine&) = 0;
+  virtual tile& crop_to(const screen_mask&) = 0;
 
-    virtual bool is_empty() const = 0;
+  virtual bool is_empty() const = 0;
 
-    // pass length for (e.g.) dash length, marker size
-    virtual std::string print_to(const format&, const std::string&) const = 0;
-    virtual void add_to_palette() const = 0;
-  }; // end of class tile
+  // pass length for (e.g.) dash length, marker size
+  virtual std::string print_to(const format&, const std::string&) const = 0;
+  virtual void add_to_palette() const = 0;
+};  // end of class tile
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_TILE */

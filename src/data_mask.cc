@@ -1,14 +1,14 @@
-/* 
+/*
  * data_mask.cc -- ePiX::data_mask class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 22, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -37,40 +37,36 @@
 
 namespace ePiX {
 
-  double identity(double x) { return x; }
+double identity(double x) { return x; }
 
-  data_mask::data_mask(std::string arg)
-    : m_range(arg), m_filter(identity), m_reverse(false) { }
+data_mask::data_mask(std::string arg)
+    : m_range(arg), m_filter(identity), m_reverse(false) {}
 
-  data_mask::data_mask(std::string arg, double f(double))
-    : m_range(arg), m_filter(f), m_reverse(false) { }
+data_mask::data_mask(std::string arg, double f(double))
+    : m_range(arg), m_filter(f), m_reverse(false) {}
 
+data_mask::data_mask(const interval& range)
+    : m_range(range), m_filter(identity), m_reverse(false) {}
 
-  data_mask::data_mask(const interval& range)
-    : m_range(range), m_filter(identity), m_reverse(false) { }
+data_mask::data_mask(const interval& range, double f(double))
+    : m_range(range), m_filter(f), m_reverse(false) {}
 
-  data_mask::data_mask(const interval& range, double f(double))
-    : m_range(range), m_filter(f), m_reverse(false) { }
+data_mask::data_mask(double arg1, double arg2)
+    : m_range(arg1, arg2), m_filter(identity), m_reverse(false) {}
 
-  data_mask::data_mask(double arg1, double arg2)
-    : m_range(arg1, arg2), m_filter(identity), m_reverse(false) { }
+data_mask::data_mask(double arg1, double arg2, double f(double))
+    : m_range(arg1, arg2), m_filter(f), m_reverse(false) {}
 
-  data_mask::data_mask(double arg1, double arg2, double f(double))
-    : m_range(arg1, arg2), m_filter(f), m_reverse(false) { }
+data_mask& data_mask::reverse() {
+  m_reverse = !m_reverse;
+  return *this;
+}
 
-  data_mask& data_mask::reverse()
-  {
-    m_reverse = !m_reverse;
-    return *this;
-  }
+bool data_mask::masks(double x) const {
+  bool masked(!m_range.contains(m_filter(x)));
 
-  bool data_mask::masks(double x) const
-  {
-    bool masked(!m_range.contains(m_filter(x)));
+  if (m_reverse) masked = !masked;
 
-    if (m_reverse)
-      masked = !masked;
-
-    return masked;
-  }
-} // end of namespace
+  return masked;
+}
+}  // namespace ePiX

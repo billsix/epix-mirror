@@ -18,7 +18,7 @@
  * Worcester, MA, 01610-2395, USA
  *
  */
- 
+
 /*
  * ePiX is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
@@ -41,70 +41,65 @@
 
 namespace ePiX {
 
-  // Magic number: 8-bits per color channel
-  const int COLORS(0xFF);
+// Magic number: 8-bits per color channel
+const int COLORS(0xFF);
 
-  // Force double to [0,1]
-  double clip_to_unit(double t)
-  {
-    if (t < 0)       return 0;
-    else if (t > 1)  return 1;
-    else             return t;
-  }
+// Force double to [0,1]
+double clip_to_unit(double t) {
+  if (t < 0)
+    return 0;
+  else if (t > 1)
+    return 1;
+  else
+    return t;
+}
 
-  double rd(double arg) // may assume arg in [0,1]
-  {
-    return floor(COLORS*arg)/COLORS; // round down to nearest 8-bit
-  }
+double rd(double arg)  // may assume arg in [0,1]
+{
+  return floor(COLORS * arg) / COLORS;  // round down to nearest 8-bit
+}
 
-  // represent a double in [0,1] by an 8-bit hex string
-  std::string dtohex(double arg) // assumes arg>0
-  {
-    using std::ios_base;
-    int dens((int) floor(arg*COLORS));
+// represent a double in [0,1] by an 8-bit hex string
+std::string dtohex(double arg)  // assumes arg>0
+{
+  using std::ios_base;
+  int dens((int)floor(arg * COLORS));
 
-    std::ostringstream value;
-    value.setf(ios_base::hex, ios_base::basefield);
+  std::ostringstream value;
+  value.setf(ios_base::hex, ios_base::basefield);
 
-    if (dens <= 0xF) // pad
-      value << "0";
+  if (dens <= 0xF)  // pad
+    value << "0";
 
-    value << dens;
-    return value.str();
-  }
+  value << dens;
+  return value.str();
+}
 
-  // saw2th:R -> [-2,2] is (1) a sawtooth function; (2) the identity on [-2,2]
-  double saw2th(double x)
-  {
-    return x - 4*floor((x+2)/4);
-  }
+// saw2th:R -> [-2,2] is (1) a sawtooth function; (2) the identity on [-2,2]
+double saw2th(double x) { return x - 4 * floor((x + 2) / 4); }
 
-  /*
-   *  clippy(x):
-   *  1....          ____                   if (x >= 0)
-   *      .\        /.  .                     return x <=  1 ? x :  1;
-   *      . \      / .  .
-   *  0......\____/  .  .                   else
-   *      -2 -1   0  1  2 --> x               return x >= -1 ? 0 : -1-x;
-   */
-  double clippy(double x)
-  {
-    x = saw2th(x);
-    return (x >= 0) ? ( x <= 1 ? x : 1 ) : ( x >= -1 ? 0 : -1-x );
-  }
+/*
+ *  clippy(x):
+ *  1....          ____                   if (x >= 0)
+ *      .\        /.  .                     return x <=  1 ? x :  1;
+ *      . \      / .  .
+ *  0......\____/  .  .                   else
+ *      -2 -1   0  1  2 --> x               return x >= -1 ? 0 : -1-x;
+ */
+double clippy(double x) {
+  x = saw2th(x);
+  return (x >= 0) ? (x <= 1 ? x : 1) : (x >= -1 ? 0 : -1 - x);
+}
 
-  double make_r(double r, double g, double b)
-  {
-    return clip_to_unit(clippy( r) + clippy(-g) + clippy(-b));
-  }
+double make_r(double r, double g, double b) {
+  return clip_to_unit(clippy(r) + clippy(-g) + clippy(-b));
+}
 
-  double make_g(double r, double g, double b)
-  {
-    return clip_to_unit(clippy(-r) + clippy( g) + clippy(-b));
-  }
+double make_g(double r, double g, double b) {
+  return clip_to_unit(clippy(-r) + clippy(g) + clippy(-b));
+}
 
-  double make_b(double r, double g, double b)
-  {
-    return clip_to_unit(clippy(-r) + clippy(-g) + clippy( b));
-  }
-} // end of namespace
+double make_b(double r, double g, double b) {
+  return clip_to_unit(clippy(-r) + clippy(-g) + clippy(b));
+}
+}  // namespace ePiX

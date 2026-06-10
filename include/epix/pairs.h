@@ -1,14 +1,14 @@
-/* 
+/*
  * pairs.h -- ePiX pair:: class and mathematical operators
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.10
  * Last Change: August 04, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -37,52 +37,51 @@
 
 namespace ePiX {
 
-  class P;
+class P;
 
-  class pair {
-  public:
-    pair(double arg1=0, double arg2=0)
-      : m_x1(arg1), m_x2(arg2) { }
+class pair {
+ public:
+  pair(double arg1 = 0, double arg2 = 0) : m_x1(arg1), m_x2(arg2) {}
 
-    pair(const P& arg); // take first two coordinates
+  pair(const P& arg);  // take first two coordinates
 
-    double x1() const { return m_x1; }
-    double x2() const { return m_x2; }
+  double x1() const { return m_x1; }
+  double x2() const { return m_x2; }
 
-    // unary increment operators
-    pair& operator += (const pair& arg);
-    pair& operator -= (const pair& arg);
-    pair& operator *= (double c);
+  // unary increment operators
+  pair& operator+=(const pair& arg);
+  pair& operator-=(const pair& arg);
+  pair& operator*=(double c);
 
-    // complex multiplication and division
-    pair& operator *= (const pair& arg);
-    pair& operator /= (const pair& arg);
-    bool operator== (const pair& u) const;
-    bool operator!= (const pair& u) const;
+  // complex multiplication and division
+  pair& operator*=(const pair& arg);
+  pair& operator/=(const pair& arg);
+  bool operator==(const pair& u) const;
+  bool operator!=(const pair& u) const;
 
-  private:
-    double m_x1;
-    double m_x2;
+ private:
+  double m_x1;
+  double m_x2;
 
-  }; // end of class pair
-  
-  pair operator- (pair u);
-  pair operator+ (pair u, const pair& v);
-  pair operator- (pair u, const pair& v);
-  pair operator* (double c, pair u);
+};  // end of class pair
 
-  // complex arithmetic
-  pair J(pair p);
-  pair operator* (pair u, const pair& v);
-  pair operator/ (pair u, const pair& v);
+pair operator-(pair u);
+pair operator+(pair u, const pair& v);
+pair operator-(pair u, const pair& v);
+pair operator*(double c, pair u);
 
-  // dot product
-  double operator| (const pair& u, const pair& v);
-  double norm (const pair& u);
+// complex arithmetic
+pair J(pair p);
+pair operator*(pair u, const pair& v);
+pair operator/(pair u, const pair& v);
 
-  // componentwise product (a,b)&(x,y)=(ax,by)
-  pair operator& (const pair& u, const pair& v);
+// dot product
+double operator|(const pair& u, const pair& v);
+double norm(const pair& u);
 
-} // end of namespace
+// componentwise product (a,b)&(x,y)=(ax,by)
+pair operator&(const pair& u, const pair& v);
+
+}  // namespace ePiX
 
 #endif /* EPIX_PAIRS */

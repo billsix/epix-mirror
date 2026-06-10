@@ -1,13 +1,13 @@
-/* 
+/*
  * interval.cc -- ePiX::interval class functions
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.2.0-2
  * Last Change: September 26, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,191 +38,156 @@
 
 namespace ePiX {
 
-  // expect arg of the form (a,b), [a,b), (a,b], or [a,b]
-  interval::interval(std::string arg)
-    : m_closed_l(true), m_closed_r(true)
+// expect arg of the form (a,b), [a,b), (a,b], or [a,b]
+interval::interval(std::string arg) : m_closed_l(true), m_closed_r(true) {
+  std::string::size_type i(arg.find_first_of("[("));
+
+  if (i == std::string::npos)  // return "empty interval"
   {
-    std::string::size_type i(arg.find_first_of("[("));
-
-    if (i == std::string::npos) // return "empty interval"
-      {
-	m_rmin=1;
-	m_rmax=0;
-	return;
-      }
-
-    // else
-    arg.erase(0, i);
-
-    if (arg.at(0) == '(')
-      m_closed_l = false;
-
-    // expect numerical argument
-    i = arg.find_first_of("-0123456789.");
-    if (i == std::string::npos)
-      {
-	m_rmin=1;
-	m_rmax=0;
-	return;
-      }
-
-    arg.erase(0, i);
-
-    // get left endpoint
-    const char* tmp1(arg.c_str());
-    char* new_arg;
-    m_rmin = strtod(tmp1, &new_arg);
-    arg=new_arg;
-
-    i = arg.find_first_of(",");
-    if (i == std::string::npos)
-      {
-	m_rmax=0;
-	m_rmin=1;
-	return;
-      }
-
-    arg.erase(0, i);
-
-    // expect another numerical argument
-    i = arg.find_first_of("-0123456789.");
-    if (i == std::string::npos)
-      {
-	m_rmax=0;
-	m_rmin=1;
-	return;
-      }
-
-    arg.erase(0, i);
-
-    const char* tmp2(arg.c_str());
-    m_rmax = strtod(tmp2, &new_arg);
-    arg=new_arg;
-
-    i = arg.find_first_of(")]");
-
-    if (i == std::string::npos)
-      {
-	m_rmax=0;
-	m_rmin=1;
-	return;
-      }
-
-    if (arg.at(0) == ')')
-      m_closed_r = false;
-  } // end of interval(std::string)
-
-
-  interval::interval(double a, double b)
-    : m_rmin(ePiX::min(a, b)), m_rmax(ePiX::max(a, b)),
-      m_closed_l(true), m_closed_r(true) { }
-
-  interval interval::literal(double a, double b)
-  {
-    interval value(a, a);
-    value.m_rmax = b;
-    return value;
+    m_rmin = 1;
+    m_rmax = 0;
+    return;
   }
 
-  interval interval::emptyset(literal(1,0));
+  // else
+  arg.erase(0, i);
 
-  double interval::min() const
-  {
-    return m_rmin;
+  if (arg.at(0) == '(') m_closed_l = false;
+
+  // expect numerical argument
+  i = arg.find_first_of("-0123456789.");
+  if (i == std::string::npos) {
+    m_rmin = 1;
+    m_rmax = 0;
+    return;
   }
 
-  double interval::max() const
-  {
-    return m_rmax;
+  arg.erase(0, i);
+
+  // get left endpoint
+  const char* tmp1(arg.c_str());
+  char* new_arg;
+  m_rmin = strtod(tmp1, &new_arg);
+  arg = new_arg;
+
+  i = arg.find_first_of(",");
+  if (i == std::string::npos) {
+    m_rmax = 0;
+    m_rmin = 1;
+    return;
   }
 
-  double interval::avg() const
-  {
-    return 0.5*(m_rmin + m_rmax);
+  arg.erase(0, i);
+
+  // expect another numerical argument
+  i = arg.find_first_of("-0123456789.");
+  if (i == std::string::npos) {
+    m_rmax = 0;
+    m_rmin = 1;
+    return;
   }
 
+  arg.erase(0, i);
 
-  // Magic number
-  const double EPS(1.0e-10);
+  const char* tmp2(arg.c_str());
+  m_rmax = strtod(tmp2, &new_arg);
+  arg = new_arg;
 
-  bool interval::contains(double x) const
-  {
-    // check bounds at each endpoint
-    return (    (m_closed_l ? (m_rmin - EPS <= x) : (m_rmin + EPS < x))
-	     && (m_closed_r ? (x <= m_rmax + EPS) : (x < m_rmax - EPS)) );
+  i = arg.find_first_of(")]");
+
+  if (i == std::string::npos) {
+    m_rmax = 0;
+    m_rmin = 1;
+    return;
   }
 
-  // Minkowski sum
-  interval& interval::operator +=(const interval& I)
-  {
-    if (is_empty())
-      ;
+  if (arg.at(0) == ')') m_closed_r = false;
+}  // end of interval(std::string)
 
-    else if (I.is_empty())
-      *this = interval::emptyset;
+interval::interval(double a, double b)
+    : m_rmin(ePiX::min(a, b)),
+      m_rmax(ePiX::max(a, b)),
+      m_closed_l(true),
+      m_closed_r(true) {}
 
-    else
-      {
-	m_rmin += I.m_rmin;
-	m_rmax += I.m_rmax;
+interval interval::literal(double a, double b) {
+  interval value(a, a);
+  value.m_rmax = b;
+  return value;
+}
 
-	// sum contains endpoint iff both arguments do
-	m_closed_l &= I.m_closed_l;
-	m_closed_r &= I.m_closed_r;
-      }
+interval interval::emptyset(literal(1, 0));
 
-      return *this;
-    }
+double interval::min() const { return m_rmin; }
 
-  // intersection
-  interval& interval::operator *=(const interval& I)
-  {
-    if (!is_empty())
-      {
-	m_rmin = ePiX::max(m_rmin, I.m_rmin);
-	m_rmax = ePiX::min(m_rmax, I.m_rmax);
+double interval::max() const { return m_rmax; }
 
-	m_closed_l &= I.m_closed_l;
-	m_closed_r &= I.m_closed_r;
-      }
+double interval::avg() const { return 0.5 * (m_rmin + m_rmax); }
 
-    return *this;
+// Magic number
+const double EPS(1.0e-10);
+
+bool interval::contains(double x) const {
+  // check bounds at each endpoint
+  return ((m_closed_l ? (m_rmin - EPS <= x) : (m_rmin + EPS < x)) &&
+          (m_closed_r ? (x <= m_rmax + EPS) : (x < m_rmax - EPS)));
+}
+
+// Minkowski sum
+interval& interval::operator+=(const interval& I) {
+  if (is_empty())
+    ;
+
+  else if (I.is_empty())
+    *this = interval::emptyset;
+
+  else {
+    m_rmin += I.m_rmin;
+    m_rmax += I.m_rmax;
+
+    // sum contains endpoint iff both arguments do
+    m_closed_l &= I.m_closed_l;
+    m_closed_r &= I.m_closed_r;
   }
 
-  bool interval::operator== (const interval& I) const
-  {
-    if (is_empty())
-      return (I.is_empty()); // both empty?
+  return *this;
+}
 
-    else
-      return ((m_rmin == I.m_rmin) && (m_rmax == I.m_rmax)
-	      && (m_closed_l == I.m_closed_l) && (m_closed_r == I.m_closed_r));
+// intersection
+interval& interval::operator*=(const interval& I) {
+  if (!is_empty()) {
+    m_rmin = ePiX::max(m_rmin, I.m_rmin);
+    m_rmax = ePiX::min(m_rmax, I.m_rmax);
+
+    m_closed_l &= I.m_closed_l;
+    m_closed_r &= I.m_closed_r;
   }
 
-  bool interval::operator!= (const interval& I) const
-  {
-    return !(*this == I);
-  }
+  return *this;
+}
 
-  bool interval::is_empty() const
-  {
-    if (     (m_rmin <  m_rmax)
-	|| ( (m_rmin == m_rmax) && m_closed_l && m_closed_r ) )
-      return false;
+bool interval::operator==(const interval& I) const {
+  if (is_empty())
+    return (I.is_empty());  // both empty?
 
-    else
-      return true;
-  }
+  else
+    return ((m_rmin == I.m_rmin) && (m_rmax == I.m_rmax) &&
+            (m_closed_l == I.m_closed_l) && (m_closed_r == I.m_closed_r));
+}
 
-  // non-members
-  interval operator+ (interval I1, const interval& I2)
-  {
-    return I1 += I2;
-  }
+bool interval::operator!=(const interval& I) const { return !(*this == I); }
 
-  interval operator* (interval I1, const interval& I2)
-  {
-    return I1 *= I2;
-  }
+bool interval::is_empty() const {
+  if ((m_rmin < m_rmax) || ((m_rmin == m_rmax) && m_closed_l && m_closed_r))
+    return false;
 
-} // end of namespace
+  else
+    return true;
+}
+
+// non-members
+interval operator+(interval I1, const interval& I2) { return I1 += I2; }
+
+interval operator*(interval I1, const interval& I2) { return I1 *= I2; }
+
+}  // namespace ePiX

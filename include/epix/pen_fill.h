@@ -1,14 +1,14 @@
-/* 
+/*
  * pen_fill.cc -- ePiX::pen_fill class, for filled screen elements
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
+ * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
  * Version 1.1.11
  * Last Change: August 12, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -46,38 +46,38 @@
 
 namespace ePiX {
 
-  class length;
-  class screen_mask;
+class length;
+class screen_mask;
 
-  class pen_fill : public tile {
-  public:
-    pen_fill();
+class pen_fill : public tile {
+ public:
+  pen_fill();
 
-    pen_fill(const Color&, const pen_data&, const std::list<edge2d>&);
+  pen_fill(const Color&, const pen_data&, const std::list<edge2d>&);
 
-    pen_fill(const Color&, const pen_data&, double theta,
-	     const std::list<edge2d>&);
+  pen_fill(const Color&, const pen_data&, double theta,
+           const std::list<edge2d>&);
 
-    pen_fill* clone() const override;
+  pen_fill* clone() const override;
 
-    pen_fill& map_by(const affine&) override;
-    pen_fill& crop_to(const screen_mask&) override;
+  pen_fill& map_by(const affine&) override;
+  pen_fill& crop_to(const screen_mask&) override;
 
-    bool is_empty() const override;
+  bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const override;
-    void add_to_palette() const override;
+  std::string print_to(const format&, const std::string&) const override;
+  void add_to_palette() const override;
 
-  private:
-    Color    m_tint;
-    pen_data m_line;
+ private:
+  Color m_tint;
+  pen_data m_line;
 
-    path_state m_style;
+  path_state m_style;
 
-    std::list<edge2d> m_border; // filled boundary (loop)
-    std::list<edge2d> m_edges;  // visible boundary (path)
-  }; // end of class pen_fill
+  std::list<edge2d> m_border;  // filled boundary (loop)
+  std::list<edge2d> m_edges;   // visible boundary (path)
+};  // end of class pen_fill
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PEN_FILL */

@@ -1,14 +1,14 @@
-/* 
- * intersections.h -- Circle, Plane, Segment, Sphere intersection operators 
+/*
+ * intersections.h -- Circle, Plane, Segment, Sphere intersection operators
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.9
  * Last Change: July 30, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -36,35 +36,35 @@
 
 namespace ePiX {
 
-  class Circle;
-  class Plane;
-  class Segment;
-  class Sphere;
+class Circle;
+class Plane;
+class Segment;
+class Sphere;
 
-  Segment operator* (const Circle&,  const Circle&);
-  Segment operator* (const Circle&,  const Plane&);
-  Segment operator* (const Circle&,  const Segment&);
-  Segment operator* (const Circle&,  const Sphere&);
+Segment operator*(const Circle&, const Circle&);
+Segment operator*(const Circle&, const Plane&);
+Segment operator*(const Circle&, const Segment&);
+Segment operator*(const Circle&, const Sphere&);
 
-  Segment operator* (const Plane&,   const Plane&);
-  P       operator* (const Plane&,   const Segment&);
-  Circle  operator* (const Plane&,   const Sphere&);
+Segment operator*(const Plane&, const Plane&);
+P operator*(const Plane&, const Segment&);
+Circle operator*(const Plane&, const Sphere&);
 
-  P       operator* (const Segment&, const Segment&);
-  Segment operator* (const Segment&, const Sphere&);
+P operator*(const Segment&, const Segment&);
+Segment operator*(const Segment&, const Sphere&);
 
-  Circle  operator* (const Sphere&,  const Sphere&);
+Circle operator*(const Sphere&, const Sphere&);
 
-  // derived operators with reversed argument order
-  Segment operator* (const Plane&,   const Circle&);
-  Segment operator* (const Segment&, const Circle&);
-  Segment operator* (const Sphere&,  const Circle&);
+// derived operators with reversed argument order
+Segment operator*(const Plane&, const Circle&);
+Segment operator*(const Segment&, const Circle&);
+Segment operator*(const Sphere&, const Circle&);
 
-  P       operator* (const Segment&, const Plane&);
-  Circle  operator* (const Sphere&,  const Plane&);
+P operator*(const Segment&, const Plane&);
+Circle operator*(const Sphere&, const Plane&);
 
-  Segment operator* (const Sphere&,  const Segment&);
+Segment operator*(const Sphere&, const Segment&);
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_INTERSECTIONS */

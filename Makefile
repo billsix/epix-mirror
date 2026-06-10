@@ -10,6 +10,10 @@
 
 .DEFAULT_GOAL := help
 
+# This wrapper drives heavy, ordered `podman run` steps; never parallelize them
+# (e.g. `build: lib py-ext` must run lib before py-ext links its output).
+.NOTPARALLEL:
+
 CONTAINER_CMD  = podman
 CONTAINER_NAME = epix
 
@@ -42,7 +46,8 @@ SCRIPT_MOUNTS = \
 	-v $(CURDIR)/entrypoint/shell.sh:/shell.sh:Z \
 	-v $(CURDIR)/entrypoint/build.sh:/build.sh:Z \
 	-v $(CURDIR)/entrypoint/examples.sh:/examples.sh:Z \
-	-v $(CURDIR)/entrypoint/examples-anim.sh:/examples-anim.sh:Z
+	-v $(CURDIR)/entrypoint/examples-anim.sh:/examples-anim.sh:Z \
+	-v $(CURDIR)/entrypoint/format.sh:/format.sh:Z
 
 RUN = $(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) --entrypoint /bin/bash
 
@@ -60,11 +65,14 @@ shell: ## Interactive dev shell (live tree bind-mounted; epix/elaps/flix on PATH
 		$(GITCONFIG_MOUNT) $(TMUX_MOUNT) \
 		$(CONTAINER_NAME) /shell.sh
 
-.PHONY: build
-build: ## Build libepix.a + driver scripts from the bind-mounted sources
+.PHONY: lib
+lib: ## Build libepix.a + driver scripts (meson) from the bind-mounted sources
 	$(RUN) \
 		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
 		$(CONTAINER_NAME) /build.sh
+
+.PHONY: build
+build: lib py-ext ## Full build: libepix.a + the Python extension (reflects edited sources)
 
 .PHONY: examples
 examples: ## Render samples/+doc/ figures -> $(OUTPUT_DIR) (.eepic; add RENDER=pdf for PDF)
@@ -83,6 +91,42 @@ examples-anim: ## Render .flx animations -> $(OUTPUT_DIR)/anim (FMT=mng|gif)
 		-v $(OUTPUT_DIR):/output:Z \
 		-e FMT=$(FMT) \
 		$(CONTAINER_NAME) /examples-anim.sh
+
+.PHONY: py-ext
+py-ext: ## Build the nanobind extension (_epix*.so); links build/libepix.a if present, else installed
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/build_py.sh:/build_py.sh:Z \
+		$(CONTAINER_NAME) /build_py.sh
+
+.PHONY: asan
+asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (remove last phase)
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/asan_check.sh:/asan_check.sh:Z \
+		$(CONTAINER_NAME) /asan_check.sh
+
+.PHONY: jupyter
+jupyter: py-ext ## Launch JupyterLab (:8888) with the epix package; builds the extension first
+	$(RUN) -it \
+		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
+		-v $(CURDIR)/entrypoint/jupyter.sh:/usr/local/bin/jupyter.sh:Z \
+		-p 8888:8888 \
+		$(CONTAINER_NAME) /usr/local/bin/jupyter.sh
+
+.PHONY: notebooks
+notebooks: ## Convert notebooks/*.py (jupytext percent) to .ipynb
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/percentToIpynb.sh:/usr/local/bin/percentToIpynb.sh:Z \
+		$(CONTAINER_NAME) /usr/local/bin/percentToIpynb.sh
+
+.PHONY: format
+format: ## Format C++ (clang-format) + Python (ruff) in place
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/format.sh:/format.sh:Z \
+		$(CONTAINER_NAME) /format.sh
 
 .PHONY: clean
 clean: ## Remove the host $(OUTPUT_DIR) folder

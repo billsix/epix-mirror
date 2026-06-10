@@ -42,87 +42,69 @@
 
 namespace ePiX {
 
-  Gray_Color::Gray_Color(double d)
-    : m_gray(clip_to_unit(d)) { }
+Gray_Color::Gray_Color(double d) : m_gray(clip_to_unit(d)) {}
 
+Gray_Color::Gray_Color(const RGB_Densities& s)
+    : m_gray((1.0 / 3) * (s.m_dens_red + s.m_dens_green + s.m_dens_blue)) {}
 
-  Gray_Color::Gray_Color(const RGB_Densities& s)
-    : m_gray((1.0/3)*(s.m_dens_red+s.m_dens_green+s.m_dens_blue)) { }
+Color_Base::RGB_Densities Gray_Color::to_rgb() const {
+  return Color_Base::RGB_Densities(m_gray, m_gray, m_gray);
+}
 
-  Color_Base::RGB_Densities Gray_Color::to_rgb() const
-  {
-    return Color_Base::RGB_Densities(m_gray, m_gray, m_gray);
-  }
+Gray_Color* Gray_Color::clone() const { return new Gray_Color(*this); }
 
-  Gray_Color* Gray_Color::clone() const
-  {
-    return new Gray_Color(*this);
-  }
+Gray_Color& Gray_Color::filter(const Color_Base& color) {
+  Color_Base::RGB_Densities s(color.to_rgb());
 
+  m_gray = std::min(
+      m_gray, (1.0 / 3) * (s.m_dens_red + s.m_dens_green + s.m_dens_blue));
+  return *this;
+}
 
-  Gray_Color& Gray_Color::filter(const Color_Base& color)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
+Gray_Color& Gray_Color::operator*=(double c) {
+  m_gray = clip_to_unit(c * m_gray);
+  return *this;
+}
 
-    m_gray = std::min(m_gray,
-		      (1.0/3)*(s.m_dens_red+s.m_dens_green+s.m_dens_blue));
-    return *this;
-  }
+Gray_Color& Gray_Color::blend(const Color_Base& color, double d) {
+  Color_Base::RGB_Densities s(color.to_rgb());
+  double wt(clip_to_unit(d));
 
-  Gray_Color& Gray_Color::operator*= (double c)
-  {
-    m_gray = clip_to_unit(c*m_gray);
-    return *this;
-  }
+  m_gray += wt * ((1.0 / 3) * (s.m_dens_red + s.m_dens_green + s.m_dens_blue) -
+                  m_gray);
 
-  Gray_Color& Gray_Color::blend(const Color_Base& color, double d)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
-    double wt(clip_to_unit(d));
+  return *this;
+}
 
-    m_gray += wt*((1.0/3)*(s.m_dens_red+s.m_dens_green+s.m_dens_blue)-m_gray);
+Gray_Color& Gray_Color::superpose(const Color_Base& color) {
+  Color_Base::RGB_Densities s(color.to_rgb());
 
-    return *this;
-  }
+  m_gray = clip_to_unit(
+      (1.0 / 3) * (s.m_dens_red + s.m_dens_green + s.m_dens_blue) + m_gray);
 
-  Gray_Color& Gray_Color::superpose(const Color_Base& color)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
+  return *this;
+}
 
-    m_gray = clip_to_unit((1.0/3)*(s.m_dens_red   +
-			       s.m_dens_green +
-			       s.m_dens_blue) + m_gray);
+Gray_Color& Gray_Color::invert() {
+  m_gray = 1 - m_gray;
+  return *this;
+}
 
-    return *this;
-  }
+std::string Gray_Color::model() const { return "rgb"; }
 
-  Gray_Color& Gray_Color::invert()
-  {
-    m_gray = 1 - m_gray;
-    return *this;
-  }
+std::string Gray_Color::name() const {
+  std::ostringstream nm;
 
+  nm << "gray_" << dtohex(m_gray);
 
-  std::string Gray_Color::model() const
-  {
-    return "rgb";
-  }
+  return nm.str();
+}
 
-  std::string Gray_Color::name() const
-  {
-    std::ostringstream nm;
-
-    nm << "gray_" << dtohex(m_gray);
-
-    return nm.str();
-  }
-
-  std::vector<double> Gray_Color::densities() const
-  {
-    std::vector<double> val(3);
-    val.at(0) = rd(m_gray);
-    val.at(1) = rd(m_gray);
-    val.at(2) = rd(m_gray);
-    return val;
-  }
-} // end of namespace
+std::vector<double> Gray_Color::densities() const {
+  std::vector<double> val(3);
+  val.at(0) = rd(m_gray);
+  val.at(1) = rd(m_gray);
+  val.at(2) = rd(m_gray);
+  return val;
+}
+}  // namespace ePiX

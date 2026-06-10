@@ -1,14 +1,14 @@
-/* 
+/*
  * active_screen.h -- ePiX screen_broker class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.11
  * Last Change: August 15, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -45,28 +45,28 @@
 
 namespace ePiX {
 
-  class screen;
+class screen;
 
-  class screen_broker {
-  public:
-    screen_broker();
+class screen_broker {
+ public:
+  screen_broker();
 
-    // no need for destructor; we don't manage resources
+  // no need for destructor; we don't manage resources
 
-    screen* active() const;
-    void push(screen&);
-    screen* pop();
+  screen* active() const;
+  void push(screen&);
+  screen* pop();
 
-  private:
-    std::list<screen*> m_screens;
+ private:
+  std::list<screen*> m_screens;
 
-    // forbid copying
-    screen_broker(const screen_broker&) = delete;
-    screen_broker& operator= (const screen_broker&) = delete;
-  };
+  // forbid copying
+  screen_broker(const screen_broker&) = delete;
+  screen_broker& operator=(const screen_broker&) = delete;
+};
 
-  screen_broker& the_screen_stack();
-  screen* active_screen();
-} // end of namespace
+screen_broker& the_screen_stack();
+screen* active_screen();
+}  // namespace ePiX
 
 #endif /* EPIX_ACTIVE_SCREEN */

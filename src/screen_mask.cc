@@ -1,14 +1,14 @@
-/* 
+/*
  * screen_mask.cc -- ePiX::screen_mask interface
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.4
  * Last Change: June 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -40,16 +40,16 @@
 
 namespace ePiX {
 
-  //// screen_mask::alignment points ////
-  pair screen_mask::tr() const { return pair(h_max(), v_max()); }
-  pair screen_mask::tl() const { return pair(h_min(), v_max()); }
-  pair screen_mask::bl() const { return pair(h_min(), v_min()); }
-  pair screen_mask::br() const { return pair(h_max(), v_min()); }
+//// screen_mask::alignment points ////
+pair screen_mask::tr() const { return pair(h_max(), v_max()); }
+pair screen_mask::tl() const { return pair(h_min(), v_max()); }
+pair screen_mask::bl() const { return pair(h_min(), v_min()); }
+pair screen_mask::br() const { return pair(h_max(), v_min()); }
 
-  pair screen_mask::t()  const { return pair(h_avg(), v_max()); }
-  pair screen_mask::b()  const { return pair(h_avg(), v_min()); }
-  pair screen_mask::l()  const { return pair(h_min(), v_avg()); }
-  pair screen_mask::r()  const { return pair(h_max(), v_avg()); }
-  pair screen_mask::c()  const { return pair(h_avg(), v_avg()); }
+pair screen_mask::t() const { return pair(h_avg(), v_max()); }
+pair screen_mask::b() const { return pair(h_avg(), v_min()); }
+pair screen_mask::l() const { return pair(h_min(), v_avg()); }
+pair screen_mask::r() const { return pair(h_max(), v_avg()); }
+pair screen_mask::c() const { return pair(h_avg(), v_avg()); }
 
-} // end of ePiX namespace
+}  // namespace ePiX

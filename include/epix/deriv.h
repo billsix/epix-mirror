@@ -1,14 +1,14 @@
 /*
  * deriv.h  -- ePiX derivative function template
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.0.23
  * Last Change: January 06, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,11 +39,11 @@
 
 namespace ePiX {
 
-  // moved from functions.h to hide global constant EPIX_EPSILON
-  template<class T> T deriv(T f(double), double t, double dt=EPIX_EPSILON)
-  {
-    return (1.0/dt)*(f(t+0.5*dt) - f(t-0.5*dt));
-  }
-} // end of namespace
+// moved from functions.h to hide global constant EPIX_EPSILON
+template <class T>
+T deriv(T f(double), double t, double dt = EPIX_EPSILON) {
+  return (1.0 / dt) * (f(t + 0.5 * dt) - f(t - 0.5 * dt));
+}
+}  // namespace ePiX
 
 #endif /* EPIX_DERIV */

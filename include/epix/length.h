@@ -1,14 +1,14 @@
 /*
  * length.h -- ePiX true and LaTeX length manipulation
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.2.0
  * Last Change: September 22, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -36,7 +36,7 @@
  * This file provides the length class from ePiX2:
  *
  *   - length(std::string) assumes argument is "double [space(s)] unit"
- *     Recognized units are pt (points), in, cm, mm, pc (picas = 1/12 in), 
+ *     Recognized units are pt (points), in, cm, mm, pc (picas = 1/12 in),
  *     bp (big points = 1/72 in)
  *
  *     Malformed strings are handled as follows:
@@ -63,48 +63,48 @@
 
 namespace ePiX {
 
-  class length {
-  public:
-    length(std::string); // not const std::string&
-    explicit length(double = 0);
+class length {
+ public:
+  length(std::string);  // not const std::string&
+  explicit length(double = 0);
 
-    length& operator+= (const length&); // increment by another length
-    length& operator*= (double);  // scale
-    length& to(std::string);            // convert to specified units
+  length& operator+=(const length&);  // increment by another length
+  length& operator*=(double);         // scale
+  length& to(std::string);            // convert to specified units
 
-    // compare, with units conversion
-    bool operator== (const length&) const;
-    bool operator!= (const length& len) const { return !((*this) == len); }
+  // compare, with units conversion
+  bool operator==(const length&) const;
+  bool operator!=(const length& len) const { return !((*this) == len); }
 
-    // for output
-    double magnitude() const;
-    std::string units() const;
-    std::string name() const;
+  // for output
+  double magnitude() const;
+  std::string units() const;
+  std::string name() const;
 
-  private:
-    double m_mag;
-    double pts_per_unit; // constants defined in length.cc
-    std::string m_units;
-  }; // end of class length
+ private:
+  double m_mag;
+  double pts_per_unit;  // constants defined in length.cc
+  std::string m_units;
+};  // end of class length
 
-  // value-returning operators
-  length operator+ (length, const length&);
-  length operator* (double, length len);
+// value-returning operators
+length operator+(length, const length&);
+length operator*(double, length len);
 
-  // Compare true size; must pass by value...
-  bool operator< (length arg1, length arg2);
+// Compare true size; must pass by value...
+bool operator<(length arg1, length arg2);
 
-  /*
-   * Parse a string into two lengths (width and height).
-   *
-   * The "sz" argument is expected to look like "4in x 10cm" or "4 x 6 in",
-   * specifically a double, an optional two-letter unitlength, an "x", a
-   * double, and a two-letter unitlength (defaults to pt). Spaces are
-   * unimportant, as is initial or trailing garbage. Badly malformed input
-   * (e.g., "4,6 in") may confuse the parsing code on some platforms.
-   */
-  void get_lengths(std::string sz, length& length1, length& length2);
+/*
+ * Parse a string into two lengths (width and height).
+ *
+ * The "sz" argument is expected to look like "4in x 10cm" or "4 x 6 in",
+ * specifically a double, an optional two-letter unitlength, an "x", a
+ * double, and a two-letter unitlength (defaults to pt). Spaces are
+ * unimportant, as is initial or trailing garbage. Badly malformed input
+ * (e.g., "4,6 in") may confuse the parsing code on some platforms.
+ */
+void get_lengths(std::string sz, length& length1, length& length2);
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_LENGTH */

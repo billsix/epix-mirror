@@ -1,14 +1,14 @@
-/* 
+/*
  * picture_data.h -- ePiX::picture implementation class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.7
  * Last Change: July 14, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -69,45 +69,44 @@
 
 namespace ePiX {
 
-  class format;
+class format;
 
-  class picture_data {
-  public:
-    // rely on members' default constructors
-    picture_data();
+class picture_data {
+ public:
+  // rely on members' default constructors
+  picture_data();
 
-    picture_data(const picture_data&);
-    picture_data& operator= (const picture_data&);
-    ~picture_data();
+  picture_data(const picture_data&);
+  picture_data& operator=(const picture_data&);
+  ~picture_data();
 
-    picture_data& add_to_palette(const Color&);
+  picture_data& add_to_palette(const Color&);
 
-    void set_format(const format&);
+  void set_format(const format&);
 
-    // output requires knowledge of unitlength; all other ops handled by data
-    void print();
-    void print_to(const format&);
-    void print_to(const std::string& filename, const format&);
+  // output requires knowledge of unitlength; all other ops handled by data
+  void print();
+  void print_to(const format&);
+  void print_to(const std::string& filename, const format&);
 
-    void  pre_write(const std::string&);
-    void post_write(const std::string&);
+  void pre_write(const std::string&);
+  void post_write(const std::string&);
 
-    //// public data (true size, offsets, and screens) ////
-    length the_unitlength;
-    length the_hoffset, the_voffset;
+  //// public data (true size, offsets, and screens) ////
+  length the_unitlength;
+  length the_hoffset, the_voffset;
 
-    screen the_canvas;
-    screen the_page;
+  screen the_canvas;
+  screen the_page;
 
+ private:
+  format* m_format;
+  std::set<Color> m_palette;
+  // user-specified strings to be written before/after start of picture
+  std::list<verbatim> m_pre_writes;
+  std::list<verbatim> m_post_writes;
+};  // end of class picture_data
 
-  private:
-    format* m_format;
-    std::set<Color> m_palette;
-    // user-specified strings to be written before/after start of picture
-    std::list<verbatim> m_pre_writes;
-    std::list<verbatim> m_post_writes;
-  }; // end of class picture_data
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PICTURE_DATA */

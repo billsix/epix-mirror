@@ -1,14 +1,14 @@
-/* 
+/*
  * arrow_data.h -- ePiX implementation class for arrows
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 19, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -42,36 +42,36 @@
 
 namespace ePiX {
 
-  class Camera;
-  class Color;
-  class halfspace;
-  class pen_data;
-  class screen;
+class Camera;
+class Color;
+class halfspace;
+class pen_data;
+class screen;
 
-  // sequence of vertices
-  class arrow_data {
-  public:
-    arrow_data(const std::vector<P>&, const P& base, const P& tip,
-	       double scale=1);
+// sequence of vertices
+class arrow_data {
+ public:
+  arrow_data(const std::vector<P>&, const P& base, const P& tip,
+             double scale = 1);
 
-    arrow_data& clip();
-    arrow_data& clip_to(const halfspace&);
+  arrow_data& clip();
+  arrow_data& clip_to(const halfspace&);
 
-    void photo(screen&, const Camera&, const pen_data&, const pen_data&) const;
+  void photo(screen&, const Camera&, const pen_data&, const pen_data&) const;
 
-    void draw() const;
-    void draw(const pen_data&, const pen_data&) const;
+  void draw() const;
+  void draw(const pen_data&, const pen_data&) const;
 
-  private:
-    // head data
-    P m_base, m_tip;
-    double m_scale; // size multiplier
-    bool m_head_seen;
+ private:
+  // head data
+  P m_base, m_tip;
+  double m_scale;  // size multiplier
+  bool m_head_seen;
 
-    // shaft
-    std::list<edge3d> m_shaft;
-  }; // end of class arrow_data
+  // shaft
+  std::list<edge3d> m_shaft;
+};  // end of class arrow_data
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_ARROW_DATA */

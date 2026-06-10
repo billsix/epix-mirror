@@ -1,14 +1,14 @@
-/* 
+/*
  * clipping.h -- ePiX's clip box
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.13
  * Last Change: August 23, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -46,32 +46,32 @@
 
 namespace ePiX {
 
-  class P;
+class P;
 
-  class clip_state {
-  public:
-    // create inward-pointing faces of clip_box
-    clip_state(const P& arg1, const P& arg2);
-    clip_state(); // very large box by default
+class clip_state {
+ public:
+  // create inward-pointing faces of clip_box
+  clip_state(const P& arg1, const P& arg2);
+  clip_state();  // very large box by default
 
-    // add and remove faces
-    clip_state& add_face(const P& loc, const P& perp);
-    clip_state& clear_extras();
+  // add and remove faces
+  clip_state& add_face(const P& loc, const P& perp);
+  clip_state& clear_extras();
 
-    bool clips(const P&) const;
+  bool clips(const P&) const;
 
-    // return reference to clipped argument
-    std::list<edge3d>& clip_path(std::list<edge3d>&) const;
-    std::list<edge3d>& clip_loop(std::list<edge3d>&) const;
+  // return reference to clipped argument
+  std::list<edge3d>& clip_path(std::list<edge3d>&) const;
+  std::list<edge3d>& clip_loop(std::list<edge3d>&) const;
 
-  private:
-    std::list<halfspace> m_walls;  // always present
+ private:
+  std::list<halfspace> m_walls;  // always present
 
-    std::list<halfspace> m_extras; // user-added
-  }; // end of class clip_state
+  std::list<halfspace> m_extras;  // user-added
+};  // end of class clip_state
 
-  clip_state& the_clip_box();
+clip_state& the_clip_box();
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_CLIPPING */

@@ -1,14 +1,14 @@
-/* 
+/*
  * segment.h -- ePiX::Segment class
- * 
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ *
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.2.5
  * Last Change: May 04, 2008
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -50,35 +50,35 @@
 
 namespace ePiX {
 
-  class Segment {
-  public:
-    Segment(const P&, const P&); // endpoints
+class Segment {
+ public:
+  Segment(const P&, const P&);  // endpoints
 
-    Segment(bool); // malformed Segment for intersection operators
+  Segment(bool);  // malformed Segment for intersection operators
 
-    // Segment ends are not distinguished geometrically,
-    // so these functions should normally be used in tandem.
-    P end1() const;
-    P end2() const;
+  // Segment ends are not distinguished geometrically,
+  // so these functions should normally be used in tandem.
+  P end1() const;
+  P end2() const;
 
-    bool malformed() const;
+  bool malformed() const;
 
-    // translate
-    Segment& shift(const P&);
-    Segment& move_to(const P&);
+  // translate
+  Segment& shift(const P&);
+  Segment& move_to(const P&);
 
-    Segment& scale(double);
+  Segment& scale(double);
 
-    P midpoint(double t=0.5) const;
+  P midpoint(double t = 0.5) const;
 
-    void draw(double stretch=0) const;
+  void draw(double stretch = 0) const;
 
-  private:
-    P m_endpt1;
-    P m_endpt2;
+ private:
+  P m_endpt1;
+  P m_endpt2;
 
-    bool m_malformed;
-  }; // end of Segment class
+  bool m_malformed;
+};  // end of Segment class
 
-} // end of namespace
+}  // namespace ePiX
 #endif /* EPIX_SEGMENT */

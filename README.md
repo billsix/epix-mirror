@@ -81,16 +81,47 @@ wrapper around `podman` that builds a Fedora image with the full toolchain
 ```sh
 make image                 # build the OCI image
 make shell                  # interactive dev shell
-make build                  # build libepix.a + driver scripts
+make lib                    # build libepix.a + driver scripts (meson)
+make build                  # full build: libepix.a + Python extension
 make examples               # render samples/+doc/ -> ./output (.eepic)
 make examples RENDER=pdf    # ... also render PDFs
 make examples-anim          # render .flx animations -> ./output/anim
+make py-ext                 # build just the Python (nanobind) extension (see below)
+make jupyter                # JupyterLab on :8888 (builds the extension first)
+make notebooks              # convert notebooks/*.py (jupytext) -> .ipynb
 ```
 
 Rendered figures land in `./output/` on the host (bind-mounted into the
 container). The build scripts live in [`entrypoint/`](entrypoint/); the image
 builds ePiX with Meson. When running nested inside another container, append
-`PODMAN_RUN_FLAGS=--cgroups=disabled`.
+`PODMAN_RUN_FLAGS=--cgroups=disabled`. (Repeated `make image` rebuilds can
+exhaust the container image store, a small tmpfs — run `podman image prune -f`
+to reclaim space.)
+
+## Python interface
+
+A Python front-end lives in [`python/`](python/): real bindings (via
+[nanobind](https://nanobind.readthedocs.io)) over `libepix`, so you can build
+figures in Python with the same vocabulary as the C++ samples and render them
+inline in Jupyter. [`notebooks/`](notebooks/) holds percent-format (jupytext)
+ports of the `samples/` demos — **80 of the 81**, each verified **byte-identical**
+to the original figure. (The lone exception, `histogram`, needs a data file the
+repo doesn't ship.)
+
+```python
+import epix
+with epix.figure(epix.P(-1, -1), epix.P(1, 1), "2x1in") as fig:
+    epix.font_size("Huge")
+    epix.label(epix.P(0, 0), "Hello, world!")
+fig                      # displays inline in a notebook
+```
+
+`make jupyter` gives a notebook environment (it builds the extension first via
+`make py-ext`; or run `make py-ext` on its own, and `make notebooks` to convert
+the `.py` notebooks to `.ipynb`).
+This is purely additive — the C++ library and the `.xp`/`.flx` workflow are
+unchanged. Design and status:
+[`tasks/python-bindings-and-notebooks.md`](tasks/python-bindings-and-notebooks.md).
 
 ## Documentation
 

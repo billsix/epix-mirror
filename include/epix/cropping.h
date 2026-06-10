@@ -1,14 +1,14 @@
-/* 
+/*
  * cropping.h -- Implementation of ePiX's current drawing state.
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.0.23
  * Last Change: January 07, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -46,23 +46,22 @@
 
 namespace ePiX {
 
-  class crop_state {
-  public:
-    crop_state(const screen_mask& M)
-      : crop_state_mask(M.clone()) { }
+class crop_state {
+ public:
+  crop_state(const screen_mask& M) : crop_state_mask(M.clone()) {}
 
-    crop_state(const crop_state&);
-    crop_state& operator= (const crop_state&);
-    ~crop_state();
+  crop_state(const crop_state&);
+  crop_state& operator=(const crop_state&);
+  ~crop_state();
 
-    std::list<edge2d>& crop_path(std::list<edge2d>&) const;
-    std::list<edge2d>& crop_loop(std::list<edge2d>&) const;
+  std::list<edge2d>& crop_path(std::list<edge2d>&) const;
+  std::list<edge2d>& crop_loop(std::list<edge2d>&) const;
 
-  private:
-    screen_mask* crop_state_mask;
+ private:
+  screen_mask* crop_state_mask;
 
-  }; // end of class crop_state
+};  // end of class crop_state
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_CROPPING */

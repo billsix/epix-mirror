@@ -17,7 +17,7 @@
  * Worcester, MA, 01610-2395, USA
  *
  */
- 
+
 /*
  * ePiX is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
@@ -45,100 +45,84 @@
 
 namespace ePiX {
 
-  RGB_Color::RGB_Color(double r, double g, double b)
-    : red(make_r(r, g, b)), green(make_g(r, g, b)), blue(make_b(r, g, b)) { }
+RGB_Color::RGB_Color(double r, double g, double b)
+    : red(make_r(r, g, b)), green(make_g(r, g, b)), blue(make_b(r, g, b)) {}
 
+RGB_Color::RGB_Color(const RGB_Densities& s)
+    : red(s.m_dens_red), green(s.m_dens_green), blue(s.m_dens_blue) {}
 
-  RGB_Color::RGB_Color(const RGB_Densities& s)
-    : red(s.m_dens_red), green(s.m_dens_green), blue(s.m_dens_blue) { }
+Color_Base::RGB_Densities RGB_Color::to_rgb() const {
+  return Color_Base::RGB_Densities(red, green, blue);
+}
 
-  Color_Base::RGB_Densities RGB_Color::to_rgb() const
-  {
-    return Color_Base::RGB_Densities(red, green, blue);
-  }
+RGB_Color* RGB_Color::clone() const { return new RGB_Color(*this); }
 
-  RGB_Color* RGB_Color::clone() const
-  {
-    return new RGB_Color(*this);
-  }
+RGB_Color& RGB_Color::filter(const Color_Base& color) {
+  Color_Base::RGB_Densities s(color.to_rgb());
 
+  red = std::min(red, s.m_dens_red);
+  green = std::min(green, s.m_dens_green);
+  blue = std::min(blue, s.m_dens_blue);
 
-  RGB_Color& RGB_Color::filter(const Color_Base& color)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
+  return *this;
+}
 
-    red   = std::min(red,   s.m_dens_red);
-    green = std::min(green, s.m_dens_green);
-    blue  = std::min(blue,  s.m_dens_blue);
+RGB_Color& RGB_Color::operator*=(double c) {
+  double r(red * c);
+  double g(green * c);
+  double b(blue * c);
 
-    return *this;
-  }
+  red = make_r(r, g, b);
+  green = make_g(r, g, b);
+  blue = make_b(r, g, b);
 
-  RGB_Color& RGB_Color::operator*= (double c)
-  {
-    double r(red*c);
-    double g(green*c);
-    double b(blue*c);
+  return *this;
+}
 
-    red   = make_r(r, g, b);
-    green = make_g(r, g, b);
-    blue  = make_b(r, g, b);
+RGB_Color& RGB_Color::blend(const Color_Base& color, double d) {
+  Color_Base::RGB_Densities s(color.to_rgb());
+  double wt(clip_to_unit(d));
 
-    return *this;
-  }
+  red += wt * (s.m_dens_red - red);
+  green += wt * (s.m_dens_green - green);
+  blue += wt * (s.m_dens_blue - blue);
 
-  RGB_Color& RGB_Color::blend(const Color_Base& color, double d)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
-    double wt(clip_to_unit(d));
+  return *this;
+}
 
-    red   += wt*(s.m_dens_red   - red);
-    green += wt*(s.m_dens_green - green);
-    blue  += wt*(s.m_dens_blue  - blue);
+RGB_Color& RGB_Color::superpose(const Color_Base& color) {
+  Color_Base::RGB_Densities s(color.to_rgb());
 
-    return *this;
-  }
+  red = clip_to_unit(red + s.m_dens_red);
+  green = clip_to_unit(green + s.m_dens_green);
+  blue = clip_to_unit(blue + s.m_dens_blue);
 
-  RGB_Color& RGB_Color::superpose(const Color_Base& color)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
+  return *this;
+}
 
-    red   = clip_to_unit(red   + s.m_dens_red);
-    green = clip_to_unit(green + s.m_dens_green);
-    blue  = clip_to_unit(blue  + s.m_dens_blue);
+RGB_Color& RGB_Color::invert() {
+  red = 1 - red;
+  green = 1 - green;
+  blue = 1 - blue;
 
-    return *this;
-  }
+  return *this;
+}
 
-  RGB_Color& RGB_Color::invert()
-  {
-    red   = 1 - red;
-    green = 1 - green;
-    blue  = 1 - blue;
+std::string RGB_Color::model() const { return "rgb"; }
 
-    return *this;
-  }
+std::string RGB_Color::name() const {
+  std::ostringstream nm;
 
-  std::string RGB_Color::model() const
-  {
-    return "rgb";
-  }
+  nm << "rgb_" << dtohex(red) << dtohex(green) << dtohex(blue);
 
-  std::string RGB_Color::name() const
-  {
-    std::ostringstream nm;
+  return nm.str();
+}
 
-    nm << "rgb_" << dtohex(red) << dtohex(green) << dtohex(blue);
-
-    return nm.str();
-  }
-
-  std::vector<double> RGB_Color::densities() const
-  {
-    std::vector<double> val(3);
-    val.at(0) = rd(red);
-    val.at(1) = rd(green);
-    val.at(2) = rd(blue);
-    return val;
-  }
-} // end of namespace
+std::vector<double> RGB_Color::densities() const {
+  std::vector<double> val(3);
+  val.at(0) = rd(red);
+  val.at(1) = rd(green);
+  val.at(2) = rd(blue);
+  return val;
+}
+}  // namespace ePiX

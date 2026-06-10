@@ -1,13 +1,13 @@
 /*
  * Color_CMYK.h -- ePiX::CMYK_Color class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.17
  * Last Change: September 13, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,47 +39,45 @@
 
 namespace ePiX {
 
-  class CMYK_Color : public Color_Base {
-  public:
-    CMYK_Color(double c=1, double m=1, double y=1,
-	       double k=1);
-    CMYK_Color(const RGB_Densities&);
+class CMYK_Color : public Color_Base {
+ public:
+  CMYK_Color(double c = 1, double m = 1, double y = 1, double k = 1);
+  CMYK_Color(const RGB_Densities&);
 
-    CMYK_Color* clone() const override;
+  CMYK_Color* clone() const override;
 
-    CMYK_Color& filter(const Color_Base&) override;
+  CMYK_Color& filter(const Color_Base&) override;
 
-    CMYK_Color& operator*= (double c) override;
+  CMYK_Color& operator*=(double c) override;
 
-    CMYK_Color& blend(const Color_Base&, double) override;
-    CMYK_Color& superpose(const Color_Base&) override;
-    CMYK_Color& invert() override;
+  CMYK_Color& blend(const Color_Base&, double) override;
+  CMYK_Color& superpose(const Color_Base&) override;
+  CMYK_Color& invert() override;
 
-    std::string model() const override;
-    std::string name() const override;
-    std::vector<double> densities() const override;
+  std::string model() const override;
+  std::string name() const override;
+  std::vector<double> densities() const override;
 
-    RGB_Densities to_rgb() const override;
+  RGB_Densities to_rgb() const override;
 
-    // These need to call our private constructor
-    friend Color CyanK(double);
-    friend Color MagentaK(double);
-    friend Color YellowK(double);
-    friend Color CMYK_White(double);
-    friend Color CMYK_Black(double);
-    friend Color CMYK_Neutral();
+  // These need to call our private constructor
+  friend Color CyanK(double);
+  friend Color MagentaK(double);
+  friend Color YellowK(double);
+  friend Color CMYK_White(double);
+  friend Color CMYK_Black(double);
+  friend Color CMYK_Neutral();
 
-  private:
-    double cyan;
-    double magenta;
-    double yellow;
-    double black;
+ private:
+  double cyan;
+  double magenta;
+  double yellow;
+  double black;
 
-    // Construct a CMYK color without checking arguments. Final argument
-    // only changes call signature
-    CMYK_Color(double c, double m, double y,
-	       double k, const bool);
-  }; // end of class CMYK_Color
+  // Construct a CMYK color without checking arguments. Final argument
+  // only changes call signature
+  CMYK_Color(double c, double m, double y, double k, const bool);
+};  // end of class CMYK_Color
 
-} // end of namespace
+}  // namespace ePiX
 #endif /* EPIX_COLOR_CMYK */
