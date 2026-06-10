@@ -17,6 +17,7 @@ The scene API (P, picture, begin, plot, label, pen, fill, line, colors, …) com
 straight from the `_epix` bindings; this module just adds capture + render.
 One figure at a time (matches ePiX's global model) — fine for notebooks.
 """
+
 from __future__ import annotations
 
 import base64
@@ -42,6 +43,7 @@ def render(dpi: int = 150) -> Figure:
 
 class _Pending:
     """Yielded by ``figure()``; becomes the rendered Figure after the block."""
+
     figure: Figure | None = None
 
     def _repr_png_(self):
@@ -104,7 +106,7 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
         for i in range(count):
             ep = os.path.join(d, f"f{i:04d}.eepic")
             pid = os.fork()
-            if pid == 0:                       # child: isolated ePiX state
+            if pid == 0:  # child: isolated ePiX state
                 try:
                     _epix.set_tix(i / count)
                     build()
@@ -118,15 +120,18 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
             eepics.append(ep)
 
         paths = []
-        for i, ep in enumerate(eepics):        # parent renders eepic -> png
+        for i, ep in enumerate(eepics):  # parent renders eepic -> png
             fig = render_eepic(ep, dpi=dpi)
             frames.append(fig)
             p = os.path.join(d, f"f{i:04d}.png")
             fig.save(p)
             paths.append(p)
         gif_path = os.path.join(d, "anim.gif")
-        subprocess.run(["convert", "-loop", "0", "-delay", str(delay), *paths, gif_path],
-                       check=True, capture_output=True)
+        subprocess.run(
+            ["convert", "-loop", "0", "-delay", str(delay), *paths, gif_path],
+            check=True,
+            capture_output=True,
+        )
         with open(gif_path, "rb") as f:
             gif = f.read()
     return Animation(gif, frames)

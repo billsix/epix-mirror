@@ -1,14 +1,14 @@
-/* 
+/*
  * mask_rectangle.h -- ePiX:: rectangular screen_mask for cropping
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.15
  * Last Change: September 05, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -43,47 +43,47 @@
 
 namespace ePiX {
 
-  class pair;
+class pair;
 
-  class Color;
+class Color;
 
-  class length;
-  class pen_fill;
-  class pen_line;
+class length;
+class pen_fill;
+class pen_line;
 
-  class mask_rectangle : public screen_mask {
-  public:
-    // mask_rectangle() { }
-    mask_rectangle(const pair& arg1, const pair& arg2);
+class mask_rectangle : public screen_mask {
+ public:
+  // mask_rectangle() { }
+  mask_rectangle(const pair& arg1, const pair& arg2);
 
-    mask_rectangle* clone() const override;
-    double h_min()  const override;
-    double h_max()  const override;
-    double h_size() const override;
-    double h_avg()  const override;
+  mask_rectangle* clone() const override;
+  double h_min() const override;
+  double h_max() const override;
+  double h_size() const override;
+  double h_avg() const override;
 
-    double v_min()  const override;
-    double v_max()  const override;
-    double v_size() const override;
-    double v_avg()  const override;
+  double v_min() const override;
+  double v_max() const override;
+  double v_size() const override;
+  double v_avg() const override;
 
-    bool crops(const pair& arg) const override; // false if arg visible
-    std::list<edge2d>& crop_path(std::list<edge2d>&) const override;
-    std::list<edge2d>& crop_loop(std::list<edge2d>&) const override;
+  bool crops(const pair& arg) const override;  // false if arg visible
+  std::list<edge2d>& crop_path(std::list<edge2d>&) const override;
+  std::list<edge2d>& crop_loop(std::list<edge2d>&) const override;
 
-    pen_line  border(const Color&, const length&) const override;
-    pen_fill backing(const Color&) const override;
+  pen_line border(const Color&, const length&) const override;
+  pen_fill backing(const Color&) const override;
 
-    pen_line  border() const override;
-    pen_fill backing() const override;
+  pen_line border() const override;
+  pen_fill backing() const override;
 
-  private:
-    double m_hmin, m_hmax;
-    double m_vmin, m_vmax;
+ private:
+  double m_hmin, m_hmax;
+  double m_vmin, m_vmax;
 
-    std::list<edge2d> m_border;
-  }; // end of class mask_rectangle
+  std::list<edge2d> m_border;
+};  // end of class mask_rectangle
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_MASK_RECTANGLE */

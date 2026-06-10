@@ -1,14 +1,14 @@
-/* 
+/*
  * pen_data.h -- Color and width
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.20
  * Last Change: September 19, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -45,38 +45,37 @@
 
 namespace ePiX {
 
-  class Camera;
+class Camera;
 
-  class pen_data {
-  public:
-    // plain black
-    pen_data(const Color& col, const length& wid);
-    pen_data(const Color& col=Black());
+class pen_data {
+ public:
+  // plain black
+  pen_data(const Color& col, const length& wid);
+  pen_data(const Color& col = Black());
 
-    // set
-    void color(const Color& col);
-    void width(const length& len);
+  // set
+  void color(const Color& col);
+  void width(const length& len);
 
-    // get
-    Color  color() const;
-    length width() const;
+  // get
+  Color color() const;
+  length width() const;
 
-    bool operator== (const pen_data& pen) const;
-    bool operator!= (const pen_data& pen) const;
+  bool operator==(const pen_data& pen) const;
+  bool operator!=(const pen_data& pen) const;
 
-    pen_data seen_through(const Camera& cam) const;
+  pen_data seen_through(const Camera& cam) const;
 
-    bool is_unset() const;
+  bool is_unset() const;
 
-  private:
-    Color  m_color;
-    length m_width;  
-  }; // end of class pen_data
+ private:
+  Color m_color;
+  length m_width;
+};  // end of class pen_data
 
+// undrawn
+const pen_data& Xfine();
 
-  // undrawn
-  const pen_data& Xfine();
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PEN_DATA */

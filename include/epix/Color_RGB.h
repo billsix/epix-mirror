@@ -1,13 +1,13 @@
 /*
  * Color_RGB.h -- ePiX::RGB_Color class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.17
  * Last Change: September 13, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -37,32 +37,32 @@
 #include "Color_Base.h"
 
 namespace ePiX {
-  class RGB_Color : public Color_Base {
-  public:
-    RGB_Color(double r=0, double g=0, double b=0);
-    RGB_Color(const RGB_Densities&);
+class RGB_Color : public Color_Base {
+ public:
+  RGB_Color(double r = 0, double g = 0, double b = 0);
+  RGB_Color(const RGB_Densities&);
 
-    RGB_Color* clone() const override;
+  RGB_Color* clone() const override;
 
-    RGB_Color& filter(const Color_Base&) override;
+  RGB_Color& filter(const Color_Base&) override;
 
-    RGB_Color& operator*= (double c) override;
+  RGB_Color& operator*=(double c) override;
 
-    RGB_Color& blend(const Color_Base&, double) override;
-    RGB_Color& superpose(const Color_Base&) override;
-    RGB_Color& invert() override;
+  RGB_Color& blend(const Color_Base&, double) override;
+  RGB_Color& superpose(const Color_Base&) override;
+  RGB_Color& invert() override;
 
-    std::string model() const override;
-    std::string name() const override;
-    std::vector<double> densities() const override;
+  std::string model() const override;
+  std::string name() const override;
+  std::vector<double> densities() const override;
 
-    RGB_Densities to_rgb() const override;
+  RGB_Densities to_rgb() const override;
 
-  private:
-    double red;
-    double green;
-    double blue;
-  }; // end of class RGB_Color
+ private:
+  double red;
+  double green;
+  double blue;
+};  // end of class RGB_Color
 
-} // end of namespace
+}  // namespace ePiX
 #endif /* EPIX_COLOR_RGB */

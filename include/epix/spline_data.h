@@ -1,13 +1,13 @@
-/* 
+/*
  * splinee_data.h -- ePiX parametric spline functions
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.4
  * Last Change: June 18, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -34,18 +34,16 @@
 
 namespace ePiX {
 
-  template <typename T>
-    T spl_pt(const T& p1, const T& p2, const T& p3, double t)
-    {
-      return (1-t)*(1-t)*p1 + 2*t*(1-t)*p2 + t*t*p3;
-    }
+template <typename T>
+T spl_pt(const T& p1, const T& p2, const T& p3, double t) {
+  return (1 - t) * (1 - t) * p1 + 2 * t * (1 - t) * p2 + t * t * p3;
+}
 
-  template <typename T>
-    T spl_pt(const T& p1, const T& p2, const T& p3, const T& p4, double t)
-    {
-      const double s(1-t);
-      return s*s*(s*p1 + 3*t*p2) + t*t*(3*s*p3 + t*p4);
-    }
-} // end of namespace
+template <typename T>
+T spl_pt(const T& p1, const T& p2, const T& p3, const T& p4, double t) {
+  const double s(1 - t);
+  return s * s * (s * p1 + 3 * t * p2) + t * t * (3 * s * p3 + t * p4);
+}
+}  // namespace ePiX
 
 #endif /* EPIX_SPLINE_DATA */

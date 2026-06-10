@@ -1,14 +1,14 @@
-/* 
+/*
  * label_data.h -- ePiX::label_data class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.18
  * Last Change: September 16, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -53,45 +53,47 @@
 
 namespace ePiX {
 
-  class Camera;
-  class Color;
-  class screen;
+class Camera;
+class Color;
+class screen;
 
-  class label_data {
-  public:
-    label_data(const P& here, const P& offset,
-	       const std::string& text, epix_mark_type mark=epix_mark_type::TEXT);
+class label_data {
+ public:
+  label_data(const P& here, const P& offset, const std::string& text,
+             epix_mark_type mark = epix_mark_type::TEXT);
 
-    // generate label text from user-specified function of 2 or 3 variables
-    label_data(const P& here, const P& offset,
-	       std::string f(double,double), epix_mark_type mark=epix_mark_type::TEXT);
+  // generate label text from user-specified function of 2 or 3 variables
+  label_data(const P& here, const P& offset, std::string f(double, double),
+             epix_mark_type mark = epix_mark_type::TEXT);
 
-    label_data(const P& here, const P& offset,
-	       std::string f(double,double,double), epix_mark_type mark=epix_mark_type::TEXT);
+  label_data(const P& here, const P& offset,
+             std::string f(double, double, double),
+             epix_mark_type mark = epix_mark_type::TEXT);
 
-    // marker; alignment affects only TICK marks
-    label_data(const P& here, epix_mark_type mark, epix_label_posn align=epix_label_posn::c);
+  // marker; alignment affects only TICK marks
+  label_data(const P& here, epix_mark_type mark,
+             epix_label_posn align = epix_label_posn::c);
 
-    // pass through to m_style
-    label_data& text_color(const Color&);
-    label_data& mask_color(const Color&);
-    label_data& align_to(epix_label_posn);
+  // pass through to m_style
+  label_data& text_color(const Color&);
+  label_data& mask_color(const Color&);
+  label_data& align_to(epix_label_posn);
 
-    void draw() const;
+  void draw() const;
 
-  private:
-    P m_here;
-    pair m_offset;
+ private:
+  P m_here;
+  pair m_offset;
 
-    std::string m_text;
-    epix_mark_type m_mark;
+  std::string m_text;
+  epix_mark_type m_mark;
 
-    marker_sizes m_sizes;
-    label_state m_style;
+  marker_sizes m_sizes;
+  label_state m_style;
 
-    bool m_seen;
-  }; // end of label_data class
+  bool m_seen;
+};  // end of label_data class
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_LABEL */

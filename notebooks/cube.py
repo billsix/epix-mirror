@@ -33,7 +33,7 @@ def frame():
     epix.revolutions()
     epix.grid(1, 1)
 
-    ctr = P(3.25, -3.25)                      # "clock" showing the angle
+    ctr = P(3.25, -3.25)  # "clock" showing the angle
     epix.bold()
     epix.ellipse(ctr, P(0.5, 0.5))
     epix.line(ctr, ctr + epix.polar(0.4, t))
@@ -43,10 +43,10 @@ def frame():
     R = epix.domain(P(-2, -2, -2), P(2, 2, 2), epix.mesh(1, 1, 1))
     epix.camera.at(epix.sph(10, t, -0.05))
     epix.plain(epix.Cyan())
-    epix.plot(epix.xyz, R)                     # the cube
+    epix.plot(epix.xyz, R)  # the cube
     epix.camera.at(epix.sph(10, 0.01 + t, -0.05))
     epix.red(1.4)
-    epix.plot(epix.xyz, R)                     # second, slightly-rotated copy
+    epix.plot(epix.xyz, R)  # second, slightly-rotated copy
 
 
 # %%

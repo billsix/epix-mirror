@@ -42,7 +42,8 @@ SCRIPT_MOUNTS = \
 	-v $(CURDIR)/entrypoint/shell.sh:/shell.sh:Z \
 	-v $(CURDIR)/entrypoint/build.sh:/build.sh:Z \
 	-v $(CURDIR)/entrypoint/examples.sh:/examples.sh:Z \
-	-v $(CURDIR)/entrypoint/examples-anim.sh:/examples-anim.sh:Z
+	-v $(CURDIR)/entrypoint/examples-anim.sh:/examples-anim.sh:Z \
+	-v $(CURDIR)/entrypoint/format.sh:/format.sh:Z
 
 RUN = $(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) --entrypoint /bin/bash
 
@@ -112,6 +113,13 @@ notebooks: ## Convert notebooks/*.py (jupytext percent) to .ipynb
 		$(SRC_MOUNT) \
 		-v $(CURDIR)/entrypoint/percentToIpynb.sh:/usr/local/bin/percentToIpynb.sh:Z \
 		$(CONTAINER_NAME) /usr/local/bin/percentToIpynb.sh
+
+.PHONY: format
+format: ## Format C++ (clang-format) + Python (ruff) in place
+	$(RUN) \
+		$(SRC_MOUNT) \
+		-v $(CURDIR)/entrypoint/format.sh:/format.sh:Z \
+		$(CONTAINER_NAME) /format.sh
 
 .PHONY: clean
 clean: ## Remove the host $(OUTPUT_DIR) folder

@@ -1,14 +1,14 @@
-/* 
+/*
  * circle.h -- ePiX::Circle class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.9
  * Last Change: July 30, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -51,44 +51,44 @@
 
 namespace ePiX {
 
-  class Circle {
-  public:
-    // defaults to unit circle in (x1,x2,0) plane
-    Circle(const P& ctr=P(0,0,0), double rad=1, const P& perp=E_3);
+class Circle {
+ public:
+  // defaults to unit circle in (x1,x2,0) plane
+  Circle(const P& ctr = P(0, 0, 0), double rad = 1, const P& perp = E_3);
 
-    Circle(const P& ctr, const P& pt); // center, and point, normal = E_3
-    Circle(const P& pt1, const P& pt2, const P& pt3); // three points
+  Circle(const P& ctr, const P& pt);  // center, and point, normal = E_3
+  Circle(const P& pt1, const P& pt2, const P& pt3);  // three points
 
-    Circle(bool); // malformed Circle for intersection operators
+  Circle(bool);  // malformed Circle for intersection operators
 
-    P center() const;
-    double radius() const;
-    P perp() const;
+  P center() const;
+  double radius() const;
+  P perp() const;
 
-    bool malformed() const;
+  bool malformed() const;
 
-    // translate
-    Circle& shift(const P&);
-    Circle& move_to(const P&);
-    // scale radius by c
-    Circle& scale(double c);
+  // translate
+  Circle& shift(const P&);
+  Circle& move_to(const P&);
+  // scale radius by c
+  Circle& scale(double c);
 
-    void draw() const;
+  void draw() const;
 
-  private:
-    P m_center;
-    double m_radius;
-    P m_perp; // unit normal, even if rad = 0
+ private:
+  P m_center;
+  double m_radius;
+  P m_perp;  // unit normal, even if rad = 0
 
-    bool m_malformed;
-  }; // end of Circle class
+  bool m_malformed;
+};  // end of Circle class
 
-  // global object-drawing commands
-  void circle(const P& ctr=P(0,0,0), double rad=1, const P& perp=E_3);
+// global object-drawing commands
+void circle(const P& ctr = P(0, 0, 0), double rad = 1, const P& perp = E_3);
 
-  void circle(const P& ctr, const P& pt); // center, and point, normal = E_3
-  void circle(const P& pt1, const P& pt2, const P& pt3); // three points
+void circle(const P& ctr, const P& pt);  // center, and point, normal = E_3
+void circle(const P& pt1, const P& pt2, const P& pt3);  // three points
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_CIRCLE */

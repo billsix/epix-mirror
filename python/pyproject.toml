@@ -22,3 +22,19 @@ jupyter = ["jupyterlab", "jupytext", "ipython"]
 [tool.setuptools.packages.find]
 where = ["."]
 include = ["epix*"]
+
+# Python lint + formatting (ruff) for the package and the percent-format
+# notebooks. `format.sh`/`make format` point ruff at this file explicitly
+# (`--config python/pyproject.toml`) so it also covers notebooks/ at the repo root.
+[tool.ruff]
+line-length = 88
+extend-exclude = ["build", "output"]
+
+[tool.ruff.lint]
+select = [
+    "F401", "F811", "E402", "I001", "TID252", "F841",
+    "E302", "E231", "B006", "B007", "B008", "UP007",
+    "UP035", "S311", "S602", "T201",
+    "E", "F", "I",
+]
+ignore = []

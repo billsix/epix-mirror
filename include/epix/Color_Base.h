@@ -1,13 +1,13 @@
 /*
  * Color_Base.h -- ePiX::Color interface
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.17
  * Last Change: September 13, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -38,47 +38,45 @@
 
 namespace ePiX {
 
-  class Color_Base {
+class Color_Base {
+ protected:
+  struct RGB_Densities {
+    // ensures densities are in [0,1]
+    RGB_Densities(double r, double g, double b);
 
-  protected:
-    struct RGB_Densities
-    {
-      // ensures densities are in [0,1]
-      RGB_Densities (double r, double g, double b);
+    double m_dens_red, m_dens_green, m_dens_blue;
+  };
 
-      double m_dens_red, m_dens_green, m_dens_blue;
-    };
+ public:
+  virtual ~Color_Base() = default;
+  virtual Color_Base* clone() const = 0;
 
-  public:
-    virtual ~Color_Base() = default;
-    virtual Color_Base* clone() const = 0;
+  // blending (all non-const)
+  // apply us as filter
+  virtual Color_Base& filter(const Color_Base&) = 0;
 
-    // blending (all non-const)
-    // apply us as filter
-    virtual Color_Base& filter(const Color_Base&) = 0;
+  // scale intensities
+  virtual Color_Base& operator*=(double) = 0;
 
-    // scale intensities
-    virtual Color_Base& operator*= (double) = 0;
+  // clip d to [0,1], then return (1-d)*this + d*col
+  virtual Color_Base& blend(const Color_Base&, double) = 0;
 
-    // clip d to [0,1], then return (1-d)*this + d*col
-    virtual Color_Base& blend(const Color_Base&, double) = 0;
+  // add channels
+  virtual Color_Base& superpose(const Color_Base&) = 0;
 
-    // add channels
-    virtual Color_Base& superpose(const Color_Base&) = 0;
+  // return negative color
+  virtual Color_Base& invert() = 0;
 
-    // return negative color
-    virtual Color_Base& invert() = 0;
+  // internal colorname and densities
+  virtual std::string model() const = 0;
+  virtual std::string name() const = 0;
+  virtual std::vector<double> densities() const = 0;
 
-    // internal colorname and densities
-    virtual std::string model() const = 0;
-    virtual std::string name() const = 0;
-    virtual std::vector<double> densities() const = 0;
+  bool operator==(const Color_Base& col) const;
+  virtual RGB_Densities to_rgb() const = 0;
 
-    bool operator== (const Color_Base& col) const;
-    virtual RGB_Densities to_rgb() const = 0;
+};  // end of class Color_Base
 
-  }; // end of class Color_Base
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_COLOR_BASE */

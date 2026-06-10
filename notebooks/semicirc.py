@@ -16,9 +16,10 @@
 # A semicircle with an inscribed rectangle.
 
 # %%
+from math import pi, sqrt
+
 import epix
 from epix import P
-from math import sqrt, pi
 
 
 def f(x):

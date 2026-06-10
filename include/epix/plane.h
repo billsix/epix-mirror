@@ -1,14 +1,14 @@
-/* 
+/*
  *  plane.h -- ePiX::Plane class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.17
  * Last Change: September 13, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,36 +39,36 @@
 
 namespace ePiX {
 
-  class Circle;
-  class Plane;
-  class Segment;
-  class Sphere;
+class Circle;
+class Plane;
+class Segment;
+class Sphere;
 
-  class Plane {
-  public:
-    Plane(const P& pt=P(0,0,0), const P& perp=E_3);
-    Plane(const P&, const P&, const P&);
+class Plane {
+ public:
+  Plane(const P& pt = P(0, 0, 0), const P& perp = E_3);
+  Plane(const P&, const P&, const P&);
 
-    P pt() const;
-    P perp() const;
-    bool malformed() const;
+  P pt() const;
+  P perp() const;
+  bool malformed() const;
 
-    // affine operations
-    Plane& shift(const P&);
-    Plane& move_to(const P&);
+  // affine operations
+  Plane& shift(const P&);
+  Plane& move_to(const P&);
 
-    void draw() const;
+  void draw() const;
 
-  private:
-    P m_pt;
-    P m_perp; // unit normal
+ private:
+  P m_pt;
+  P m_perp;  // unit normal
 
-    bool m_malformed;
-  }; // end of Plane class
+  bool m_malformed;
+};  // end of Plane class
 
-  void plane(const P& pt=P(0,0,0), const P& perp=E_3);
-  void plane(const P&, const P&, const P&);
+void plane(const P& pt = P(0, 0, 0), const P& perp = E_3);
+void plane(const P&, const P&, const P&);
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_PLANE */

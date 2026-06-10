@@ -20,9 +20,10 @@
 # on an ordinary Python function.
 
 # %%
+from math import pi
+
 import epix
 from epix import P
-from math import pi
 
 MAX = 2 * pi
 

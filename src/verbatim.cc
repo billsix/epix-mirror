@@ -1,14 +1,14 @@
-/* 
+/*
  * verbatim.cc -- ePiX screen implemenation for verbatim text
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.7
  * Last Change: July 14, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,42 +39,25 @@
 
 namespace ePiX {
 
-  class affine;
-  class screen_mask;
+class affine;
+class screen_mask;
 
-  verbatim::verbatim(const std::string& text) : m_text(text)
-  {
-  }
+verbatim::verbatim(const std::string& text) : m_text(text) {}
 
-  verbatim& verbatim::map_by(const affine& f)
-  {
-    return *this;
-  }
+verbatim& verbatim::map_by(const affine& f) { return *this; }
 
-  verbatim& verbatim::crop_to(const screen_mask& M)
-  {
-    return *this;
-  }
+verbatim& verbatim::crop_to(const screen_mask& M) { return *this; }
 
-  verbatim* verbatim::clone() const
-  {
-    return new verbatim(*this);
-  }
+verbatim* verbatim::clone() const { return new verbatim(*this); }
 
-  bool verbatim::is_empty() const
-  {
-    return (m_text == "");
-  }
+bool verbatim::is_empty() const { return (m_text == ""); }
 
-  std::string verbatim::print_to(const format& fmt, const std::string& L) const
-  {
-    if (is_empty())
-      return "";
+std::string verbatim::print_to(const format& fmt, const std::string& L) const {
+  if (is_empty()) return "";
 
-    // else
-    return fmt.print_verbatim(m_text);
-  }
+  // else
+  return fmt.print_verbatim(m_text);
+}
 
-  void verbatim::add_to_palette() const { }
-} // end of namespace
-
+void verbatim::add_to_palette() const {}
+}  // namespace ePiX

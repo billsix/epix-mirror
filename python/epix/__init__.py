@@ -10,8 +10,9 @@ bindings, so it grows automatically as the bound surface expands.
 
 (Provisional package name / API shape — still open.)
 """
+
 from __future__ import annotations
 
-from ._epix import *           # noqa: F401,F403  (scene API: P, Color, picture, ...)
-from .render import Figure, render_xp, render_eepic, show
-from .figure import render, figure, animate, Animation
+from ._epix import *  # noqa: F401,F403  (scene API: P, Color, picture, ...)
+from .figure import Animation, animate, figure, render
+from .render import Figure, render_eepic, render_xp, show

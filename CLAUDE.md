@@ -79,7 +79,9 @@ Targets (invoke with `make <t>`): `image`, `shell`, `build`,
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
 `examples-anim` (`.flx` → `./output/anim`), `clean`; and for the Python layer:
 `py-ext` (build the nanobind extension), `jupyter` (JupyterLab on :8888),
-`notebooks` (jupytext → `.ipynb`), `asan` (**dev-only** sanitizer smoke).
+`notebooks` (jupytext → `.ipynb`), `asan` (**dev-only** sanitizer smoke),
+`format` (clang-format C++ + ruff Python — also runs automatically on `make
+shell` exit, via `entrypoint/format.sh`).
 Entrypoint scripts in `entrypoint/` are bind-mounted (edit without rebuild).
 Nested (podman-in-podman) usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The
 render scripts run each figure from a scratch copy with `epix -I.` so the host
@@ -222,7 +224,13 @@ code/ChangeLog wins:
 
 - Don't "fix" generated files (above) — change the source they're built from.
 - This is a faithful mirror; keep upstream-authored prose (`NEWS`, `BUGS`,
-  `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise.
+  `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise. **Exception
+  (Bill, 2026-06-10): code formatting.** `make format` / `entrypoint/format.sh`
+  applies `clang-format` (google style, `.clang-format`) tree-wide — *including*
+  the upstream `src/`/`include/` sources — and `ruff` to the Python
+  (`python/pyproject.toml [tool.ruff]`, covering `notebooks/` too). So formatting
+  churn on upstream files is expected and intended, not a violation of the mirror
+  rule. (`.clang-tidy` + `make`-able clang-tidy are available too.)
 - Bill commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
   `tasks/<slug>.md` doc — see `tasks/` for in-flight items and
   `tasks/archive/` for finished ones.

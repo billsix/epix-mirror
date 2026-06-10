@@ -1,14 +1,14 @@
-/* 
+/*
  * angle_units.h -- Implementation of ePiX's angular units
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.22
  * Last Change: September 24, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -48,30 +48,30 @@
 
 namespace ePiX {
 
-  class angle_state {
-  public:
-    angle_state();
+class angle_state {
+ public:
+  angle_state();
 
-    void set_radians_mode();
-    void set_degrees_mode();
-    void set_revolutions_mode();
+  void set_radians_mode();
+  void set_degrees_mode();
+  void set_revolutions_mode();
 
-    // convert to radians, for angle-sensitive trig functions
-    double to_radians(double t);
+  // convert to radians, for angle-sensitive trig functions
+  double to_radians(double t);
 
-    // current angle units to/from degrees, for label_style
-    double to_degrees(double t);
-    double from_degrees(double t);
+  // current angle units to/from degrees, for label_style
+  double to_degrees(double t);
+  double from_degrees(double t);
 
-  private:
-    // store state redundantly; small overhead, saves conversion
-    double m_rad_per_unit;
-    double m_unit_per_deg;
-    double m_rev_per_unit;
-  }; // end of class angle_state
+ private:
+  // store state redundantly; small overhead, saves conversion
+  double m_rad_per_unit;
+  double m_unit_per_deg;
+  double m_rev_per_unit;
+};  // end of class angle_state
 
-  angle_state& the_angle_style();
+angle_state& the_angle_style();
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_ANGLE_UNITS */

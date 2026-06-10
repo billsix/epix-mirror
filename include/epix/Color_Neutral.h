@@ -1,13 +1,13 @@
 /*
  * Color_Neutral.h -- ePiX::Neutral ("unset") class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.17
  * Last Change: September 13, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -36,29 +36,29 @@
 #include "Color_Base.h"
 
 namespace ePiX {
-  class Neutral_Color : public Color_Base {
-  public:
-    Neutral_Color();
+class Neutral_Color : public Color_Base {
+ public:
+  Neutral_Color();
 
-    Color_Base& filter(const Color_Base&) override;
+  Color_Base& filter(const Color_Base&) override;
 
-    std::string name() const override;
+  std::string name() const override;
 
-  private:
-    // these functions are implemented, but should never be called
-    RGB_Densities to_rgb() const override;
-    Neutral_Color* clone() const override;
+ private:
+  // these functions are implemented, but should never be called
+  RGB_Densities to_rgb() const override;
+  Neutral_Color* clone() const override;
 
-    Neutral_Color& operator*= (double c) override;
+  Neutral_Color& operator*=(double c) override;
 
-    Neutral_Color& blend(const Color_Base&, double) override;
-    Neutral_Color& superpose(const Color_Base&) override;
-    Neutral_Color& invert() override;
+  Neutral_Color& blend(const Color_Base&, double) override;
+  Neutral_Color& superpose(const Color_Base&) override;
+  Neutral_Color& invert() override;
 
-    // not implemented, should never be called
-    std::string model() const override;
-    std::vector<double> densities() const override;
-  }; // end of class Neutral_Color
+  // not implemented, should never be called
+  std::string model() const override;
+  std::vector<double> densities() const override;
+};  // end of class Neutral_Color
 
-} // end of namespace
+}  // namespace ePiX
 #endif /* EPIX_COLOR_NEUTRAL */

@@ -1,13 +1,13 @@
-/* 
+/*
  * lens.h -- ePiX::Lens interface ans implementations
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.21
  * Last Change: September 22, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -34,66 +34,57 @@
 
 namespace ePiX {
 
-  class frame;
-  class P;
-  class pair;
+class frame;
+class P;
+class pair;
 
-  class Lens {
-  public:
-    // lens map(arg, orient, viewpt, distance)
-    virtual pair operator() (const P&,
-			     const frame&, const P&, double) const = 0;
-    virtual bool is_linear() const = 0; // lens preserves lines?
-    virtual bool needs_clip() const = 0; // lens needs scene pre-clipping?
-    virtual ~Lens();
-    virtual Lens* clone() const = 0;
-  }; // end of class Lens
+class Lens {
+ public:
+  // lens map(arg, orient, viewpt, distance)
+  virtual pair operator()(const P&, const frame&, const P&, double) const = 0;
+  virtual bool is_linear() const = 0;   // lens preserves lines?
+  virtual bool needs_clip() const = 0;  // lens needs scene pre-clipping?
+  virtual ~Lens();
+  virtual Lens* clone() const = 0;
+};  // end of class Lens
 
+// actual lenses
+class Perspective : public Lens {
+ public:
+  pair operator()(const P&, const frame&, const P&, double) const override;
 
-  // actual lenses
-  class Perspective : public Lens {
-  public:
-    pair operator()
-      (const P&, const frame&, const P&, double) const override;
+  bool is_linear() const override;
+  bool needs_clip() const override;
+  Perspective* clone() const override;
+};  // end of class Perspective
 
-    bool is_linear() const override;
-    bool needs_clip() const override;
-    Perspective* clone() const override;
-  }; // end of class Perspective
+class Orthog : public Lens {
+ public:
+  pair operator()(const P&, const frame&, const P&, double) const override;
 
+  bool is_linear() const override;
+  bool needs_clip() const override;
+  Orthog* clone() const override;
+};  // end of class Orthog
 
-  class Orthog : public Lens {
-  public:
-    pair operator()
-      (const P&, const frame&, const P&, double) const override;
+class Fisheye : public Lens {
+ public:
+  pair operator()(const P&, const frame&, const P&, double) const override;
 
-    bool is_linear() const override;
-    bool needs_clip() const override;
-    Orthog* clone() const override;
-  }; // end of class Orthog
+  bool is_linear() const override;
+  bool needs_clip() const override;
+  Fisheye* clone() const override;
+};  // end of class Fisheye
 
+class Bubble : public Lens {
+ public:
+  pair operator()(const P&, const frame&, const P&, double) const override;
 
-  class Fisheye : public Lens {
-  public:
-    pair operator()
-      (const P&, const frame&, const P&, double) const override;
+  bool is_linear() const override;
+  bool needs_clip() const override;
+  Bubble* clone() const override;
+};  // end of class Bubble
 
-    bool is_linear() const override;
-    bool needs_clip() const override;
-    Fisheye* clone() const override;
-  }; // end of class Fisheye
-
-
-  class Bubble : public Lens {
-  public:
-    pair operator()
-      (const P&, const frame&, const P&, double) const override;
-
-    bool is_linear() const override;
-    bool needs_clip() const override;
-    Bubble* clone() const override;
-  }; // end of class Bubble
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_LENS */

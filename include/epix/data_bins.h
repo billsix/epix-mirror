@@ -1,14 +1,14 @@
-/* 
+/*
  * data_bins.h -- ePiX::data_bins class for histogram data
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.19
  * Last Change: September 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -57,45 +57,45 @@
 
 namespace ePiX {
 
-  class d_bin;
+class d_bin;
 
-  class data_bins {
-  public:
-    data_bins(double lo, double hi, unsigned int n=1);
+class data_bins {
+ public:
+  data_bins(double lo, double hi, unsigned int n = 1);
 
-    data_bins(const data_bins&);
-    data_bins& operator= (const data_bins&);
-    ~data_bins();
+  data_bins(const data_bins&);
+  data_bins& operator=(const data_bins&);
+  ~data_bins();
 
-    data_bins&  cut(double); // add a cut
-    data_bins& read(const std::vector<double>&);
+  data_bins& cut(double);  // add a cut
+  data_bins& read(const std::vector<double>&);
 
-    unsigned int pop() const; // current population
+  unsigned int pop() const;  // current population
 
-    // draw rectangles
-    void histogram(double scale=1) const; // area prop to pop
-    void bar_chart(double scale=1) const; // height prop to pop
-    void plot(double scale=1) const;  // smooth interpolation
+  // draw rectangles
+  void histogram(double scale = 1) const;  // area prop to pop
+  void bar_chart(double scale = 1) const;  // height prop to pop
+  void plot(double scale = 1) const;       // smooth interpolation
 
-  private:
-    double m_lo_val;
-    double m_hi_val;
+ private:
+  double m_lo_val;
+  double m_hi_val;
 
-    unsigned int m_lo_ct; // population smaller than m_lo_val
-    unsigned int m_hi_ct; // population larger than m_hi_val
-    unsigned int m_pop;   // current total population
+  unsigned int m_lo_ct;  // population smaller than m_lo_val
+  unsigned int m_hi_ct;  // population larger than m_hi_val
+  unsigned int m_pop;    // current total population
 
-    unsigned int m_cut_hits; // number of data on a cut
-    bool m_cuts_locked; // true once we read data
+  unsigned int m_cut_hits;  // number of data on a cut
+  bool m_cuts_locked;       // true once we read data
 
-    std::list<double> m_cuts;
-    std::list<d_bin*> m_bins;
+  std::list<double> m_cuts;
+  std::list<d_bin*> m_bins;
 
-    // bookkeeping
-    void initialize();         // convert cuts to bins and lock
-    void insert(double); // add data point
-  }; // end of class data_bins
+  // bookkeeping
+  void initialize();    // convert cuts to bins and lock
+  void insert(double);  // add data point
+};  // end of class data_bins
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_DATA_BINS */

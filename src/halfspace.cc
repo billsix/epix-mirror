@@ -1,14 +1,14 @@
-/* 
+/*
  * halfspace.cc -- ePiX::halfspace class for clipping
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -41,27 +41,23 @@
 
 namespace ePiX {
 
-  halfspace::halfspace(const P& base, const P& perp)
-    : m_base(base), m_perp((1.0/norm(perp))*perp) { }
+halfspace::halfspace(const P& base, const P& perp)
+    : m_base(base), m_perp((1.0 / norm(perp)) * perp) {}
 
-  halfspace& halfspace::reverse()
-  {
-    m_perp *= -1;
-    return *this;
-  }
+halfspace& halfspace::reverse() {
+  m_perp *= -1;
+  return *this;
+}
 
-  bool halfspace::clips(const P& arg) const
-  {
-    return height(m_perp, m_base, arg) < -EPIX_EPSILON;
-  }
+bool halfspace::clips(const P& arg) const {
+  return height(m_perp, m_base, arg) < -EPIX_EPSILON;
+}
 
-  std::list<edge3d>& halfspace::clip_path(std::list<edge3d>& L) const
-  {
-    return chop_path<P>(m_perp, m_base, L);
-  }
+std::list<edge3d>& halfspace::clip_path(std::list<edge3d>& L) const {
+  return chop_path<P>(m_perp, m_base, L);
+}
 
-  std::list<edge3d>& halfspace::clip_loop(std::list<edge3d>& L) const
-  {
-    return chop_loop<P>(m_perp, m_base, L);
-  }
-} // end of namespace
+std::list<edge3d>& halfspace::clip_loop(std::list<edge3d>& L) const {
+  return chop_loop<P>(m_perp, m_base, L);
+}
+}  // namespace ePiX

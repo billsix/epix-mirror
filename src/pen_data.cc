@@ -1,14 +1,14 @@
-/* 
+/*
  * pen_data.cc -- ePiX's pen class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.20
  * Last Change: September 19, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,50 +39,40 @@
 
 namespace ePiX {
 
-  pen_data::pen_data(const Color& col, const length& wid)
-    : m_color(col), m_width(wid) { }
+pen_data::pen_data(const Color& col, const length& wid)
+    : m_color(col), m_width(wid) {}
 
-  pen_data::pen_data(const Color& col)
-    : m_color(col), m_width(PLAIN_WIDTH) { }
+pen_data::pen_data(const Color& col) : m_color(col), m_width(PLAIN_WIDTH) {}
 
-  // set
-  void pen_data::color(const Color& col)  { m_color = col; }
-  void pen_data::width(const length& len) { m_width = len; }
+// set
+void pen_data::color(const Color& col) { m_color = col; }
+void pen_data::width(const length& len) { m_width = len; }
 
-  // get
-  Color  pen_data::color() const { return m_color; }
-  length pen_data::width() const { return m_width; }
+// get
+Color pen_data::color() const { return m_color; }
+length pen_data::width() const { return m_width; }
 
-  bool pen_data::operator== (const pen_data& pen) const
-  {
-    return ((m_color == pen.m_color) && (m_width == pen.m_width));
-  }
+bool pen_data::operator==(const pen_data& pen) const {
+  return ((m_color == pen.m_color) && (m_width == pen.m_width));
+}
 
-  bool pen_data::operator!= (const pen_data& pen) const
-  {
-    return !(*this == pen);
-  }
+bool pen_data::operator!=(const pen_data& pen) const { return !(*this == pen); }
 
-  pen_data pen_data::seen_through(const Camera& mycam) const
-  {
-    Color col(m_color);
-    if (!col.is_unset())
-      col = mycam(col);
+pen_data pen_data::seen_through(const Camera& mycam) const {
+  Color col(m_color);
+  if (!col.is_unset()) col = mycam(col);
 
-    return pen_data(col, m_width);
-  }
+  return pen_data(col, m_width);
+}
 
-  bool pen_data::is_unset() const
-  {
-    return m_color.is_unset() || (m_width < length(EPIX_EPSILON));
-  }
+bool pen_data::is_unset() const {
+  return m_color.is_unset() || (m_width < length(EPIX_EPSILON));
+}
 
-  // undrawn
-  const pen_data& Xfine()
-  {
-    static const pen_data*
-      const xfine_pen(new pen_data(Neutral(), length(0)));
+// undrawn
+const pen_data& Xfine() {
+  static const pen_data* const xfine_pen(new pen_data(Neutral(), length(0)));
 
-    return *xfine_pen;
-  }
-} // end of namespace
+  return *xfine_pen;
+}
+}  // namespace ePiX

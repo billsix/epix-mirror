@@ -15,6 +15,7 @@ the shell for several. Run in the container with PYTHONPATH=/epix/python.
 Usage:  verify_ports.py NAME            ->  prints "NAME: PASS" or "NAME: FAIL ..."
 Exit 0 on PASS, 1 on FAIL/error.
 """
+
 import os
 import subprocess
 import sys
@@ -26,8 +27,9 @@ SAMPLES = os.path.join(REPO, "samples")
 
 
 def strip(s):
-    return "\n".join(l for l in s.splitlines()
-                     if "Generated" not in l and "Automatically" not in l)
+    return "\n".join(
+        l for l in s.splitlines() if "Generated" not in l and "Automatically" not in l
+    )
 
 
 def run_notebook(name):
@@ -41,10 +43,27 @@ def run_notebook(name):
 
 
 def _compile(src, out, defs=()):
-    subprocess.run(["g++", "-std=c++20", "-DEPIX_FMT_EEPIC", *defs,
-                    "-I/usr/local/include", f"-I{SAMPLES}", "-x", "c++", src,
-                    "-L/usr/local/lib64/epix", "-lepix", "-lm", "-o", out],
-                   check=True, capture_output=True, text=True)
+    subprocess.run(
+        [
+            "g++",
+            "-std=c++20",
+            "-DEPIX_FMT_EEPIC",
+            *defs,
+            "-I/usr/local/include",
+            f"-I{SAMPLES}",
+            "-x",
+            "c++",
+            src,
+            "-L/usr/local/lib64/epix",
+            "-lepix",
+            "-lm",
+            "-o",
+            out,
+        ],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
 
 
 def verify_xp(name):
@@ -56,8 +75,11 @@ def verify_xp(name):
     with tempfile.TemporaryDirectory() as d:
         binp = os.path.join(d, "bin")
         _compile(os.path.join(SAMPLES, name + ".xp"), binp)
-        orig = strip(subprocess.run([binp], cwd=d, check=True,
-                                    capture_output=True, text=True).stdout)
+        orig = strip(
+            subprocess.run(
+                [binp], cwd=d, check=True, capture_output=True, text=True
+            ).stdout
+        )
     return py == orig, "eepic mismatch" if py != orig else ""
 
 
@@ -84,7 +106,7 @@ def main():
             ok, why = verify_flx(name)
         else:
             ok, why = verify_xp(name)
-    except Exception as e:                      # noqa: BLE001
+    except Exception as e:  # noqa: BLE001
         print(f"{name}: FAIL ({type(e).__name__}: {e})")
         sys.exit(1)
     print(f"{name}: {'PASS' if ok else 'FAIL (' + why + ')'}")

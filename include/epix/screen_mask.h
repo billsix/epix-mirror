@@ -1,14 +1,14 @@
-/* 
+/*
  * screen_mask.h -- ePiX::screen_mask interface, for screen cropping
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -42,56 +42,56 @@
 
 namespace ePiX {
 
-  class pair;
+class pair;
 
-  class Color;
+class Color;
 
-  class length;
-  class pen_fill;
-  class pen_line;
+class length;
+class pen_fill;
+class pen_line;
 
-  class screen_mask {
-  public:
-    virtual ~screen_mask() = default;
+class screen_mask {
+ public:
+  virtual ~screen_mask() = default;
 
-    virtual screen_mask* clone() const = 0;
+  virtual screen_mask* clone() const = 0;
 
-    // alignment points
-    pair tr() const;
-    pair tl() const;
-    pair bl() const;
-    pair br() const;
+  // alignment points
+  pair tr() const;
+  pair tl() const;
+  pair bl() const;
+  pair br() const;
 
-    pair  t() const;
-    pair  b() const;
-    pair  l() const;
-    pair  r() const;
-    pair  c() const;
+  pair t() const;
+  pair b() const;
+  pair l() const;
+  pair r() const;
+  pair c() const;
 
-    // cropping facilities (for tiles: glyph, pen_line, pen_fill resp.)
-    virtual bool crops(const pair& arg) const = 0; // false if arg visible
-    virtual std::list<edge2d>& crop_path(std::list<edge2d>&) const = 0;
-    virtual std::list<edge2d>& crop_loop(std::list<edge2d>&) const = 0;
+  // cropping facilities (for tiles: glyph, pen_line, pen_fill resp.)
+  virtual bool crops(const pair& arg) const = 0;  // false if arg visible
+  virtual std::list<edge2d>& crop_path(std::list<edge2d>&) const = 0;
+  virtual std::list<edge2d>& crop_loop(std::list<edge2d>&) const = 0;
 
-    // extreme and average coordinates, dimensions
-    virtual double h_min()  const = 0;
-    virtual double h_max()  const = 0;
-    virtual double h_size() const = 0;
-    virtual double h_avg()  const = 0;
+  // extreme and average coordinates, dimensions
+  virtual double h_min() const = 0;
+  virtual double h_max() const = 0;
+  virtual double h_size() const = 0;
+  virtual double h_avg() const = 0;
 
-    virtual double v_min()  const = 0;
-    virtual double v_max()  const = 0;
-    virtual double v_size() const = 0;
-    virtual double v_avg()  const = 0;
+  virtual double v_min() const = 0;
+  virtual double v_max() const = 0;
+  virtual double v_size() const = 0;
+  virtual double v_avg() const = 0;
 
-    // convert us to screen border or backing
-    virtual pen_line border(const Color&, const length&) const = 0;
-    virtual pen_fill backing(const Color&) const = 0;
+  // convert us to screen border or backing
+  virtual pen_line border(const Color&, const length&) const = 0;
+  virtual pen_fill backing(const Color&) const = 0;
 
-    virtual pen_line border() const = 0;
-    virtual pen_fill backing() const = 0;
-  }; // end of class screen_mask
+  virtual pen_line border() const = 0;
+  virtual pen_fill backing() const = 0;
+};  // end of class screen_mask
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_SCREEN_MASK */

@@ -1,14 +1,14 @@
-/* 
+/*
  * state_data.cc -- Implementation of ePiX's current drawing state
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.4
  * Last Change: June 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -48,41 +48,33 @@
 
 namespace ePiX {
 
-  crop_state::crop_state(const crop_state& cs)
-    : crop_state_mask(cs.crop_state_mask->clone()) { }
+crop_state::crop_state(const crop_state& cs)
+    : crop_state_mask(cs.crop_state_mask->clone()) {}
 
-  crop_state& crop_state::operator= (const crop_state& cs)
-  {
-    if (this != &cs)
-      {
-	screen_mask* tmp(cs.crop_state_mask->clone());
+crop_state& crop_state::operator=(const crop_state& cs) {
+  if (this != &cs) {
+    screen_mask* tmp(cs.crop_state_mask->clone());
 
-	delete crop_state_mask;
-	crop_state_mask=tmp;
-      }
-
-    return *this;
-  }
-
-  crop_state::~crop_state()
-  {
     delete crop_state_mask;
+    crop_state_mask = tmp;
   }
 
-  std::list<edge2d>& crop_state::crop_path(std::list<edge2d>& L) const
-  {
-    return crop_state_mask->crop_path(L);
-  }
+  return *this;
+}
 
-  std::list<edge2d>& crop_state::crop_loop(std::list<edge2d>& L) const
-  {
-    return crop_state_mask->crop_loop(L);
-  }
+crop_state::~crop_state() { delete crop_state_mask; }
 
-  crop_state& the_crop_box()
-  {
-    const pair M(EPIX_INFTY, EPIX_INFTY);
-    static auto* current_crop_box(new crop_state(mask_rectangle(-M,M)));
-    return *current_crop_box;
-  }
-} // end of namespace
+std::list<edge2d>& crop_state::crop_path(std::list<edge2d>& L) const {
+  return crop_state_mask->crop_path(L);
+}
+
+std::list<edge2d>& crop_state::crop_loop(std::list<edge2d>& L) const {
+  return crop_state_mask->crop_loop(L);
+}
+
+crop_state& the_crop_box() {
+  const pair M(EPIX_INFTY, EPIX_INFTY);
+  static auto* current_crop_box(new crop_state(mask_rectangle(-M, M)));
+  return *current_crop_box;
+}
+}  // namespace ePiX

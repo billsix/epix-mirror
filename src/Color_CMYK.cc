@@ -43,172 +43,153 @@
 
 namespace ePiX {
 
-  // Behaves "classically" if c+k, m+k, y+k are in [0,1]
-  // Except as noted, CMYK methods enforce/preserve this condition
-  CMYK_Color::CMYK_Color(double c, double m, double y,
-			 double k)
-    : cyan(make_r(c+k, m+k, y+k)),
-      magenta(make_g(c+k, m+k, y+k)),
-      yellow(make_b(c+k, m+k, y+k)),
-      black(std::min(std::min(cyan, magenta), yellow))
-  {
-    /* conventional RGB densities
-    double r(1 - std::min(1, c+k));
-    double g(1 - std::min(1, m+k));
-    double b(1 - std::min(1, y+k));
-    */
-    cyan    -= black;
-    magenta -= black;
-    yellow  -= black;
-  }
+// Behaves "classically" if c+k, m+k, y+k are in [0,1]
+// Except as noted, CMYK methods enforce/preserve this condition
+CMYK_Color::CMYK_Color(double c, double m, double y, double k)
+    : cyan(make_r(c + k, m + k, y + k)),
+      magenta(make_g(c + k, m + k, y + k)),
+      yellow(make_b(c + k, m + k, y + k)),
+      black(std::min(std::min(cyan, magenta), yellow)) {
+  /* conventional RGB densities
+  double r(1 - std::min(1, c+k));
+  double g(1 - std::min(1, m+k));
+  double b(1 - std::min(1, y+k));
+  */
+  cyan -= black;
+  magenta -= black;
+  yellow -= black;
+}
 
-  // private, no arg checking, bool unused
-  CMYK_Color::CMYK_Color(double c, double m,
-			 double y, double k, const bool arg)
-    : cyan(c), magenta(m), yellow(y), black(k) { }
+// private, no arg checking, bool unused
+CMYK_Color::CMYK_Color(double c, double m, double y, double k, const bool arg)
+    : cyan(c), magenta(m), yellow(y), black(k) {}
 
+// black = min(c,m,y), following Uwe Kern's xcolor documentation
+// V 1.11, 2004/05/09, p. 31
+CMYK_Color::CMYK_Color(const RGB_Densities& s) {
+  // may assume densities are in [0,1]
+  double c(1 - s.m_dens_red), m(1 - s.m_dens_green), y(1 - s.m_dens_blue);
 
-  // black = min(c,m,y), following Uwe Kern's xcolor documentation
-  // V 1.11, 2004/05/09, p. 31
-  CMYK_Color::CMYK_Color(const RGB_Densities& s)
-  {
-    // may assume densities are in [0,1]
-    double c(1-s.m_dens_red), m(1-s.m_dens_green), y(1-s.m_dens_blue);
+  black = std::min(std::min(c, m), y);
+  cyan = c - black;
+  magenta = m - black;
+  yellow = y - black;
+}
 
-    black = std::min(std::min(c, m), y);
-    cyan    = c-black;
-    magenta = m-black;
-    yellow  = y-black;
-  }
+Color_Base::RGB_Densities CMYK_Color::to_rgb() const {
+  // Use conventional formulas since our densities are already in [0,1];
+  // "min" for safety, should be unnecessary.
+  return Color_Base::RGB_Densities(1 - std::min(1.0, cyan + black),
+                                   1 - std::min(1.0, magenta + black),
+                                   1 - std::min(1.0, yellow + black));
+}
 
-  Color_Base::RGB_Densities CMYK_Color::to_rgb() const
-  {
-    // Use conventional formulas since our densities are already in [0,1];
-    // "min" for safety, should be unnecessary.
-    return Color_Base::RGB_Densities(1 - std::min(1.0, cyan    + black),
-				     1 - std::min(1.0, magenta + black),
-				     1 - std::min(1.0, yellow  + black));
-  }
+CMYK_Color* CMYK_Color::clone() const { return new CMYK_Color(*this); }
 
-  CMYK_Color* CMYK_Color::clone() const
-  {
-    return new CMYK_Color(*this);
-  }
+CMYK_Color& CMYK_Color::filter(const Color_Base& color) {
+  Color_Base::RGB_Densities s(color.to_rgb());  // arg
+  Color_Base::RGB_Densities t(to_rgb());        // this
 
-  CMYK_Color& CMYK_Color::filter(const Color_Base& color)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb()); // arg
-    Color_Base::RGB_Densities t(to_rgb());       // this
+  // filter in RGB
+  double c(1 - std::min(t.m_dens_red, s.m_dens_red));
+  double m(1 - std::min(t.m_dens_green, s.m_dens_green));
+  double y(1 - std::min(t.m_dens_blue, s.m_dens_blue));
+  black = std::min(std::min(c, m), y);
 
-    // filter in RGB
-    double c(1 - std::min(t.m_dens_red,   s.m_dens_red));
-    double m(1 - std::min(t.m_dens_green, s.m_dens_green));
-    double y(1 - std::min(t.m_dens_blue,  s.m_dens_blue));
-    black = std::min(std::min(c, m), y);
+  cyan = c - black;
+  magenta = m - black;
+  yellow = y - black;
 
-    cyan    = c-black;
-    magenta = m-black;
-    yellow  = y-black;
+  return *this;
+}
 
-    return *this;
-  }
+CMYK_Color& CMYK_Color::operator*=(double sc) {
+  Color_Base::RGB_Densities s(to_rgb());
 
+  // scale in RGB
+  double r(sc * (s.m_dens_red));
+  double g(sc * (s.m_dens_green));
+  double b(sc * (s.m_dens_blue));
 
-  CMYK_Color& CMYK_Color::operator*= (double sc)
-  {
-    Color_Base::RGB_Densities s(to_rgb());
+  // Necessary b/c sc may not be in [0,1]
+  double c(1 - make_r(r, g, b));
+  double m(1 - make_g(r, g, b));
+  double y(1 - make_b(r, g, b));
 
-    // scale in RGB
-    double r(sc*(s.m_dens_red));
-    double g(sc*(s.m_dens_green));
-    double b(sc*(s.m_dens_blue));
+  black = std::min(std::min(c, m), y);
+  cyan = c - black;
+  magenta = m - black;
+  yellow = y - black;
 
-    // Necessary b/c sc may not be in [0,1]
-    double c(1 - make_r(r, g, b));
-    double m(1 - make_g(r, g, b));
-    double y(1 - make_b(r, g, b));
+  return *this;
+}
 
-    black = std::min(std::min(c, m), y);
-    cyan    = c-black;
-    magenta = m-black;
-    yellow  = y-black;
+CMYK_Color& CMYK_Color::blend(const Color_Base& color, double d) {
+  Color_Base::RGB_Densities s(color.to_rgb());
+  double wt(clip_to_unit(d));
 
-    return *this;
-  }
+  double c((1 - wt) * std::min(1.0, cyan + black) + wt * (1 - s.m_dens_red));
+  double m((1 - wt) * std::min(1.0, magenta + black) +
+           wt * (1 - s.m_dens_green));
+  double y((1 - wt) * std::min(1.0, yellow + black) + wt * (1 - s.m_dens_blue));
 
-  CMYK_Color& CMYK_Color::blend(const Color_Base& color, double d)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
-    double wt(clip_to_unit(d));
+  black = std::min(std::min(c, m), y);
+  cyan = c - black;
+  magenta = m - black;
+  yellow = y - black;
 
-    double c((1-wt)*std::min(1.0, cyan+black)    + wt*(1 - s.m_dens_red));
-    double m((1-wt)*std::min(1.0, magenta+black) + wt*(1 - s.m_dens_green));
-    double y((1-wt)*std::min(1.0, yellow+black)  + wt*(1 - s.m_dens_blue));
+  return *this;
+}
 
-    black = std::min(std::min(c, m), y);
-    cyan    = c-black;
-    magenta = m-black;
-    yellow  = y-black;
+CMYK_Color& CMYK_Color::superpose(const Color_Base& color) {
+  Color_Base::RGB_Densities s(color.to_rgb());
+  Color_Base::RGB_Densities t(to_rgb());
 
-    return *this;
-  }
+  // add in RGB
+  double c(1 - clip_to_unit(t.m_dens_red + s.m_dens_red));
+  double m(1 - clip_to_unit(t.m_dens_green + s.m_dens_green));
+  double y(1 - clip_to_unit(t.m_dens_blue + s.m_dens_blue));
 
-  CMYK_Color& CMYK_Color::superpose(const Color_Base& color)
-  {
-    Color_Base::RGB_Densities s(color.to_rgb());
-    Color_Base::RGB_Densities t(to_rgb());
+  black = std::min(std::min(c, m), y);
+  cyan = c - black;
+  magenta = m - black;
+  yellow = y - black;
 
-    // add in RGB
-    double c(1 - clip_to_unit(t.m_dens_red   + s.m_dens_red));
-    double m(1 - clip_to_unit(t.m_dens_green + s.m_dens_green));
-    double y(1 - clip_to_unit(t.m_dens_blue  + s.m_dens_blue));
+  return *this;
+}
 
-    black = std::min(std::min(c, m), y);
-    cyan    = c-black;
-    magenta = m-black;
-    yellow  = y-black;
+CMYK_Color& CMYK_Color::invert() {
+  Color_Base::RGB_Densities s(to_rgb());
 
-    return *this;
-  }
+  // invert in RGB
+  double c(1 - s.m_dens_red);
+  double m(1 - s.m_dens_green);
+  double y(1 - s.m_dens_blue);
 
-  CMYK_Color& CMYK_Color::invert()
-  {
-    Color_Base::RGB_Densities s(to_rgb());
+  black = std::min(std::min(c, m), y);
+  cyan = c - black;
+  magenta = m - black;
+  yellow = y - black;
 
-    // invert in RGB
-    double c(1 - s.m_dens_red);
-    double m(1 - s.m_dens_green);
-    double y(1 - s.m_dens_blue);
+  return *this;
+}
 
-    black   = std::min(std::min(c, m), y);
-    cyan    = c-black;
-    magenta = m-black;
-    yellow  = y-black;
+std::string CMYK_Color::model() const { return "cmyk"; }
 
-    return *this;
-  }
+std::string CMYK_Color::name() const {
+  std::ostringstream nm;
 
-  std::string CMYK_Color::model() const
-  {
-    return "cmyk";
-  }
+  nm << "cmyk_" << dtohex(cyan) << dtohex(magenta) << dtohex(yellow)
+     << dtohex(black);
+  return nm.str();
+}
 
-  std::string CMYK_Color::name() const
-  {
-    std::ostringstream nm;
-
-    nm << "cmyk_" << dtohex(cyan) << dtohex(magenta) << dtohex(yellow)
-       << dtohex(black);
-    return nm.str();
-  }
-
-  std::vector<double> CMYK_Color::densities() const
-  {
-    std::vector<double> val(4);
-    val.at(0) = rd(cyan);
-    val.at(1) = rd(magenta);
-    val.at(2) = rd(yellow);
-    val.at(3) = rd(black);
-    return val;
-  }
-} // end of namespace
+std::vector<double> CMYK_Color::densities() const {
+  std::vector<double> val(4);
+  val.at(0) = rd(cyan);
+  val.at(1) = rd(magenta);
+  val.at(2) = rd(yellow);
+  val.at(3) = rd(black);
+  return val;
+}
+}  // namespace ePiX

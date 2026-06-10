@@ -1,13 +1,13 @@
-/* 
+/*
  * glyph.h -- ePiX screen implemenation for labels and markers
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
+ * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
  * Version 1.1.18
  * Last Change: September 16, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -45,41 +45,40 @@
 
 namespace ePiX {
 
-  class format;
-  class affine;
-  class screen_mask;
+class format;
+class affine;
+class screen_mask;
 
-  class glyph : public tile {
-  public:
-    // location, offsets, contents, mark type, visibility
-    glyph(const pair& here, const pair& offset,
-	  const std::string& label, const epix_mark_type mark,
-	  const marker_sizes& sizes, 
-	  const label_state& style, const bool seen);
+class glyph : public tile {
+ public:
+  // location, offsets, contents, mark type, visibility
+  glyph(const pair& here, const pair& offset, const std::string& label,
+        const epix_mark_type mark, const marker_sizes& sizes,
+        const label_state& style, const bool seen);
 
-    glyph& map_by(const affine&) override;
-    glyph& crop_to(const screen_mask&) override;
+  glyph& map_by(const affine&) override;
+  glyph& crop_to(const screen_mask&) override;
 
-    glyph* clone() const override;
+  glyph* clone() const override;
 
-    bool is_empty() const override;
+  bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const override;
-    void add_to_palette() const override;
+  std::string print_to(const format&, const std::string&) const override;
+  void add_to_palette() const override;
 
-  private:
-    pair m_here;
-    pair m_offset;
+ private:
+  pair m_here;
+  pair m_offset;
 
-    std::string m_label;
-    epix_mark_type m_mark;
+  std::string m_label;
+  epix_mark_type m_mark;
 
-    marker_sizes m_sizes;
-    label_state m_style;
+  marker_sizes m_sizes;
+  label_state m_style;
 
-    bool m_seen;
-  }; // end of class glyph
+  bool m_seen;
+};  // end of class glyph
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_GLYPH */

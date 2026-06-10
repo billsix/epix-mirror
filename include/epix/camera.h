@@ -1,13 +1,13 @@
-/* 
+/*
  * camera.h -- ePiX::Camera
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.21
  * Last Change: September 22, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -60,75 +60,75 @@
 
 namespace ePiX {
 
-  class halfspace;
-  class Lens;
-  class pair;
+class halfspace;
+class Lens;
+class pair;
 
-  class Camera {
-  public:
-    Camera();
-    Camera(const P& vpt);
+class Camera {
+ public:
+  Camera();
+  Camera(const P& vpt);
 
-    Camera(const Camera&);
-    Camera& operator= (const Camera&);
-    ~Camera();
+  Camera(const Camera&);
+  Camera& operator=(const Camera&);
+  ~Camera();
 
-    // rotate
-    Camera& tilt(double angle); // up/down (pitch)
-    Camera& pan(double angle);  // left/right (yaw)
-    Camera& roll(double angle); // about viewing axis
+  // rotate
+  Camera& tilt(double angle);  // up/down (pitch)
+  Camera& pan(double angle);   // left/right (yaw)
+  Camera& roll(double angle);  // about viewing axis
 
-    // fix target, move viewpt radially along eye()
-    Camera& range(double);
-    // fix viewpt, move target radially along eye()
-    Camera& focus(double);
+  // fix target, move viewpt radially along eye()
+  Camera& range(double);
+  // fix viewpt, move target radially along eye()
+  Camera& focus(double);
 
-    // set clip distance
-    Camera& clip_range(double);
+  // set clip distance
+  Camera& clip_range(double);
 
-    Camera& at(const P& arg);      // fix target, set viewpt
-    Camera& look_at(const P& arg); // fix viewpt, set target
+  Camera& at(const P& arg);       // fix target, set viewpt
+  Camera& look_at(const P& arg);  // fix viewpt, set target
 
-    // alternative syntax
-    Camera& at(double, double, double);
-    Camera& look_at(double, double, double);
+  // alternative syntax
+  Camera& at(double, double, double);
+  Camera& look_at(double, double, double);
 
-    Camera& filter(const Color&);
+  Camera& filter(const Color&);
 
-    // set lens
-    Camera& perspective(); // default
-    Camera& orthog(); // faster
-    Camera& fisheye();
-    Camera& bubble();
+  // set lens
+  Camera& perspective();  // default
+  Camera& orthog();       // faster
+  Camera& fisheye();
+  Camera& bubble();
 
-    // Functions for internal use
-    // Camera maps
-    Color operator() (const Color&) const; // filter
-    pair  operator() (const P&) const; // lens map
-    bool  is_linear() const; // lens preserves lines?
+  // Functions for internal use
+  // Camera maps
+  Color operator()(const Color&) const;  // filter
+  pair operator()(const P&) const;       // lens map
+  bool is_linear() const;                // lens preserves lines?
 
-    bool needs_clip() const; // lens needs scene pre-clipping
-    halfspace clip_plane() const;
+  bool needs_clip() const;  // lens needs scene pre-clipping
+  halfspace clip_plane() const;
 
-    // situation
-    P eye() const;
-    P viewpt() const;
+  // situation
+  P eye() const;
+  P viewpt() const;
 
-  private:
-    P the_viewpt; // center of projection
-    P the_target; // mapped to Screen origin
-    frame the_orient; // our {sea, sky, eye}
-    double the_distance;
-    double the_clip_range;
+ private:
+  P the_viewpt;      // center of projection
+  P the_target;      // mapped to Screen origin
+  frame the_orient;  // our {sea, sky, eye}
+  double the_distance;
+  double the_clip_range;
 
-    Color the_filter;
-    void adjust(); // re-orient according to target, viewpt
-    Lens* the_lens;
-  }; // end of class Camera
+  Color the_filter;
+  void adjust();  // re-orient according to target, viewpt
+  Lens* the_lens;
+};  // end of class Camera
 
-  // global Camera
-  Camera& cam();
-  extern Camera& camera;
-} // end of namespace
+// global Camera
+Camera& cam();
+extern Camera& camera;
+}  // namespace ePiX
 
 #endif /* EPIX_CAMERA */

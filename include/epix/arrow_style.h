@@ -1,14 +1,14 @@
-/* 
+/*
  * arrow_style.h -- ePiX's arrowhead parameters
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.15
  * Last Change: September 08, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -41,36 +41,36 @@
 
 namespace ePiX {
 
-  // arrowhead parameters
-  // Magic numbers: initialization constants
-  class arrowhead_state {
-  public:
-    arrowhead_state();
+// arrowhead parameters
+// Magic numbers: initialization constants
+class arrowhead_state {
+ public:
+  arrowhead_state();
 
-    // set
-    arrowhead_state& width(double w);
-    arrowhead_state& ratio(double r);
-    arrowhead_state& inset(double arg);
+  // set
+  arrowhead_state& width(double w);
+  arrowhead_state& ratio(double r);
+  arrowhead_state& inset(double arg);
 
-    arrowhead_state& fill(bool);
+  arrowhead_state& fill(bool);
 
-    // get
-    double width() const;
-    double ratio() const;
-    double inset() const;
+  // get
+  double width() const;
+  double ratio() const;
+  double inset() const;
 
-    bool   fill() const;
+  bool fill() const;
 
-  private:
-    double m_width; // Half-width of arrowheads in pt
-    double m_ratio; // 2*Length/width ratio of arrowheads
-    double m_inset; // Base indentation (frac of width*ratio)
+ private:
+  double m_width;  // Half-width of arrowheads in pt
+  double m_ratio;  // 2*Length/width ratio of arrowheads
+  double m_inset;  // Base indentation (frac of width*ratio)
 
-    bool   m_fill;
-  }; // end of class arrowhead_state
+  bool m_fill;
+};  // end of class arrowhead_state
 
-  arrowhead_state& the_arrowhead_style();
+arrowhead_state& the_arrowhead_style();
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_ARROW_STYLE */

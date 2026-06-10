@@ -16,9 +16,10 @@
 # A parametric surface over a polar domain, with coordinate arrows.
 
 # %%
+from math import pi
+
 import epix
 from epix import P
-from math import pi
 
 
 def f(r, th):

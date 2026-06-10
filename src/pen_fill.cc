@@ -1,13 +1,13 @@
-/* 
+/*
  * pen_fill.cc -- ePiX::pen_fill class, for filled screen elements
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
+ * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
  * Version 1.1.20
  * Last Change: September 19, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -54,96 +54,86 @@
 
 namespace ePiX {
 
-  using ep2 = std::list<edge2d>::const_iterator;
+using ep2 = std::list<edge2d>::const_iterator;
 
-  pen_fill::pen_fill()
-    : m_tint(Neutral()), m_line(Xfine()), m_style(the_path_style()) { }
+pen_fill::pen_fill()
+    : m_tint(Neutral()), m_line(Xfine()), m_style(the_path_style()) {}
 
-  pen_fill::pen_fill(const Color& fill, const pen_data& line,
-		     const std::list<edge2d>& data)
-    : m_tint(fill), m_line(line),
-      m_style(the_path_style()), m_border(data), m_edges(data) { }
+pen_fill::pen_fill(const Color& fill, const pen_data& line,
+                   const std::list<edge2d>& data)
+    : m_tint(fill),
+      m_line(line),
+      m_style(the_path_style()),
+      m_border(data),
+      m_edges(data) {}
 
-  pen_fill::pen_fill(const Color& fill, const pen_data& line, double th,
-		     const std::list<edge2d>& data)
-    : m_tint(fill), m_line(line),
-      m_style(the_path_style()), m_border(data), m_edges(data) { }
+pen_fill::pen_fill(const Color& fill, const pen_data& line, double th,
+                   const std::list<edge2d>& data)
+    : m_tint(fill),
+      m_line(line),
+      m_style(the_path_style()),
+      m_border(data),
+      m_edges(data) {}
 
+pen_fill* pen_fill::clone() const { return new pen_fill(*this); }
 
-  pen_fill* pen_fill::clone() const
-  {
-    return new pen_fill(*this);
-  }
+pen_fill& pen_fill::map_by(const affine& f) {
+  if (m_border.size() == 0) return *this;
 
+  // else map border
+  std::list<edge2d> bord;
 
-  pen_fill& pen_fill::map_by(const affine& f)
-  {
-    if (m_border.size() == 0)
-      return *this;
+  for (auto p = m_border.begin(); p != m_border.end(); ++p)
+    bord.push_back(edge2d(f(p->tail()), f(p->head()), (*p).is_seen()));
 
-    // else map border
-    std::list<edge2d> bord;
+  swap(m_border, bord);
 
-    for (auto p=m_border.begin(); p!=m_border.end(); ++p)
-      bord.push_back(edge2d(f(p->tail()), f(p->head()), (*p).is_seen()));
+  // and edges
+  std::list<edge2d> edges;
 
-    swap(m_border, bord);
+  for (auto p = m_edges.begin(); p != m_edges.end(); ++p)
+    edges.push_back(edge2d(f(p->tail()), f(p->head()), (*p).is_seen()));
 
-    // and edges
-    std::list<edge2d> edges;
+  swap(m_edges, edges);
+  return *this;
+}
 
-    for (auto p=m_edges.begin(); p!=m_edges.end(); ++p)
-      edges.push_back(edge2d(f(p->tail()), f(p->head()), (*p).is_seen()));
+pen_fill& pen_fill::crop_to(const screen_mask& M) {
+  m_border = M.crop_loop(m_border);
+  m_edges = M.crop_path(m_edges);
+  return *this;
+}
 
-    swap(m_edges, edges);
-    return *this;
-  }
+bool pen_fill::is_empty() const {
+  return (m_border.size() == 0 || (m_tint.is_unset() && m_line.is_unset()));
+}
 
+std::string pen_fill::print_to(const format& fmt,
+                               const std::string& len) const {
+  if (is_empty()) return "";
 
-  pen_fill& pen_fill::crop_to(const screen_mask& M)
-  {
-    m_border = M.crop_loop(m_border);
-    m_edges  = M.crop_path(m_edges);
-    return *this;
-  }
+  // else at least one is true
+  bool filled(!m_tint.is_unset());
+  bool edged(!m_line.is_unset());
 
-  bool pen_fill::is_empty() const
-  {
-    return (m_border.size() == 0
-	    || (m_tint.is_unset() && m_line.is_unset()));
-  }
+  // if solid bd, try to draw/fill in one step
+  if (m_style.is_solid() && filled && edged)
+    return fmt.print_fill(m_border, pair(0, 0), m_tint, m_line, len);
 
+  // else draw fill, border separately
+  std::string val;
 
-  std::string pen_fill::print_to(const format& fmt,
-				 const std::string& len) const
-  {
-    if (is_empty())
-      return "";
+  if (filled)
+    val += fmt.print_fill(m_border, pair(0, 0), m_tint,
+                          pen_data(m_tint, m_line.width()), len);
 
-    // else at least one is true
-    bool filled(!m_tint.is_unset());
-    bool edged(!m_line.is_unset());
+  if (edged)
+    val += fmt.print_line(m_edges, pair(0, 0), m_line, Xfine(), m_style, len);
 
-    // if solid bd, try to draw/fill in one step
-    if (m_style.is_solid() && filled && edged)
-      return fmt.print_fill(m_border, pair(0,0), m_tint, m_line, len);
+  return val;
+}
 
-    // else draw fill, border separately
-    std::string val;
-
-    if (filled)
-      val += fmt.print_fill(m_border, pair(0,0), m_tint, 
-			    pen_data(m_tint, m_line.width()), len);
-
-    if (edged)
-      val += fmt.print_line(m_edges, pair(0,0), m_line, Xfine(),
-			    m_style, len);
-
-    return val;
-  }
-
-  void pen_fill::add_to_palette() const
-  {
-    the_picture().add_to_palette(m_tint).add_to_palette(m_line.color());
-  }
-} // end of namespace
+void pen_fill::add_to_palette() const {
+  the_picture().add_to_palette(m_tint).add_to_palette(m_line.color());
+}
+}  // namespace ePiX

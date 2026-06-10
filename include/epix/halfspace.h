@@ -1,14 +1,14 @@
-/* 
+/*
  * halfspace.h -- ePiX::halfspace class for clipping
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.8
  * Last Change: July 17, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -47,21 +47,21 @@
 
 namespace ePiX {
 
-  class halfspace {
-  public:
-    halfspace(const P& base, const P& perp);
+class halfspace {
+ public:
+  halfspace(const P& base, const P& perp);
 
-    halfspace& reverse();
+  halfspace& reverse();
 
-    bool clips(const P&) const;
+  bool clips(const P&) const;
 
-    std::list<edge3d>& clip_path(std::list<edge3d>&) const;
-    std::list<edge3d>& clip_loop(std::list<edge3d>&) const;
+  std::list<edge3d>& clip_path(std::list<edge3d>&) const;
+  std::list<edge3d>& clip_loop(std::list<edge3d>&) const;
 
-  private:
-    P m_base;
-    P m_perp;
-  }; // end of class halfspace
-} // end of namespace
+ private:
+  P m_base;
+  P m_perp;
+};  // end of class halfspace
+}  // namespace ePiX
 
 #endif /* EPIX_HALFSPACE */

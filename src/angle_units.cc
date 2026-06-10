@@ -1,14 +1,14 @@
-/* 
+/*
  * angle_units.cc -- Implementation of ePiX's angular units
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.22
  * Last Change: September 24, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -37,58 +37,46 @@
 
 namespace ePiX {
 
-  angle_state::angle_state()
+angle_state::angle_state()
     : m_rad_per_unit(1.0),
       m_unit_per_deg(PI_180),
-      m_rev_per_unit(1.0/TWO_PI) { }
+      m_rev_per_unit(1.0 / TWO_PI) {}
 
-  void angle_state::set_radians_mode()
-  {
-    m_rad_per_unit = 1.0;
-    m_unit_per_deg = PI_180;
-    m_rev_per_unit = 1.0/TWO_PI;
-  }
+void angle_state::set_radians_mode() {
+  m_rad_per_unit = 1.0;
+  m_unit_per_deg = PI_180;
+  m_rev_per_unit = 1.0 / TWO_PI;
+}
 
-  void angle_state::set_degrees_mode()
-  {
-    m_rad_per_unit = PI_180;
-    m_unit_per_deg = 1.0;
-    m_rev_per_unit = 1.0/360;
-  }
+void angle_state::set_degrees_mode() {
+  m_rad_per_unit = PI_180;
+  m_unit_per_deg = 1.0;
+  m_rev_per_unit = 1.0 / 360;
+}
 
-  void angle_state::set_revolutions_mode()
-  {
-    m_rad_per_unit = TWO_PI;
-    m_unit_per_deg = 1.0/360;
-    m_rev_per_unit = 1.0;
-  }
+void angle_state::set_revolutions_mode() {
+  m_rad_per_unit = TWO_PI;
+  m_unit_per_deg = 1.0 / 360;
+  m_rev_per_unit = 1.0;
+}
 
+double angle_state::to_radians(double t) { return t *= m_rad_per_unit; }
 
-  double angle_state::to_radians(double t)
-  {
-    return t *= m_rad_per_unit;
-  }
+// result lies in (-180, 180]
+double angle_state::to_degrees(double t) {
+  t *= m_rev_per_unit;
 
-  // result lies in (-180, 180]
-  double angle_state::to_degrees(double t)
-  {
-    t *= m_rev_per_unit;
+  t -= 0.5;      // shift half a turn
+  t -= ceil(t);  // map to (-1,0]
+  t += 0.5;      // shift to (-0.5, 0.5]
 
-    t -= 0.5;     // shift half a turn
-    t -= ceil(t); // map to (-1,0]
-    t += 0.5;     // shift to (-0.5, 0.5]
+  return t *= 360.0;
+}
 
-    return t *= 360.0;
-  }
+double angle_state::from_degrees(double t) { return t *= m_unit_per_deg; }
 
-  double angle_state::from_degrees(double t)
-  {
-    return t *= m_unit_per_deg;
-  }
-
-  angle_state& the_angle_style()
-  {
-    static auto* the_angle_state(new angle_state());
-    return *the_angle_state;
-  }
-} // end of namespace
+angle_state& the_angle_style() {
+  static auto* the_angle_state(new angle_state());
+  return *the_angle_state;
+}
+}  // namespace ePiX

@@ -1,14 +1,14 @@
 /*
  * Sline.h -- ePiX::Sline class (spherical arc)
  *
- * This file is part of ePiX, a preprocessor for creating high-quality 
- * line figures in LaTeX 
+ * This file is part of ePiX, a preprocessor for creating high-quality
+ * line figures in LaTeX
  *
  * Version 1.2.17
  * Last Change: June 29, 2017
  */
 
-/* 
+/*
  * Copyright (C) 2017
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,37 +39,37 @@
 #include "sphere.h"
 
 namespace ePiX {
-  class P;
+class P;
 
-  class Sline {
-  public:
-    Sline(const P& tail, const P& head);
+class Sline {
+ public:
+  Sline(const P& tail, const P& head);
 
-    bool malformed() const;
-    P pole() const; // normalization of tail * head
-    double cosine() const; // cosine of subtended arc
-    P operator * (const Sline&) const; // this.pole() * pole()
+  bool malformed() const;
+  P pole() const;                   // normalization of tail * head
+  double cosine() const;            // cosine of subtended arc
+  P operator*(const Sline&) const;  // this.pole() * pole()
 
-    P reflect(const P&) const;
-    Sline reflect(const Sline&) const;
+  P reflect(const P&) const;
+  Sline reflect(const Sline&) const;
 
-    bool collinear(const Sline&) const;
-    bool cuts(const Sline&) const; // we cross arg
+  bool collinear(const Sline&) const;
+  bool cuts(const Sline&) const;  // we cross arg
 
-    void draw() const; // entire arc
-    void draw_front() const; // front arc
-    void draw_back() const; // back arc
+  void draw() const;        // entire arc
+  void draw_front() const;  // front arc
+  void draw_back() const;   // back arc
 
-    void draw_line() const; // entire line
-    void line_front() const; // front line
-    void line_back() const; // back line
+  void draw_line() const;   // entire line
+  void line_front() const;  // front line
+  void line_back() const;   // back line
 
-  private:
-    P m_tail;
-    P m_head;
-    P m_pole;
-    bool m_malformed; // tail, head collinear
-  }; // end of Sline class
-} // end of namespace
+ private:
+  P m_tail;
+  P m_head;
+  P m_pole;
+  bool m_malformed;  // tail, head collinear
+};  // end of Sline class
+}  // namespace ePiX
 
 #endif /* EPIX_SLINE */

@@ -1,14 +1,14 @@
-/* 
+/*
  * spline.h -- ePiX spline class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.3
  * Last Change: March 04, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,25 +39,24 @@
 
 namespace ePiX {
 
-  class path;
+class path;
 
-  class n_spline {
-  public:
+class n_spline {
+ public:
+  n_spline(const std::vector<P>& data, bool loop = false);
 
-    n_spline(const std::vector<P>& data, bool loop=false);
+  path data(const unsigned int) const;
 
-    path data(const unsigned int) const;
+ private:
+  std::vector<P> m_vertices;
 
-  private:
-    std::vector<P> m_vertices;
+  // coefficient sequences
+  std::vector<double> m_k0;
+  std::vector<double> m_k1;
+  std::vector<double> m_k2;
+  std::vector<double> m_k3;
+};  // end of class n_spline
 
-    // coefficient sequences
-    std::vector<double> m_k0;
-    std::vector<double> m_k1;
-    std::vector<double> m_k2;
-    std::vector<double> m_k3;
-  }; // end of class n_spline
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_SPLINE */

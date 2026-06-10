@@ -17,11 +17,14 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
 #   libasan: DEV-ONLY runtime for AddressSanitizer builds (`make asan`), used to
 #     catch latent libepix memory bugs while the Python bindings are written.
 #     REMOVE in the final cleanup phase (see python-bindings task doc).
+#   clang-tools-extra: clang-format + clang-tidy for `make format` / `make tidy`
+#     (the C++ formatter/linter; pairs with .clang-format / .clang-tidy). Permanent.
 RUN --mount=type=cache,target=/var/cache/libdnf5 \
     --mount=type=cache,target=/var/lib/dnf \
     dnf install -y \
         meson ninja-build gcc-c++ binutils \
         libasan \
+        clang-tools-extra \
         findutils sed which diffutils bash \
         python3 python3-pip python3-devel \
         ghostscript ImageMagick \
@@ -39,7 +42,7 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
 # The epix Python package itself is bind-mounted at runtime (PYTHONPATH), so only
 # the environment is baked here.
 RUN --mount=type=cache,target=/root/.cache/pip \
-    pip install --break-system-packages jupyterlab jupytext ipython ipykernel nanobind
+    pip install --break-system-packages jupyterlab jupytext ipython ipykernel nanobind ruff
 
 # Whole source tree (trimmed by .dockerignore).  At runtime `make shell`/`build`
 # bind-mount the live host tree over /epix, so this copy only feeds the in-image

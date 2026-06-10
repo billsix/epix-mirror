@@ -1,14 +1,14 @@
-/* 
+/*
  * hatching.h -- ePiX hatched region data structures
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.13
  * Last Change: August 29, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -42,82 +42,78 @@
 
 namespace ePiX {
 
-  // edge, endpoint heights, orientation (+/-1 = up/down)
-  class bd_edge {
-  public:
-    bd_edge(const edge2d&, double, double, int);
+// edge, endpoint heights, orientation (+/-1 = up/down)
+class bd_edge {
+ public:
+  bd_edge(const edge2d&, double, double, int);
 
-    pair tail() const;
-    pair head() const;
-    pair dir() const;
+  pair tail() const;
+  pair head() const;
+  pair dir() const;
 
-    double lo() const;
-    double hi() const;
+  double lo() const;
+  double hi() const;
 
-    int orient() const;
+  int orient() const;
 
-  private:
-    edge2d m_edge;
+ private:
+  edge2d m_edge;
 
-    double m_lo;
-    double m_hi;
+  double m_lo;
+  double m_hi;
 
-    int m_orient;
-  };
+  int m_orient;
+};
 
-  // location where scan line crosses bd_edge
-  class cut {
-  public:
-    cut(pair loc, int sign);
+// location where scan line crosses bd_edge
+class cut {
+ public:
+  cut(pair loc, int sign);
 
-    pair loc() const;
-    int sign() const;
+  pair loc() const;
+  int sign() const;
 
-  private:
-    pair m_loc; // location
-    int m_sign; // orientation
-  };
+ private:
+  pair m_loc;  // location
+  int m_sign;  // orientation
+};
 
-  // ax + by + c = 0
-  class scan_line {
-  public:
-    scan_line(const pair& t, const pair& h);
+// ax + by + c = 0
+class scan_line {
+ public:
+  scan_line(const pair& t, const pair& h);
 
-    void add_cut(const cut&);
+  void add_cut(const cut&);
 
-    // store what we find in value
-    void draw(std::vector<edge2d>& value) const;
+  // store what we find in value
+  void draw(std::vector<edge2d>& value) const;
 
-  private:
-    pair m_perp; // (a, b)
-    double m_ht; // c
+ private:
+  pair m_perp;  // (a, b)
+  double m_ht;  // c
 
-    std::list<cut> m_cuts;
-  }; // end of class scan_line
+  std::list<cut> m_cuts;
+};  // end of class scan_line
 
+// ctor converts a list of edge2d into a (large) vector of scan lines
+class hatch_data {
+ public:
+  // components of hatch direction, scanline separation, polygon to fill
+  hatch_data(double, double, double sep, const std::list<edge2d>&);
 
-  // ctor converts a list of edge2d into a (large) vector of scan lines
-  class hatch_data {
-  public:
-    // components of hatch direction, scanline separation, polygon to fill
-    hatch_data(double, double,
-	       double sep, const std::list<edge2d>&);
+  // angle, scanline separation, polygon to fill
+  hatch_data(double th, double sep, const std::list<edge2d>&);
 
-    // angle, scanline separation, polygon to fill
-    hatch_data(double th, double sep, const std::list<edge2d>&);
+  std::vector<edge2d> data() const;
 
-    std::vector<edge2d> data() const;
+ private:
+  std::list<bd_edge> m_edges;
+  std::vector<scan_line> m_scans;
 
-  private:
-    std::list<bd_edge> m_edges;
-    std::vector<scan_line> m_scans;
+  // convert polygon to scan lines parallel to dir, common to both ctors
+  void hatch_init(const pair& dir, double sep, std::list<edge2d> polygon);
+};  // end of class hatch_data
 
-    // convert polygon to scan lines parallel to dir, common to both ctors
-    void hatch_init(const pair& dir,
-		    double sep,
-		    std::list<edge2d> polygon);
-  }; // end of class hatch_data
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_HATCHING */

@@ -27,8 +27,13 @@ def F(s, t):
 # %%
 with epix.figure(P(-4, -3), P(2, 2), "3x2.5in") as fig:
     epix.blue(1.8)
-    epix.dart_field(F, P(epix.xmin(), epix.ymin()), P(epix.xmax(), epix.ymax()),
-                    int(4 * epix.xsize()), int(4 * epix.ysize()))
+    epix.dart_field(
+        F,
+        P(epix.xmin(), epix.ymin()),
+        P(epix.xmax(), epix.ymax()),
+        int(4 * epix.xsize()),
+        int(4 * epix.ysize()),
+    )
     epix.set_crop()
     epix.bold()
     for i in range(7):

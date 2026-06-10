@@ -19,8 +19,9 @@
 # Output is byte-identical to the C++ library.
 
 # %%
+from math import cos, pi, sin
+
 import epix
-from math import cos, sin, pi
 
 # %% [markdown]
 # A graph $y = x^2$ with axes:

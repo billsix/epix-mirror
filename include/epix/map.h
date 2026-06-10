@@ -7,7 +7,7 @@
  * Last Change: June 18, 2008
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -58,110 +58,107 @@
 
 namespace ePiX {
 
-  // identity and coordinate projection functions
-  template<typename T>T id(T arg) { return arg; }
+// identity and coordinate projection functions
+template <typename T>
+T id(T arg) {
+  return arg;
+}
 
-  template<typename T1, typename T2>T1 proj1(T1 arg1, T2 arg2) { return arg1; }
-  template<typename T1, typename T2>T2 proj2(T1 arg1, T2 arg2) { return arg2; }
+template <typename T1, typename T2>
+T1 proj1(T1 arg1, T2 arg2) {
+  return arg1;
+}
+template <typename T1, typename T2>
+T2 proj2(T1 arg1, T2 arg2) {
+  return arg2;
+}
 
-  // R -> R^3
-  class path_map {
-  private:
-    P (*y)(double);
-    P (*Y)(P);
+// R -> R^3
+class path_map {
+ private:
+  P (*y)(double);
+  P (*Y)(P);
 
-  public:
-    path_map(P f(double), P F(P) = id) : y(f), Y(F) { }
+ public:
+  path_map(P f(double), P F(P) = id) : y(f), Y(F) {}
 
-    P operator() (const P& arg) const
-      {
-	return Y(y(arg.x1()));
-      }
+  P operator()(const P& arg) const { return Y(y(arg.x1())); }
 
-  }; // end of class path_map
+};  // end of class path_map
 
-  // R x R -> R^3
-  class surface_map {
-  private:
-    P (*y)(double, double);
-    P (*Y)(P);
+// R x R -> R^3
+class surface_map {
+ private:
+  P (*y)(double, double);
+  P (*Y)(P);
 
-  public:
-    surface_map(P f(double, double), P F(P) = id) : y(f), Y(F) { }
-    P operator() (const P& arg) const
-      {
-	return Y(y(arg.x1(), arg.x2()));
-      }
+ public:
+  surface_map(P f(double, double), P F(P) = id) : y(f), Y(F) {}
+  P operator()(const P& arg) const { return Y(y(arg.x1(), arg.x2())); }
 
-  }; // end of class surface_map
+};  // end of class surface_map
 
-  // R x R x R -> R^3
-  class space_map {
-  private:
-    P (*y)(double, double, double);
-    P (*Y)(P);
+// R x R x R -> R^3
+class space_map {
+ private:
+  P (*y)(double, double, double);
+  P (*Y)(P);
 
-  public:
-    space_map(P f(double, double, double), P F(P) = id) : y(f), Y(F) { }
-    P operator() (const P& arg) const
-      {
-	return Y(y(arg.x1(), arg.x2(), arg.x3()));
-      }
+ public:
+  space_map(P f(double, double, double), P F(P) = id) : y(f), Y(F) {}
+  P operator()(const P& arg) const {
+    return Y(y(arg.x1(), arg.x2(), arg.x3()));
+  }
 
-  }; // end of class space_map
+};  // end of class space_map
 
+// assemble R -> R^3 from components
+class column_1var {
+ private:
+  double (*y1)(double);
+  double (*y2)(double);
+  double (*y3)(double);
+  P (*Y)(P);
 
-  // assemble R -> R^3 from components
-  class column_1var {
-  private:
-    double (*y1)(double);
-    double (*y2)(double);
-    double (*y3)(double);
-    P (*Y)(P);
+ public:
+  column_1var(double f1(double), double f2(double), double f3(double) = zero,
+              P F(P) = id)
+      : y1(f1), y2(f2), y3(f3), Y(F) {}
 
-  public:
-    column_1var(double f1(double), double f2(double), double f3(double) = zero,
-		P F(P) = id) : y1(f1), y2(f2), y3(f3), Y(F) { }
+  // parameterized path from f:R -> R
+  column_1var(double f(double), P F(P) = id) : y1(id), y2(f), y3(zero), Y(F) {}
+  P operator()(const P& arg) const {
+    double t = arg.x1();
+    return Y(P(y1(t), y2(t), y3(t)));
+  }
+};  // end of class column_1var
 
-    // parameterized path from f:R -> R
-    column_1var(double f(double), P F(P) = id)
-      : y1(id), y2(f), y3(zero), Y(F) { }
-    P operator() (const P& arg) const
-      { 
-	double t = arg.x1();
-	return Y(P(y1(t), y2(t), y3(t))); 
-      }
-  }; // end of class column_1var
+// assemble R x R -> R^3 from components
+class column_2var {
+ private:
+  double (*y1)(double, double);
+  double (*y2)(double, double);
+  double (*y3)(double, double);
+  P (*Y)(P);
 
-  // assemble R x R -> R^3 from components
-  class column_2var {
-  private:
-    double (*y1)(double, double);
-    double (*y2)(double, double);
-    double (*y3)(double, double);
-    P (*Y)(P);
+ public:
+  column_2var(double f1(double, double), double f2(double, double),
+              double f3(double, double), P F(P) = id)
+      : y1(f1), y2(f2), y3(f3), Y(F) {}
 
-  public:
-    column_2var(double f1(double, double), 
-		double f2(double, double), 
-		double f3(double, double),
-		P F(P) = id) : y1(f1), y2(f2), y3(f3), Y(F) { }
+  // omitted third component defaults to zero
+  column_2var(double f1(double, double), double f2(double, double), P F(P) = id)
+      : y1(f1), y2(f2), y3(zero), Y(F) {}
 
-    // omitted third component defaults to zero
-    column_2var(double f1(double, double), 
-		double f2(double, double), 
-		P F(P) = id) : y1(f1), y2(f2), y3(zero), Y(F) { }
-
-    // parameterized surface from f:R x R -> R
-    column_2var(double f(double, double), P F(P) = id)
-      : y1(proj1), y2(proj2), y3(f), Y(F) { }
-    P operator() (const P& arg) const
-      {
-	double u(arg.x1());
-	double v(arg.x2());
-	return Y(P(y1(u, v), y2(u, v), y3(u, v))); 
-      }
-  }; // end of class column_2var
-} // end of namespace
+  // parameterized surface from f:R x R -> R
+  column_2var(double f(double, double), P F(P) = id)
+      : y1(proj1), y2(proj2), y3(f), Y(F) {}
+  P operator()(const P& arg) const {
+    double u(arg.x1());
+    double v(arg.x2());
+    return Y(P(y1(u, v), y2(u, v), y3(u, v)));
+  }
+};  // end of class column_2var
+}  // namespace ePiX
 
 #endif /* EPIX_MAP */

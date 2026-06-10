@@ -17,9 +17,10 @@
 # (not the `figure()` context manager, which is for `picture(sw, ne, size)`).
 
 # %%
+from math import sqrt
+
 import epix
 from epix import P
-from math import sqrt
 
 tau = (1 + sqrt(5)) / 2
 

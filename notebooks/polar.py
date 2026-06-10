@@ -28,7 +28,7 @@ def f(t):
 with epix.figure(P(-2, -2), P(2, 2), "2x2in") as fig:
     epix.degrees()
     epix.black(0.3)
-    epix.polar_grid(2, 4, 24)          # radius, rings, sectors
+    epix.polar_grid(2, 4, 24)  # radius, rings, sectors
     epix.black()
     epix.bottom_axis(4, P(0, -4)).subdivide(2).draw()
     epix.left_axis(4, P(-4, 0)).subdivide(2).draw()

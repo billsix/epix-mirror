@@ -16,7 +16,7 @@
  * Worcester, MA, 01610-2395, USA
  *
  */
- 
+
 /*
  * ePiX is free software; you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by
@@ -40,59 +40,38 @@
 
 namespace ePiX {
 
-  Neutral_Color::Neutral_Color() = default;
+Neutral_Color::Neutral_Color() = default;
 
-  Color_Base::RGB_Densities Neutral_Color::to_rgb() const
-  {
-    return Color_Base::RGB_Densities(1, 1, 1);
-  }
+Color_Base::RGB_Densities Neutral_Color::to_rgb() const {
+  return Color_Base::RGB_Densities(1, 1, 1);
+}
 
-  Neutral_Color* Neutral_Color::clone() const
-  {
-    return new Neutral_Color(*this);
-  }
+Neutral_Color* Neutral_Color::clone() const { return new Neutral_Color(*this); }
 
+Color_Base& Neutral_Color::filter(const Color_Base& color) {
+  Color_Base* tmp(color.clone());
+  return *tmp;
+}
 
-  Color_Base& Neutral_Color::filter(const Color_Base& color)
-  {
-    Color_Base* tmp(color.clone());
-    return *tmp;
-  }
+Neutral_Color& Neutral_Color::operator*=(double c) { return *this; }
 
-  Neutral_Color& Neutral_Color::operator*= (double c)
-  {
-    return *this;
-  }
+Neutral_Color& Neutral_Color::blend(const Color_Base& color, double d) {
+  return *this;
+}
 
-  Neutral_Color& Neutral_Color::blend(const Color_Base& color, double d)
-  {
-    return *this;
-  }
+Neutral_Color& Neutral_Color::superpose(const Color_Base& color) {
+  return *this;
+}
 
-  Neutral_Color& Neutral_Color::superpose(const Color_Base& color)
-  {
-    return *this;
-  }
+Neutral_Color& Neutral_Color::invert() { return *this; }
 
-  Neutral_Color& Neutral_Color::invert()
-  {
-    return *this;
-  }
+// string identifier -- not output-specific
+std::string Neutral_Color::name() const { return ""; }
 
-  // string identifier -- not output-specific
-  std::string Neutral_Color::name() const
-  {
-    return "";
-  }
+std::string Neutral_Color::model() const { return ""; }
 
-  std::string Neutral_Color::model() const
-  {
-    return "";
-  }
-
-  std::vector<double> Neutral_Color::densities() const
-  {
-    std::vector<double> value(0);
-    return value;
-  }
-} // end of namespace
+std::vector<double> Neutral_Color::densities() const {
+  std::vector<double> value(0);
+  return value;
+}
+}  // namespace ePiX

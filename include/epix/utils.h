@@ -8,7 +8,7 @@
  * Last Change: September 15, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,18 +39,18 @@
 
 namespace ePiX {
 
-  const std::string epix_version();
+const std::string epix_version();
 
-  double truncate(double); // return 0 if fabs(arg) < epsilon
+double truncate(double);  // return 0 if fabs(arg) < epsilon
 
-  // print GMT string for file header
-  std::string date_and_time();
+// print GMT string for file header
+std::string date_and_time();
 
-  // remove everything from arg except chars in srch
-  std::string get_chars(std::string arg, const std::string& srch);
+// remove everything from arg except chars in srch
+std::string get_chars(std::string arg, const std::string& srch);
 
-  // Use break to split arg into lines of at most FILE_WIDTH characters,
-  // return mangled copy of arg
-  std::string break_lines(std::string arg, const std::string& break_str);
-}
+// Use break to split arg into lines of at most FILE_WIDTH characters,
+// return mangled copy of arg
+std::string break_lines(std::string arg, const std::string& break_str);
+}  // namespace ePiX
 #endif /* EPIX_UTILS */

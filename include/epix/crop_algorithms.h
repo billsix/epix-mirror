@@ -1,14 +1,14 @@
-/* 
+/*
  * crop_algorithms.h -- clipping/cropping templates
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.9
  * Last Change: July 31, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -54,172 +54,150 @@
 
 namespace ePiX {
 
-  // perp assumed to be *unit*
-  template <typename PT>
-    double height(const PT& perp, const PT& base, const PT& arg)
+// perp assumed to be *unit*
+template <typename PT>
+double height(const PT& perp, const PT& base, const PT& arg) {
+  //      return (perp|(operator-(arg, base)));
+  return (perp | (arg - base));
+}
+
+// no check for parallel
+template <typename PT>
+PT cut_location(const PT& perp, const PT& base, const PT& p1, const PT& p2) {
+  //      PT dir(operator-(p2, p1)); // -dir to base
+  //      return p1 + (((operator-(base, p1))|perp)/(dir|perp))*dir;
+  PT dir(p2 - p1);  // -dir to base
+  return p1 + (((base - p1) | perp) / (dir | perp)) * dir;
+}
+
+// remove edges whose tail, head are equal
+template <typename PT>
+std::list<edge_data<PT> >& cull(std::list<edge_data<PT> >& edges) {
+  auto ep(edges.begin());
+
+  while (ep != edges.end()) {
+    if ((*ep).is_null())
+      ep = edges.erase(ep);
+
+    else
+      ++ep;
+  }
+
+  return edges;
+}
+
+template <typename PT>
+std::list<edge_data<PT> >& loopify(std::list<edge_data<PT> >& edges) {
+  if (edges.begin() == edges.end()) return edges;
+
+  auto ep(edges.begin());
+  bool in_path(false);  // currently in a visible sublist?
+
+  // After first pass, ep points to first visible edge
+  while (ep != edges.end()) {
+    if (!(*ep).is_seen())  // invisible edge
     {
-      //      return (perp|(operator-(arg, base)));
-      return (perp|(arg - base));
+      ep = edges.erase(ep);
+      in_path = false;
+      continue;
     }
 
-  // no check for parallel
-  template <typename PT>
-    PT cut_location(const PT& perp, const PT& base, const PT& p1, const PT& p2)
-    {
-      //      PT dir(operator-(p2, p1)); // -dir to base
-      //      return p1 + (((operator-(base, p1))|perp)/(dir|perp))*dir;
-      PT dir(p2 - p1); // -dir to base
-      return p1 + (((base - p1)|perp)/(dir|perp))*dir;
+    // else visible edge
+    if (in_path) {
+      ++ep;
+      continue;
     }
 
-  // remove edges whose tail, head are equal
-  template <typename PT>
-    std::list<edge_data<PT> >& cull(std::list<edge_data<PT> >& edges)
+    // else
+    in_path = true;
+    if (ep != edges.begin())  // join our tail to previous head
     {
-      auto ep(edges.begin());
+      auto prev(ep);
+      --prev;
+      ep = edges.insert(ep, edge_data<PT>((*prev).head(), (*ep).tail(), true));
+      ++ep;
+      ++ep;
+    }
+  }
 
-      while (ep != edges.end())
-	{
-	  if ((*ep).is_null())
-	    ep = edges.erase(ep);
+  // all edges examined; if we contain multiple edges, close final cut
+  ep = edges.begin();
+  // contains at most one edge
+  if (ep == edges.end())
+    ;  // return below
 
-	  else
-	    ++ep;
-	}
+  else if (++ep == edges.end())
+    edges.erase(edges.begin());
 
-      return edges;
+  else {
+    ep = edges.end();
+    --ep;
+    edges.push_back(edge_data<PT>((*ep).head(), (*edges.begin()).tail(), true));
+  }
+
+  return edges;
+}  // end of loopify()
+
+// return result of clipping edges to half space/plane through base
+// with unit inward normal perp
+template <typename PT>
+std::list<edge_data<PT> >& chop_path(const PT& perp, const PT& base,
+                                     std::list<edge_data<PT> >& edges) {
+  auto ep(edges.begin());
+
+  while (ep != edges.end()) {
+    if (!(*ep).is_seen()) {
+      ++ep;
+      continue;
     }
 
-  template <typename PT>
-    std::list<edge_data<PT> >& loopify(std::list<edge_data<PT> >& edges)
-    {
-      if (edges.begin() == edges.end())
-	return edges;
+    // else
+    const PT tail((*ep).tail());
+    const PT head((*ep).head());
 
-      auto ep(edges.begin());
-      bool in_path(false); // currently in a visible sublist?
+    const double ht_tail(height(perp, base, tail));
+    const double ht_head(height(perp, base, head));
 
-      // After first pass, ep points to first visible edge
-      while (ep != edges.end())
-	{
-	  if (!(*ep).is_seen()) // invisible edge
-	    {
-	      ep=edges.erase(ep);
-	      in_path=false;
-	      continue;
-	    }
-
-	  // else visible edge
-	  if (in_path)
-	    {
-	      ++ep;
-	      continue;
-	    }
-
-	  // else
-	  in_path=true;
-	  if (ep != edges.begin()) // join our tail to previous head
-	    {
-	      auto prev(ep);
-	      --prev;
-	      ep = edges.insert(ep, edge_data<PT>((*prev).head(),
-						  (*ep).tail(),
-						  true));
-	      ++ep;
-	      ++ep;
-	    }
-	}
-
-      // all edges examined; if we contain multiple edges, close final cut
-      ep = edges.begin();
-      // contains at most one edge
-      if (ep == edges.end())
-	; // return below
-
-      else if (++ep == edges.end())
-	edges.erase(edges.begin());
-
-      else
-        {
-          ep = edges.end();
-	  --ep;
-          edges.push_back(edge_data<PT>((*ep).head(),
-					(*edges.begin()).tail(),
-                                        true));
-        }
-
-      return edges;
-    } // end of loopify()
-
-
-  // return result of clipping edges to half space/plane through base
-  // with unit inward normal perp
-  template <typename PT>
-    std::list<edge_data<PT> >& chop_path(const PT& perp, const PT& base,
-					 std::list<edge_data<PT> >& edges)
-    {
-      auto ep(edges.begin());
-
-      while(ep != edges.end())
-	{
-	  if (!(*ep).is_seen())
-	    {
-	      ++ep;
-	      continue;
-	    }
-
-	  // else
-	  const PT tail((*ep).tail());
-	  const PT head((*ep).head());
-
-	  const double ht_tail(height(perp, base, tail));
-	  const double ht_head(height(perp, base, head));
-
-	  // non-crossings:
-	  // unclipped
-	  if (-EPIX_EPSILON < ht_tail && -EPIX_EPSILON < ht_head)
-	    {
-	      ++ep;
-	      continue;
-	    }
-
-	  // clipped
-	  else if (ht_tail <= 0 && ht_head <= 0)
-	    {
-	      (*ep).seen(false);
-	      ++ep;
-	      continue;
-	    }
-
-	  // else one end below -EPS, one above 0; split edge
-	  const PT crossing(cut_location(perp, base, tail, head));
-
-	  // visibility of segments
-	  bool vis_tail(false), vis_head(true);
-
-	  if (0 < ht_tail)
-	    {
-	      vis_tail=true;
-	      vis_head=false;
-	    }
-
-	  ep = edges.erase(ep);
-	  ep=edges.insert(ep, edge_data<PT>(crossing, head, vis_head));
-	  ep=edges.insert(ep, edge_data<PT>(tail, crossing, vis_tail));
-	  ++ep;
-	  ++ep;
-	} // all edges examined
-
-      return cull(edges);
-    } // end of chop_path()
-
-
-  template <typename PT>
-    std::list<edge_data<PT> >& chop_loop(const PT& perp, const PT& base,
-			    std::list<edge_data<PT> >& edges)
-    {
-      return loopify(chop_path(perp, base, edges));
+    // non-crossings:
+    // unclipped
+    if (-EPIX_EPSILON < ht_tail && -EPIX_EPSILON < ht_head) {
+      ++ep;
+      continue;
     }
-} // end of namespace
+
+    // clipped
+    else if (ht_tail <= 0 && ht_head <= 0) {
+      (*ep).seen(false);
+      ++ep;
+      continue;
+    }
+
+    // else one end below -EPS, one above 0; split edge
+    const PT crossing(cut_location(perp, base, tail, head));
+
+    // visibility of segments
+    bool vis_tail(false), vis_head(true);
+
+    if (0 < ht_tail) {
+      vis_tail = true;
+      vis_head = false;
+    }
+
+    ep = edges.erase(ep);
+    ep = edges.insert(ep, edge_data<PT>(crossing, head, vis_head));
+    ep = edges.insert(ep, edge_data<PT>(tail, crossing, vis_tail));
+    ++ep;
+    ++ep;
+  }  // all edges examined
+
+  return cull(edges);
+}  // end of chop_path()
+
+template <typename PT>
+std::list<edge_data<PT> >& chop_loop(const PT& perp, const PT& base,
+                                     std::list<edge_data<PT> >& edges) {
+  return loopify(chop_path(perp, base, edges));
+}
+}  // namespace ePiX
 
 #endif /* EPIX_CROP_ALGO */

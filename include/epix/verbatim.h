@@ -1,13 +1,13 @@
-/* 
+/*
  * verbatim.h -- ePiX screen implemenation of verbatim text
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
+ * This file is part of ePiX, a C++ library for creating high-quality
  * figures in LaTeX
  *
  * Version 1.1.7
  * Last Change: July 14, 2007
  *
- * 
+ *
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -39,28 +39,28 @@
 
 namespace ePiX {
 
-  class format;
-  class affine;
-  class screen_mask;
+class format;
+class affine;
+class screen_mask;
 
-  class verbatim : public tile {
-  public:
-    verbatim(const std::string& text="");
+class verbatim : public tile {
+ public:
+  verbatim(const std::string& text = "");
 
-    verbatim& map_by(const affine&) override;
-    verbatim& crop_to(const screen_mask&) override;
+  verbatim& map_by(const affine&) override;
+  verbatim& crop_to(const screen_mask&) override;
 
-    verbatim* clone() const override;
+  verbatim* clone() const override;
 
-    bool is_empty() const override;
+  bool is_empty() const override;
 
-    std::string print_to(const format&, const std::string&) const override;
-    void add_to_palette() const override;
+  std::string print_to(const format&, const std::string&) const override;
+  void add_to_palette() const override;
 
-  private:
-    std::string m_text;
-  }; // end of class verbatim
+ private:
+  std::string m_text;
+};  // end of class verbatim
 
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_VERBATIM */

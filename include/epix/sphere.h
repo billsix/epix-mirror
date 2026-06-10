@@ -1,14 +1,14 @@
-/* 
+/*
  * sphere.h -- ePiX::Sphere class
  *
- * This file is part of ePiX, a C++ library for creating high-quality 
- * figures in LaTeX 
+ * This file is part of ePiX, a C++ library for creating high-quality
+ * figures in LaTeX
  *
  * Version 1.1.9
  * Last Change: July 30, 2007
  */
 
-/* 
+/*
  * Copyright (C) 2001, 2002, 2003, 2004, 2005, 2006, 2007
  * Andrew D. Hwang <ahwang -at- holycross -dot- edu>
  * Department of Mathematics and Computer Science
@@ -51,37 +51,36 @@
 
 namespace ePiX {
 
-  class Sphere {
-  public:
-    Sphere(const P& ctr=P(0,0,0), double rad=1);
-    Sphere(const P& ctr, const P& pt);
+class Sphere {
+ public:
+  Sphere(const P& ctr = P(0, 0, 0), double rad = 1);
+  Sphere(const P& ctr, const P& pt);
 
-    P center() const;
-    double radius() const;
+  P center() const;
+  double radius() const;
 
-    bool malformed() const; // always returns false, currently
+  bool malformed() const;  // always returns false, currently
 
-    // translation
-    Sphere& shift(const P&);
-    Sphere& move_to(const P&);
+  // translation
+  Sphere& shift(const P&);
+  Sphere& move_to(const P&);
 
-    // scale radius
-    Sphere& scale(double&);
+  // scale radius
+  Sphere& scale(double&);
 
-    void draw() const;
+  void draw() const;
 
-  private:
-    P m_ctr;
-    double m_rad;
+ private:
+  P m_ctr;
+  double m_rad;
 
-    bool m_malformed;
-  }; // end of Sphere class
+  bool m_malformed;
+};  // end of Sphere class
 
+// global horizon-drawing functions
+void sphere(const P& ctr = P(0, 0, 0), double rad = 1);
+void sphere(const P& ctr, const P& pt);
 
-  // global horizon-drawing functions
-  void sphere(const P& ctr=P(0,0,0), double rad=1);
-  void sphere(const P& ctr, const P& pt);
-
-} // end of namespace
+}  // namespace ePiX
 
 #endif /* EPIX_SPHERE */

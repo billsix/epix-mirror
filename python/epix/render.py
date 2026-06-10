@@ -6,6 +6,7 @@ backend serves both: Phase-1 `render_xp` (a source file) and Phase-2
 elaps -> eps -> ghostscript png. Runs in the container image that ships the
 TeX-Live + ghostscript toolchain.
 """
+
 from __future__ import annotations
 
 import os
@@ -21,7 +22,7 @@ class Figure:
         self.png = png
         self.eepic = eepic
 
-    def _repr_png_(self) -> bytes:          # IPython/Jupyter inline display hook
+    def _repr_png_(self) -> bytes:  # IPython/Jupyter inline display hook
         return self.png
 
     def save(self, path: str) -> None:
@@ -31,9 +32,20 @@ class Figure:
 
 def _eps_to_png(eps: str, png: str, dpi: int) -> None:
     subprocess.run(
-        ["gs", "-q", "-dSAFER", "-dNOPAUSE", "-dBATCH", "-dEPSCrop",
-         "-sDEVICE=pngalpha", f"-r{dpi}", f"-sOutputFile={png}", eps],
-        check=True, capture_output=True,
+        [
+            "gs",
+            "-q",
+            "-dSAFER",
+            "-dNOPAUSE",
+            "-dBATCH",
+            "-dEPSCrop",
+            "-sDEVICE=pngalpha",
+            f"-r{dpi}",
+            f"-sOutputFile={png}",
+            eps,
+        ],
+        check=True,
+        capture_output=True,
     )
 
 
@@ -44,8 +56,13 @@ def _render_via_elaps(src_path: str, dpi: int) -> Figure:
     with tempfile.TemporaryDirectory() as d:
         shutil.copy(src_path, os.path.join(d, name))
         eps = os.path.join(d, "fig.eps")
-        subprocess.run(["elaps", "-o", eps, name],
-                       cwd=d, check=True, capture_output=True, text=True)
+        subprocess.run(
+            ["elaps", "-o", eps, name],
+            cwd=d,
+            check=True,
+            capture_output=True,
+            text=True,
+        )
         png = os.path.join(d, "fig.png")
         _eps_to_png(eps, png, dpi)
         with open(png, "rb") as f:
