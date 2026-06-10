@@ -112,13 +112,12 @@ written in C++, rendered inline. Goal: port all ~81 `samples/` to percent-format
 notebooks, each **byte-identical** to the C++ original. The C++ samples stay as
 the permanent oracle — this is purely additive. **Authoritative status + full
 history (incl. the precise remaining-work list): `tasks/python-bindings-and-notebooks.md`.**
-(Tech chosen: nanobind → architecture A, real bindings; C++20.) **Status: 63 of
-81 demos ported byte-identically** as of 2026-06-10; the remaining 18 each need a
-specific subsystem (lighting model, `Sphere`/`Circle` intersections, the
-`data_file`/`data_bins` subsystem, `Complex`/`rootC`, `surface_rev`, `fractal`,
-CMYK separation, `domain_list`, plus a few small-setter/larger read-and-translate
-demos). Note `histogram` is **blocked** — its `samples/binom.dat` is absent — see
-the task doc.
+(Tech chosen: nanobind → architecture A, real bindings; C++20.) **Status: 80 of
+81 demos ported byte-identically** as of 2026-06-10 — **effectively complete.** The
+single remaining demo, `histogram`, is **blocked** (its `samples/binom.dat` data
+file is absent from the repo; the C++ oracle can't run either), not a porting gap.
+See the task doc — post-port follow-ups (Pythonic cleanup, keyword args, dir
+grouping, distro packaging, ASan teardown) are now unblocked.
 
 Layout:
 - `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`

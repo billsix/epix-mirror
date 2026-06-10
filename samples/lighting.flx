@@ -4,6 +4,7 @@
 #include "epix.h"
 #include "lighting.h"
 using namespace ePiX;
+using enum epix_label_posn;  // so bare `bl`/`br`/`t` resolve under enum-class
 
 // mesh intervals for torus
 int N1(36), N2(12);

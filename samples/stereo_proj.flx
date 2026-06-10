@@ -6,6 +6,7 @@
  */
 #include "epix.h"
 using namespace ePiX;
+using enum epix_label_posn;  // so bare `br`/`t` resolve under enum-class
 
 P O(0,0,0);
 

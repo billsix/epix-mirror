@@ -97,14 +97,15 @@ builds ePiX with Meson. When running nested inside another container, append
 exhaust the container image store, a small tmpfs — run `podman image prune -f`
 to reclaim space.)
 
-## Python interface (experimental, in progress)
+## Python interface
 
-A Python front-end is under construction in [`python/`](python/): real bindings
-(via [nanobind](https://nanobind.readthedocs.io)) over `libepix`, so you can
-build figures in Python with the same vocabulary as the C++ samples and render
-them inline in Jupyter. [`notebooks/`](notebooks/) holds percent-format
-(jupytext) ports of the `samples/` demos, each verified to reproduce the original
-figure exactly.
+A Python front-end lives in [`python/`](python/): real bindings (via
+[nanobind](https://nanobind.readthedocs.io)) over `libepix`, so you can build
+figures in Python with the same vocabulary as the C++ samples and render them
+inline in Jupyter. [`notebooks/`](notebooks/) holds percent-format (jupytext)
+ports of the `samples/` demos — **80 of the 81**, each verified **byte-identical**
+to the original figure. (The lone exception, `histogram`, needs a data file the
+repo doesn't ship.)
 
 ```python
 import epix

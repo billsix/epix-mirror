@@ -484,46 +484,97 @@ couplings that were open when this was written:
     `Cos`/`Sin`) but needs the meatier `data_file(f1, f2, t_min, t_max, n)`
     two-function-trampoline ctor + `transform(P f(u,v))` + `DF.plot(MarkType,…)`
     scatter + the `data_bins` class (`read`/`bar_chart`/`pop`).
-  - **Remaining 18 — precise handoff** (each = same port→verify loop; grouped by the
-    one new binding/subsystem it needs). Resume by porting any item, binding the
-    listed piece, and running `build-aux/verify_ports.py NAME`:
-    - **lighting model** (`light()`/`facet`/`model_*` — a shading subsystem):
-      `lighting`, `helicoid`, `stereo_proj`. These also have bare-enum compile
-      breakage like `riemann.flx` did — add `using enum epix_label_posn;` to make
-      the oracle compile.
-    - **`Sphere`/`Circle` classes + `Sphere*Sphere`→`Circle` intersection:**
-      `mirrorball`. (`camera.viewpt()` already bound in batch 10.)
-    - **`data_file`/`data_bins`** subsystem: `dataplot` (viable — generates data
-      from `Cos`/`Sin`; needs the 2-function-trampoline `data_file` ctor +
-      `transform` + scatter `plot` + `data_bins`). `histogram` is **BLOCKED** —
-      `samples/binom.dat` is missing from the repo (see batch-10 note above).
-    - **`Complex` + `rootC`** (complex n-th roots): `cubic_cutaway`.
-    - **`surface_rev` + `frame` class:** `hyperboloid`.
-    - **`fractal` (takes a C `int[]` seed — bind a Python-list→array shim):**
-      `koch`.
-    - **CMYK colour separation** (`CMYK_Neutral`/`C_Process`/`M_Process`/…
-      camera filters): `color_sep`.
-    - **`domain_list` + `slices2()`/`slices3()` + `plot(f, P, P, mesh, mesh)`
-      region form:** `levelset`, `levelset2`, `levelset3`.
-    - **small setters only** (`label_border`/`label_mask` already bound in batch
-      10; still need `base_color`/`base_pen`/`fill_color`/`line_color`/
-      `label_pad`/`set_border`, then it's mechanical): `line_debug`, `label_debug`
-      (large internal debug harnesses).
-    - **mostly-covered, just larger** (read + translate; bind a stray fn or two):
-      `std_F` (needs the sample's own `std_F.h` helpers reimplemented in Python),
-      `polyhedra` (uses `-D` variants). (`decorate`, `butterfly`, `log`,
-      `S2_harmonics` done in batch 10; `extract` done — `Deriv.eval`/lens bound.)
-    - **not previously grouped, done in batch 10:** `clipping`, `legend`,
-      `shadeplot`, `minkowski` (needed no new subsystem beyond the batch-10
-      bindings).
-  - **Session 2 (2026-06-10) continued the grind to a clean, harness-verified
-    63/81** (batch 10 above). Everything remaining is a pure continuation — no
-    rework, no new risk; the bindings + `verify_ports.py` make each remaining demo
-    a tight loop. Note: the image store is an ephemeral tmpfs, so a session must
-    `make image` first (≈ several min for the TeX-Live layer), then iterate with
-    `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled` + a container loop over
-    `verify_ports.py`.
-  - **Outstanding (ASan cleanup):** the **batch-10 bindings are not yet mirrored
+  - **Batch 11 ✅ (2026-06-10, session 2 cont.), 11 demos → 75/81:** `levelset`,
+    `levelset2`, `levelset3`, `polyhedra`, `hyperboloid`, `mirrorball` (`.flx`),
+    `line_debug`, `label_debug`, `koch`, `cubic_cutaway`, `color_sep` — all
+    byte-identical, regressions clean (incl. after a `make format` + rebuild).
+    Also bound: `fractal` (Python `list[int]` → the C `int*` seed via
+    `std::vector<int>.data()`); the **`Complex`** value type (`__mul__`/`__add__`/
+    `__sub__`) + **`rootC`** (returns a `P` via ePiX's implicit `P(Complex)`
+    conversion — sidesteps `Complex + P` arithmetic in the ports); **scenery with
+    a color function** (additively extended `PyScenery` with a 3-arg color ctor +
+    `add(f, domain, color)`, dispatching 2-var vs 3-var color — left the existing
+    no-color path untouched, regressions on minkowski/spherical/bowl confirm);
+    the **CMYK process colors** `CMYK_Neutral`/`C_Process`/`M_Process`/`Y_Process`/
+    `K_Process` (camera filters, for `color_sep`). Bound on
+    demand: the **`domain_list` subsystem** (`domain.slices2()`/`slices3()` wrap
+    the `std::list<domain>` into a `domain_list`; the `domain_list` class;
+    `plot(F, domain_list)`; `plot(f, p1, p2, coarse, fine)` **level-set/contour**
+    form for a *double*-valued `f` via a new 2-var scalar trampoline `tramp_d2`);
+    the **`Sphere`** class (ctors / `center` / `draw` / `__mul__`→`Circle`), the
+    **`Circle`** class, **`Sphere*Sphere`→`Circle`** intersection; the **`frame`**
+    class (default + 3-vector ctor + `sea`/`sky`/`eye`); `back_/front_dodeca` +
+    `back_/front_icosa`; `cam()`; **`surface_rev(f, g, domain, coords, cull)`**
+    (two-function trampoline); `label_pad`. `line_debug`/`label_debug` needed
+    almost nothing new — their `line_color`/`base_pen`/`set_border`/… "setters"
+    are the **sample's own bool-flag helper functions** (reimplemented in Python),
+    not ePiX API (the earlier "bind base_color/… setters" note was a misread).
+    - **Two binding gotchas re-learned (worth keeping):** (1) the
+      **bind-only-*defined*-symbols** rule bit again — `plot(P f(double,double),
+      p1, p2, mesh, mesh)` (the P-valued region form) is *declared but not
+      compiled* in libepix; referencing it broke the whole module at import with
+      an undefined-symbol error. Only the double-valued level-set form is defined,
+      so only that is bound. (2) a **class-instance default arg needs its
+      `nb::class_` registered first** — `nb::arg("coords") = frame()` on
+      `surface_rev` threw `std::bad_cast` at import because `frame` is registered
+      later in the module than `surface_rev`; fixed by making `coords` required.
+    - **`.flx` count is arbitrary for verification** (Python and C++ both use
+      `tix = i/count` with the same `count`); `mirrorball` uses `count=24` like
+      `cube`.
+  - **Batch 12 ✅ (2026-06-10, session 2 cont.), 3 demos → 78/81 — the lighting
+    trio:** `helicoid`, `stereo_proj`, `lighting` (all `.flx`). The task-doc
+    grouping was misleading: **only `lighting.flx` uses the shading library**
+    `lighting.h` (the sample's own `Spot`/`Fog`/`Chip` classes — reimplemented in
+    Python, needing `Color.blend`/`Color.filter` bindings). `helicoid` has its own
+    `element` facet class (3-light RGB shading) and needed **no** new bindings;
+    `stereo_proj` needed only `Tan` + the `using enum` oracle fix. The enum fix
+    (`using enum epix_label_posn;` added to `stereo_proj.flx` and `lighting.flx`,
+    after `using namespace ePiX;`) is **output-neutral** (compile-time name
+    resolution only — same as the earlier `riemann.flx` fix) and is what lets the
+    oracle build under enum-class. C++ `pow(x, 2)` → Python **`math.pow(x, 2)`**,
+    not `x**2` (Python folds `**2` to `x*x`, which can differ in the last bit).
+    - **`animate()` made render-resilient (figure.py):** a heavy `.flx` frame
+      (e.g. `stereo_proj`'s 144×48 surface, or `helicoid`'s 1728 facets) can
+      exceed LaTeX/ghostscript limits when rasterized; `animate()` now keeps the
+      frame's **eepic** (the correctness artifact, captured pre-render) with an
+      empty PNG and drops it from the gif, instead of crashing the whole
+      animation — exactly mirroring what `render()` already does for giant single
+      figures. The byte-identity check is unaffected (it compares eepic text).
+      `.flx` `count` is arbitrary for verification; heavy ones use a small count
+      (`stereo_proj` = 9, odd per its own advice) — bump later for a smoother gif.
+  - **Batch 13 ✅ (2026-06-10, session 2 cont.), 2 demos → 80/81:** `dataplot`,
+    `std_F`. Bound the **`data_file`/`data_bins`** subsystem: `data_file` with the
+    2-function-trampoline ctor (placement-`new` `__init__`, sampling `f1`/`f2` via
+    `g_fa`/`g_fb`), `transform(P f(u,v))`, `column(col)` (→ Python list), scatter
+    `plot(MarkType)`; `data_bins(lo,hi,n)` + `read(list)`/`pop()`/`bar_chart()`.
+    For `std_F` (a sample with an external impl file `std_F.cc`): extended
+    `affine` (`v_scale`/`h_scale`/`scale`/`shift(pair)`/3-`pair` ctor/`__call__`)
+    and `pair` (`__add__`/`__sub__`), reimplemented the `std_F` class in Python
+    (skipping its paint-state save/restore — **output-neutral** here because every
+    `draw()` fully re-sets fill/pen and nothing between/after the F-draws depends
+    on the restored state), and **taught `verify_ports.py` to compile+link a
+    sibling `samples/NAME.cc`** so the oracle links (the same pattern any future
+    external-library sample would need). Gotcha: `v_axis_labels`' third arg is
+    `unsigned int n` — C++ silently truncates `dataplot`'s `0.5*ysize()` double, so
+    the port passes `int(0.5*epix.ysize())`.
+  - **Remaining 1 — `histogram`, and it is BLOCKED, not portable:** it reads
+    `samples/binom.dat`, which **does not exist** in the repo (the sample says to
+    generate it via `binom.cc`). The C++ oracle can't run without it, so there's
+    nothing to verify against. **This is the only unported demo — 80/81 is
+    effectively complete.** Unblock only if `binom.dat` is produced/committed.
+  - **Session 2 (2026-06-10) drove the grind to a clean, harness-verified 80/81**
+    (batches 10–13 above) — **the port is effectively done.** The only unported
+    demo, `histogram`, is hard-blocked by a missing data file (`samples/binom.dat`)
+    that the repo doesn't ship. Note: the image store is an ephemeral tmpfs, so a
+    session must `make image` first (≈ several min for the TeX-Live layer), then
+    iterate with `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled` + a container
+    loop over `verify_ports.py`.
+  - **Next phase: the post-port follow-ups are now unblocked** — see
+    `tasks/pythonic-cleanup.md`, `tasks/notebook-keyword-args.md`,
+    `tasks/source-notebook-grouping.md`, `tasks/distro-packaging.md`, and the ASan
+    teardown (mirror remaining bindings into `asan_smoke.cc`, then remove the
+    dev-only ASan tooling).
+  - **Outstanding (ASan cleanup):** the **batch-10/11 bindings are not yet mirrored
     into `build-aux/asan_smoke.cc`** (the standing "keep mirroring until removal"
     rule). The session-2 churn there is only clang-format reformatting, *not* new
     coverage. Risk is low — the new bindings (`path` list-ctor, `quad`,

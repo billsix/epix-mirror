@@ -29,6 +29,11 @@ static double tramp_d(double t) { return nb::cast<double>(g_fn(t)); }
 // two-variable trampoline for surface(P F(double,double), ...)
 static nb::callable g_fn2;
 static P tramp_P2(double u, double v) { return nb::cast<P>(g_fn2(u, v)); }
+// two-variable *scalar* trampoline (reuses g_fn2) for the level-set/contour
+// plot(double f(double,double), p1, p2, mesh, mesh).
+static double tramp_d2(double u, double v) {
+  return nb::cast<double>(g_fn2(u, v));
+}
 // two-function trampolines for back/frontplot_N(double f(double), double
 // g(double), ...)
 static nb::callable g_fa, g_fb;
@@ -67,8 +72,15 @@ static bool callable_takes_two(nb::callable f) {
 struct PyScenery {
   scenery sc;
   PyScenery(nb::callable f, const domain& R) { build(f, R, true); }
+  PyScenery(nb::callable f, const domain& R, nb::callable color) {
+    build_c(f, R, color, true);
+  }
   PyScenery& add(nb::callable f, const domain& R) {
     build(f, R, false);
+    return *this;
+  }
+  PyScenery& add_c(nb::callable f, const domain& R, nb::callable color) {
+    build_c(f, R, color, false);
     return *this;
   }
   void build(nb::callable f, const domain& R, bool first) {
@@ -87,6 +99,27 @@ struct PyScenery {
         sc.add(tramp_P3, R);
       g_fn3 = nb::callable();
     }
+  }
+  // f(u,v)->P over the domain, colored by color(u,v)->RGB or color(x,y,z)->RGB.
+  void build_c(nb::callable f, const domain& R, nb::callable color,
+               bool first) {
+    g_fn2 = f;
+    if (callable_takes_two(color)) {
+      g_col = color;
+      if (first)
+        sc = scenery(tramp_P2, R, tramp_col2);
+      else
+        sc.add(tramp_P2, R, tramp_col2);
+      g_col = nb::callable();
+    } else {
+      g_fn3 = color;
+      if (first)
+        sc = scenery(tramp_P2, R, tramp_P3);
+      else
+        sc.add(tramp_P2, R, tramp_P3);
+      g_fn3 = nb::callable();
+    }
+    g_fn2 = nb::callable();
   }
 };
 
@@ -122,7 +155,22 @@ NB_MODULE(_epix, m) {
   // ----  `c * d` / `d * c` scale intensity (mirrors C++ `Color::operator*=`).
   nb::class_<Color>(m, "Color")
       .def("__mul__", [](const Color& c, double d) { return d * c; })
-      .def("__rmul__", [](const Color& c, double d) { return d * c; });
+      .def("__rmul__", [](const Color& c, double d) { return d * c; })
+      // blend toward `other` by t; returns the blended color (non-mutating from
+      // Python's view -- operates on a copy, mirroring the .xp usage pattern).
+      .def(
+          "blend",
+          [](Color c, const Color& other, double t) -> Color {
+            c.blend(other, t);
+            return c;
+          },
+          nb::arg("other"), nb::arg("t"))
+      .def(
+          "filter",
+          [](const Color& c, const Color& other) -> Color {
+            return c.filter(other);
+          },
+          nb::arg("other"));
 
   // ---- scoped enums (the C++ enum class types) ----
   nb::enum_<epix_mark_type>(m, "MarkType")
@@ -283,6 +331,38 @@ NB_MODULE(_epix, m) {
       },
       nb::arg("f"), nb::arg("domain"));
 
+  // plot(F, domain_list) -- F over each domain in a list of slices (from
+  // domain.slices2()/slices3()). 2-var vs 3-var by arity, like plot(F, domain).
+  m.def(
+      "plot",
+      [](nb::callable f, const domain_list& dl) {
+        if (callable_takes_two(f)) {
+          g_fn2 = f;
+          plot(tramp_P2, dl);
+          g_fn2 = nb::callable();
+        } else {
+          g_fn3 = f;
+          plot(tramp_P3, dl);
+          g_fn3 = nb::callable();
+        }
+      },
+      nb::arg("f"), nb::arg("domain"));
+
+  // plot(f, p1, p2, coarse, fine) -- level-set/contour plot of the scalar field
+  // f(x,y)->double over a rectangular region. (Only the double-valued form is
+  // defined in libepix; the P-valued region overload is
+  // declared-but-uncompiled, so it is intentionally not bound.)
+  m.def(
+      "plot",
+      [](nb::callable f, const P& p1, const P& p2, const mesh& coarse,
+         const mesh& fine) {
+        g_fn2 = f;
+        plot(tramp_d2, p1, p2, coarse, fine);
+        g_fn2 = nb::callable();
+      },
+      nb::arg("f"), nb::arg("p1"), nb::arg("p2"), nb::arg("coarse"),
+      nb::arg("fine"));
+
   // envelope of tangent lines to a parametric curve f(t) -> P
   m.def(
       "envelope",
@@ -335,6 +415,13 @@ NB_MODULE(_epix, m) {
         nb::arg("ne"));
   m.def("triangle", &triangle, nb::arg("a"), nb::arg("b"), nb::arg("c"));
   m.def("quad", &quad, nb::arg("a"), nb::arg("b"), nb::arg("c"), nb::arg("d"));
+  // fractal: a Python list of ints is the seed (passed as the C int*).
+  m.def(
+      "fractal",
+      [](const P& p, const P& q, int depth, const std::vector<int>& pre_seed) {
+        fractal(p, q, depth, pre_seed.data());
+      },
+      nb::arg("p"), nb::arg("q"), nb::arg("depth"), nb::arg("pre_seed"));
   m.def("ellipse",
         static_cast<void (*)(const P&, const P&, const P&)>(&ellipse),
         nb::arg("center"), nb::arg("axis1"), nb::arg("axis2"));
@@ -507,6 +594,7 @@ NB_MODULE(_epix, m) {
       .def("eye", &Camera::eye)
       .def("viewpt", &Camera::viewpt);
   m.attr("camera") = nb::cast(&camera, nb::rv_policy::reference);
+  m.def("cam", &cam, nb::rv_policy::reference);  // the global camera, as a fn
 
   m.def(
       "sphere", [](const P& ctr, double rad) { sphere(ctr, rad); },
@@ -559,7 +647,23 @@ NB_MODULE(_epix, m) {
       .def("resize3", &domain::resize3, nb::arg("a"), nb::arg("b"))
       .def("slice1", &domain::slice1, nb::arg("a"))
       .def("slice2", &domain::slice2, nb::arg("a"))
-      .def("slice3", &domain::slice3, nb::arg("a"));
+      .def("slice3", &domain::slice3, nb::arg("a"))
+      // slices2/3 return a std::list<domain>; wrap it into a domain_list (the
+      // implicit conversion the C++ relies on) so plot(F, domain_list) works.
+      .def(
+          "slices2",
+          [](const domain& d, unsigned int n) {
+            return domain_list(d.slices2(n));
+          },
+          nb::arg("n") = 0)
+      .def(
+          "slices3",
+          [](const domain& d, unsigned int n) {
+            return domain_list(d.slices3(n));
+          },
+          nb::arg("n") = 0);
+
+  nb::class_<domain_list>(m, "domain_list");
 
   // surface: F(u, v) -> P over a domain (parametric surface), same trampoline
   // idea
@@ -571,6 +675,21 @@ NB_MODULE(_epix, m) {
         g_fn2 = nb::callable();
       },
       nb::arg("f"), nb::arg("domain"), nb::arg("cull") = 0);
+
+  // surface of revolution: profile (f(t), g(t)) revolved about the frame's
+  // axis over a domain. Two scalar function-ptrs -> the g_fa/g_fb trampolines.
+  m.def(
+      "surface_rev",
+      [](nb::callable f, nb::callable g, const domain& R, const frame& coords,
+         int cull) {
+        g_fa = f;
+        g_fb = g;
+        surface_rev(tramp_a, tramp_b, R, coords, cull);
+        g_fa = nb::callable();
+        g_fb = nb::callable();
+      },
+      nb::arg("f"), nb::arg("g"), nb::arg("domain"), nb::arg("coords"),
+      nb::arg("cull") = 0);
 
   // ===== more state setters, shapes, axis labels, and field/polar plots =====
   m.def("black", &black, nb::arg("d") = 1.0);  // set pen color to a tint
@@ -719,10 +838,13 @@ NB_MODULE(_epix, m) {
              a *= c;
              return a;
            })
-      .def("__rmul__", [](pair a, double c) {
-        a *= c;
-        return a;
-      });
+      .def("__rmul__",
+           [](pair a, double c) {
+             a *= c;
+             return a;
+           })
+      .def("__add__", [](pair a, const pair& b) { return a + b; })
+      .def("__sub__", [](pair a, const pair& b) { return a - b; });
 
   // ---- Plane (drawable plane region) ----
   nb::class_<Plane>(m, "Plane")
@@ -731,6 +853,97 @@ NB_MODULE(_epix, m) {
       .def(nb::init<const P&, const P&, const P&>())
       .def("shift", &Plane::shift, nb::arg("v"), nb::rv_policy::reference)
       .def("draw", &Plane::draw);
+
+  // ---- Sphere (the geometric object) + frame + the platonic-solid drawers
+  // ----
+  nb::class_<Circle>(m, "Circle")
+      .def(nb::init<const P&, double, const P&>(), nb::arg("ctr") = P(0, 0, 0),
+           nb::arg("rad") = 1.0, nb::arg("perp") = E_3)
+      .def("center", &Circle::center)
+      .def("draw", &Circle::draw);
+
+  nb::class_<Sphere>(m, "Sphere")
+      .def(nb::init<const P&, double>(), nb::arg("ctr") = P(0, 0, 0),
+           nb::arg("rad") = 1.0)
+      .def(nb::init<const P&, const P&>(), nb::arg("ctr"), nb::arg("pt"))
+      .def("center", &Sphere::center)
+      .def("draw", &Sphere::draw)
+      // Sphere * Sphere -> Circle (their intersection circle)
+      .def("__mul__", [](const Sphere& a, const Sphere& b) { return a * b; });
+
+  nb::class_<frame>(m, "frame")
+      .def(nb::init<>())
+      .def(nb::init<P, P, P>(), nb::arg("e1"), nb::arg("e2"), nb::arg("e3"))
+      .def("sea", &frame::sea)
+      .def("sky", &frame::sky)
+      .def("eye", &frame::eye);
+
+  m.def("back_dodeca", &back_dodeca, nb::arg("sphere"), nb::arg("frame"));
+  m.def("back_icosa", &back_icosa, nb::arg("sphere"), nb::arg("frame"));
+  m.def("front_dodeca", &front_dodeca, nb::arg("sphere"), nb::arg("frame"));
+  m.def("front_icosa", &front_icosa, nb::arg("sphere"), nb::arg("frame"));
+
+  // ---- Complex (the plane-complex value type) + complex nth root ----
+  nb::class_<Complex>(m, "Complex")
+      .def(nb::init<double, double>(), nb::arg("real") = 0.0,
+           nb::arg("imag") = 0.0)
+      .def("__mul__", [](Complex a, const Complex& b) { return a * b; })
+      .def("__add__", [](Complex a, const Complex& b) { return a + b; })
+      .def("__sub__", [](Complex a, const Complex& b) { return a - b; });
+  // the order-th root, branch `branch`, returned as a P (re, im, 0) -- ePiX
+  // implicitly converts Complex -> P, which is how the .xp samples plot it.
+  m.def(
+      "rootC",
+      [](const Complex& z, int order, int branch) {
+        return P(rootC(z, order, branch));
+      },
+      nb::arg("z"), nb::arg("order"), nb::arg("branch") = 0);
+
+  // ---- data_file / data_bins (tabular data + histograms) ----
+  nb::class_<data_file>(m, "data_file")
+      // build two columns by sampling f1, f2 over [t_min, t_max] (n+1 rows);
+      // the two scalar function-ptrs route through the g_fa/g_fb trampolines.
+      .def(
+          "__init__",
+          [](data_file* self, nb::callable f1, nb::callable f2, double t_min,
+             double t_max, unsigned int n) {
+            g_fa = f1;
+            g_fb = f2;
+            new (self) data_file(tramp_a, tramp_b, t_min, t_max, n);
+            g_fa = nb::callable();
+            g_fb = nb::callable();
+          },
+          nb::arg("f1"), nb::arg("f2"), nb::arg("t_min"), nb::arg("t_max"),
+          nb::arg("n"))
+      .def(
+          "transform",
+          [](data_file& df, nb::callable f) -> data_file& {
+            g_fn2 = f;
+            df.transform(tramp_P2);  // P f(double,double), cols 1,2
+            g_fn2 = nb::callable();
+            return df;
+          },
+          nb::arg("f"), nb::rv_policy::reference)
+      .def(
+          "column",
+          [](const data_file& df, unsigned int col) { return df.column(col); },
+          nb::arg("col"))
+      .def(
+          "plot",
+          [](const data_file& df, epix_mark_type type) { df.plot(type); },
+          nb::arg("type"));
+
+  nb::class_<data_bins>(m, "data_bins")
+      .def(nb::init<double, double, unsigned int>(), nb::arg("lo"),
+           nb::arg("hi"), nb::arg("n") = 1)
+      .def(
+          "read",
+          [](data_bins& db, const std::vector<double>& v) -> data_bins& {
+            return db.read(v);
+          },
+          nb::arg("data"), nb::rv_policy::reference)
+      .def("pop", &data_bins::pop)
+      .def("bar_chart", &data_bins::bar_chart, nb::arg("scale") = 1.0);
 
   // ---- integral type enum + Riemann sums ----
   nb::enum_<epix_integral_type>(m, "IntegralType")
@@ -758,6 +971,11 @@ NB_MODULE(_epix, m) {
   m.def("Neutral", &Neutral);  // the neutral (50% gray) Color
   m.def("RGB_Neutral", &RGB_Neutral);
   m.def("CMY_Neutral", &CMY_Neutral);
+  m.def("CMYK_Neutral", &CMYK_Neutral);
+  m.def("C_Process", &C_Process, nb::arg("d") = 1.0);
+  m.def("M_Process", &M_Process, nb::arg("d") = 1.0);
+  m.def("Y_Process", &Y_Process, nb::arg("d") = 1.0);
+  m.def("K_Process", &K_Process, nb::arg("d") = 1.0);
   m.def("tikz_format", &tikz_format);
   m.def("dot_size", &dot_size, nb::arg("diam") = 0.0);
   m.def("ddot", [](const P& p) { ddot(p); }, nb::arg("at"));
@@ -779,6 +997,7 @@ NB_MODULE(_epix, m) {
   m.def("label_mask", static_cast<void (*)(const Color&)>(&label_mask),
         nb::arg("col"));
   m.def("label_mask", static_cast<void (*)()>(&label_mask));
+  m.def("label_pad", &label_pad, nb::arg("pad"));
   m.def("clip_face", &clip_face, nb::arg("loc"), nb::arg("perp"));
   m.def("clip_restore", &clip_restore);
   m.def("clip_slice",
@@ -814,8 +1033,12 @@ NB_MODULE(_epix, m) {
   nb::class_<PyScenery>(m, "scenery")
       .def(nb::init<nb::callable, const domain&>(), nb::arg("f"),
            nb::arg("domain"))
+      .def(nb::init<nb::callable, const domain&, nb::callable>(), nb::arg("f"),
+           nb::arg("domain"), nb::arg("color"))
       .def("add", &PyScenery::add, nb::arg("f"), nb::arg("domain"),
            nb::rv_policy::reference_internal)
+      .def("add", &PyScenery::add_c, nb::arg("f"), nb::arg("domain"),
+           nb::arg("color"), nb::rv_policy::reference_internal)
       .def(
           "draw", [](PyScenery& s, int cull) { s.sc.draw(cull); },
           nb::arg("cull") = 0);
@@ -951,8 +1174,14 @@ NB_MODULE(_epix, m) {
   // ----
   nb::class_<affine>(m, "affine")
       .def(nb::init<>())
+      .def(nb::init<const pair&, const pair&, const pair&>(), nb::arg("e1"),
+           nb::arg("e2"), nb::arg("loc") = pair(0, 0))
       .def(
           "shift", [](affine& a, const P& v) -> affine& { return a.shift(v); },
+          nb::arg("v"), nb::rv_policy::reference)
+      .def(
+          "shift",
+          [](affine& a, const pair& v) -> affine& { return a.shift(v); },
           nb::arg("v"), nb::rv_policy::reference)
       .def(
           "rotate",
@@ -961,11 +1190,26 @@ NB_MODULE(_epix, m) {
       .def(
           "reflect",
           [](affine& a, double th) -> affine& { return a.reflect(th); },
-          nb::arg("theta"), nb::rv_policy::reference);
+          nb::arg("theta"), nb::rv_policy::reference)
+      .def(
+          "scale", [](affine& a, double s) -> affine& { return a.scale(s); },
+          nb::arg("s"), nb::rv_policy::reference)
+      .def(
+          "h_scale",
+          [](affine& a, double s) -> affine& { return a.h_scale(s); },
+          nb::arg("s"), nb::rv_policy::reference)
+      .def(
+          "v_scale",
+          [](affine& a, double s) -> affine& { return a.v_scale(s); },
+          nb::arg("s"), nb::rv_policy::reference)
+      .def(
+          "__call__", [](const affine& a, const pair& p) { return a(p); },
+          nb::arg("p"));
 
   // ---- functions ----
   m.def("Sin", &Sin);
   m.def("Cos", &Cos);
+  m.def("Tan", &Tan);
   m.def("Atan", &Atan);
   m.def("Atan2", &Atan2, nb::arg("y"), nb::arg("x"));
   m.def("Asin", &Asin);

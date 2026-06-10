@@ -131,17 +131,29 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
 
         paths = []
         for i, ep in enumerate(eepics):  # parent renders eepic -> png
-            fig = render_eepic(ep, dpi=dpi)
+            # The eepic is always captured (it's the correctness artifact); the
+            # PNG is best-effort. A heavy frame (tens of thousands of facets) can
+            # exceed LaTeX/ghostscript limits when rasterized, exactly like the
+            # giant single figures render() guards against -- in that case keep
+            # the frame's eepic with an empty PNG instead of failing the whole
+            # animation, and just drop it from the assembled gif.
+            try:
+                fig = render_eepic(ep, dpi=dpi)
+                p = os.path.join(d, f"f{i:04d}.png")
+                fig.save(p)
+                paths.append(p)
+            except subprocess.CalledProcessError:
+                with open(ep) as f:
+                    fig = Figure(b"", f.read())
             frames.append(fig)
-            p = os.path.join(d, f"f{i:04d}.png")
-            fig.save(p)
-            paths.append(p)
-        gif_path = os.path.join(d, "anim.gif")
-        subprocess.run(
-            ["convert", "-loop", "0", "-delay", str(delay), *paths, gif_path],
-            check=True,
-            capture_output=True,
-        )
-        with open(gif_path, "rb") as f:
-            gif = f.read()
+        gif = b""
+        if paths:
+            gif_path = os.path.join(d, "anim.gif")
+            subprocess.run(
+                ["convert", "-loop", "0", "-delay", str(delay), *paths, gif_path],
+                check=True,
+                capture_output=True,
+            )
+            with open(gif_path, "rb") as f:
+                gif = f.read()
     return Animation(gif, frames)

@@ -43,6 +43,11 @@ def run_notebook(name):
 
 
 def _compile(src, out, defs=()):
+    # A few samples ship an accompanying implementation file (e.g. std_F.xp +
+    # std_F.cc, normally built into a small external library); compile it in
+    # alongside the .xp so the oracle links.
+    sibling = os.path.splitext(src)[0] + ".cc"
+    extra = [sibling] if os.path.exists(sibling) else []
     subprocess.run(
         [
             "g++",
@@ -54,6 +59,7 @@ def _compile(src, out, defs=()):
             "-x",
             "c++",
             src,
+            *extra,
             "-L/usr/local/lib64/epix",
             "-lepix",
             "-lm",
