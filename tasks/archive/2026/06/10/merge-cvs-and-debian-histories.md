@@ -1,6 +1,25 @@
 # Merge the CVS-mirror and Debian-based histories into one clean master
 
-**Status:** proposed — plan approved, awaiting go-ahead to execute. Bill handles all pushes himself.
+**Status:** DONE (2026-06-10). Executed exactly as planned; all checks passed. Bill handles all pushes himself.
+
+## Result (2026-06-10)
+
+Unified `master` built and verified:
+- `git diff backup/master-pre-graft master` → **empty** (final tree byte-identical).
+- `8f8c19e` (2003 Savannah import) is now an ancestor of `master`.
+- `master` total commits: **115** (74 CVS + 1 strip + 40 modern).
+- The three `*-from debian` commits (`e2f5431`/`3e61d13`/`9190483`) are gone from `master`.
+- All 4 topic-branch merges preserved; the 4 topic branches deleted.
+- Graft seam: `c4bc237 release epix-1.2.22` → `864cd83 Drop generated doc/sample artifacts` → modern work.
+- New `master` tip: `001b05f Merge branch 'pythonBindingsAndNotebooks'`.
+- Safety tag `backup/master-pre-graft` (→ old `adbf6c2`) left in place; drop it once confident.
+
+**Caveat — GPG signing:** Bill's `commit.gpgsign` is on, but gpg pinentry times out in the
+container, so the rebase ran with `-c commit.gpgsign=false`. The new graft commit and all 40
+replayed modern commits are therefore **unsigned** (rebasing rewrote their SHAs regardless).
+Bill confirmed mid-run to keep signing off. Re-sign on his host if desired before/after pushing.
+
+**Pushes:** Bill's job. `master` is rewritten, so it needs a force-push to origin and/or github.
 
 ## Problem
 
