@@ -66,25 +66,24 @@ with epix.figure(
     raw: epix.Screen = epix.Screen(
         lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
     )
-    epix.activate(raw)
-    epix.label_color(epix.red())
-    data.plot(epix.MarkType.DDOT)  # scatter plot
-    L.mark_item(epix.MarkType.DDOT, "Data points")
+    with epix.activated(raw):
+        epix.label_color(epix.red())
+        data.plot(epix.MarkType.DDOT)  # scatter plot
+        L.mark_item(epix.MarkType.DDOT, "Data points")
 
-    epix.nofill()
-    epix.plain(epix.black(0.3))
-    epix.grid(nx=1, ny=10)
+        epix.nofill()
+        epix.plain(epix.black(0.3))
+        epix.grid(nx=1, ny=10)
 
-    epix.v_axis_labels(
-        Point(x=1, y=-1),
-        Point(x=1, y=1),
-        n=4,
-        offset=Point(x=4, y=0),
-        align=epix.LabelPos.r,
-    )
+        epix.v_axis_labels(
+            Point(x=1, y=-1),
+            Point(x=1, y=1),
+            n=4,
+            offset=Point(x=4, y=0),
+            align=epix.LabelPos.r,
+        )
 
-    epix.inset(lower_left=Point(x=-1, y=0), upper_right=Point(x=1, y=20))
-    epix.deactivate(raw)  # polite but unnecessary
+        epix.inset(lower_left=Point(x=-1, y=0), upper_right=Point(x=1, y=20))
 
     L.draw(loc=epix.canvas().c(), offset=Point(x=0, y=0), align=epix.LabelPos.c)
 

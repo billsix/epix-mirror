@@ -81,6 +81,30 @@ def figure(lower_left, upper_right, size, dpi: int = 150):
     pending.figure = render(dpi=dpi)
 
 
+@contextmanager
+def activated(screen):
+    """Context manager: activate ``screen`` for the duration of a ``with`` block.
+
+    ePiX's ``activate``/``deactivate`` bracket a run of drawing calls that should
+    land on a secondary ``screen`` (an inset panel, a separate view) instead of
+    the main picture.  That bracket is exactly a context manager::
+
+        with epix.activated(panel):
+            epix.surface(F, R)
+            epix.inset(panel, lower_left=..., upper_right=...)
+
+    instead of the manual ``epix.activate(panel)`` ... ``epix.deactivate(panel)``
+    pair.  Equivalent to that pair -- the same two calls in the same order, with
+    ``deactivate`` guaranteed even if the block raises -- so figures stay
+    byte-identical.
+    """
+    _epix.activate(screen)
+    try:
+        yield screen
+    finally:
+        _epix.deactivate(screen)
+
+
 class Animation:
     """A rendered animation: a gif (shown inline in Jupyter) + the per-frame Figures."""
 

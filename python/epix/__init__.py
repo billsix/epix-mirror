@@ -14,5 +14,5 @@ bindings, so it grows automatically as the bound surface expands.
 from __future__ import annotations
 
 from ._epix import *  # noqa: F401,F403  (scene API: Point, Color, picture, ...)
-from .figure import Animation, animate, figure, render
+from .figure import Animation, activated, animate, figure, render
 from .render import Figure, render_eepic, render_xp, show

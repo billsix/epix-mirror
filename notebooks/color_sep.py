@@ -42,7 +42,25 @@ R: epix.Domain = epix.Domain(
     coarse=epix.Mesh(nx=16, ny=16),
 )
 
+
 # %%
+# Each layer is the same surface on its own cropped Screen, drawn through a
+# different CMYK output filter and inset at column x.  `process=None` keeps the
+# camera's current filter (the cmyk_neutral set below) for the full-color image.
+def separation(process: epix.Color | None, x: int) -> None:
+    panel: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
+    )
+    with epix.activated(panel):
+        epix.set_crop()
+        if process is not None:
+            epix.camera.filter(process)
+        epix.surface(f, R, color)
+        epix.inset(
+            child=panel, lower_left=Point(x=x, y=0), upper_right=Point(x=x + 1, y=1)
+        )
+
+
 with epix.figure(
     lower_left=Point(x=0, y=0), upper_right=Point(x=5, y=1), size="5x1in"
 ) as fig:
@@ -52,67 +70,9 @@ with epix.figure(
 
     epix.plain(epix.red(1.6))
 
-    # Original
-    screen_full: epix.Screen = epix.Screen(
-        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
-    )
-    epix.activate(screen_full)
-    epix.set_crop()
-
-    epix.surface(f, R, color)
-    epix.inset(
-        child=screen_full, lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1)
-    )
-
-    # Cyan
-    screen_cyan: epix.Screen = epix.Screen(
-        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
-    )
-    epix.activate(screen_cyan)
-    epix.set_crop()
-    epix.camera.filter(epix.c_process())  # get cyan layer
-
-    epix.surface(f, R, color)
-    epix.inset(
-        child=screen_cyan, lower_left=Point(x=1, y=0), upper_right=Point(x=2, y=1)
-    )
-
-    # Magenta
-    screen_magenta: epix.Screen = epix.Screen(
-        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
-    )
-    epix.activate(screen_magenta)
-    epix.set_crop()
-    epix.camera.filter(epix.m_process())
-
-    epix.surface(f, R, color)
-    epix.inset(
-        child=screen_magenta, lower_left=Point(x=2, y=0), upper_right=Point(x=3, y=1)
-    )
-
-    # Yellow
-    screen_yellow: epix.Screen = epix.Screen(
-        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
-    )
-    epix.activate(screen_yellow)
-    epix.set_crop()
-    epix.camera.filter(epix.y_process())
-
-    epix.surface(f, R, color)
-    epix.inset(
-        child=screen_yellow, lower_left=Point(x=3, y=0), upper_right=Point(x=4, y=1)
-    )
-
-    # Black
-    screen_black: epix.Screen = epix.Screen(
-        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
-    )
-    epix.activate(screen_black)
-    epix.set_crop()
-    epix.camera.filter(epix.k_process())
-
-    epix.surface(f, R, color)
-    epix.inset(
-        child=screen_black, lower_left=Point(x=4, y=0), upper_right=Point(x=5, y=1)
-    )
+    separation(None, 0)  # full color
+    separation(epix.c_process(), 1)  # cyan layer
+    separation(epix.m_process(), 2)  # magenta layer
+    separation(epix.y_process(), 3)  # yellow layer
+    separation(epix.k_process(), 4)  # black layer
 fig
