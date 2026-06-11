@@ -1,8 +1,31 @@
 # Task: Feasibility — Python bindings + percent-format notebooks for ePiX
 
-**Status:** in progress — A + nanobind; Phases 0–1 done, Phase 2 first increment done (round-trip stable, eepic-identical) 2026-06-09
+**Status:** DONE (2026-06-11) — port effectively complete at 80/81; `histogram` won't-fix (blocked by a data file the repo doesn't ship). Re-verified byte-exact 2026-06-11. Follow-ups split into their own task docs.
 **Requested:** 2026-06-09 (Bill)
 **Owner:** Bill (via Claude)
+
+## Closeout (2026-06-11)
+
+Closed as **effectively complete**. Final state:
+
+- **All 79 byte-comparable port notebooks PASS** — re-verified 2026-06-11 with a
+  fresh `make image` + `make build` + `verify_ports.py` over every notebook in the
+  container; each reproduces its C++ oracle's eepic byte-for-byte.
+- The 2 non-PASS notebooks are **not ports** and have no oracle to diff against,
+  so they're outside the byte-exact suite (unchanged, expected):
+  - `build.py` — Phase-2 "build a figure in Python" tutorial; there is no
+    `samples/build.xp`.
+  - `hello.py` — Phase-1 *inline-display* demo (`epix.show(...)`); never builds a
+    scene, so defines neither `fig` nor `anim`.
+- **`histogram` — WON'T-FIX (hard-blocked):** reads `samples/binom.dat`, which the
+  repo doesn't ship; the C++ oracle can't run either, so there's nothing to verify
+  against. Reopen only if `binom.dat` is ever generated/committed.
+
+**Follow-ups (now unblocked, tracked separately):** `tasks/pythonic-cleanup.md`,
+`tasks/notebook-keyword-args.md`, `tasks/source-notebook-grouping.md`,
+`tasks/distro-packaging.md`, plus the ASan dev-tooling teardown (mirror the
+batch-10/11 bindings into `build-aux/asan_smoke.cc`, run `make asan`, then remove
+the dev-only ASan tooling per the Dockerfile/CLAUDE.md cleanup notes).
 
 ## Phase 0 — demo API audit (DONE 2026-06-09): the nanobind bind-list
 
