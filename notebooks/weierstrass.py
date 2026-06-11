@@ -21,11 +21,11 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-N = 8  # number of summands
+N: int = 8  # number of summands
 
 
 def weierstrass(t: float) -> float:
-    y = 0
+    y: int = 0
     for i in range(N):
         y += pow(2, -i) * epix.cb(pow(2, i) * t)
     return y

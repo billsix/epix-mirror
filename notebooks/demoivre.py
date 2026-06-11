@@ -23,8 +23,8 @@ from math import pi
 import epix
 from epix import Point
 
-N = 24
-theta = 0.875 * pi
+N: int = 24
+theta: float = 0.875 * pi
 alpha = epix.Pair(1, theta / N)
 
 

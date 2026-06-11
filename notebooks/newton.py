@@ -35,8 +35,8 @@ with epix.figure(
     lower_left=Point(x=1.5, y=0), upper_right=Point(x=2, y=3), size="2.5 x 2.5in"
 ) as fig:
     epix.h_axis(2)
-    x0 = 2
-    x1 = x0 - f(x0) / df(x0)
+    x0: int = 2
+    x1: float = x0 - f(x0) / df(x0)
     epix.label(Point(x=x0, y=0), Point(x=0, y=-4), "$x_i$", epix.LabelPos.b)
     for _ in range(3):
         epix.dashed()

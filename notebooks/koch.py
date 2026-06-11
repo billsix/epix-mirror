@@ -23,7 +23,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-koch_seed = [6, 4, 0, 1, -1, 0]
+koch_seed: list[int] = [6, 4, 0, 1, -1, 0]
 
 # %%
 with epix.figure(

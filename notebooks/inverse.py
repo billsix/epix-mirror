@@ -23,8 +23,8 @@ from math import sqrt
 import epix
 from epix import Point
 
-x0 = 0.4
-sqrt3 = sqrt(3)
+x0: float = 0.4
+sqrt3: float = sqrt(3)
 
 
 def f(x: float) -> float:

@@ -21,7 +21,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-N = 20
+N: int = 20
 
 # %%
 with epix.figure(

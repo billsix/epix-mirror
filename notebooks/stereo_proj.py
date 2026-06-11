@@ -26,7 +26,7 @@ import math
 import epix
 from epix import Point
 
-O = Point(x=0, y=0, z=0)
+O: epix.Point = Point(x=0, y=0, z=0)
 
 
 def circ(t: float) -> None:
@@ -37,7 +37,7 @@ def circ(t: float) -> None:
 
 
 def f(u: float, v: float) -> epix.Point:
-    sph_point = epix.sph(radius=1, theta=u, phi=v)
+    sph_point: epix.Point = epix.sph(radius=1, theta=u, phi=v)
     return Point(x=sph_point.x3(), y=sph_point.x1(), z=sph_point.x2())
 
 
@@ -108,5 +108,5 @@ def build() -> None:
     epix.pst_format()
 
 
-anim = epix.animate(build, count=9)
+anim: epix.Animation = epix.animate(build, count=9)
 anim

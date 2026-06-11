@@ -33,14 +33,14 @@ def phi(x: float) -> float:
 
 
 # parameters defining an arbitrary line ell
-slope = -2
-beta = 0.5
+slope: int = -2
+beta: float = 0.5
 
-ht = phi(beta)
+ht: float = phi(beta)
 # alpha uses phi's numerical derivative at beta (ePiX `Deriv(phi).eval(beta)`)
 alpha = slope - epix.deriv_eval(phi, beta)
 
-eps = 0.02  # size of extraction
+eps: float = 0.02  # size of extraction
 
 
 # a small perturbation to adjust the derivative
@@ -58,8 +58,8 @@ def psi(x: float) -> float:
 
 
 # inset parameters
-mag_ctr = Point(x=0.75, y=0.2)
-mag_sz = 0.125
+mag_ctr: epix.Point = Point(x=0.75, y=0.2)
+mag_sz: float = 0.125
 
 # %%
 with epix.figure(

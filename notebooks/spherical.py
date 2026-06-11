@@ -21,7 +21,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-MAX = 3
+MAX: int = 3
 
 
 def sph3(
@@ -42,8 +42,8 @@ with epix.figure(
         coarse=epix.Mesh(nx=12, ny=48, nz=24),
         fine=epix.Mesh(nx=12, ny=96, nz=120),
     )
-    Phi = 7.0 / 48
-    Theta = 7.0 / 48
+    Phi: float = 7.0 / 48
+    Theta: float = 7.0 / 48
     epix.plain(epix.black(0.5))
     epix.fill(epix.red(1.9))
     coords: epix.Scenery = epix.Scenery(sph3, R.slice1(2))  # rho = 2

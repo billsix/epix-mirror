@@ -78,5 +78,5 @@ def build() -> None:
 
 
 # %%
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

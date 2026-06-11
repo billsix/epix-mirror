@@ -60,5 +60,5 @@ def frame() -> None:
 
 
 # %%
-anim = epix.animate(frame, count=24)
+anim: epix.Animation = epix.animate(frame, count=24)
 anim

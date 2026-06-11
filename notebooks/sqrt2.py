@@ -22,7 +22,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-MAX = 1.5
+MAX: float = 1.5
 
 
 def f(u: float, v: float) -> epix.Point:

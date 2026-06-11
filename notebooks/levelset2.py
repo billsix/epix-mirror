@@ -26,9 +26,9 @@ import math
 import epix
 from epix import Point
 
-MAX = 1
+MAX: int = 1
 
-sqrt3 = math.sqrt(3)
+sqrt3: float = math.sqrt(3)
 
 
 # function to be graphed

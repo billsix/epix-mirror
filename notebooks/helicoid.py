@@ -28,20 +28,20 @@ import epix
 from epix import Point
 
 # number of meridians and latitudes
-n_merid = 72
-n_lat = 24
+n_merid: int = 72
+n_lat: int = 24
 
-VIEWPT = Point(x=4, y=3, z=4)
+VIEWPT: epix.Point = Point(x=4, y=3, z=4)
 
 # locations of "lights"
-LIGHT_R = Point(x=10, y=0, z=10)
-LIGHT_G = Point(x=0, y=10, z=10)
-LIGHT_B = Point(x=0, y=-10, z=10)
+LIGHT_R: epix.Point = Point(x=10, y=0, z=10)
+LIGHT_G: epix.Point = Point(x=0, y=10, z=10)
+LIGHT_B: epix.Point = Point(x=0, y=-10, z=10)
 
 # internal constants
-facet_shrink = 0.0  # facet shrink factor
-du = 2.0 / n_merid
-dv = 4.0 / n_lat
+facet_shrink: float = 0.0  # facet shrink factor
+du: float = 2.0 / n_merid
+dv: float = 4.0 / n_lat
 
 
 # parametrized surfaces
@@ -94,9 +94,9 @@ class Element:
         normal: epix.Point = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
         normal = (1 / normal.norm()) * normal
 
-        dens_r = 0.75 * (math.pow(normal | LIGHT_R, 2) / (LIGHT_R | LIGHT_R))
-        dens_g = 0.75 * (math.pow(normal | LIGHT_G, 2) / (LIGHT_G | LIGHT_G))
-        dens_b = 0.75 * (math.pow(normal | LIGHT_B, 2) / (LIGHT_B | LIGHT_B))
+        dens_r: float = 0.75 * (math.pow(normal | LIGHT_R, 2) / (LIGHT_R | LIGHT_R))
+        dens_g: float = 0.75 * (math.pow(normal | LIGHT_G, 2) / (LIGHT_G | LIGHT_G))
+        dens_b: float = 0.75 * (math.pow(normal | LIGHT_B, 2) / (LIGHT_B | LIGHT_B))
 
         epix.fill(epix.rgb(dens_r, dens_g, dens_b))
         epix.quad(a=self.pt1, b=self.pt2, c=self.pt3, d=self.pt4)
@@ -104,7 +104,7 @@ class Element:
 
 # %%
 def build() -> None:
-    MAX = 8
+    MAX: int = 8
     epix.picture(
         lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="5x5in"
     )
@@ -133,5 +133,5 @@ def build() -> None:
     epix.pst_format()
 
 
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

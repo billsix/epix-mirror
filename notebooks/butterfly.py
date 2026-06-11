@@ -25,14 +25,14 @@ import math
 import epix
 from epix import Point
 
-VIEWPT = Point(x=20, y=0, z=8)
+VIEWPT: epix.Point = Point(x=20, y=0, z=8)
 
-tmin = 2 / math.sqrt(3)
+tmin: float = 2 / math.sqrt(3)
 
-light = epix.blue(1.6)
-dark = epix.red(0.8)
-lt_gray = epix.black(0.2)
-net_color = epix.yellow(0.1)
+light: epix.Color = epix.blue(1.6)
+dark: epix.Color = epix.red(0.8)
+lt_gray: epix.Color = epix.black(0.2)
+net_color: epix.Color = epix.yellow(0.1)
 
 
 def label_tag(loc: epix.Point, head: epix.Point, txt: str, align) -> None:
@@ -51,17 +51,17 @@ def cubic(t: float) -> epix.Point:
 
 # cubic projections to background planes
 def Phi12(t: float) -> epix.Point:
-    cusp_pt = cubic(t)
+    cusp_pt: epix.Point = cubic(t)
     return Point(x=cusp_pt.x1(), y=cusp_pt.x2(), z=-8)
 
 
 def Phi13(t: float) -> epix.Point:
-    cusp_pt = cubic(t)
+    cusp_pt: epix.Point = cubic(t)
     return Point(x=cusp_pt.x1(), y=-8, z=cusp_pt.x3())
 
 
 def Phi23(t: float) -> epix.Point:
-    cusp_pt = cubic(t)
+    cusp_pt: epix.Point = cubic(t)
     return Point(x=-8, y=cusp_pt.x2(), z=cusp_pt.x3())
 
 

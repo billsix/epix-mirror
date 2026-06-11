@@ -23,12 +23,12 @@ from math import pi, sqrt
 import epix
 from epix import Point
 
-theta0 = -5 * pi / 6
-EPS = 0.01  # avoid the singularity of f at theta0
+theta0: float = -5 * pi / 6
+EPS: float = 0.01  # avoid the singularity of f at theta0
 posn0: epix.Point = Point(x=theta0, y=0)
 pivot: epix.Point = Point(x=0, y=5.5)
-ell = 3
-K = -epix.cos(theta0)
+ell: int = 3
+K: float = -epix.cos(theta0)
 
 
 def F(u: float, v: float) -> epix.Point:
@@ -47,13 +47,13 @@ def build() -> None:
         size="6.5 x 5.5in",
     )
     epix.begin()
-    period = 4 * (
+    period: float = 4 * (
         sqrt(2 * EPS / (-epix.sin(theta0))) + epix.integral_eval(f, -theta0 - EPS)
     )
     epix.border(epix.black(0.1), width="1pt")
     posn: epix.Point = epix.flow(F, posn0, period * t, int(120 * t))  # phase position
-    x_t = -epix.sin(posn.x1())
-    y_t = epix.cos(posn.x1())
+    x_t: float = -epix.sin(posn.x1())
+    y_t: float = epix.cos(posn.x1())
     epix.slope_field(
         F,
         lower_left=Point(x=-2 * pi, y=-2),
@@ -71,5 +71,5 @@ def build() -> None:
 
 
 # %%
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

@@ -28,13 +28,13 @@ import epix
 from epix import Point
 
 # mesh intervals for torus
-N1 = 36
-N2 = 12
+N1: int = 36
+N2: int = 12
 
 
 # torus
 def F(x: float, y: float) -> epix.Point:
-    R = 5 - 2 * epix.sin(math.pi * y / N2)
+    R: float = 5 - 2 * epix.sin(math.pi * y / N2)
     return Point(
         R * epix.cos(2 * math.pi * x / N1),
         R * epix.sin(2 * math.pi * x / N1),
@@ -86,11 +86,11 @@ class Chip:
         self, viewer: epix.Point, fog: Fog, spot: Spot, ambient: epix.Color
     ) -> epix.Color:
         spot_dir = spot.loc - self.center
-        spot_dist = spot_dir.norm()
+        spot_dist: float = spot_dir.norm()
         spot_dir = epix.recip(spot_dist) * spot_dir
 
-        view_dir = viewer - self.center
-        view_dist = view_dir.norm()
+        view_dir: epix.Point = viewer - self.center
+        view_dist: float = view_dir.norm()
         view_dir = epix.recip(view_dist) * view_dir
 
         # |cos| of normal angle
@@ -98,10 +98,10 @@ class Chip:
 
         # reflect spot_dir across perp, then take cos(angle to viewer)^2
         refl_dir = -spot_dir + 2 * (spot_dir | self.perp) * self.perp
-        I_spot = math.pow(refl_dir | view_dir, 2)
+        I_spot: float = math.pow(refl_dir | view_dir, 2)
 
         # light from spot reaching us and reflected to viewer
-        spot_refl = I_spot * fog.apply_to(spot.tint, spot_dist)
+        spot_refl: float = I_spot * fog.apply_to(spot.tint, spot_dist)
 
         # not shiny -> reflect mostly ambient
         refl = I_ambt * ambient.blend(spot_refl, self.shine)
@@ -191,5 +191,5 @@ def build() -> None:
     epix.pst_format()
 
 
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

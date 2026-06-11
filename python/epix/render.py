@@ -22,7 +22,7 @@ class Figure:
         self.png = png
         self.eepic = eepic
 
-    def _repr_png_(self):  # IPython/Jupyter inline display hook
+    def _repr_png_(self) -> bytes | None:  # IPython/Jupyter inline display hook
         return self.png or None  # None when the figure was too large to rasterize
 
     def save(self, path: str) -> None:
@@ -52,10 +52,10 @@ def _eps_to_png(eps: str, png: str, dpi: int) -> None:
 def _render_via_elaps(src_path: str, dpi: int) -> Figure:
     """Render a `.xp` or `.eepic` file to a Figure, in a scratch dir."""
     src_path = os.path.abspath(src_path)
-    name = os.path.basename(src_path)
+    name: str = os.path.basename(src_path)
     with tempfile.TemporaryDirectory() as d:
         shutil.copy(src_path, os.path.join(d, name))
-        eps = os.path.join(d, "fig.eps")
+        eps: str = os.path.join(d, "fig.eps")
         subprocess.run(
             ["elaps", "-o", eps, name],
             cwd=d,
@@ -63,14 +63,14 @@ def _render_via_elaps(src_path: str, dpi: int) -> Figure:
             capture_output=True,
             text=True,
         )
-        png = os.path.join(d, "fig.png")
+        png: str = os.path.join(d, "fig.png")
         _eps_to_png(eps, png, dpi)
         with open(png, "rb") as f:
-            data = f.read()
+            data: bytes = f.read()
         # for a .xp, elaps leaves the eepic intermediate; for eepic input use the source
-        eepic_path = os.path.join(d, "fig.eepic")
+        eepic_path: str = os.path.join(d, "fig.eepic")
         if os.path.exists(eepic_path):
-            eepic = open(eepic_path).read()
+            eepic: str | None = open(eepic_path).read()
         elif name.endswith(".eepic"):
             eepic = open(os.path.join(d, name)).read()
         else:

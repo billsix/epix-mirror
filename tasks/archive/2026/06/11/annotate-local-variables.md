@@ -1,10 +1,34 @@
 # Task: Annotate local variables across the Python code (types everywhere)
 
-**Status:** proposed — investigation DONE (scope below); ready to execute on
-go-ahead. Zero output risk (local annotations are never evaluated), still
-harness-gated.
+**Status:** DONE (2026-06-11). **206 annotations across 56 notebooks** + hand-
+annotated `python/epix/{figure,render}.py`. Full byte-identity regression
+**79/79 ports PASS**; ruff introduced **zero** new lint (the 5 notebook + 9
+`__init__.py` errors are all pre-existing, project-tolerated). Import smoke OK.
 **Requested:** 2026-06-11 (Bill)
 **Owner:** Bill (via Claude)
+
+## Execution (2026-06-11)
+
+- **Notebooks (automated, AST-assisted):** a `Name = …` annotator
+  (`/tmp/annotate.py`, dev-only) inferred types from the existing param/return
+  annotations + RHS shape, inserting `: type` **textually** (not via `ast.unparse`,
+  to preserve the jupytext percent formatting). Conservative: annotates only when
+  confident, **first binding only** (skips re-assignments / already-annotated),
+  leaves the unsure ones bare. Types: `int`/`float` (literals, numeric exprs,
+  division → float), `epix.Point` (Point/`sph`/`cyl`/`polar`/point-returning user
+  fns; `.x1/.x2/.x3/.norm()` → `float`), `str` (`os.path.join`, paths),
+  `epix.Color` (color factories), `epix.Figure`/`epix.Animation`, `list[...]`.
+  206 inserted; full `verify_ports.py` sweep byte-identical.
+- **Package (`figure.py`/`render.py`, by hand):** `str` paths, `bytes`,
+  `str | None` eepic, `_Pending`, `Figure`, `list[str]`, `int`, plus
+  `_repr_png_(self) -> bytes | None`. (Did these by hand rather than the notebook
+  annotator, since `epix.`-prefixed types aren't valid inside the package.)
+- **Could-not-annotate (as planned, left alone):** `for` targets, tuple-unpacking,
+  augmented assignments — Python has no inline annotation form for these.
+- **Open questions resolved by doing:** annotated essentially all confidently-typed
+  locals (notebooks + package example both done); int-vs-float matched to runtime
+  type. Trivial cell literals that the inferencer was sure of were annotated; the
+  genuinely-ambiguous ones were left bare rather than guessed.
 
 ## Goal
 

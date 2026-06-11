@@ -47,7 +47,7 @@ with epix.figure(
         align=epix.LabelPos.b,
     )
     epix.camera.at(Point(x=11, y=8, z=5))
-    grid_count = 6
+    grid_count: int = 6
     epix.plain(epix.black(0.3))
     epix.grid(
         lower_left=Point(x=-1, y=-1, z=-1),
@@ -69,13 +69,13 @@ with epix.figure(
     )
     epix.bold()
     for i in range(12):
-        t = pi / 2 + i * pi / 6
+        t: float = pi / 2 + i * pi / 6
         epix.pen(epix.rgb(0.25 * (3 + epix.sin(t)), 0.25, 0.25 * (3 + epix.cos(t))))
         epix.ode_plot(F, epix.cyl(radius=1.4, theta=t, z=1), 0, 10, n=60)
     epix.plain(epix.black())
     epix.base(epix.white(), width="2pt")
     epix.dart_field(F, R, scale=0.5)  # darts at 50% of default length
-    label_offset = 0.125
+    label_offset: float = 0.125
     epix.font_size("scriptsize")
     epix.degrees()
     epix.label_angle(30)

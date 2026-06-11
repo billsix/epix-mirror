@@ -21,10 +21,10 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-theta = 60
-rad = 0.25
-Rad = 4.5
-ht = 0.0625
+theta: int = 60
+rad: float = 0.25
+Rad: float = 4.5
+ht: float = 0.0625
 
 # %%
 epix.bounding_box(Point(x=-5, y=-5), Point(x=5, y=5))
@@ -32,8 +32,8 @@ epix.picture(160, 160)
 epix.unitlength("0.35mm")
 epix.begin()
 epix.degrees()
-theta1 = epix.asin(ht / rad)
-theta2 = epix.asin(ht / Rad)
+theta1: float = epix.asin(ht / rad)
+theta2: float = epix.asin(ht / Rad)
 epix.fill(epix.black(0.1))
 contour: epix.Path = epix.Path(
     Point(x=0, y=0), Rad * epix.E_1, Rad * epix.E_2, theta2, 360 - theta2
@@ -74,5 +74,5 @@ epix.label(
     text=r"$\gamma$",
     align=epix.LabelPos.tr,
 )
-fig = epix.render()
+fig: epix.Figure = epix.render()
 fig

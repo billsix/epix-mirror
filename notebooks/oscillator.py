@@ -40,14 +40,14 @@ def err(t: float) -> float:
     return 0.125 * (1 + abs(f1(t)))
 
 
-samples = 8
-N = 2
+samples: int = 8
+N: int = 2
 
 # %%
 with epix.figure(
     lower_left=Point(x=0, y=-N), upper_right=Point(x=2 * N, y=N), size="2.5 x 2.5in"
 ) as fig:
-    delta = 0.0625 * epix.xsize()
+    delta: float = 0.0625 * epix.xsize()
     epix.pen(epix.black(0.25))
     epix.grid(nx=5 * N * int(epix.xsize()), ny=int(5 * N * epix.ysize()))
     epix.pen(epix.black())
@@ -88,7 +88,7 @@ with epix.figure(
     epix.set_red()
     L.mark_item(epix.MarkType.CIRC, "Measured")
     for i in range(1, samples):
-        t = epix.xmin() + i * epix.xsize() / samples
+        t: float = epix.xmin() + i * epix.xsize() / samples
         epix.v_error_bar(
             loc=Point(x=t, y=f2(t)), error=err(t), kind=epix.MarkType.CIRC, width=4
         )

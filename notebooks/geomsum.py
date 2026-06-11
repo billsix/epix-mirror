@@ -21,7 +21,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-N = 8
+N: int = 8
 
 # %%
 with epix.figure(
@@ -36,7 +36,7 @@ with epix.figure(
     epix.label(Point(x=13.0 / 16, y=7.0 / 8), r"$\frac{1}{32}$")
     epix.set_white()
     epix.fill(epix.blue())
-    t = 0.5
+    t: float = 0.5
     for _ in range(N):
         epix.rect(
             lower_left=Point(x=1 - t, y=1 - 2 * t), upper_right=Point(x=1, y=1 - t)

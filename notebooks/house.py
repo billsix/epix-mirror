@@ -21,9 +21,9 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-DY = 0.1
-N = 200
-dN = 1.0 / N
+DY: float = 0.1
+N: int = 200
+dN: float = 1.0 / N
 
 
 def build() -> None:
@@ -80,5 +80,5 @@ def build() -> None:
 
 
 # %%
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim
