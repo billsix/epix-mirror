@@ -1,9 +1,14 @@
 # Task: Structural refactor + type hints for the ported notebooks
 
-**Status:** IN PROGRESS (2026-06-11). Go-ahead given. Defaults chosen: `activated()`
-lives in the `epix` package; extraction limited to the worst offenders
-(`color_sep`/`tori`/`coord_tricks`); object-typed locals annotated, scalar loop
-vars left bare. Stages: A type hints → B1 `activated()` → B2 extraction → B4 enum.
+**Status:** DONE (2026-06-11). All chosen stages complete and harness-verified
+byte-identical (79/79 ports PASS; the only non-PASS in the full sweep are `build`
+and `hello`, which are **original demo notebooks with no `samples/*.xp` oracle** —
+Phase-2 / Phase-1 intros — not ports, plus the known-blocked `histogram`). B3
+(comprehensions) was intentionally not in the chosen stage set.
+- **A** type hints — DONE (prior). **B1** `epix.activated()` ctx mgr — DONE (11
+  paired notebooks). **B2** extraction — DONE (`color_sep` → `separation()` helper;
+  `tori`/`coord_tricks` deliberately `with`-only, too heterogeneous to extract).
+  **B4** enum — DONE (`log.py` `PatchKind`). See EXECUTION LOG for detail.
 **Requested:** 2026-06-11 (Bill)
 **Owner:** Bill (via Claude)
 
