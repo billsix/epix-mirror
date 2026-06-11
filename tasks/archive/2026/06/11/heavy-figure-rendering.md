@@ -1,10 +1,39 @@
 # Task: Fix "Pending"-instead-of-figure for heavy notebooks (LaTeX main_memory)
 
-**Status:** IN PROGRESS (2026-06-11). Go-ahead given (Bill): generate the affected
-list (done/below), and **bump LaTeX `main_memory` in the Dockerfile** (the chosen
-fix). Verify by re-surveying on the rebuilt image.
+**Status:** DONE (2026-06-11). Fixed via **runtime env vars passed to the `elaps`
+subprocess in `render.py`** — NOT a Dockerfile/`texmf.cnf` edit (Bill pushed back on
+modifying a distro-managed config; a cleaner runtime override exists). All 5
+affected figures now render, and **byte-identity is preserved** (the change touches
+only the PNG render subprocess, not `print_eepic`). So we keep eepic everywhere +
+byte-identical *and* everything renders — the outcome Bill preferred.
 **Requested:** 2026-06-11 (Bill)
 **Owner:** Bill (via Claude)
+
+## RESOLUTION (2026-06-11)
+
+- **Survey (current image) found 5 offenders:** `bowl`, `levelset3`, `spherical`,
+  `surface_shade`, `stereo_proj` (2/9 frames). (Guessed `helicoid`/`lighting`/`log`
+  do **not** overflow — empirical beat the guess. `hello` ERROR'd in the survey
+  harness only because `runpy` from `/epix` mis-resolves its `../samples` path; it
+  is a Phase-1 `show()` demo, not a figure.)
+- **The clean fix (no config edit, no format rebuild, no `main_memory` change):**
+  `extra_mem_top`/`extra_mem_bot` extend TeX's pool **at runtime**, and kpathsea
+  reads them straight from the **environment**. Verified: `extra_mem_top=…
+  extra_mem_bot=…` makes `surface_shade` render in ~6 s on the *unmodified* image.
+  Landed in `python/epix/render.py` as `_TEX_MEM_ENV` passed to the `elaps`
+  `subprocess.run(env=…)` — so it travels with the package (works for a pip install
+  on any host, not just our container).
+- **Verified:** all 5 → render OK with only the `render.py` change (no shell env, no
+  rebuild). Byte-identity untouched (eepic capture is independent of the render
+  subprocess).
+- **Dockerfile reverted** — the earlier `texmf.cnf` + `fmtutil-sys` approach was
+  removed in favor of the env-var override.
+- **Fallback repr (optional):** not done; the figures now render, so the confusing
+  `_Pending` repr no longer appears. Could still add a friendly message for any
+  future pathological figure — left as a possible follow-up, not needed now.
+
+---
+_Original investigation below (kept for the cause/`main_memory` writeup)._
 
 ## Symptom
 

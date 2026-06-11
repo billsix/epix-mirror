@@ -14,6 +14,19 @@ import shutil
 import subprocess
 import tempfile
 
+# Heavy eepic figures (e.g. surface_shade's ~129K-line `picture`) overflow TeX's
+# default main_memory when rasterized, leaving an empty PNG (the
+# "Pending"-instead-of-figure symptom). extra_mem_top/bot extend the pool at
+# *runtime* and kpathsea reads them straight from the environment -- so we pass
+# them to the `elaps` subprocess and need no texmf.cnf edit or format rebuild.
+# (The C++ originals sidestep the issue by emitting PSTricks instead of eepic.)
+_TEX_MEM_ENV = {
+    "extra_mem_top": "40000000",
+    "extra_mem_bot": "40000000",
+    "save_size": "1000000",
+    "pool_size": "12500000",
+}
+
 
 class Figure:
     """A rendered ePiX figure. Displays inline in Jupyter via ``_repr_png_``."""
@@ -62,6 +75,7 @@ def _render_via_elaps(src_path: str, dpi: int) -> Figure:
             check=True,
             capture_output=True,
             text=True,
+            env={**os.environ, **_TEX_MEM_ENV},
         )
         png: str = os.path.join(d, "fig.png")
         _eps_to_png(eps, png, dpi)
