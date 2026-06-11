@@ -21,7 +21,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-N = 8
+N: int = 8
 
 
 def F(t1: float, t2: float) -> epix.Point:

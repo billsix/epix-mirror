@@ -27,9 +27,9 @@ from epix import Point
 
 def sin_n(x: float, n: int) -> epix.Point:  # Taylor polynomial of sin x
     N = int(math.floor(n))  # convert n to an index bound
-    sqx = -(x**2)  # store -x^2 for efficiency
-    val = x  # places to store results of evaluation
-    summand = x
+    sqx: float = -(x**2)  # store -x^2 for efficiency
+    val: float = x  # places to store results of evaluation
+    summand: float = x
 
     # step through odd numbers from 1 to 2N+1
     for i in range(1, 2 * N + 2, 2):

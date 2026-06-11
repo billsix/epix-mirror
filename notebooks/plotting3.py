@@ -28,9 +28,9 @@ def sin_n(
     x: float, n: float
 ) -> epix.Point:  # Taylor polynomial of sin x, degree from n
     N = int(floor(n))
-    sqx = -(x**2)
-    val = x
-    summand = x
+    sqx: float = -(x**2)
+    val: float = x
+    summand: float = x
     for i in range(1, 2 * N + 2, 2):
         summand *= sqx / ((i + 1) * (i + 2))
         val += summand

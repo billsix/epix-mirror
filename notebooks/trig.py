@@ -48,9 +48,11 @@ def build() -> None:
         lower_left=Point(x=0, y=-1), upper_right=Point(x=1, y=1)
     )
     with epix.activated(rolling):
-        wheel_center = epix.polar(radius=0.5, theta=t)
-        rim = epix.polar(radius=0.5, theta=t) + epix.polar(radius=0.5, theta=-t)
-        rim_point2 = epix.polar(radius=0.5, theta=t) + epix.polar(
+        wheel_center: epix.Point = epix.polar(radius=0.5, theta=t)
+        rim: epix.Point = epix.polar(radius=0.5, theta=t) + epix.polar(
+            radius=0.5, theta=-t
+        )
+        rim_point2: epix.Point = epix.polar(radius=0.5, theta=t) + epix.polar(
             radius=0.5, theta=0.5 - t
         )
         epix.circle(center=wheel_center, radius=0.5)  # small wheel
@@ -77,5 +79,5 @@ def build() -> None:
 
 
 # %%
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

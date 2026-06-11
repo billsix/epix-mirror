@@ -28,10 +28,10 @@ def f(x: float) -> float:
     return sqrt(1 - x * x)
 
 
-width = 0.6
-height = f(width)
-posn = 0.5
-y_posn = f(posn)
+width: float = 0.6
+height: float = f(width)
+posn: float = 0.5
+y_posn: float = f(posn)
 
 # %%
 with epix.figure(

@@ -23,7 +23,7 @@ from math import exp, pi, sqrt
 import epix
 from epix import Point
 
-mult = 1.0 / sqrt(pi)
+mult: float = 1.0 / sqrt(pi)
 
 
 def f(x: float) -> float:
@@ -34,8 +34,8 @@ def g(x: float) -> float:
     return f(x - 3)
 
 
-PAD_X = 0.4
-PAD_Y = 0.01
+PAD_X: float = 0.4
+PAD_Y: float = 0.01
 
 # %%
 with epix.figure(

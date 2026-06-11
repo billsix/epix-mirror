@@ -23,7 +23,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-MAX = 1.25
+MAX: float = 1.25
 
 # %%
 with epix.figure(

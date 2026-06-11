@@ -25,8 +25,8 @@ import math
 import epix
 from epix import Point
 
-NUM_LINES = 64
-dt = 1.0 / NUM_LINES
+NUM_LINES: int = 64
+dt: float = 1.0 / NUM_LINES
 
 # %%
 with epix.figure(
@@ -57,7 +57,7 @@ with epix.figure(
 
     # rulings
     for i in range(-NUM_LINES // 2, NUM_LINES // 2 + 1):
-        t = i * dt
+        t: float = i * dt
         epix.set_rgb(0, 0.5, 1)
         epix.infinite_line(
             tail=Point(x=epix.cos(t), y=epix.sin(t), z=0),

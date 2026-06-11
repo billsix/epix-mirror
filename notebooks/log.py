@@ -36,20 +36,20 @@ class PatchKind(enum.Enum):
     SEGMENT = enum.auto()
 
 
-LIGHT = Point(x=2, y=2, z=0)  # location of light, for shading
-VIEWPT = Point(x=15, y=-10, z=6)
+LIGHT: epix.Point = Point(x=2, y=2, z=0)  # location of light, for shading
+VIEWPT: epix.Point = Point(x=15, y=-10, z=6)
 
 # surface and path mesh fineness
-N1 = 18
-N2 = 80
-N3 = 120
+N1: int = 18
+N2: int = 80
+N3: int = 120
 
-du = 4.5 / N1
-dv = 6.0 / N2
-dt = 4.0 / N3
+du: float = 4.5 / N1
+dv: float = 6.0 / N2
+dt: float = 4.0 / N3
 
 # "gap size" between surface mesh elements
-EPS = 0  # (0.002)
+EPS: int = 0  # (0.002)
 
 
 # visual styles
@@ -121,7 +121,7 @@ class MeshElt:
             normal: epix.Point = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
             normal = (1 / normal.norm()) * normal
 
-            dens = 0.5 * (1 - ((normal | LIGHT) / LIGHT.norm()))
+            dens: float = 0.5 * (1 - ((normal | LIGHT) / LIGHT.norm()))
 
             if MeshElt.last_kind is PatchKind.SEGMENT:
                 MeshElt.last_kind = PatchKind.SURFACE
@@ -214,5 +214,5 @@ epix.label(C_log(0, -2), Point(x=6, y=0), r"$-2\pi i$", epix.LabelPos.r)
 epix.label(C_log(0, 0), Point(x=6, y=0), "$0$", epix.LabelPos.r)
 epix.label(C_log(0, 2), Point(x=-6, y=0), r"$2\pi i$", epix.LabelPos.l)
 
-fig = epix.render()
+fig: epix.Figure = epix.render()
 fig

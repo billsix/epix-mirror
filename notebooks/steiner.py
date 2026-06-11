@@ -21,14 +21,14 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-MAX = 2.5
-rad = 0.8 * MAX
+MAX: float = 2.5
+rad: float = 0.8 * MAX
 
 
 def F(u: float, v: float) -> epix.Point:
-    x = rad * epix.cos(u) * epix.cos(v)
-    y = rad * epix.cos(u) * epix.sin(v)
-    z = rad * epix.sin(u)
+    x: float = rad * epix.cos(u) * epix.cos(v)
+    y: float = rad * epix.cos(u) * epix.sin(v)
+    z: float = rad * epix.sin(u)
     return Point(x=y * z, y=x * z, z=x * y)
 
 
@@ -59,5 +59,5 @@ def build() -> None:
 
 
 # %%
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

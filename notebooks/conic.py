@@ -25,10 +25,10 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-MAX = 24
-x0 = 4
-ht = 3  # camera height
-INFTY = 100000
+MAX: int = 24
+x0: int = 4
+ht: int = 3  # camera height
+INFTY: int = 100000
 
 
 def f(t: float) -> epix.Point:

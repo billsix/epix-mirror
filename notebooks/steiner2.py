@@ -21,15 +21,15 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-MAX = 2.5
-rad = 0.8 * MAX
-N = 6
+MAX: float = 2.5
+rad: float = 0.8 * MAX
+N: int = 6
 
 
 def F(u: float, v: float) -> epix.Point:
-    x = rad * epix.cos(u) * epix.cos(v)
-    y = rad * epix.cos(u) * epix.sin(v)
-    z = rad * epix.sin(u)
+    x: float = rad * epix.cos(u) * epix.cos(v)
+    y: float = rad * epix.cos(u) * epix.sin(v)
+    z: float = rad * epix.sin(u)
     return Point(x=y * z, y=x * z, z=x * y)
 
 
@@ -43,14 +43,14 @@ def build() -> None:
     epix.fill()
     epix.revolutions()
     epix.camera.at(epix.cyl(radius=10, theta=0.25, z=4))
-    cut_plane_normal = epix.sph(radius=1, theta=0.125, phi=t)
+    cut_plane_normal: epix.Point = epix.sph(radius=1, theta=0.125, phi=t)
     R: epix.Domain = epix.Domain(
         lower_left=Point(x=-0.25, y=0),
         upper_right=Point(x=0.25, y=0.5),
         coarse=epix.Mesh(nx=32, ny=32),
         fine=epix.Mesh(nx=64, ny=64),
     )
-    direction = 1
+    direction: int = 1
     if cut_plane_normal.dot(epix.camera.eye()) < 0:
         direction = -1
     for i in range(-direction * N, direction * N, direction):
@@ -65,5 +65,5 @@ def build() -> None:
 
 
 # %%
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

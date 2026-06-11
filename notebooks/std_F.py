@@ -65,7 +65,7 @@ class StdF:
         return Point(x=loc.x1(), y=loc.x2())
 
     def draw(self) -> None:
-        r = 1.0 / 6.0
+        r: float = 1.0 / 6.0
 
         F: epix.Path = epix.Path()
         # pr converts coords in [0,1]^2 to our coords

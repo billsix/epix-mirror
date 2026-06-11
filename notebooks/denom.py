@@ -23,7 +23,7 @@ from math import gcd
 import epix
 from epix import Point
 
-N = 30  # maximum denominator plotted
+N: int = 30  # maximum denominator plotted
 
 # %%
 with epix.figure(
@@ -44,7 +44,7 @@ with epix.figure(
             if gcd(i, j) == 1:
                 epix.ddot(Point(x=j * 1.0 / i, y=1.0 / i))
     epix.font_size("scriptsize")
-    buf = (
+    buf: str = (
         "$f(x)=\\begin{cases}%\n"
         "  \\frac{1}{q} & \\text{ $x=\\frac{p}{q}$ in lowest terms} \\\\\n"
         "  0 & \\text{ $x$ irrational}%\n"

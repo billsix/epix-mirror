@@ -27,7 +27,7 @@ from math import exp, pi, sqrt
 import epix
 from epix import Point
 
-k = 2 * pi / (360 * sqrt(3))  # loxodrome pitch (degrees mode)
+k: float = 2 * pi / (360 * sqrt(3))  # loxodrome pitch (degrees mode)
 
 
 def exp_cos(t: float) -> float:

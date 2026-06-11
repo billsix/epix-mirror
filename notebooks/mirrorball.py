@@ -26,8 +26,8 @@ import math
 import epix
 from epix import Point
 
-r_0 = 1  # 0.75
-golden = 0.5 * (1 + math.sqrt(5))
+r_0: int = 1  # 0.75
+golden: float = 0.5 * (1 + math.sqrt(5))
 
 S0: epix.Sphere = epix.Sphere(center=Point(x=0, y=0, z=0), radius=math.sqrt(3))
 
@@ -85,5 +85,5 @@ def build() -> None:
 
 
 # %%
-anim = epix.animate(build, count=24)
+anim: epix.Animation = epix.animate(build, count=24)
 anim

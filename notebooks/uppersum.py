@@ -21,7 +21,7 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-N = 12  # number of rectangles
+N: int = 12  # number of rectangles
 
 
 def f(t: float) -> float:

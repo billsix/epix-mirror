@@ -21,9 +21,9 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-mesh_density = 8
-MAX = 1.5
-box_size = 2
+mesh_density: int = 8
+MAX: float = 1.5
+box_size: int = 2
 
 
 def F(x: float, y: float) -> epix.Point:  # fake pole

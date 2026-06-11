@@ -21,8 +21,8 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-gap = 0.15
-GRAY = epix.black(0.5)
+gap: float = 0.15
+GRAY: epix.Color = epix.black(0.5)
 
 # %%
 with epix.figure(

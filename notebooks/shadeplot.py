@@ -24,9 +24,9 @@ import math
 import epix
 from epix import Point
 
-k = 4  # change width of hump
-dx = 0.05  # width of thin shaded region
-x = 1 / math.sqrt(k)  # position of thin shaded region
+k: int = 4  # change width of hump
+dx: float = 0.05  # width of thin shaded region
+x: float = 1 / math.sqrt(k)  # position of thin shaded region
 
 
 def f(t: float) -> float:

@@ -24,7 +24,7 @@ from math import sqrt
 import epix
 from epix import Point
 
-tau = (1 + sqrt(5)) / 2
+tau: float = (1 + sqrt(5)) / 2
 
 # %%
 epix.bounding_box(lower_left=Point(x=0, y=0), upper_right=Point(x=tau, y=1))

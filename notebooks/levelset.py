@@ -26,12 +26,12 @@ import math
 import epix
 from epix import Point
 
-MAX = 3
-k = 0.25
+MAX: int = 3
+k: float = 0.25
 
 
 def Fp(u: float, v: float) -> epix.Point:
-    r = math.sqrt(abs(v))
+    r: float = math.sqrt(abs(v))
     if v >= 0:
         return Point(x=r * math.cosh(u), y=r * math.sinh(u), z=k * v)
     else:
@@ -39,7 +39,7 @@ def Fp(u: float, v: float) -> epix.Point:
 
 
 def Fm(u: float, v: float) -> epix.Point:
-    r = math.sqrt(abs(v))
+    r: float = math.sqrt(abs(v))
     if v >= 0:
         return Point(x=-r * math.cosh(u), y=r * math.sinh(u), z=k * v)
     else:

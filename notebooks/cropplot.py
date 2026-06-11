@@ -28,7 +28,7 @@ def f(t: float) -> float:
 
 
 def g(t: float) -> float:
-    d = 1 - t * t
+    d: float = 1 - t * t
     return 1.0 / d if d != 0.0 else float("inf")
 
 

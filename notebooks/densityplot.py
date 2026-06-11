@@ -23,7 +23,7 @@ from math import sqrt
 import epix
 from epix import Point
 
-MAX = 18
+MAX: int = 18
 
 
 def ripple(u: float, v: float) -> float:

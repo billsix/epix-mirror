@@ -22,12 +22,12 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-sigma = 10
-rho = 28
-beta = 2.6666
-MAX = 30
-XMAX = 50
-TMAX = 2000
+sigma: int = 10
+rho: int = 28
+beta: float = 2.6666
+MAX: int = 30
+XMAX: int = 50
+TMAX: int = 2000
 
 
 def F(x: float, y: float, z: float) -> epix.Point:

@@ -23,8 +23,8 @@ from collections.abc import Callable
 import epix
 from epix import Point
 
-MAX = 2.5
-XMIN = -2
+MAX: float = 2.5
+XMIN: int = -2
 
 
 def cubic(t: float) -> epix.Point:
@@ -32,17 +32,17 @@ def cubic(t: float) -> epix.Point:
 
 
 def cubic12(t: float) -> epix.Point:
-    pt = cubic(t)
+    pt: epix.Point = cubic(t)
     return Point(x=pt.x1(), y=pt.x2(), z=XMIN)
 
 
 def cubic13(t: float) -> epix.Point:
-    pt = cubic(t)
+    pt: epix.Point = cubic(t)
     return Point(x=pt.x1(), y=XMIN, z=pt.x3())
 
 
 def cubic23(t: float) -> epix.Point:
-    pt = cubic(t)
+    pt: epix.Point = cubic(t)
     return Point(x=XMIN, y=pt.x2(), z=pt.x3())
 
 

@@ -25,10 +25,10 @@ import math
 import epix
 from epix import Point
 
-ht = 2  # truncation height
-sz = 2  # domain size
-sq = 12  # domain mesh
-eps = 0.0000001
+ht: int = 2  # truncation height
+sz: int = 2  # domain size
+sq: int = 12  # domain mesh
+eps: float = 0.0000001
 
 
 def poly(x: float, y: float) -> epix.Complex:

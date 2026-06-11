@@ -23,11 +23,11 @@ from math import pi
 import epix
 from epix import Point
 
-N = 13
-charge1 = 1
-charge2 = 1
-Q1 = Point(x=1, y=0)
-Q2 = Point(x=-1, y=0)
+N: int = 13
+charge1: int = 1
+charge2: int = 1
+Q1: epix.Point = Point(x=1, y=0)
+Q2: epix.Point = Point(x=-1, y=0)
 
 
 def unit_charge(arg: epix.Point) -> epix.Point:
@@ -44,7 +44,7 @@ def potential(x: float, y: float) -> epix.Point:
     return epix.quarter_turn(E(x, y))
 
 
-MAX = 3
+MAX: int = 3
 
 # %%
 with epix.figure(

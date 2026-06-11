@@ -32,8 +32,8 @@ def F(t: float, r: float) -> epix.Point:
 with epix.figure(
     lower_left=Point(x=0, y=0), upper_right=Point(x=15, y=27), size="4 x 7.2in"
 ) as fig:
-    dt = 5 * pi / 11
-    t = dt
+    dt: float = 5 * pi / 11
+    t: float = dt
     for i in range(9):
         panel: epix.Screen = epix.Screen(
             lower_left=Point(x=-1, y=0), upper_right=Point(x=15, y=2)

@@ -26,18 +26,18 @@ import epix
 from epix import Point
 
 # camera location (in spherical coordinates); must be in first orthant
-VIEWPT = epix.sph(radius=4, theta=math.pi / 6, phi=math.pi / 6)
+VIEWPT: epix.Point = epix.sph(radius=4, theta=math.pi / 6, phi=math.pi / 6)
 
-MESH = 12  # number of coordinate grid squares
+MESH: int = 12  # number of coordinate grid squares
 
 # location of tangency point
-x_0 = 7.0 / MESH
-y_0 = 6.0 / MESH
-z_0 = 0.25  # height of top of slicing planes
+x_0: float = 7.0 / MESH
+y_0: float = 6.0 / MESH
+z_0: float = 0.25  # height of top of slicing planes
 
-MAX = 1  # maximum coordinate
+MAX: int = 1  # maximum coordinate
 
-sqrt3 = math.sqrt(3)
+sqrt3: float = math.sqrt(3)
 
 
 # colors

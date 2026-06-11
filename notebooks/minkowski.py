@@ -26,7 +26,7 @@ import math
 import epix
 from epix import Point
 
-MAX = 3
+MAX: int = 3
 
 
 # hyperboloid of one sheet / spacelike cone
@@ -144,5 +144,5 @@ epix.arrow(tail=Point(x=1.5, y=-0.5), head=Point(x=1, y=-1.05), scale=0.5)
 
 epix.pst_format()
 
-fig = epix.render()
+fig: epix.Figure = epix.render()
 fig

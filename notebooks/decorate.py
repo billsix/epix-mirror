@@ -27,16 +27,16 @@ from dataclasses import dataclass, field
 import epix
 from epix import Point
 
-n_lat = 24  # latitudes
-n_long = 48  # longitudes
+n_lat: int = 24  # latitudes
+n_long: int = 48  # longitudes
 
-du = 1.0 / n_lat
-dv = 1.0 / n_long
+du: float = 1.0 / n_lat
+dv: float = 1.0 / n_long
 
-VIEWPT = Point(x=6, y=3, z=4)
+VIEWPT: epix.Point = Point(x=6, y=3, z=4)
 
-r_0 = 0.95  # minor radius
-R_0 = 2  # major radius
+r_0: float = 0.95  # minor radius
+R_0: int = 2  # major radius
 
 
 def g(u: float) -> float:

@@ -25,10 +25,10 @@ import math
 import epix
 from epix import Point
 
-MESH = 12  # number of coordinate grid squares
-MAX = 3  # maximum coordinate
+MESH: int = 12  # number of coordinate grid squares
+MAX: int = 3  # maximum coordinate
 
-sqrt3 = math.sqrt(3)
+sqrt3: float = math.sqrt(3)
 
 
 # function to be graphed

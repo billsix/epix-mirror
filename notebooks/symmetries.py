@@ -25,10 +25,10 @@ from epix import Point
 
 
 def polygon(n: int, th_0: float = 0) -> None:
-    d_th = epix.full_turn() / n
+    d_th: float = epix.full_turn() / n
     poly = epix.Path()
     for i in range(n):
-        th = th_0 + i * d_th
+        th: float = th_0 + i * d_th
         vtx = epix.cis(th)
         poly.pt(vtx)
         epix.label_angle(th + 0.25 * epix.full_turn())

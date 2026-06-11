@@ -76,7 +76,7 @@ def figure(lower_left, upper_right, size, dpi: int = 150):
     """Context manager: sets up the picture, captures + renders it on exit."""
     _epix.picture(lower_left, upper_right, size)
     _epix.begin()
-    pending = _Pending()
+    pending: _Pending = _Pending()
     yield pending
     pending.figure = render(dpi=dpi)
 
@@ -136,10 +136,10 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
     """
     frames: list[Figure] = []
     with tempfile.TemporaryDirectory() as d:
-        eepics = []
+        eepics: list[str] = []
         for i in range(count):
-            ep = os.path.join(d, f"f{i:04d}.eepic")
-            pid = os.fork()
+            ep: str = os.path.join(d, f"f{i:04d}.eepic")
+            pid: int = os.fork()
             if pid == 0:  # child: isolated ePiX state
                 try:
                     _epix.set_tix(i / count)
@@ -153,7 +153,7 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
                 raise RuntimeError(f"animation frame {i} failed to render")
             eepics.append(ep)
 
-        paths = []
+        paths: list[str] = []
         for i, ep in enumerate(eepics):  # parent renders eepic -> png
             # The eepic is always captured (it's the correctness artifact); the
             # PNG is best-effort. A heavy frame (tens of thousands of facets) can
@@ -162,17 +162,17 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
             # the frame's eepic with an empty PNG instead of failing the whole
             # animation, and just drop it from the assembled gif.
             try:
-                fig = render_eepic(ep, dpi=dpi)
-                p = os.path.join(d, f"f{i:04d}.png")
+                fig: Figure = render_eepic(ep, dpi=dpi)
+                p: str = os.path.join(d, f"f{i:04d}.png")
                 fig.save(p)
                 paths.append(p)
             except subprocess.CalledProcessError:
                 with open(ep) as f:
                     fig = Figure(b"", f.read())
             frames.append(fig)
-        gif = b""
+        gif: bytes = b""
         if paths:
-            gif_path = os.path.join(d, "anim.gif")
+            gif_path: str = os.path.join(d, "anim.gif")
             subprocess.run(
                 ["convert", "-loop", "0", "-delay", str(delay), *paths, gif_path],
                 check=True,
