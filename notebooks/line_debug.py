@@ -98,22 +98,20 @@ with epix.figure(
                         panel: epix.Screen = epix.Screen(
                             lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
                         )
-                        epix.activate(panel)
+                        with epix.activated(panel):
+                            epix.solid()  # may need to reset line style
+                            epix.border(epix.green(0.6), width="0.1pt")
 
-                        epix.solid()  # may need to reset line style
-                        epix.border(epix.green(0.6), width="0.1pt")
+                            line_color(to_bool(i0))
+                            line_style(to_bool(i1))
+                            base_pen(to_bool(i2), to_bool(i3))
+                            fill_color(to_bool(i4))
 
-                        line_color(to_bool(i0))
-                        line_style(to_bool(i1))
-                        base_pen(to_bool(i2), to_bool(i3))
-                        fill_color(to_bool(i4))
+                            objs()
 
-                        objs()
-
-                        panel.scale(factor=0.9)
-                        epix.inset(
-                            lower_left=loc(i0, i1, i2, i3, i4),
-                            upper_right=loc(i0, i1, i2, i3, i4) + Point(x=1, y=1),
-                        )
-                        epix.deactivate(panel)
+                            panel.scale(factor=0.9)
+                            epix.inset(
+                                lower_left=loc(i0, i1, i2, i3, i4),
+                                upper_right=loc(i0, i1, i2, i3, i4) + Point(x=1, y=1),
+                            )
 fig

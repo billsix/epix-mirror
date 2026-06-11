@@ -44,43 +44,42 @@ with epix.figure(
     screen_solid: epix.Screen = epix.Screen(
         lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3)
     )
-    epix.activate(screen_solid)
-    epix.fill(epix.white())
-    epix.surface(F, R)
-    epix.inset(lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
-    epix.deactivate(screen_solid)
+    with epix.activated(screen_solid):
+        epix.fill(epix.white())
+        epix.surface(F, R)
+        epix.inset(lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
 
     screen_cropped: epix.Screen = epix.Screen(
         lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3)
     )
-    epix.activate(screen_cropped)
-    epix.set_crop()
-    epix.border()
-    epix.surface(F, R)
-    epix.inset(lower_left=Point(x=1.5, y=0), upper_right=Point(x=2.5, y=1))
-    epix.deactivate(screen_cropped)
+    with epix.activated(screen_cropped):
+        epix.set_crop()
+        epix.border()
+        epix.surface(F, R)
+        epix.inset(lower_left=Point(x=1.5, y=0), upper_right=Point(x=2.5, y=1))
 
     screen_boxed: epix.Screen = epix.Screen(
         lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3)
     )
-    epix.activate(screen_boxed)
-    epix.clip_box(Point(x=3.5, y=2, z=1.5))
-    epix.nofill()
-    epix.rect(
-        lower_left=Point(x=-3.5, y=-2, z=-1.5), upper_right=Point(x=-3.5, y=2, z=1.5)
-    )
-    epix.rect(
-        lower_left=Point(x=-3.5, y=-2, z=-1.5), upper_right=Point(x=3.5, y=-2, z=1.5)
-    )
-    epix.fill()
-    epix.surface(F, R)
-    epix.nofill()
-    epix.rect(
-        lower_left=Point(x=3.5, y=-2, z=-1.5), upper_right=Point(x=3.5, y=2, z=1.5)
-    )
-    epix.rect(
-        lower_left=Point(x=-3.5, y=2, z=-1.5), upper_right=Point(x=3.5, y=2, z=1.5)
-    )
-    epix.inset(lower_left=Point(x=3, y=0), upper_right=Point(x=4, y=1))
-    epix.deactivate(screen_boxed)
+    with epix.activated(screen_boxed):
+        epix.clip_box(Point(x=3.5, y=2, z=1.5))
+        epix.nofill()
+        epix.rect(
+            lower_left=Point(x=-3.5, y=-2, z=-1.5),
+            upper_right=Point(x=-3.5, y=2, z=1.5),
+        )
+        epix.rect(
+            lower_left=Point(x=-3.5, y=-2, z=-1.5),
+            upper_right=Point(x=3.5, y=-2, z=1.5),
+        )
+        epix.fill()
+        epix.surface(F, R)
+        epix.nofill()
+        epix.rect(
+            lower_left=Point(x=3.5, y=-2, z=-1.5), upper_right=Point(x=3.5, y=2, z=1.5)
+        )
+        epix.rect(
+            lower_left=Point(x=-3.5, y=2, z=-1.5), upper_right=Point(x=3.5, y=2, z=1.5)
+        )
+        epix.inset(lower_left=Point(x=3, y=0), upper_right=Point(x=4, y=1))
 fig

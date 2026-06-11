@@ -21,11 +21,20 @@
 # %%
 from __future__ import annotations
 
+import enum
 import math
 from dataclasses import dataclass, field
 
 import epix
 from epix import Point
+
+
+# A mesh element is either a (shaded, filled) surface patch or a path segment.
+# An enum reads better than the old is_segment / last_was_seg booleans.
+class PatchKind(enum.Enum):
+    SURFACE = enum.auto()
+    SEGMENT = enum.auto()
+
 
 LIGHT = Point(x=2, y=2, z=0)  # location of light, for shading
 VIEWPT = Point(x=15, y=-10, z=6)
@@ -63,9 +72,9 @@ def path_width() -> None:
 # can represent either a surface element or a path element
 @dataclass
 class MeshElt:
-    last_was_seg = False  # static shared state
+    last_kind = PatchKind.SURFACE  # static: kind of the previously drawn element
 
-    is_segment: bool
+    kind: PatchKind
     fudge: float
     center: object = field(init=False, default=None)
     pt1: object = field(init=False, default=None)
@@ -79,7 +88,9 @@ class MeshElt:
 
     @classmethod
     def surface(cls, f, u0: float, v0: float) -> MeshElt:
-        self: MeshElt = cls(is_segment=False, fudge=0.25)  # fudge = distance increment
+        self: MeshElt = cls(
+            kind=PatchKind.SURFACE, fudge=0.25
+        )  # fudge = dist increment
         self.pt1 = f(u0 + EPS, v0 + EPS)
         self.pt2 = f(u0 + 0.5 * du, v0 + EPS)
         self.pt3 = f(u0 + du - EPS, v0 + EPS)
@@ -93,7 +104,7 @@ class MeshElt:
 
     @classmethod
     def segment(cls, f, t0: float) -> MeshElt:
-        self: MeshElt = cls(is_segment=True, fudge=0)
+        self: MeshElt = cls(kind=PatchKind.SEGMENT, fudge=0)
         self.pt1 = f(t0)
         self.pt2 = f(t0 + 0.25 * dt)
         self.pt3 = f(t0 + 0.5 * dt)
@@ -106,14 +117,14 @@ class MeshElt:
         return self.fudge + (self.center - epix.camera.viewpt()).norm()
 
     def draw(self) -> None:
-        if not self.is_segment:
+        if self.kind is PatchKind.SURFACE:
             normal: epix.Point = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
             normal = (1 / normal.norm()) * normal
 
             dens = 0.5 * (1 - ((normal | LIGHT) / LIGHT.norm()))
 
-            if MeshElt.last_was_seg:
-                MeshElt.last_was_seg = False
+            if MeshElt.last_kind is PatchKind.SEGMENT:
+                MeshElt.last_kind = PatchKind.SURFACE
                 epix.plain()  # reset pen width
 
             epix.set_black()
@@ -134,8 +145,8 @@ class MeshElt:
             )  # closed and filled
             patch.draw()
         else:  # segment
-            if not MeshElt.last_was_seg:
-                MeshElt.last_was_seg = True
+            if MeshElt.last_kind is not PatchKind.SEGMENT:
+                MeshElt.last_kind = PatchKind.SEGMENT
                 path_width()
                 path_color()
 

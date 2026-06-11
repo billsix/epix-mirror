@@ -167,7 +167,43 @@ one-offs local. Bill's call.
   string mode. Also reverted two Stage-1 leftovers where `P(`→`Point(` had wrongly
   hit *markdown* math notation (`P(z)`, `|P(sin φ)|` in S2_harmonics) — the earlier
   fix only covered string literals, not comments.
-- **Stages B1 (`activated()` ctx mgr) / B2 (extraction) / B4 (enum): TODO.**
+- **Stage B1 — `activated()` context manager: DONE (2026-06-11), 11 notebooks / 15
+  pairs, all PASS.** Added `epix.activated(screen)` (a `@contextmanager` in
+  `figure.py`, `try/finally` so `deactivate` runs even on exception; exported from
+  `__init__.py`). Converted the **cleanly-paired** notebooks (explicit
+  `activate`+`deactivate`): S2_harmonics, dataplot, koch, label_debug, layout,
+  layout2, line_debug, symmetries, tori, trig, wheel.
+  - **Scope finding:** the "31 pairs / 17 notebooks" estimate was high — many
+    `activate`s have **no** `deactivate`. Those split two ways:
+    (1) **block-structured** (`color_sep`, `coord_tricks`): each panel is
+    `Screen→activate→draw→inset`, self-contained — these fit `with` and are folded
+    into **B2** (the extracted helper uses `with epix.activated()`).
+    (2) **switch-later** (`twisted_cubic`, `lorenz`, `inverse`; `artifacts` similar):
+    they `activate` several screens to switch the draw target, then `inset` them all
+    at the end. Wrapping would move `deactivate` before the `inset` and change the
+    eepic — **left as plain `activate()`, intentionally.**
+- **Stage B2 — extraction: DONE (2026-06-11).** Only **`color_sep`** was a genuine
+  near-identical-block extraction (5 CMYK layers → one `separation(process, x)`
+  helper using `with epix.activated()`; the `process=None` full-color layer keeps
+  the camera's current filter). PASS. **`tori` and `coord_tricks` were re-evaluated
+  and deliberately NOT extracted** — their panels are heterogeneous (different
+  draw logic / axis-label sets, and coord_tricks' first panel omits the
+  `plain(GRAY)` the others repeat), so a shared helper would need a clumsy
+  multi-flag signature that hurts the teaching clarity it's meant to improve. They
+  instead got the safe **`with epix.activated()`** conversion (tori in B1;
+  coord_tricks' 3 blocks here — proven byte-safe by color_sep). All PASS.
+- **Stage B4 — enum: DONE (2026-06-11).** `log.py`'s `is_segment: bool` field +
+  `last_was_seg` class-static bool → a `PatchKind(enum.Enum)` (`SURFACE`/`SEGMENT`);
+  `kind: PatchKind` field, `last_kind = PatchKind.SURFACE` static, and the `draw()`
+  branches test `is PatchKind.SURFACE` / `is (not) PatchKind.SEGMENT`. Behaviorally
+  identical (init `SURFACE` reproduces `last_was_seg=False`); PASS.
+- **B3 (comprehensions): not in the chosen stage set — skipped, as planned.**
+- **Formatting:** `ruff format` + `ruff check --fix` (the `make format` Python half)
+  applied to `notebooks/` + `python/epix/`. Note: `__init__.py` carries pre-existing,
+  project-tolerated F401 re-export warnings on its `from .figure/.render import …`
+  lines (format.sh runs `ruff check --fix … || true`, so they don't gate); adding
+  `activated` joins that existing pattern. Could be silenced with `__all__` or
+  `# noqa: F401` if ruff-check-clean is wanted — out of this task's scope.
 
 ## Process
 

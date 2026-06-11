@@ -43,17 +43,16 @@ with epix.figure(
             panel: epix.Screen = epix.Screen(
                 lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3)
             )
-            epix.activate(panel)
-            epix.border(epix.red(0.6), width="1pt")
-            epix.camera.at(
-                epix.sph(radius=10, theta=(2 * j + i + 1) * pi / 8, phi=pi / 6)
-            )
-            epix.plot(f, R)
-            epix.arrow(tail=Point(x=0, y=0, z=0), head=2 * epix.E_1)
-            epix.arrow(tail=Point(x=0, y=0, z=0), head=2 * epix.E_2)
-            epix.inset(
-                lower_left=Point(x=i + 0.05, y=2.05 - j),
-                upper_right=Point(x=i + 0.95, y=2.95 - j),
-            )
-            epix.deactivate(panel)
+            with epix.activated(panel):
+                epix.border(epix.red(0.6), width="1pt")
+                epix.camera.at(
+                    epix.sph(radius=10, theta=(2 * j + i + 1) * pi / 8, phi=pi / 6)
+                )
+                epix.plot(f, R)
+                epix.arrow(tail=Point(x=0, y=0, z=0), head=2 * epix.E_1)
+                epix.arrow(tail=Point(x=0, y=0, z=0), head=2 * epix.E_2)
+                epix.inset(
+                    lower_left=Point(x=i + 0.05, y=2.05 - j),
+                    upper_right=Point(x=i + 0.95, y=2.95 - j),
+                )
 fig

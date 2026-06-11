@@ -36,20 +36,22 @@ with epix.figure(
         panel: epix.Screen = epix.Screen(
             lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
         )
-        epix.activate(panel)
+        with epix.activated(panel):
+            if i == 1:
+                epix.bold(epix.red())
+                epix.fractal(
+                    p=epix.cis(150), q=epix.cis(30), depth=i, pre_seed=koch_seed
+                )
+                epix.plain(epix.black())
+            else:
+                epix.fractal(
+                    p=epix.cis(150), q=epix.cis(30), depth=i, pre_seed=koch_seed
+                )
 
-        if i == 1:
-            epix.bold(epix.red())
-            epix.fractal(p=epix.cis(150), q=epix.cis(30), depth=i, pre_seed=koch_seed)
-            epix.plain(epix.black())
-        else:
-            epix.fractal(p=epix.cis(150), q=epix.cis(30), depth=i, pre_seed=koch_seed)
+            epix.fractal(p=epix.cis(30), q=epix.cis(-90), depth=i, pre_seed=koch_seed)
+            epix.fractal(p=epix.cis(-90), q=epix.cis(150), depth=i, pre_seed=koch_seed)
 
-        epix.fractal(p=epix.cis(30), q=epix.cis(-90), depth=i, pre_seed=koch_seed)
-        epix.fractal(p=epix.cis(-90), q=epix.cis(150), depth=i, pre_seed=koch_seed)
-
-        epix.inset(
-            child=panel, lower_left=Point(x=i - 1, y=0), upper_right=Point(x=i, y=1)
-        )
-        epix.deactivate(panel)
+            epix.inset(
+                child=panel, lower_left=Point(x=i - 1, y=0), upper_right=Point(x=i, y=1)
+            )
 fig

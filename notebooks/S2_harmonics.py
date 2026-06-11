@@ -107,32 +107,30 @@ with epix.figure(
     graph: epix.Screen = epix.Screen(
         lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
     )
-    epix.activate(graph)
+    with epix.activated(graph):
+        epix.camera.at(Point(x=0, y=0, z=10000))
+        epix.plain(epix.green(0.6))
+        epix.grid(lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), nx=8, ny=8)
+        epix.bold(epix.yellow())
+        epix.h_axis(8)
+        epix.v_axis(8)
 
-    epix.camera.at(Point(x=0, y=0, z=10000))
-    epix.plain(epix.green(0.6))
-    epix.grid(lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), nx=8, ny=8)
-    epix.bold(epix.yellow())
-    epix.h_axis(8)
-    epix.v_axis(8)
+        epix.bold(epix.green())
+        epix.plot(P_n, -1, 1, n=60)
 
-    epix.bold(epix.green())
-    epix.plot(P_n, -1, 1, n=60)
+        epix.font_size("footnotesize")
+        epix.label_color(epix.green(0.6))
+        epix.label_mask(epix.rgb(1, 0.8, 0.2))
 
-    epix.font_size("footnotesize")
-    epix.label_color(epix.green(0.6))
-    epix.label_mask(epix.rgb(1, 0.8, 0.2))
+        # Y30
+        epix.label(
+            Point(x=0, y=-1),
+            offset=Point(x=0, y=-4),
+            text=r"$P(z)=\frac{1}{2}(5z^2-3)$",
+            align=epix.LabelPos.b,
+        )
 
-    # Y30
-    epix.label(
-        Point(x=0, y=-1),
-        offset=Point(x=0, y=-4),
-        text=r"$P(z)=\frac{1}{2}(5z^2-3)$",
-        align=epix.LabelPos.b,
-    )
-
-    epix.inset(lower_left=Point(x=-1, y=0.875), upper_right=Point(x=-0.375, y=1.5))
-    epix.deactivate(graph)  # a good habit, but not strictly necessary
+        epix.inset(lower_left=Point(x=-1, y=0.875), upper_right=Point(x=-0.375, y=1.5))
 
     epix.tikz_format()
 fig

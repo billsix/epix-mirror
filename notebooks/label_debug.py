@@ -100,26 +100,24 @@ with epix.figure(
                         panel: epix.Screen = epix.Screen(
                             lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
                         )
-                        epix.activate(panel)
+                        with epix.activated(panel):
+                            epix.solid()  # may need to reset line style
+                            epix.border(epix.green(0.6), width="0.1pt")
 
-                        epix.solid()  # may need to reset line style
-                        epix.border(epix.green(0.6), width="0.1pt")
+                            epix.backing(epix.black(0.1))
+                            epix.pen(epix.black(0.3))
+                            epix.grid(nx=8, ny=8)
 
-                        epix.backing(epix.black(0.1))
-                        epix.pen(epix.black(0.3))
-                        epix.grid(nx=8, ny=8)
+                            label_color(tf(i0))
+                            label_mask(tf(i1))
+                            label_border(tf(i2), tf(i3))
+                            pad(tf(i4))
 
-                        label_color(tf(i0))
-                        label_mask(tf(i1))
-                        label_border(tf(i2), tf(i3))
-                        pad(tf(i4))
+                            objs()
 
-                        objs()
-
-                        panel.scale(factor=0.9)
-                        epix.inset(
-                            lower_left=loc(i0, i1, i2, i3, i4),
-                            upper_right=loc(i0, i1, i2, i3, i4) + Point(x=1, y=1),
-                        )
-                        epix.deactivate(panel)
+                            panel.scale(factor=0.9)
+                            epix.inset(
+                                lower_left=loc(i0, i1, i2, i3, i4),
+                                upper_right=loc(i0, i1, i2, i3, i4) + Point(x=1, y=1),
+                            )
 fig

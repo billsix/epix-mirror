@@ -47,28 +47,28 @@ def build() -> None:
     waving: epix.Screen = epix.Screen(
         lower_left=Point(x=0, y=-1), upper_right=Point(x=1, y=1)
     )
-    epix.activate(rolling)
-    wheel_center = epix.polar(radius=0.5, theta=t)
-    rim = epix.polar(radius=0.5, theta=t) + epix.polar(radius=0.5, theta=-t)
-    rim_point2 = epix.polar(radius=0.5, theta=t) + epix.polar(radius=0.5, theta=0.5 - t)
-    epix.circle(center=wheel_center, radius=0.5)  # small wheel
-    epix.bold()
-    epix.circle(center=Point(x=0, y=0), radius=1)  # big wheel
-    epix.set_green()
-    epix.line(tail=Point(x=1, y=0), head=Point(x=-1, y=0))
-    epix.set_blue()
-    epix.line(tail=Point(x=0, y=1), head=Point(x=0, y=-1))
-    epix.set_red()
-    epix.line(tail=wheel_center, head=rim)
-    epix.line(tail=wheel_center, head=rim_point2)
-    epix.ddot(rim)
-    epix.ddot(rim_point2)
-    epix.deactivate(rolling)
-    epix.activate(waving)
-    epix.set_crop()
-    epix.set_blue()
-    epix.plot(f, R.slice2(t))
-    epix.deactivate(waving)
+    with epix.activated(rolling):
+        wheel_center = epix.polar(radius=0.5, theta=t)
+        rim = epix.polar(radius=0.5, theta=t) + epix.polar(radius=0.5, theta=-t)
+        rim_point2 = epix.polar(radius=0.5, theta=t) + epix.polar(
+            radius=0.5, theta=0.5 - t
+        )
+        epix.circle(center=wheel_center, radius=0.5)  # small wheel
+        epix.bold()
+        epix.circle(center=Point(x=0, y=0), radius=1)  # big wheel
+        epix.set_green()
+        epix.line(tail=Point(x=1, y=0), head=Point(x=-1, y=0))
+        epix.set_blue()
+        epix.line(tail=Point(x=0, y=1), head=Point(x=0, y=-1))
+        epix.set_red()
+        epix.line(tail=wheel_center, head=rim)
+        epix.line(tail=wheel_center, head=rim_point2)
+        epix.ddot(rim)
+        epix.ddot(rim_point2)
+    with epix.activated(waving):
+        epix.set_crop()
+        epix.set_blue()
+        epix.plot(f, R.slice2(t))
     epix.inset(child=rolling, lower_left=Point(x=0, y=0), upper_right=Point(x=2, y=2))
     epix.inset(child=waving, lower_left=Point(x=3, y=0), upper_right=Point(x=5, y=2))
     epix.dashed()

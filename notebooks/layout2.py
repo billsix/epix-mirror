@@ -37,29 +37,28 @@ with epix.figure(
             panel: epix.Screen = epix.Screen(
                 lower_left=Point(x=-4, y=-3), upper_right=Point(x=2, y=2)
             )
-            epix.activate(panel)
-            epix.border(epix.red(0.6), width="1pt")
-            epix.set_crop()
-            epix.plain(epix.blue(1.8))
-            epix.dart_field(
-                F,
-                lower_left=Point(x=-4, y=-3),
-                upper_right=Point(x=2, y=2),
-                nx=12,
-                ny=10,
-            )
-            epix.bold()
-            for i in range(7):
-                epix.pen(epix.rgb(0.05 * (7 - i), 1 - 0.1 * i, 0.15 * i))
-                epix.ode_plot(
+            with epix.activated(panel):
+                epix.border(epix.red(0.6), width="1pt")
+                epix.set_crop()
+                epix.plain(epix.blue(1.8))
+                epix.dart_field(
                     F,
-                    Point(x=-0.9 - 0.025 * i, y=0),
-                    4 * (3 * j + k + 0.5),
-                    n=int(30 * (3 * j + k + 0.5)),
+                    lower_left=Point(x=-4, y=-3),
+                    upper_right=Point(x=2, y=2),
+                    nx=12,
+                    ny=10,
                 )
-            epix.inset(
-                lower_left=Point(x=j + 0.05, y=1.05 - k),
-                upper_right=Point(x=j + 0.95, y=1.95 - k),
-            )
-            epix.deactivate(panel)
+                epix.bold()
+                for i in range(7):
+                    epix.pen(epix.rgb(0.05 * (7 - i), 1 - 0.1 * i, 0.15 * i))
+                    epix.ode_plot(
+                        F,
+                        Point(x=-0.9 - 0.025 * i, y=0),
+                        4 * (3 * j + k + 0.5),
+                        n=int(30 * (3 * j + k + 0.5)),
+                    )
+                epix.inset(
+                    lower_left=Point(x=j + 0.05, y=1.05 - k),
+                    upper_right=Point(x=j + 0.95, y=1.95 - k),
+                )
 fig
