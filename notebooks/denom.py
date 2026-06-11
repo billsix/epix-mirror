@@ -16,23 +16,33 @@
 # Thomae's function: a dot at each rational p/q of height 1/q.
 
 # %%
+from __future__ import annotations
+
 from math import gcd
 
 import epix
-from epix import P
+from epix import Point
 
 N = 30  # maximum denominator plotted
 
 # %%
-with epix.figure(P(-2, 0), P(2, 1), "4x1in") as fig:
-    Ax = epix.axis(P(-2, 0), P(2, 0), 8, P(0, -6), epix.LabelPos.b)
-    Ax.subdivide(6).frac().draw()
-    epix.v_axis(2)
-    epix.dot_size(2)
+with epix.figure(
+    lower_left=Point(x=-2, y=0), upper_right=Point(x=2, y=1), size="4x1in"
+) as fig:
+    Ax: epix.Axis = epix.Axis(
+        Point(x=-2, y=0),
+        Point(x=2, y=0),
+        n=8,
+        offset=Point(x=0, y=-6),
+        align=epix.LabelPos.b,
+    )
+    Ax.subdivide(n=6).frac().draw()
+    epix.v_axis(n=2)
+    epix.dot_size(diameter=2)
     for i in range(1, N):
         for j in range(int(i * epix.xmin()), int(i * epix.xmax()) + 1):
             if gcd(i, j) == 1:
-                epix.ddot(P(j * 1.0 / i, 1.0 / i))
+                epix.ddot(Point(x=j * 1.0 / i, y=1.0 / i))
     epix.font_size("scriptsize")
     buf = (
         "$f(x)=\\begin{cases}%\n"
@@ -40,5 +50,7 @@ with epix.figure(P(-2, 0), P(2, 1), "4x1in") as fig:
         "  0 & \\text{ $x$ irrational}%\n"
         "\\end{cases}$"
     )
-    epix.label(P(0, 0.75), P(2, 0), buf, epix.LabelPos.r)
+    epix.label(
+        Point(x=0, y=0.75), offset=Point(x=2, y=0), text=buf, align=epix.LabelPos.r
+    )
 fig

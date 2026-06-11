@@ -18,73 +18,101 @@
 # layers in turn — via the camera's output `filter`, laid out side by side.
 
 # %%
+from __future__ import annotations
+
 import math
 
 import epix
-from epix import P
+from epix import Point
 
 
 # re cos(u+iv)
-def f(u, v):
-    return P(u, v, 2 * math.cosh(u) * epix.Cos(v))
+def f(u: float, v: float) -> epix.Point:
+    return Point(x=u, y=v, z=2 * math.cosh(u) * epix.cos(v))
 
 
 # RGB densities
-def color(x, y, z):
-    return P(epix.Sin(x), -epix.Sin(y), -epix.Sin(x))
+def color(x: float, y: float, z: float) -> epix.Point:
+    return Point(x=epix.sin(x), y=-epix.sin(y), z=-epix.sin(x))
 
 
-R = epix.domain(P(-1, -1), P(1, 1), epix.mesh(16, 16))
+R: epix.Domain = epix.Domain(
+    lower_left=Point(x=-1, y=-1),
+    upper_right=Point(x=1, y=1),
+    coarse=epix.Mesh(nx=16, ny=16),
+)
 
 # %%
-with epix.figure(P(0, 0), P(5, 1), "5x1in") as fig:
-    epix.camera.filter(epix.CMYK_Neutral())  # convert colors to CMYK in output
-    epix.grid(5, 1)
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=5, y=1), size="5x1in"
+) as fig:
+    epix.camera.filter(epix.cmyk_neutral())  # convert colors to CMYK in output
+    epix.grid(nx=5, ny=1)
     epix.camera.at(4, 3, 1)
 
-    epix.plain(epix.Red(1.6))
+    epix.plain(epix.red(1.6))
 
     # Original
-    all_scr = epix.screen(P(-1.5, 0.5), P(1.5, 3.5))
-    epix.activate(all_scr)
+    screen_full: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
+    )
+    epix.activate(screen_full)
     epix.set_crop()
 
     epix.surface(f, R, color)
-    epix.inset(all_scr, P(0, 0), P(1, 1))
+    epix.inset(
+        child=screen_full, lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1)
+    )
 
     # Cyan
-    cyn = epix.screen(P(-1.5, 0.5), P(1.5, 3.5))
-    epix.activate(cyn)
+    screen_cyan: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
+    )
+    epix.activate(screen_cyan)
     epix.set_crop()
-    epix.camera.filter(epix.C_Process())  # get cyan layer
+    epix.camera.filter(epix.c_process())  # get cyan layer
 
     epix.surface(f, R, color)
-    epix.inset(cyn, P(1, 0), P(2, 1))
+    epix.inset(
+        child=screen_cyan, lower_left=Point(x=1, y=0), upper_right=Point(x=2, y=1)
+    )
 
     # Magenta
-    mgn = epix.screen(P(-1.5, 0.5), P(1.5, 3.5))
-    epix.activate(mgn)
+    screen_magenta: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
+    )
+    epix.activate(screen_magenta)
     epix.set_crop()
-    epix.camera.filter(epix.M_Process())
+    epix.camera.filter(epix.m_process())
 
     epix.surface(f, R, color)
-    epix.inset(mgn, P(2, 0), P(3, 1))
+    epix.inset(
+        child=screen_magenta, lower_left=Point(x=2, y=0), upper_right=Point(x=3, y=1)
+    )
 
     # Yellow
-    ylw = epix.screen(P(-1.5, 0.5), P(1.5, 3.5))
-    epix.activate(ylw)
+    screen_yellow: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
+    )
+    epix.activate(screen_yellow)
     epix.set_crop()
-    epix.camera.filter(epix.Y_Process())
+    epix.camera.filter(epix.y_process())
 
     epix.surface(f, R, color)
-    epix.inset(ylw, P(3, 0), P(4, 1))
+    epix.inset(
+        child=screen_yellow, lower_left=Point(x=3, y=0), upper_right=Point(x=4, y=1)
+    )
 
     # Black
-    blk = epix.screen(P(-1.5, 0.5), P(1.5, 3.5))
-    epix.activate(blk)
+    screen_black: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
+    )
+    epix.activate(screen_black)
     epix.set_crop()
-    epix.camera.filter(epix.K_Process())
+    epix.camera.filter(epix.k_process())
 
     epix.surface(f, R, color)
-    epix.inset(blk, P(4, 0), P(5, 1))
+    epix.inset(
+        child=screen_black, lower_left=Point(x=4, y=0), upper_right=Point(x=5, y=1)
+    )
 fig

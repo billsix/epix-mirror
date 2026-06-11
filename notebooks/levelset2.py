@@ -19,10 +19,12 @@
 # — uses the position-dependent `color` shading.)
 
 # %%
+from __future__ import annotations
+
 import math
 
 import epix
-from epix import P
+from epix import Point
 
 MAX = 1
 
@@ -30,54 +32,94 @@ sqrt3 = math.sqrt(3)
 
 
 # function to be graphed
-def f(x, y):
-    return P(x, y, 0.75 * y * (y - sqrt3 * x) * (y + sqrt3 * x))
+def f(x: float, y: float) -> epix.Point:
+    return Point(x=x, y=y, z=0.75 * y * (y - sqrt3 * x) * (y + sqrt3 * x))
 
 
-def color(u, v, w):
-    return P(-0.5 * w, 0.25 * w, 0.95 * w)
+def color(u: float, v: float, w: float) -> epix.Point:
+    return Point(x=-0.5 * w, y=0.25 * w, z=0.95 * w)
 
 
 # In the C++ the 3rd ctor arg is the comma-expression `(24, 24)` == 24, which
-# converts to mesh(24); reproduced here as epix.mesh(24).
-R = epix.domain(P(-MAX, -MAX), P(MAX, MAX), epix.mesh(24), epix.mesh(72, 72))
+# converts to mesh(24); reproduced here as epix.Mesh(24).
+R: epix.Domain = epix.Domain(
+    lower_left=Point(x=-MAX, y=-MAX),
+    upper_right=Point(x=MAX, y=MAX),
+    coarse=epix.Mesh(24),
+    fine=epix.Mesh(72, 72),
+)
 
 # %%
-with epix.figure(P(-2 * MAX, -2 * MAX), P(2 * MAX, 2 * MAX), "6 x 6in") as fig:
-    epix.border(epix.Green(0.6), "1pt")
-    epix.backing(epix.Black())
+with epix.figure(
+    lower_left=Point(x=-2 * MAX, y=-2 * MAX),
+    upper_right=Point(x=2 * MAX, y=2 * MAX),
+    size="6 x 6in",
+) as fig:
+    epix.border(epix.green(0.6), width="1pt")
+    epix.backing(epix.black())
 
-    epix.camera.at(epix.sph(4 * MAX, math.pi / 6, math.pi / 6))
+    epix.camera.at(epix.sph(radius=4 * MAX, theta=math.pi / 6, phi=math.pi / 6))
 
     # positioned for viewpt in first orthant
-    epix.yellow()
-    epix.grid(P(-MAX, -MAX, -MAX), P(MAX, MAX, -MAX), 4, 4)
-    epix.grid(P(-MAX, -MAX, -MAX), P(MAX, -MAX, MAX), 4, 4)
-    epix.grid(P(-MAX, -MAX, -MAX), P(-MAX, MAX, MAX), 4, 4)
-
-    Ax = epix.axis(P(-MAX, -MAX, MAX), P(MAX, -MAX, MAX), 4, P(0, 6), epix.LabelPos.t)
-    Ay = epix.axis(
-        P(MAX, -MAX, -MAX), P(MAX, MAX, -MAX), 4, P(-2, -2), epix.LabelPos.bl
+    epix.set_yellow()
+    epix.grid(
+        lower_left=Point(x=-MAX, y=-MAX, z=-MAX),
+        upper_right=Point(x=MAX, y=MAX, z=-MAX),
+        nx=4,
+        ny=4,
     )
-    Az = epix.axis(
-        P(MAX, -MAX, -MAX), P(MAX, -MAX, MAX), 4, P(-2, -2), epix.LabelPos.bl
+    epix.grid(
+        lower_left=Point(x=-MAX, y=-MAX, z=-MAX),
+        upper_right=Point(x=MAX, y=-MAX, z=MAX),
+        nx=4,
+        ny=4,
+    )
+    epix.grid(
+        lower_left=Point(x=-MAX, y=-MAX, z=-MAX),
+        upper_right=Point(x=-MAX, y=MAX, z=MAX),
+        nx=4,
+        ny=4,
+    )
+
+    Ax: epix.Axis = epix.Axis(
+        Point(x=-MAX, y=-MAX, z=MAX),
+        Point(x=MAX, y=-MAX, z=MAX),
+        n=4,
+        offset=Point(x=0, y=6),
+        align=epix.LabelPos.t,
+    )
+    Ay: epix.Axis = epix.Axis(
+        Point(x=MAX, y=-MAX, z=-MAX),
+        Point(x=MAX, y=MAX, z=-MAX),
+        n=4,
+        offset=Point(x=-2, y=-2),
+        align=epix.LabelPos.bl,
+    )
+    Az: epix.Axis = epix.Axis(
+        Point(x=MAX, y=-MAX, z=-MAX),
+        Point(x=MAX, y=-MAX, z=MAX),
+        n=4,
+        offset=Point(x=-2, y=-2),
+        align=epix.LabelPos.bl,
     )
 
     Ax.frac().draw()
     Ay.frac().draw()
     Az.frac().draw()
 
-    epix.clip_box(P(MAX, MAX, MAX))
+    epix.clip_box(Point(x=MAX, y=MAX, z=MAX))
 
     # wire mesh surface
-    epix.plain(epix.Green())
+    epix.plain(epix.green())
     epix.plot(f, R)
 
     # level bands
-    epix.plain(epix.Red())
+    epix.plain(epix.red())
 
     for i in range(-5, 6):
-        epix.clip_slice(P(0, 0, 0.2 * i), P(0, 0, 1), 0.1)
+        epix.clip_slice(
+            loc=Point(x=0, y=0, z=0.2 * i), normal=Point(x=0, y=0, z=1), thickness=0.1
+        )
         epix.surface(f, R, color)  # domain- or position-dependent coloring
         epix.clip_restore()  # remove temporary slicing planes, keep clip box
 

@@ -16,35 +16,44 @@
 # The Steiner Roman surface, rotating (a `.flx` animation; 2-var color function).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 MAX = 2.5
 rad = 0.8 * MAX
 
 
-def F(u, v):
-    x = rad * epix.Cos(u) * epix.Cos(v)
-    y = rad * epix.Cos(u) * epix.Sin(v)
-    z = rad * epix.Sin(u)
-    return P(y * z, x * z, x * y)
+def F(u: float, v: float) -> epix.Point:
+    x = rad * epix.cos(u) * epix.cos(v)
+    y = rad * epix.cos(u) * epix.sin(v)
+    z = rad * epix.sin(u)
+    return Point(x=y * z, y=x * z, z=x * y)
 
 
-def color(x, y):
-    return P(1, 1, 1)  # white (COLORSHADE off)
+def color(x: float, y: float) -> epix.Point:
+    return Point(x=1, y=1, z=1)  # white (COLORSHADE off)
 
 
-def build():
+def build() -> None:
     t = epix.tix()
-    epix.picture(P(-MAX, -MAX), P(MAX, MAX), "4x4in")
+    epix.picture(
+        lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="4x4in"
+    )
     epix.begin()
-    epix.backing(epix.RGB(0.7, 0.9, 1))
+    epix.backing(epix.rgb(0.7, 0.9, 1))
     epix.fill()
     epix.revolutions()
-    epix.camera.at(epix.cyl(10, 0.5 * t, 2))  # exploit 2-fold symmetry
+    epix.camera.at(epix.cyl(radius=10, theta=0.5 * t, z=2))  # exploit 2-fold symmetry
     epix.surface(
         F,
-        epix.domain(P(-0.25, 0), P(0.25, 0.5), epix.mesh(32, 32), epix.mesh(64, 64)),
+        epix.Domain(
+            lower_left=Point(x=-0.25, y=0),
+            upper_right=Point(x=0.25, y=0.5),
+            coarse=epix.Mesh(nx=32, ny=32),
+            fine=epix.Mesh(nx=64, ny=64),
+        ),
         color,
     )
 

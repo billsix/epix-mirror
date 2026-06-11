@@ -19,52 +19,67 @@
 # domain via `domain.slices2()`.
 
 # %%
+from __future__ import annotations
+
 import math
 
 import epix
-from epix import P
+from epix import Point
 
 MAX = 3
 k = 0.25
 
 
-def Fp(u, v):
+def Fp(u: float, v: float) -> epix.Point:
     r = math.sqrt(abs(v))
     if v >= 0:
-        return P(r * math.cosh(u), r * math.sinh(u), k * v)
+        return Point(x=r * math.cosh(u), y=r * math.sinh(u), z=k * v)
     else:
-        return P(-r * math.sinh(u), -r * math.cosh(u), k * v)
+        return Point(x=-r * math.sinh(u), y=-r * math.cosh(u), z=k * v)
 
 
-def Fm(u, v):
+def Fm(u: float, v: float) -> epix.Point:
     r = math.sqrt(abs(v))
     if v >= 0:
-        return P(-r * math.cosh(u), r * math.sinh(u), k * v)
+        return Point(x=-r * math.cosh(u), y=r * math.sinh(u), z=k * v)
     else:
-        return P(-r * math.sinh(u), r * math.cosh(u), k * v)
+        return Point(x=-r * math.sinh(u), y=r * math.cosh(u), z=k * v)
 
 
-def f(x, y):
+def f(x: float, y: float) -> float:
     return k * (x - y) * (x + y)
 
 
 # %%
-with epix.figure(P(-MAX, -MAX), P(MAX, MAX), "2x2in") as fig:
-    epix.camera.at(P(1, -3, 5))
+with epix.figure(
+    lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="2x2in"
+) as fig:
+    epix.camera.at(Point(x=1, y=-3, z=5))
     epix.camera.range(40)
 
-    epix.clip_box(P(MAX, MAX, 2 * MAX))
+    epix.clip_box(Point(x=MAX, y=MAX, z=2 * MAX))
     epix.clip()
 
-    epix.red()
-    epix.plot(f, P(-MAX, -MAX), P(MAX, MAX), epix.mesh(4, 4), epix.mesh(40, 40))
+    epix.set_red()
+    epix.plot(
+        f,
+        p1=Point(x=-MAX, y=-MAX),
+        p2=Point(x=MAX, y=MAX),
+        coarse=epix.Mesh(4, 4),
+        fine=epix.Mesh(40, 40),
+    )
 
-    R = epix.domain(P(-4, -9), P(4, 9), epix.mesh(1, 12), epix.mesh(90, 1))
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=-4, y=-9),
+        upper_right=Point(x=4, y=9),
+        coarse=epix.Mesh(1, 12),
+        fine=epix.Mesh(90, 1),
+    )
 
     epix.bold()
-    epix.rgb(0.5, 0.5, 1)
-    epix.line(P(MAX, -MAX, 0), P(-MAX, MAX, 0))
-    epix.line(P(MAX, MAX, 0), P(-MAX, -MAX, 0))
+    epix.set_rgb(0.5, 0.5, 1)
+    epix.line(tail=Point(x=MAX, y=-MAX, z=0), head=Point(x=-MAX, y=MAX, z=0))
+    epix.line(tail=Point(x=MAX, y=MAX, z=0), head=Point(x=-MAX, y=-MAX, z=0))
     epix.plot(Fp, R.slices2())
     epix.plot(Fm, R.slices2())
 fig

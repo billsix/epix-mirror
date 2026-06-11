@@ -20,51 +20,54 @@
 # regenerates the F at draw time.
 
 # %%
+from __future__ import annotations
+
 import math
+from dataclasses import dataclass, field
 
 import epix
-from epix import P
+from epix import Point
 
 
+@dataclass
 class StdF:
-    def __init__(self):
-        # the standard F in the unit square [0,1] x [0,1]
-        self.m_loc = epix.pair(0, 0)  # lower left
-        self.m_e1 = epix.pair(1, 0)  # lower right
-        self.m_e2 = epix.pair(0, 1)  # upper left
-        self.m_fore = epix.Black()
-        self.m_back = epix.White()
-        self.m_edge = epix.Black()
-        self.m_edge_width = 0.4
+    # the standard F in the unit square [0,1] x [0,1]
+    origin: epix.Pair = field(default_factory=lambda: epix.Pair(0, 0))  # lower left
+    e1: epix.Pair = field(default_factory=lambda: epix.Pair(1, 0))  # lower right
+    e2: epix.Pair = field(default_factory=lambda: epix.Pair(0, 1))  # upper left
+    fill_color: epix.Color = field(default_factory=epix.black)
+    back_color: epix.Color = field(default_factory=epix.white)
+    edge_color: epix.Color = field(default_factory=epix.black)
+    edge_width: float = 0.4
 
-    def map_by(self, af):
-        self.m_loc = af(self.m_loc)
-        self.m_e1 = af(self.m_e1)
-        self.m_e2 = af(self.m_e2)
+    def map_by(self, af: epix.Affine) -> StdF:
+        self.origin = af(self.origin)
+        self.e1 = af(self.e1)
+        self.e2 = af(self.e2)
         return self
 
-    def backing(self, back):
-        self.m_back = back
+    def backing(self, back: epix.Color) -> StdF:
+        self.back_color = back
         return self
 
-    def fill(self, fore):
-        self.m_fore = fore
+    def fill(self, fore: epix.Color) -> StdF:
+        self.fill_color = fore
         return self
 
-    def border(self, edge, wid):
-        self.m_edge = edge
-        self.m_edge_width = wid
+    def border(self, edge: epix.Color, wid: float) -> StdF:
+        self.edge_color = edge
+        self.edge_width = wid
         return self
 
     # convert (x, y) in [0,1]^2 to a location
-    def pr(self, x, y):
-        loc = (1 - x - y) * self.m_loc + x * self.m_e1 + y * self.m_e2
-        return P(loc.x1(), loc.x2())
+    def pr(self, x: float, y: float) -> epix.Point:
+        loc: epix.Pair = (1 - x - y) * self.origin + x * self.e1 + y * self.e2
+        return Point(x=loc.x1(), y=loc.x2())
 
-    def draw(self):
+    def draw(self) -> None:
         r = 1.0 / 6.0
 
-        F = epix.path()
+        F: epix.Path = epix.Path()
         # pr converts coords in [0,1]^2 to our coords
         (
             F.pt(self.pr(r, 0.75 * r))
@@ -80,45 +83,49 @@ class StdF:
         )
         F.close().fill()
 
-        epix.fill(self.m_back)
-        epix.pen(self.m_edge, self.m_edge_width)
+        epix.fill(self.back_color)
+        epix.pen(self.edge_color, self.edge_width)
 
         # bounding parallelogram
-        epix.quad(self.pr(0, 0), self.pr(1, 0), self.pr(1, 1), self.pr(0, 1))
+        epix.quad(a=self.pr(0, 0), b=self.pr(1, 0), c=self.pr(1, 1), d=self.pr(0, 1))
 
-        epix.fill(self.m_fore)
+        epix.fill(self.fill_color)
         F.draw()
 
 
 # %%
-with epix.figure(P(0, 0), P(6, 6), "4x4in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=6, y=6), size="4x4in"
+) as fig:
     epix.degrees()
 
-    epix.grid(6, 6)
+    epix.grid(nx=6, ny=6)
 
-    F1 = StdF()  # the standard F
-    af1 = epix.affine()  # the identity map
+    F1: StdF = StdF()  # the standard F
+    af1: epix.Affine = epix.Affine()  # the identity map
 
     F1.draw()
 
     # stretch along the main diagonal
-    af1.rotate(45).v_scale(3).h_scale(0.75).rotate(-45)
+    af1.rotate(45).v_scale(factor=3).h_scale(factor=0.75).rotate(-45)
 
     # flip over the main diagonal and translate
-    af1.reflect(45).shift(epix.pair(3, 2))
+    af1.reflect(45).shift(epix.Pair(3, 2))
 
     # apply af, set style, and draw
-    F1.map_by(af1).fill(epix.Black(0.6)).backing(epix.Blue(1.8)).draw()
+    F1.map_by(af1).fill(epix.black(0.6)).backing(epix.blue(1.8)).draw()
 
-    F2 = StdF()
-    af2 = epix.affine()
-    af2.rotate(60).scale(1.5).shift(epix.pair(5, 0))
-    F2.map_by(af2).backing(epix.RGB(1, 0.8, 0.2)).fill(epix.Green(0.6)).draw()
+    F2: StdF = StdF()
+    af2: epix.Affine = epix.Affine()
+    af2.rotate(60).scale(factor=1.5).shift(epix.Pair(5, 0))
+    F2.map_by(af2).backing(epix.rgb(1, 0.8, 0.2)).fill(epix.green(0.6)).draw()
 
-    F3 = StdF()
+    F3: StdF = StdF()
     # define af3 by images of e1, e2, origin
-    af3 = epix.affine(epix.pair(2 - math.sqrt(3), 6), epix.pair(2, 3), epix.pair(2, 5))
-    F3.map_by(af3).backing(epix.Black(0.4)).fill(epix.White()).draw()
+    af3: epix.Affine = epix.Affine(
+        epix.Pair(2 - math.sqrt(3), 6), epix.Pair(2, 3), epix.Pair(2, 5)
+    )
+    F3.map_by(af3).backing(epix.black(0.4)).fill(epix.white()).draw()
 
     epix.pst_format()
 fig

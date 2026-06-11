@@ -4,13 +4,13 @@ ePiX is global-state: ``picture()``/``begin()`` set up, drawing functions mutate
 the active picture, then we capture it via ``print_eepic`` and render inline.
 
     import epix
-    epix.picture(epix.P(-1, -1), epix.P(1, 1), "2x1in")
+    epix.picture(epix.Point(-1, -1), epix.Point(1, 1), "2x1in")
     epix.begin()
-    epix.plot(lambda t: epix.P(t, t * t), -1, 1)
+    epix.plot(lambda t: epix.Point(t, t * t), -1, 1)
     fig = epix.render()           # -> Figure (displays inline in Jupyter)
 
-    with epix.figure(epix.P(-1, -1), epix.P(1, 1), "2x1in") as fig:
-        epix.label(epix.P(0, 0), "Hello, world!")
+    with epix.figure(epix.Point(-1, -1), epix.Point(1, 1), "2x1in") as fig:
+        epix.label(epix.Point(0, 0), "Hello, world!")
     fig                           # displays inline
 
 The scene API (P, picture, begin, plot, label, pen, fill, line, colors, …) comes
@@ -72,9 +72,9 @@ class _Pending:
 
 
 @contextmanager
-def figure(sw, ne, size, dpi: int = 150):
+def figure(lower_left, upper_right, size, dpi: int = 150):
     """Context manager: sets up the picture, captures + renders it on exit."""
-    _epix.picture(sw, ne, size)
+    _epix.picture(lower_left, upper_right, size)
     _epix.begin()
     pending = _Pending()
     yield pending

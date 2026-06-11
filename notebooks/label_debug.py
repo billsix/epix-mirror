@@ -18,46 +18,48 @@
 # own little `screen` panel over a faint grid, laid out in a 4×8 grid.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
 # test objects
-def objs():
-    epix.label(P(-0.5, 0), "The")
-    epix.masklabel(P(0.5, 0), "The")
+def objs() -> None:
+    epix.label(Point(x=-0.5, y=0), "The")
+    epix.masklabel(Point(x=0.5, y=0), "The")
 
 
 # attribute-setting commands on bool flags
-def label_color(arg):
+def label_color(arg: bool) -> None:
     if arg:
-        epix.label_color(epix.Red())
+        epix.label_color(epix.red())
     else:
-        epix.label_color(epix.Neutral())
+        epix.label_color(epix.neutral())
 
 
-def label_mask(arg):
+def label_mask(arg: bool) -> None:
     if arg:
-        epix.label_mask(epix.Yellow(0.3))
+        epix.label_mask(epix.yellow(0.3))
     else:
-        epix.label_mask(epix.Neutral())
+        epix.label_mask(epix.neutral())
 
 
-def set_border(col, length):
+def set_border(col: bool, length: str) -> None:
     if col:
-        epix.label_border(epix.Blue(1.2), length)
+        epix.label_border(epix.blue(1.2), length)
     else:
-        epix.label_border(epix.Neutral(), length)
+        epix.label_border(epix.neutral(), length)
 
 
-def label_border(col, wid):
+def label_border(col: bool, wid: bool) -> None:
     if wid:
         set_border(col, "1pt")
     else:
         set_border(col, "0pt")
 
 
-def pad(arg):
+def pad(arg: bool) -> None:
     if arg:
         epix.label_pad("6pt")
     else:
@@ -65,12 +67,12 @@ def pad(arg):
 
 
 # we'll use 0, 1 as loop indices; convert to bool
-def tf(i):
+def tf(i: int) -> bool:
     return i != 0
 
 
 # where to position the result of a test
-def loc(i0, i1, i2, i3, i4):
+def loc(i0: int, i1: int, i2: int, i3: int, i4: int) -> epix.Point:
     horiz, vert = 0, 7
     if tf(i0):
         horiz += 1
@@ -82,26 +84,30 @@ def loc(i0, i1, i2, i3, i4):
         vert -= 2
     if tf(i4):
         vert -= 4
-    return P(horiz, vert)
+    return Point(x=horiz, y=vert)
 
 
 # %%
-with epix.figure(P(0, 0), P(4, 8), "6 x 9in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=4, y=8), size="6 x 9in"
+) as fig:
     # the tests proper
     for i0 in range(2):
         for i1 in range(2):
             for i2 in range(2):
                 for i3 in range(2):
                     for i4 in range(2):
-                        scr = epix.screen(P(-1, -1), P(1, 1))
-                        epix.activate(scr)
+                        panel: epix.Screen = epix.Screen(
+                            lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+                        )
+                        epix.activate(panel)
 
                         epix.solid()  # may need to reset line style
-                        epix.border(epix.Green(0.6), "0.1pt")
+                        epix.border(epix.green(0.6), width="0.1pt")
 
-                        epix.backing(epix.Black(0.1))
-                        epix.pen(epix.Black(0.3))
-                        epix.grid(8, 8)
+                        epix.backing(epix.black(0.1))
+                        epix.pen(epix.black(0.3))
+                        epix.grid(nx=8, ny=8)
 
                         label_color(tf(i0))
                         label_mask(tf(i1))
@@ -110,9 +116,10 @@ with epix.figure(P(0, 0), P(4, 8), "6 x 9in") as fig:
 
                         objs()
 
-                        scr.scale(0.9)
+                        panel.scale(factor=0.9)
                         epix.inset(
-                            loc(i0, i1, i2, i3, i4), loc(i0, i1, i2, i3, i4) + P(1, 1)
+                            lower_left=loc(i0, i1, i2, i3, i4),
+                            upper_right=loc(i0, i1, i2, i3, i4) + Point(x=1, y=1),
                         )
-                        epix.deactivate(scr)
+                        epix.deactivate(panel)
 fig

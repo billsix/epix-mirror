@@ -18,37 +18,41 @@
 # two icosahedral-symmetry solids: the dodecahedron and the icosahedron.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 MAX = 1.25
 
 # %%
-with epix.figure(P(-MAX, -MAX), P(MAX, MAX), "6 x 6in") as fig:
+with epix.figure(
+    lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="6 x 6in"
+) as fig:
     epix.grid()
-    epix.camera.at(P(8, 3, 2))
+    epix.camera.at(Point(x=8, y=3, z=2))
     epix.camera.range(20)
 
-    S = epix.Sphere()
-    f = epix.frame()
-    f2 = epix.frame(epix.E_2, epix.E_1, epix.E_3)
+    S: epix.Sphere = epix.Sphere()
+    frame1: epix.Frame = epix.Frame()
+    frame2: epix.Frame = epix.Frame(epix.E_2, epix.E_1, epix.E_3)
 
     # hidden (back) edges
-    epix.rgb(0.7, 1, 1)
-    epix.back_dodeca(S, f)
+    epix.set_rgb(0.7, 1, 1)
+    epix.back_dodeca(S, frame1)
 
-    epix.rgb(1, 1, 0.7)
-    epix.back_icosa(S, f)
+    epix.set_rgb(1, 1, 0.7)
+    epix.back_icosa(S, frame1)
 
     epix.bold()
 
     # visible (front) edges
-    epix.rgb(0, 0.7, 0.7)
-    epix.front_dodeca(S, f)
+    epix.set_rgb(0, 0.7, 0.7)
+    epix.front_dodeca(S, frame1)
 
-    epix.rgb(1, 0.9, 0)
-    epix.front_icosa(S, f)
+    epix.set_rgb(1, 0.9, 0)
+    epix.front_icosa(S, frame1)
 
-    epix.green(0.8)
+    epix.set_green(0.8)
     S.draw()
 fig

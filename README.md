@@ -102,17 +102,20 @@ to reclaim space.)
 
 A Python front-end lives in [`python/`](python/): real bindings (via
 [nanobind](https://nanobind.readthedocs.io)) over `libepix`, so you can build
-figures in Python with the same vocabulary as the C++ samples and render them
-inline in Jupyter. [`notebooks/`](notebooks/) holds percent-format (jupytext)
-ports of the `samples/` demos — **80 of the 81**, each verified **byte-identical**
-to the original figure. (The lone exception, `histogram`, needs a data file the
-repo doesn't ship.)
+figures in Python and render them inline in Jupyter. The API is **Pythonic** —
+CapWords types (`Point`, `Mesh`, `Domain`, `Screen`, …), snake_case functions,
+keyword arguments throughout, and type hints. [`notebooks/`](notebooks/) holds
+percent-format (jupytext) ports of the `samples/` demos — **80 of the 81**, each
+verified **byte-identical** to the original figure. (The lone exception,
+`histogram`, needs a data file the repo doesn't ship.)
 
 ```python
 import epix
-with epix.figure(epix.P(-1, -1), epix.P(1, 1), "2x1in") as fig:
+from epix import Point
+
+with epix.figure(lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), size="2x1in") as fig:
     epix.font_size("Huge")
-    epix.label(epix.P(0, 0), "Hello, world!")
+    epix.label(Point(x=0, y=0), "Hello, world!")
 fig                      # displays inline in a notebook
 ```
 
@@ -121,7 +124,7 @@ fig                      # displays inline in a notebook
 the `.py` notebooks to `.ipynb`).
 This is purely additive — the C++ library and the `.xp`/`.flx` workflow are
 unchanged. Design and status:
-[`tasks/python-bindings-and-notebooks.md`](tasks/python-bindings-and-notebooks.md).
+[`tasks/archive/2026/06/11/python-bindings-and-notebooks.md`](tasks/archive/2026/06/11/python-bindings-and-notebooks.md).
 
 ## Documentation
 

@@ -17,50 +17,64 @@
 # camera angles), with the flow field and two trajectories.
 
 # %%
-import epix
-from epix import P
+from __future__ import annotations
 
-A1 = 10
-A2 = 28
-A3 = 2.6666
+import epix
+from epix import Point
+
+sigma = 10
+rho = 28
+beta = 2.6666
 MAX = 30
 XMAX = 50
 TMAX = 2000
 
 
-def F(x, y, z):
-    return 0.01 * P(A1 * (y - x), x * (A2 - z) - y, x * y - A3 * z)
+def F(x: float, y: float, z: float) -> epix.Point:
+    return 0.01 * Point(x=sigma * (y - x), y=x * (rho - z) - y, z=x * y - beta * z)
 
 
-R = epix.domain(P(-MAX, -MAX, 0), P(MAX, MAX, 2 * MAX), epix.mesh(6, 6, 6))
+R: epix.Domain = epix.Domain(
+    lower_left=Point(x=-MAX, y=-MAX, z=0),
+    upper_right=Point(x=MAX, y=MAX, z=2 * MAX),
+    coarse=epix.Mesh(6, 6, 6),
+)
 
 
-def draw_frame():
-    epix.dart_field(F, R.resize1(0, MAX), 0.5)
-    epix.bold(epix.Red())
-    epix.ode_plot(F, P(10, 0, 0), 0, TMAX, TMAX)
-    epix.pen(epix.Blue())
-    epix.ode_plot(F, P(10.5, 0, 0), 0, TMAX, TMAX)
-    epix.plain(epix.Black())
-    epix.dart_field(F, R.resize1(-MAX, 0), 0.5)
+def draw_frame() -> None:
+    epix.dart_field(F, R.resize1(0, MAX), scale=0.5)
+    epix.bold(epix.red())
+    epix.ode_plot(F, Point(x=10, y=0, z=0), 0, TMAX, n=TMAX)
+    epix.pen(epix.blue())
+    epix.ode_plot(F, Point(x=10.5, y=0, z=0), 0, TMAX, n=TMAX)
+    epix.plain(epix.black())
+    epix.dart_field(F, R.resize1(-MAX, 0), scale=0.5)
 
 
-def init_cam(arg):
+def init_cam(arg: epix.Point) -> None:
     epix.camera.at(arg)
-    epix.camera.look_at(P(0, 0, MAX))
+    epix.camera.look_at(Point(x=0, y=0, z=MAX))
     epix.camera.range(500)
 
 
 # %%
-with epix.figure(P(-1, 0), P(1, 1), "6x3in") as fig:
-    left_eye = epix.screen(P(-XMAX, -XMAX), P(XMAX, XMAX))
+with epix.figure(
+    lower_left=Point(x=-1, y=0), upper_right=Point(x=1, y=1), size="6x3in"
+) as fig:
+    left_eye: epix.Screen = epix.Screen(
+        lower_left=Point(x=-XMAX, y=-XMAX), upper_right=Point(x=XMAX, y=XMAX)
+    )
     epix.activate(left_eye)
-    init_cam(P(-100, 90, 63))
+    init_cam(Point(x=-100, y=90, z=63))
     draw_frame()
-    right_eye = epix.screen(P(-XMAX, -XMAX), P(XMAX, XMAX))
+    right_eye: epix.Screen = epix.Screen(
+        lower_left=Point(x=-XMAX, y=-XMAX), upper_right=Point(x=XMAX, y=XMAX)
+    )
     epix.activate(right_eye)
-    init_cam(P(-100, 80, 63))
+    init_cam(Point(x=-100, y=80, z=63))
     draw_frame()
-    epix.inset(left_eye, P(0, 0), P(1, 1))
-    epix.inset(right_eye, P(-1, 0), P(0, 1))
+    epix.inset(child=left_eye, lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
+    epix.inset(
+        child=right_eye, lower_left=Point(x=-1, y=0), upper_right=Point(x=0, y=1)
+    )
 fig

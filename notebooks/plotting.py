@@ -16,20 +16,24 @@
 # Graphing a function, with custom axis tick labels (radian mode).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def f(x):
-    return 0.75 * epix.Sin(x) - 0.25 * epix.Sin(2 * x)
+def f(x: float) -> float:
+    return 0.75 * epix.sin(x) - 0.25 * epix.sin(2 * x)
 
 
 # %%
-with epix.figure(P(-2, -1), P(2, 1), "5x1in") as fig:
+with epix.figure(
+    lower_left=Point(x=-2, y=-1), upper_right=Point(x=2, y=1), size="5x1in"
+) as fig:
     epix.h_axis(16)
     epix.v_axis(4)
-    epix.h_axis_labels(4, P(0, -4), epix.LabelPos.b)
+    epix.h_axis_labels(4, offset=Point(x=0, y=-4), align=epix.LabelPos.b)
     epix.revolutions()
-    epix.red()
-    epix.plot(f, epix.xmin(), epix.xmax(), 120)
+    epix.set_red()
+    epix.plot(f, epix.xmin(), epix.xmax(), n=120)
 fig

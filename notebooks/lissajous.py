@@ -16,21 +16,25 @@
 # A Lissajous curve and its tangent field.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def f(t):
-    return P(epix.Sin(3 * t), epix.Sin(4 * t))
+def f(t: float) -> epix.Point:
+    return Point(x=epix.sin(3 * t), y=epix.sin(4 * t))
 
 
 # %%
-with epix.figure(P(-1, -1), P(1, 1), "2 x 2in") as fig:
+with epix.figure(
+    lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), size="2 x 2in"
+) as fig:
     epix.revolutions()
-    epix.bold(epix.Red())
-    epix.plot(f, 0, 1, 200)
+    epix.bold(epix.red())
+    epix.plot(f, 0, 1, n=200)
     epix.arrow_inset(0.2)
-    epix.arrow_width(1.5)
-    epix.plain(epix.Blue())
-    epix.tan_field(f, 0, 1, 81)
+    epix.arrow_width(width=1.5)
+    epix.plain(epix.blue())
+    epix.tan_field(f, 0, 1, n=81)
 fig

@@ -16,56 +16,72 @@
 # Field lines and equipotentials of two like point charges.
 
 # %%
+from __future__ import annotations
+
 from math import pi
 
 import epix
-from epix import P
+from epix import Point
 
 N = 13
 charge1 = 1
 charge2 = 1
-Q1 = P(1, 0)
-Q2 = P(-1, 0)
+Q1 = Point(x=1, y=0)
+Q2 = Point(x=-1, y=0)
 
 
-def unit_charge(arg):
+def unit_charge(arg: epix.Point) -> epix.Point:
     return epix.recip(arg.dot(arg)) * arg
 
 
-def E(x, y):
-    temp = P(x, y)
-    e = charge1 * unit_charge(temp - Q1) + charge2 * unit_charge(temp - Q2)
+def E(x: float, y: float) -> epix.Point:
+    temp: epix.Point = Point(x=x, y=y)
+    e: epix.Point = charge1 * unit_charge(temp - Q1) + charge2 * unit_charge(temp - Q2)
     return (1.0 / e.dot(e)) * e
 
 
-def potential(x, y):
-    return epix.J(E(x, y))
+def potential(x: float, y: float) -> epix.Point:
+    return epix.quarter_turn(E(x, y))
 
 
 MAX = 3
 
 # %%
-with epix.figure(P(-MAX, -MAX), P(MAX, MAX), "4x4in") as fig:
+with epix.figure(
+    lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="4x4in"
+) as fig:
     epix.set_crop()
     epix.degrees()
-    epix.blue()
+    epix.set_blue()
     for i in range(N):
-        epix.ode_plot(E, Q1 + epix.polar(0.05, i * 360.0 / N), 10, 120)
-        epix.ode_plot(E, Q2 - epix.polar(0.05, i * 360.0 / N), 10, 120)
-        epix.flow(E, Q2 - epix.polar(0.05, i * 360.0 / N), 3, 12)
-    epix.green()
+        epix.ode_plot(E, Q1 + epix.polar(radius=0.05, theta=i * 360.0 / N), 10, n=120)
+        epix.ode_plot(E, Q2 - epix.polar(radius=0.05, theta=i * 360.0 / N), 10, n=120)
+        epix.flow(E, Q2 - epix.polar(radius=0.05, theta=i * 360.0 / N), 3, 12)
+    epix.set_green()
     for i in range(-10, 10):
-        epix.ode_plot(potential, Q1 + epix.polar(0.25 * pow(0.8, i), 0), 2 * pi, 120)
-        epix.ode_plot(potential, Q2 - epix.polar(0.25 * pow(0.8, i), 0), 2 * pi, 120)
-    epix.dot_size(6)
+        epix.ode_plot(
+            potential,
+            Q1 + epix.polar(radius=0.25 * pow(0.8, i), theta=0),
+            2 * pi,
+            n=120,
+        )
+        epix.ode_plot(
+            potential,
+            Q2 - epix.polar(radius=0.25 * pow(0.8, i), theta=0),
+            2 * pi,
+            n=120,
+        )
+    epix.dot_size(diameter=6)
     epix.circ(Q1)
     epix.circ(Q2)
-    epix.magenta()
+    epix.set_magenta()
     epix.label(Q1, "$+$")
     epix.label(Q2, "$+$")
-    epix.blue()
+    epix.set_blue()
     for i in range(N):
-        pt = epix.flow(E, Q2 - epix.polar(0.05, i * 360.0 / N), 3.5, 12)
-        epix.arrow(pt, pt + 0.01 * E(pt.x1(), pt.x2()))
-        epix.arrow(-pt, -pt + 0.01 * E(-pt.x1(), -pt.x2()))
+        pt: epix.Point = epix.flow(
+            E, Q2 - epix.polar(radius=0.05, theta=i * 360.0 / N), 3.5, 12
+        )
+        epix.arrow(tail=pt, head=pt + 0.01 * E(pt.x1(), pt.x2()))
+        epix.arrow(tail=-pt, head=-pt + 0.01 * E(-pt.x1(), -pt.x2()))
 fig

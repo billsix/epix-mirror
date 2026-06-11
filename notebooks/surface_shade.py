@@ -16,28 +16,37 @@
 # A monkey-saddle surface shaded by a position-dependent color function.
 
 # %%
+from __future__ import annotations
+
 from math import tanh
 
 import epix
-from epix import P
+from epix import Point
 
 
-def f(u, v):
-    return P(u, v, 0.5 * u * v * (u - v) * (u + v))
+def f(u: float, v: float) -> epix.Point:
+    return Point(x=u, y=v, z=0.5 * u * v * (u - v) * (u + v))
 
 
-def color(x, y, z):
-    return P(-tanh(z), 0, tanh(z))  # quasi-geographic colors
+def color(x: float, y: float, z: float) -> epix.Point:
+    return Point(x=-tanh(z), y=0, z=tanh(z))  # quasi-geographic colors
 
 
 # %%
-with epix.figure(P(-3, -3), P(3, 3), "6x6in") as fig:
+with epix.figure(
+    lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3), size="6x6in"
+) as fig:
     epix.revolutions()
     epix.set_crop()
     epix.fill()
-    epix.backing(epix.Black())
-    epix.plain(epix.Yellow())
-    epix.camera.at(P(8, -8, 4))
-    R = epix.domain(P(-2, -2), P(2, 2), epix.mesh(36, 36), epix.mesh(72, 72))
+    epix.backing(epix.black())
+    epix.plain(epix.yellow())
+    epix.camera.at(Point(x=8, y=-8, z=4))
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=-2, y=-2),
+        upper_right=Point(x=2, y=2),
+        coarse=epix.Mesh(nx=36, ny=36),
+        fine=epix.Mesh(nx=72, ny=72),
+    )
     epix.surface(f, R, color)
 fig

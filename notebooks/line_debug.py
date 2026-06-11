@@ -18,95 +18,102 @@
 # own little `screen` panel laid out in a 4×8 grid.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
 # test objects
-def objs():
-    epix.rect(P(0, 0), P(1, 1))
-    epix.line(P(-1, -1), P(1, -1))
+def objs() -> None:
+    epix.rect(lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
+    epix.line(tail=Point(x=-1, y=-1), head=Point(x=1, y=-1))
 
 
 # attribute-setting commands on bool flags
-def line_color(arg):
+def line_color(arg: bool) -> None:
     if arg:
-        epix.pen(epix.Red(), 2)
+        epix.pen(epix.red(), width=2)
     else:
-        epix.pen(epix.Neutral(), 2)
+        epix.pen(epix.neutral(), width=2)
 
 
-def line_style(arg):
+def line_style(arg: bool) -> None:
     if arg:
         epix.dashed()
 
 
-def base_color(col, wid):
+def base_color(col: bool, wid: int) -> None:
     if col:
-        epix.base(epix.Blue(1.2), wid)
+        epix.base(epix.blue(1.2), width=wid)
     else:
-        epix.base(epix.Neutral(), wid)
+        epix.base(epix.neutral(), width=wid)
 
 
-def base_pen(col, wid):
+def base_pen(col: bool, wid: bool) -> None:
     if wid:
         base_color(col, 4)
     else:
         base_color(col, 1)
 
 
-def fill_color(arg):
+def fill_color(arg: bool) -> None:
     if arg:
-        epix.fill(epix.Yellow())
+        epix.fill(epix.yellow())
     else:
-        epix.fill(epix.Neutral())
+        epix.fill(epix.neutral())
 
 
 # we'll use 0, 1 as loop indices; convert to bool
-def tf(i):
+def to_bool(i: int) -> bool:
     return i != 0
 
 
 # where to position the result of a test
-def loc(i0, i1, i2, i3, i4):
+def loc(i0: int, i1: int, i2: int, i3: int, i4: int) -> epix.Point:
     horiz, vert = 0, 7
-    if tf(i0):
+    if to_bool(i0):
         horiz += 1
-    if tf(i1):
+    if to_bool(i1):
         horiz += 2
-    if tf(i2):
+    if to_bool(i2):
         vert -= 1
-    if tf(i3):
+    if to_bool(i3):
         vert -= 2
-    if tf(i4):
+    if to_bool(i4):
         vert -= 4
-    return P(horiz, vert)
+    return Point(x=horiz, y=vert)
 
 
 # %%
-with epix.figure(P(0, 0), P(4, 8), "6 x 9in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=4, y=8), size="6 x 9in"
+) as fig:
     # the tests proper
     for i0 in range(2):
         for i1 in range(2):
             for i2 in range(2):
                 for i3 in range(2):
                     for i4 in range(2):
-                        scr = epix.screen(P(-1, -1), P(1, 1))
-                        epix.activate(scr)
+                        panel: epix.Screen = epix.Screen(
+                            lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+                        )
+                        epix.activate(panel)
 
                         epix.solid()  # may need to reset line style
-                        epix.border(epix.Green(0.6), "0.1pt")
+                        epix.border(epix.green(0.6), width="0.1pt")
 
-                        line_color(tf(i0))
-                        line_style(tf(i1))
-                        base_pen(tf(i2), tf(i3))
-                        fill_color(tf(i4))
+                        line_color(to_bool(i0))
+                        line_style(to_bool(i1))
+                        base_pen(to_bool(i2), to_bool(i3))
+                        fill_color(to_bool(i4))
 
                         objs()
 
-                        scr.scale(0.9)
+                        panel.scale(factor=0.9)
                         epix.inset(
-                            loc(i0, i1, i2, i3, i4), loc(i0, i1, i2, i3, i4) + P(1, 1)
+                            lower_left=loc(i0, i1, i2, i3, i4),
+                            upper_right=loc(i0, i1, i2, i3, i4) + Point(x=1, y=1),
                         )
-                        epix.deactivate(scr)
+                        epix.deactivate(panel)
 fig

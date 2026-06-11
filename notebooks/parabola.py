@@ -20,24 +20,40 @@
 # an ordinary Python function, and the axis methods chain (`Ay.unmark(0).draw()`).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def f(x):
+def f(x: float) -> float:
     return x * x
 
 
 # %%
-with epix.figure(P(-2, 0), P(2, 4), "2.5x2.5in") as fig:
-    epix.pen(epix.Black(0.3))
-    epix.grid(8, 8)
-    epix.pen(epix.Black())
-    Ax = epix.axis(P(epix.xmin(), 0), P(epix.xmax(), 0), 4, P(0, -4), epix.LabelPos.b)
-    Ay = epix.axis(P(0, epix.ymin()), P(0, epix.ymax()), 4, P(4, 0), epix.LabelPos.r)
+with epix.figure(
+    lower_left=Point(x=-2, y=0), upper_right=Point(x=2, y=4), size="2.5x2.5in"
+) as fig:
+    epix.pen(epix.black(0.3))
+    epix.grid(nx=8, ny=8)
+    epix.pen(epix.black())
+    Ax: epix.Axis = epix.Axis(
+        Point(x=epix.xmin(), y=0),
+        Point(x=epix.xmax(), y=0),
+        n=4,
+        offset=Point(x=0, y=-4),
+        align=epix.LabelPos.b,
+    )
+    Ay: epix.Axis = epix.Axis(
+        Point(x=0, y=epix.ymin()),
+        Point(x=0, y=epix.ymax()),
+        n=4,
+        offset=Point(x=4, y=0),
+        align=epix.LabelPos.r,
+    )
     epix.font_size("scriptsize")
     Ax.draw()
     Ay.unmark(0).draw()
-    epix.bold(epix.Red())
-    epix.plot(f, epix.xmin(), epix.xmax(), 40)
+    epix.bold(epix.red())
+    epix.plot(f, epix.xmin(), epix.xmax(), n=40)
 fig

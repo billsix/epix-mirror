@@ -16,56 +16,64 @@
 # The dihedral group D₃ acting on a hexagon (`screen` rotate/reflect + `path`).
 
 # %%
+from __future__ import annotations
+
 from math import pi
 
 import epix
-from epix import P
+from epix import Point
 
 
-def polygon(n, th_0=0):
+def polygon(n: int, th_0: float = 0) -> None:
     d_th = epix.full_turn() / n
-    poly = epix.path()
+    poly = epix.Path()
     for i in range(n):
         th = th_0 + i * d_th
         vtx = epix.cis(th)
         poly.pt(vtx)
         epix.label_angle(th + 0.25 * epix.full_turn())
-        epix.dot(vtx, -8 * vtx, f"${i}$", epix.LabelPos.none)
+        epix.dot(vtx, offset=-8 * vtx, text=f"${i}$", align=epix.LabelPos.none)
     poly.close().draw()
 
 
 # %%
-with epix.figure(P(0, 0), P(2, 3), "4 x 6in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=2, y=3), size="4 x 6in"
+) as fig:
     epix.border()
-    scr = epix.screen(P(-1, -1), P(1, 1))
-    epix.activate(scr)
+    panel: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+    )
+    epix.activate(panel)
     polygon(6)
-    epix.spot(P(1, 0))
-    epix.black(0.3)
-    epix.line(P(-0.75, 0), P(0.75, 0))
-    epix.black()
-    epix.arc_arrow(P(0, 0), 0.75, 0, pi / 3)
-    epix.arc_arrow(P(0, 0), 0.75, 2 * pi / 3, pi)
-    epix.arc_arrow(P(0, 0), 0.75, 4 * pi / 3, 5 * pi / 3)
-    scr.scale(0.9)
-    epix.inset(P(0, 2), P(1, 3))
-    scr.rotate(2 * pi / 3)
-    epix.inset(P(0, 1), P(1, 2))
-    scr.rotate(2 * pi / 3)
-    epix.inset(P(0, 0), P(1, 1))
-    scr.rotate(2 * pi / 3).reflect(0)
-    epix.inset(P(1, 2), P(2, 3))
-    scr.rotate(2 * pi / 3)
-    epix.inset(P(1, 1), P(2, 2))
-    scr.rotate(2 * pi / 3)
-    epix.inset(P(1, 0), P(2, 1))
-    epix.deactivate(scr)
+    epix.spot(Point(x=1, y=0))
+    epix.set_black(0.3)
+    epix.line(tail=Point(x=-0.75, y=0), head=Point(x=0.75, y=0))
+    epix.set_black()
+    epix.arc_arrow(center=Point(x=0, y=0), radius=0.75, start=0, finish=pi / 3)
+    epix.arc_arrow(center=Point(x=0, y=0), radius=0.75, start=2 * pi / 3, finish=pi)
+    epix.arc_arrow(
+        center=Point(x=0, y=0), radius=0.75, start=4 * pi / 3, finish=5 * pi / 3
+    )
+    panel.scale(0.9)
+    epix.inset(lower_left=Point(x=0, y=2), upper_right=Point(x=1, y=3))
+    panel.rotate(2 * pi / 3)
+    epix.inset(lower_left=Point(x=0, y=1), upper_right=Point(x=1, y=2))
+    panel.rotate(2 * pi / 3)
+    epix.inset(lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
+    panel.rotate(2 * pi / 3).reflect(0)
+    epix.inset(lower_left=Point(x=1, y=2), upper_right=Point(x=2, y=3))
+    panel.rotate(2 * pi / 3)
+    epix.inset(lower_left=Point(x=1, y=1), upper_right=Point(x=2, y=2))
+    panel.rotate(2 * pi / 3)
+    epix.inset(lower_left=Point(x=1, y=0), upper_right=Point(x=2, y=1))
+    epix.deactivate(panel)
     epix.font_size("LARGE")
     epix.label_angle(0)
-    epix.masklabel(P(0.5, 2.5), "$e$")
-    epix.masklabel(P(0.5, 1.5), r"$\alpha$")
-    epix.masklabel(P(0.5, 0.5), r"$\alpha^2$")
-    epix.masklabel(P(1.5, 2.5), r"$\beta$")
-    epix.masklabel(P(1.5, 1.5), r"$\beta\alpha^2$")
-    epix.masklabel(P(1.5, 0.5), r"$\beta\alpha$")
+    epix.masklabel(Point(x=0.5, y=2.5), "$e$")
+    epix.masklabel(Point(x=0.5, y=1.5), r"$\alpha$")
+    epix.masklabel(Point(x=0.5, y=0.5), r"$\alpha^2$")
+    epix.masklabel(Point(x=1.5, y=2.5), r"$\beta$")
+    epix.masklabel(Point(x=1.5, y=1.5), r"$\beta\alpha^2$")
+    epix.masklabel(Point(x=1.5, y=0.5), r"$\beta\alpha$")
 fig

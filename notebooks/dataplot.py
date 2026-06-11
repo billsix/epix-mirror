@@ -19,60 +19,74 @@
 # inset and a `legend`.
 
 # %%
+from __future__ import annotations
+
 import math
 
 import epix
-from epix import P
+from epix import Point
 
 
-def F(x, y):
-    return P((x - y) * (x + y), 2 * x * y)
+def F(x: float, y: float) -> epix.Point:
+    return Point(x=(x - y) * (x + y), y=2 * x * y)
 
 
 # %%
-with epix.figure(P(-1, 0), P(1, 20), "6x6in") as fig:
+with epix.figure(
+    lower_left=Point(x=-1, y=0), upper_right=Point(x=1, y=20), size="6x6in"
+) as fig:
     # create a 2-column data file with 121 rows
-    DF = epix.data_file(epix.Cos, epix.Sin, 0, math.pi, 120)
+    data: epix.DataFile = epix.DataFile(epix.cos, epix.sin, 0, math.pi, 120)
 
-    L = epix.legend()
-    epix.plain(epix.Black())
-    epix.fill(epix.Blue(1.8))
+    L: epix.Legend = epix.Legend()
+    epix.plain(epix.black())
+    epix.fill(epix.blue(1.8))
 
     # act on first two columns; result doubles angles
-    DF.transform(F)
+    data.transform(F)
 
-    db = epix.data_bins(-1.05, 1.05, 21)  # bins centered on -1, -0.9, ..., 1
-    db.read(DF.column(1))  # read col1
-    db.bar_chart(db.pop())  # and plot, scaling to population
+    bins: epix.DataBins = epix.DataBins(
+        low=-1.05, high=1.05, n=21
+    )  # bins centered on -1, -0.9, ..., 1
+    bins.read(data.column(1))  # read col1
+    bins.bar_chart(bins.pop())  # and plot, scaling to population
 
     L.fill_item("Population count")  # add a filled legend item
 
-    epix.label_color(epix.Blue(1.2))
+    epix.label_color(epix.blue(1.2))
     epix.v_axis_labels(
-        P(epix.xmin(), epix.ymin()),
-        P(epix.xmin(), epix.ymax()),
-        int(0.5 * epix.ysize()),  # C++ truncates the double 0.5*ysize() to unsigned
-        P(-4, 0),
-        epix.LabelPos.l,
+        Point(x=epix.xmin(), y=epix.ymin()),
+        Point(x=epix.xmin(), y=epix.ymax()),
+        n=int(0.5 * epix.ysize()),  # C++ truncates the double 0.5*ysize() to unsigned
+        offset=Point(x=-4, y=0),
+        align=epix.LabelPos.l,
     )
 
     # superimpose plot of raw data
-    raw = epix.screen(P(-1, -1), P(1, 1))
+    raw: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+    )
     epix.activate(raw)
-    epix.label_color(epix.Red())
-    DF.plot(epix.MarkType.DDOT)  # scatter plot
+    epix.label_color(epix.red())
+    data.plot(epix.MarkType.DDOT)  # scatter plot
     L.mark_item(epix.MarkType.DDOT, "Data points")
 
     epix.nofill()
-    epix.plain(epix.Black(0.3))
-    epix.grid(1, 10)
+    epix.plain(epix.black(0.3))
+    epix.grid(nx=1, ny=10)
 
-    epix.v_axis_labels(P(1, -1), P(1, 1), 4, P(4, 0), epix.LabelPos.r)
+    epix.v_axis_labels(
+        Point(x=1, y=-1),
+        Point(x=1, y=1),
+        n=4,
+        offset=Point(x=4, y=0),
+        align=epix.LabelPos.r,
+    )
 
-    epix.inset(P(-1, 0), P(1, 20))
+    epix.inset(lower_left=Point(x=-1, y=0), upper_right=Point(x=1, y=20))
     epix.deactivate(raw)  # polite but unnecessary
 
-    L.draw(epix.canvas().c(), P(0, 0), epix.LabelPos.c)
+    L.draw(loc=epix.canvas().c(), offset=Point(x=0, y=0), align=epix.LabelPos.c)
 
     epix.pst_format()
 fig

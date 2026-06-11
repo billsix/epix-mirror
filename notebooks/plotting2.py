@@ -16,23 +16,32 @@
 # A parametric surface over a polar domain, with coordinate arrows.
 
 # %%
+from __future__ import annotations
+
 from math import pi
 
 import epix
-from epix import P
+from epix import Point
 
 
-def f(r, th):
-    return P(r * epix.Cos(th), r * epix.Sin(th), pow(r, 3) * epix.Cos(3 * th))
+def f(r: float, th: float) -> epix.Point:
+    return Point(x=r * epix.cos(th), y=r * epix.sin(th), z=pow(r, 3) * epix.cos(3 * th))
 
 
 # %%
-with epix.figure(P(-1, -1), P(1, 1), "2x1in") as fig:
-    R = epix.domain(P(0, 0), P(1, 2 * pi), epix.mesh(8, 40), epix.mesh(16, 120))
+with epix.figure(
+    lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), size="2x1in"
+) as fig:
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=0, y=0),
+        upper_right=Point(x=1, y=2 * pi),
+        coarse=epix.Mesh(nx=8, ny=40),
+        fine=epix.Mesh(nx=16, ny=120),
+    )
     epix.camera.at(3, 1, 2)
-    epix.arrow(P(0, 0, 0), P(1.25, 0, 0))
-    epix.arrow(P(0, 0, 0), P(0, 1.25, 0))
-    epix.plain(epix.Blue(1.2))
-    epix.fill(epix.Yellow())
+    epix.arrow(tail=Point(x=0, y=0, z=0), head=Point(x=1.25, y=0, z=0))
+    epix.arrow(tail=Point(x=0, y=0, z=0), head=Point(x=0, y=1.25, z=0))
+    epix.plain(epix.blue(1.2))
+    epix.fill(epix.yellow())
     epix.surface(f, R)
 fig

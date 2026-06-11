@@ -16,50 +16,122 @@
 # A 3-D vector field with several integral curves (`ode_plot`) and a dart field.
 
 # %%
+from __future__ import annotations
+
 from math import pi
 
 import epix
-from epix import P
+from epix import Point
 
 
-def F(x, y, z):
-    return -0.25 * P(0.5 * x + y, 0.5 * y - x, 1 + z)
+def F(x: float, y: float, z: float) -> epix.Point:
+    return -0.25 * Point(x=0.5 * x + y, y=0.5 * y - x, z=1 + z)
 
 
-R = epix.domain(P(-1, -1, -1), P(1, 1, 1), epix.mesh(6, 6, 4), epix.mesh())
+R: epix.Domain = epix.Domain(
+    lower_left=Point(x=-1, y=-1, z=-1),
+    upper_right=Point(x=1, y=1, z=1),
+    coarse=epix.Mesh(nx=6, ny=6, nz=4),
+    fine=epix.Mesh(),
+)
 
 # %%
-with epix.figure(P(-2, -2), P(2, 2), "4x4in") as fig:
+with epix.figure(
+    lower_left=Point(x=-2, y=-2), upper_right=Point(x=2, y=2), size="4x4in"
+) as fig:
     epix.border()
     epix.label(
-        P(0, epix.ymax()), P(0, -4), "$F(x,y,z)=-(x+2y, y-2x, 1+z)$", epix.LabelPos.b
+        Point(x=0, y=epix.ymax()),
+        offset=Point(x=0, y=-4),
+        text="$F(x,y,z)=-(x+2y, y-2x, 1+z)$",
+        align=epix.LabelPos.b,
     )
-    epix.camera.at(P(11, 8, 5))
-    GRIDS = 6
-    epix.plain(epix.Black(0.3))
-    epix.grid(P(-1, -1, -1), P(-1, 1, 1), GRIDS, GRIDS)
-    epix.grid(P(-1, -1, -1), P(1, -1, 1), GRIDS, GRIDS)
-    epix.grid(P(-1, -1, -1), P(1, 1, -1), GRIDS, GRIDS)
+    epix.camera.at(Point(x=11, y=8, z=5))
+    grid_count = 6
+    epix.plain(epix.black(0.3))
+    epix.grid(
+        lower_left=Point(x=-1, y=-1, z=-1),
+        upper_right=Point(x=-1, y=1, z=1),
+        nx=grid_count,
+        ny=grid_count,
+    )
+    epix.grid(
+        lower_left=Point(x=-1, y=-1, z=-1),
+        upper_right=Point(x=1, y=-1, z=1),
+        nx=grid_count,
+        ny=grid_count,
+    )
+    epix.grid(
+        lower_left=Point(x=-1, y=-1, z=-1),
+        upper_right=Point(x=1, y=1, z=-1),
+        nx=grid_count,
+        ny=grid_count,
+    )
     epix.bold()
     for i in range(12):
         t = pi / 2 + i * pi / 6
-        epix.pen(epix.RGB(0.25 * (3 + epix.Sin(t)), 0.25, 0.25 * (3 + epix.Cos(t))))
-        epix.ode_plot(F, epix.cyl(1.4, t, 1), 0, 10, 60)
-    epix.plain(epix.Black())
-    epix.base(epix.White(), "2pt")
-    epix.dart_field(F, R, 0.5)  # darts at 50% of default length
-    DX = 0.125
+        epix.pen(epix.rgb(0.25 * (3 + epix.sin(t)), 0.25, 0.25 * (3 + epix.cos(t))))
+        epix.ode_plot(F, epix.cyl(radius=1.4, theta=t, z=1), 0, 10, n=60)
+    epix.plain(epix.black())
+    epix.base(epix.white(), width="2pt")
+    epix.dart_field(F, R, scale=0.5)  # darts at 50% of default length
+    label_offset = 0.125
     epix.font_size("scriptsize")
     epix.degrees()
     epix.label_angle(30)
-    epix.label(P(1 + DX, -1, -1), P(-4, -2), "$y=-1$", epix.LabelPos.bl)
-    epix.label(P(1 + DX, 0, -1), P(-4, -2), "$y=0$", epix.LabelPos.bl)
-    epix.label(P(1 + DX, 1, -1), P(-4, -2), "$y=1$", epix.LabelPos.bl)
+    epix.label(
+        Point(x=1 + label_offset, y=-1, z=-1),
+        offset=Point(x=-4, y=-2),
+        text="$y=-1$",
+        align=epix.LabelPos.bl,
+    )
+    epix.label(
+        Point(x=1 + label_offset, y=0, z=-1),
+        offset=Point(x=-4, y=-2),
+        text="$y=0$",
+        align=epix.LabelPos.bl,
+    )
+    epix.label(
+        Point(x=1 + label_offset, y=1, z=-1),
+        offset=Point(x=-4, y=-2),
+        text="$y=1$",
+        align=epix.LabelPos.bl,
+    )
     epix.label_angle(-15)
-    epix.label(P(-1, 1 + DX, -1), P(4, 0), "$x=-1$", epix.LabelPos.br)
-    epix.label(P(0, 1 + DX, -1), P(4, 0), "$x=0$", epix.LabelPos.br)
-    epix.label(P(1, 1 + DX, -1), P(4, 0), "$x=1$", epix.LabelPos.br)
-    epix.label(P(1, -1 - DX, -1), P(-4, 0), "$z=-1$", epix.LabelPos.tl)
-    epix.label(P(1, -1 - DX, 0), P(-4, 0), "$z=0$", epix.LabelPos.tl)
-    epix.label(P(1, -1 - DX, 1), P(-4, 0), "$z=1$", epix.LabelPos.tl)
+    epix.label(
+        Point(x=-1, y=1 + label_offset, z=-1),
+        offset=Point(x=4, y=0),
+        text="$x=-1$",
+        align=epix.LabelPos.br,
+    )
+    epix.label(
+        Point(x=0, y=1 + label_offset, z=-1),
+        offset=Point(x=4, y=0),
+        text="$x=0$",
+        align=epix.LabelPos.br,
+    )
+    epix.label(
+        Point(x=1, y=1 + label_offset, z=-1),
+        offset=Point(x=4, y=0),
+        text="$x=1$",
+        align=epix.LabelPos.br,
+    )
+    epix.label(
+        Point(x=1, y=-1 - label_offset, z=-1),
+        offset=Point(x=-4, y=0),
+        text="$z=-1$",
+        align=epix.LabelPos.tl,
+    )
+    epix.label(
+        Point(x=1, y=-1 - label_offset, z=0),
+        offset=Point(x=-4, y=0),
+        text="$z=0$",
+        align=epix.LabelPos.tl,
+    )
+    epix.label(
+        Point(x=1, y=-1 - label_offset, z=1),
+        offset=Point(x=-4, y=0),
+        text="$z=1$",
+        align=epix.LabelPos.tl,
+    )
 fig

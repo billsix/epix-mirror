@@ -16,13 +16,17 @@
 # sin x and a family of its Taylor polynomials (a 2-variable function sliced).
 
 # %%
+from __future__ import annotations
+
 from math import floor, pi
 
 import epix
-from epix import P
+from epix import Point
 
 
-def sin_n(x, n):  # Taylor polynomial of sin x, degree from n
+def sin_n(
+    x: float, n: float
+) -> epix.Point:  # Taylor polynomial of sin x, degree from n
     N = int(floor(n))
     sqx = -(x**2)
     val = x
@@ -30,19 +34,26 @@ def sin_n(x, n):  # Taylor polynomial of sin x, degree from n
     for i in range(1, 2 * N + 2, 2):
         summand *= sqx / ((i + 1) * (i + 2))
         val += summand
-    return P(x, val)
+    return Point(x=x, y=val)
 
 
 # %%
-with epix.figure(P(0, -1), P(6 * pi, 1), "5x1in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=-1), upper_right=Point(x=6 * pi, y=1), size="5x1in"
+) as fig:
     epix.set_crop()
     epix.h_axis(4)
     epix.v_axis(1)
     epix.bold()
-    epix.green()
-    epix.plot(epix.Sin, 0, epix.xmax(), 120)
-    R = epix.domain(P(0, 1), P(6 * pi, 41), epix.mesh(60, 40), epix.mesh(120, 40))
+    epix.set_green()
+    epix.plot(epix.sin, 0, epix.xmax(), n=120)
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=0, y=1),
+        upper_right=Point(x=6 * pi, y=41),
+        coarse=epix.Mesh(nx=60, ny=40),
+        fine=epix.Mesh(nx=120, ny=40),
+    )
     for i in range(4):
-        epix.pen(epix.RGB(0.25 * i, 0, 1 - 0.25 * i))
+        epix.pen(epix.rgb(0.25 * i, 0, 1 - 0.25 * i))
         epix.plot(sin_n, R.slice2(5 * i + 1))
 fig

@@ -16,53 +16,64 @@
 # A wheel rolling generates a sine wave (two synchronized `screen` panels).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def f(x, t):
-    return P(x, epix.Sin(x + t))
+def f(x: float, t: float) -> epix.Point:
+    return Point(x=x, y=epix.sin(x + t))
 
 
-R = epix.domain(P(0, 0), P(1, 1), epix.mesh(60, 24), epix.mesh(120, 72))
+R: epix.Domain = epix.Domain(
+    lower_left=Point(x=0, y=0),
+    upper_right=Point(x=1, y=1),
+    coarse=epix.Mesh(nx=60, ny=24),
+    fine=epix.Mesh(nx=120, ny=72),
+)
 
 
-def build():
+def build() -> None:
     t = epix.tix()
-    epix.picture(P(0, 0), P(5, 2), "5x2in")
+    epix.picture(lower_left=Point(x=0, y=0), upper_right=Point(x=5, y=2), size="5x2in")
     epix.begin()
     epix.revolutions()
     epix.border()
     epix.set_crop()
-    rolling = epix.screen(P(-1, -1), P(1, 1))
-    waving = epix.screen(P(0, -1), P(1, 1))
+    rolling: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+    )
+    waving: epix.Screen = epix.Screen(
+        lower_left=Point(x=0, y=-1), upper_right=Point(x=1, y=1)
+    )
     epix.activate(rolling)
-    ctr = epix.polar(0.5, t)
-    rim = epix.polar(0.5, t) + epix.polar(0.5, -t)
-    rim2 = epix.polar(0.5, t) + epix.polar(0.5, 0.5 - t)
-    epix.circle(ctr, 0.5)  # small wheel
+    wheel_center = epix.polar(radius=0.5, theta=t)
+    rim = epix.polar(radius=0.5, theta=t) + epix.polar(radius=0.5, theta=-t)
+    rim_point2 = epix.polar(radius=0.5, theta=t) + epix.polar(radius=0.5, theta=0.5 - t)
+    epix.circle(center=wheel_center, radius=0.5)  # small wheel
     epix.bold()
-    epix.circle(P(0, 0), 1)  # big wheel
-    epix.green()
-    epix.line(P(1, 0), P(-1, 0))
-    epix.blue()
-    epix.line(P(0, 1), P(0, -1))
-    epix.red()
-    epix.line(ctr, rim)
-    epix.line(ctr, rim2)
+    epix.circle(center=Point(x=0, y=0), radius=1)  # big wheel
+    epix.set_green()
+    epix.line(tail=Point(x=1, y=0), head=Point(x=-1, y=0))
+    epix.set_blue()
+    epix.line(tail=Point(x=0, y=1), head=Point(x=0, y=-1))
+    epix.set_red()
+    epix.line(tail=wheel_center, head=rim)
+    epix.line(tail=wheel_center, head=rim_point2)
     epix.ddot(rim)
-    epix.ddot(rim2)
+    epix.ddot(rim_point2)
     epix.deactivate(rolling)
     epix.activate(waving)
     epix.set_crop()
-    epix.blue()
+    epix.set_blue()
     epix.plot(f, R.slice2(t))
     epix.deactivate(waving)
-    epix.inset(rolling, P(0, 0), P(2, 2))
-    epix.inset(waving, P(3, 0), P(5, 2))
+    epix.inset(child=rolling, lower_left=Point(x=0, y=0), upper_right=Point(x=2, y=2))
+    epix.inset(child=waving, lower_left=Point(x=3, y=0), upper_right=Point(x=5, y=2))
     epix.dashed()
-    epix.pen(epix.Blue(1.6), 0.15)
-    epix.line(P(1, 1 + epix.Sin(t)), P(3, 1) + f(0, t))
+    epix.pen(epix.blue(1.6), width=0.15)
+    epix.line(tail=Point(x=1, y=1 + epix.sin(t)), head=Point(x=3, y=1) + f(0, t))
 
 
 # %%

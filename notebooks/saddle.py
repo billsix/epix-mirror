@@ -17,49 +17,69 @@
 # (`clip_face`/`clip_restore`).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def F(u, v):
-    return P(u, v, 0.25 * (u + v) * (u - v))
+def F(u: float, v: float) -> epix.Point:
+    return Point(x=u, y=v, z=0.25 * (u + v) * (u - v))
 
 
-def TF(u, v):
-    return P(u, v)
+def TF(u: float, v: float) -> epix.Point:
+    return Point(x=u, y=v)
 
 
 # %%
-with epix.figure(P(-3, -2), P(3, 2), "6x4in") as fig:
-    epix.backing(epix.Black())
-    epix.label_color(epix.White())
+with epix.figure(
+    lower_left=Point(x=-3, y=-2), upper_right=Point(x=3, y=2), size="6x4in"
+) as fig:
+    epix.backing(epix.black())
+    epix.label_color(epix.white())
     epix.label(
-        P(0, epix.ymax()),
-        P(0, -4),
-        r"\textbf{A quadratic saddle cut by a tangent plane}",
-        epix.LabelPos.b,
+        Point(x=0, y=epix.ymax()),
+        offset=Point(x=0, y=-4),
+        text=r"\textbf{A quadratic saddle cut by a tangent plane}",
+        align=epix.LabelPos.b,
     )
-    epix.camera.at(P(6, 12, 8))
-    epix.camera.look_at(P(0, 0, -0.25))
-    R = epix.domain(P(-2, -2), P(2, 2), epix.mesh(24, 24), epix.mesh(48, 48))
-    epix.clip_face(P(0, 0, 0), -epix.E_3)  # 2nd arg is inward normal
+    epix.camera.at(Point(x=6, y=12, z=8))
+    epix.camera.look_at(Point(x=0, y=0, z=-0.25))
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=-2, y=-2),
+        upper_right=Point(x=2, y=2),
+        coarse=epix.Mesh(nx=24, ny=24),
+        fine=epix.Mesh(nx=48, ny=48),
+    )
+    epix.clip_face(
+        loc=Point(x=0, y=0, z=0), normal=-epix.E_3
+    )  # 2nd arg is inward normal
     epix.fill()
     epix.surface(F, R)
     epix.bold()
-    epix.green()
+    epix.set_green()
     epix.plot(F, R)
-    epix.label(F(0, 2), P(0, -4), r"$\mathbf{z<0}$", epix.LabelPos.b)
-    epix.red()
+    epix.label(
+        F(0, 2), offset=Point(x=0, y=-4), text=r"$\mathbf{z<0}$", align=epix.LabelPos.b
+    )
+    epix.set_red()
     epix.plot(TF, R)
-    epix.label(P(2, 0, 0), P(-4, -2), r"$\mathbf{z=0}$", epix.LabelPos.bl)
+    epix.label(
+        Point(x=2, y=0, z=0),
+        offset=Point(x=-4, y=-2),
+        text=r"$\mathbf{z=0}$",
+        align=epix.LabelPos.bl,
+    )
     epix.clip_restore()
-    epix.clip_face(P(0, 0, 0), epix.E_3)
-    epix.fill(epix.Blue())
+    epix.clip_face(loc=Point(x=0, y=0, z=0), normal=epix.E_3)
+    epix.fill(epix.blue())
     epix.surface(F, R)
-    epix.pen(epix.Red(), 0.2)
+    epix.pen(epix.red(), width=0.2)
     epix.plot(TF, R)
-    epix.bold(epix.Blue())
+    epix.bold(epix.blue())
     epix.plot(F, R)
-    epix.rgb(0.5, 0.5, 1)
-    epix.label(F(-2, 0), P(4, 4), r"$\mathbf{z>0}$", epix.LabelPos.tr)
+    epix.set_rgb(0.5, 0.5, 1)
+    epix.label(
+        F(-2, 0), offset=Point(x=4, y=4), text=r"$\mathbf{z>0}$", align=epix.LabelPos.tr
+    )
 fig

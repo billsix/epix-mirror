@@ -16,52 +16,64 @@
 # The Riemann surface of Re √(x+iy), sliced and rotated through the family.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def F(t, r, theta):
-    return P(
-        r * r * epix.Cos(2 * theta),
-        r * r * epix.Cos(t) * epix.Sin(2 * theta) + r * epix.Sin(t) * epix.Sin(theta),
-        r * epix.Cos(theta),
+def F(t: float, r: float, theta: float) -> epix.Point:
+    return Point(
+        r * r * epix.cos(2 * theta),
+        r * r * epix.cos(t) * epix.sin(2 * theta) + r * epix.sin(t) * epix.sin(theta),
+        r * epix.cos(theta),
     )
 
 
-R = epix.domain(P(0, 0, 0), P(1, 1.5, 1), epix.mesh(24, 8, 32), epix.mesh(24, 40, 80))
+R: epix.Domain = epix.Domain(
+    lower_left=Point(x=0, y=0, z=0),
+    upper_right=Point(x=1, y=1.5, z=1),
+    coarse=epix.Mesh(nx=24, ny=8, nz=32),
+    fine=epix.Mesh(nx=24, ny=40, nz=80),
+)
 
 
-def build():
+def build() -> None:
     t = epix.tix()
-    R1 = R.slice1(t)
-    epix.picture(P(-4, -4), P(4, 4), "5x5in")
+    R1: epix.Domain = R.slice1(t)
+    epix.picture(
+        lower_left=Point(x=-4, y=-4), upper_right=Point(x=4, y=4), size="5x5in"
+    )
     epix.begin()
     epix.revolutions()
-    epix.grid(1, 1)
-    ctr = P(3.25, -3.25)  # "clock" center
+    epix.grid(nx=1, ny=1)
+    ctr: epix.Point = Point(x=3.25, y=-3.25)  # "clock" center
     epix.bold()
-    epix.circle(ctr, 0.5)
-    epix.line(ctr, ctr + epix.polar(0.4, t))
-    epix.label(ctr + epix.polar(0.6, t), "$y$")
-    epix.line(ctr, ctr + epix.polar(0.4, t + 0.25))
-    epix.label(ctr + epix.polar(0.6, t + 0.25), "$w$")
+    epix.circle(center=ctr, radius=0.5)
+    epix.line(tail=ctr, head=ctr + epix.polar(radius=0.4, theta=t))
+    epix.label(ctr + epix.polar(radius=0.6, theta=t), "$y$")
+    epix.line(tail=ctr, head=ctr + epix.polar(radius=0.4, theta=t + 0.25))
+    epix.label(ctr + epix.polar(radius=0.6, theta=t + 0.25), "$w$")
     epix.viewpoint(4, 5, 3)
     epix.camera.range(20)
-    epix.line(P(0, 0, 0), P(3, 0, 0))
-    epix.line(P(0, 0, 0), P(0, 3, 0))
-    epix.line(P(0, 0, 0), P(0, 0, 2))
-    epix.plain(epix.Red())
+    epix.line(tail=Point(x=0, y=0, z=0), head=Point(x=3, y=0, z=0))
+    epix.line(tail=Point(x=0, y=0, z=0), head=Point(x=0, y=3, z=0))
+    epix.line(tail=Point(x=0, y=0, z=0), head=Point(x=0, y=0, z=2))
+    epix.plain(epix.red())
     epix.plot(F, R1.resize3(0, 0.5))
-    epix.blue()
+    epix.set_blue()
     epix.plot(F, R1.resize3(0.5, 1))
-    epix.bold(epix.Magenta())
+    epix.bold(epix.magenta())
     epix.plot(F, R.slice3(0))
     epix.plot(F, R.slice3(0.5))
-    epix.black()
-    epix.masklabel(P(3, 0, 0), "$x$")
-    epix.masklabel(P(0, 3, 0), "$y$")
+    epix.set_black()
+    epix.masklabel(Point(x=3, y=0, z=0), "$x$")
+    epix.masklabel(Point(x=0, y=3, z=0), "$y$")
     epix.masklabel(
-        P(0, 0, 2), P(-4, 0), r"$z=\textrm{Re}\,\sqrt{x+iy}$", epix.LabelPos.tr
+        Point(x=0, y=0, z=2),
+        offset=Point(x=-4, y=0),
+        text=r"$z=\textrm{Re}\,\sqrt{x+iy}$",
+        align=epix.LabelPos.tr,
     )
 
 

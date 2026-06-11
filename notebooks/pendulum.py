@@ -16,46 +16,58 @@
 # A pendulum swinging, with its trajectory in the phase plane (slope field).
 
 # %%
+from __future__ import annotations
+
 from math import pi, sqrt
 
 import epix
-from epix import P
+from epix import Point
 
 theta0 = -5 * pi / 6
 EPS = 0.01  # avoid the singularity of f at theta0
-posn0 = P(theta0, 0)
-pivot = P(0, 5.5)
+posn0: epix.Point = Point(x=theta0, y=0)
+pivot: epix.Point = Point(x=0, y=5.5)
 ell = 3
-K = -epix.Cos(theta0)
+K = -epix.cos(theta0)
 
 
-def F(u, v):
-    return P(v, -epix.Sin(u))
+def F(u: float, v: float) -> epix.Point:
+    return Point(x=v, y=-epix.sin(u))
 
 
-def f(t):
-    return 1.0 / sqrt(2 * (K + epix.Cos(t)))
+def f(t: float) -> float:
+    return 1.0 / sqrt(2 * (K + epix.cos(t)))
 
 
-def build():
+def build() -> None:
     t = epix.tix()
-    epix.picture(P(-6.5, -2.5), P(6.5, 8.5), "6.5 x 5.5in")
+    epix.picture(
+        lower_left=Point(x=-6.5, y=-2.5),
+        upper_right=Point(x=6.5, y=8.5),
+        size="6.5 x 5.5in",
+    )
     epix.begin()
     period = 4 * (
-        sqrt(2 * EPS / (-epix.Sin(theta0))) + epix.integral_eval(f, -theta0 - EPS)
+        sqrt(2 * EPS / (-epix.sin(theta0))) + epix.integral_eval(f, -theta0 - EPS)
     )
-    epix.border(epix.Black(0.1), "1pt")
-    posn = epix.flow(F, posn0, period * t, int(120 * t))  # phase position
-    x_t = -epix.Sin(posn.x1())
-    y_t = epix.Cos(posn.x1())
-    epix.slope_field(F, P(-2 * pi, -2), P(2 * pi, 2), 48, 12)
+    epix.border(epix.black(0.1), width="1pt")
+    posn: epix.Point = epix.flow(F, posn0, period * t, int(120 * t))  # phase position
+    x_t = -epix.sin(posn.x1())
+    y_t = epix.cos(posn.x1())
+    epix.slope_field(
+        F,
+        lower_left=Point(x=-2 * pi, y=-2),
+        upper_right=Point(x=2 * pi, y=2),
+        nx=48,
+        ny=12,
+    )
     epix.bold()
-    epix.line(pivot, pivot - ell * P(x_t, y_t))
-    epix.red()
-    epix.ode_plot(F, posn0, period, 120)
-    epix.blue()
+    epix.line(tail=pivot, head=pivot - ell * Point(x=x_t, y=y_t))
+    epix.set_red()
+    epix.ode_plot(F, posn0, period, n=120)
+    epix.set_blue()
     epix.box(posn)
-    epix.box(pivot - ell * P(x_t, y_t))
+    epix.box(pivot - ell * Point(x=x_t, y=y_t))
 
 
 # %%

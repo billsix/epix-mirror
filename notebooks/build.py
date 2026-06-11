@@ -19,6 +19,8 @@
 # Output is byte-identical to the C++ library.
 
 # %%
+from __future__ import annotations
+
 from math import cos, pi, sin
 
 import epix
@@ -27,34 +29,49 @@ import epix
 # A graph $y = x^2$ with axes:
 
 # %%
-with epix.figure(epix.P(-1.2, -0.2), epix.P(1.2, 1.2), "3x2in") as fig:
+with epix.figure(
+    lower_left=epix.Point(x=-1.2, y=-0.2),
+    upper_right=epix.Point(x=1.2, y=1.2),
+    size="3x2in",
+) as fig:
     epix.h_axis(4)
     epix.v_axis(4)
-    epix.pen(epix.Blue())
-    epix.plot(lambda t: epix.P(t, t * t), -1, 1)
-    epix.pen(epix.Black())
-    epix.label(epix.P(0.5, 0.5), r"$y=x^2$")
+    epix.pen(epix.blue())
+    epix.plot(lambda t: epix.Point(x=t, y=t * t), -1, 1)
+    epix.pen(epix.black())
+    epix.label(epix.Point(x=0.5, y=0.5), r"$y=x^2$")
 fig
 
 # %% [markdown]
 # A parametric curve (the unit circle), straight from a Python lambda:
 
 # %%
-with epix.figure(epix.P(-1.2, -1.2), epix.P(1.2, 1.2), "2x2in") as fig:
-    epix.pen(epix.Red())
-    epix.plot(lambda t: epix.P(cos(t), sin(t)), 0, 2 * pi)
+with epix.figure(
+    lower_left=epix.Point(x=-1.2, y=-1.2),
+    upper_right=epix.Point(x=1.2, y=1.2),
+    size="2x2in",
+) as fig:
+    epix.pen(epix.red())
+    epix.plot(lambda t: epix.Point(x=cos(t), y=sin(t)), 0, 2 * pi)
 fig
 
 # %% [markdown]
 # Shapes, markers, and arrows — with the scoped enums (`MarkType`, `LabelPos`):
 
 # %%
-with epix.figure(epix.P(-2, -2), epix.P(2, 2), "3x3in") as fig:
-    epix.pen(epix.Blue())
-    epix.circle(epix.P(0, 0), 1.0)
-    epix.pen(epix.Red())
-    epix.dot(epix.P(1, 1))
-    epix.marker(epix.P(-1, -1), epix.MarkType.BOX)
-    epix.arrow(epix.P(0, 0), epix.P(1.5, 0))
-    epix.label(epix.P(0, 1), epix.P(0, 0), "top", epix.LabelPos.t)
+with epix.figure(
+    lower_left=epix.Point(x=-2, y=-2), upper_right=epix.Point(x=2, y=2), size="3x3in"
+) as fig:
+    epix.pen(epix.blue())
+    epix.circle(center=epix.Point(x=0, y=0), radius=1.0)
+    epix.pen(epix.red())
+    epix.dot(epix.Point(x=1, y=1))
+    epix.marker(epix.Point(x=-1, y=-1), epix.MarkType.BOX)
+    epix.arrow(tail=epix.Point(x=0, y=0), head=epix.Point(x=1.5, y=0))
+    epix.label(
+        epix.Point(x=0, y=1),
+        offset=epix.Point(x=0, y=0),
+        text="top",
+        align=epix.LabelPos.t,
+    )
 fig

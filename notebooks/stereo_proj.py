@@ -19,69 +19,91 @@
 # where the boundary passes through the point at infinity.
 
 # %%
+from __future__ import annotations
+
 import math
 
 import epix
-from epix import P
+from epix import Point
 
-O = P(0, 0, 0)
+O = Point(x=0, y=0, z=0)
 
 
-def circ(t):
+def circ(t: float) -> None:
     if math.isnan(t):  # fallback, doesn't fill properly
-        epix.line(P(-2, 0), P(2, 0))
+        epix.line(tail=Point(x=-2, y=0), head=Point(x=2, y=0))
     else:
-        epix.circle(P(0, t), math.sqrt(1 + t * t))
+        epix.circle(center=Point(x=0, y=t), radius=math.sqrt(1 + t * t))
 
 
-def f(u, v):
-    tmp = epix.sph(1, u, v)
-    return P(tmp.x3(), tmp.x1(), tmp.x2())
+def f(u: float, v: float) -> epix.Point:
+    sph_point = epix.sph(radius=1, theta=u, phi=v)
+    return Point(x=sph_point.x3(), y=sph_point.x1(), z=sph_point.x2())
 
 
-R = epix.domain(P(0, -math.pi / 2), P(4 * math.pi, math.pi / 2), epix.mesh(144, 48))
+R: epix.Domain = epix.Domain(
+    lower_left=Point(x=0, y=-math.pi / 2),
+    upper_right=Point(x=4 * math.pi, y=math.pi / 2),
+    coarse=epix.Mesh(nx=144, ny=48),
+)
 
 
 # %%
-def build():
-    epix.picture(P(-2, -2), P(2, 2), "6 x 6in")
+def build() -> None:
+    epix.picture(
+        lower_left=Point(x=-2, y=-2), upper_right=Point(x=2, y=2), size="6 x 6in"
+    )
 
     epix.begin()
 
-    epix.camera.at(P(4, -6, 3))
+    epix.camera.at(Point(x=4, y=-6, z=3))
 
     epix.border()
 
     epix.set_crop()
 
     # disk
-    epix.plain(epix.Black())
-    epix.fill(epix.Black(0.3))
+    epix.plain(epix.black())
+    epix.fill(epix.black(0.3))
 
     if 0.25 <= epix.tix() <= 0.75:
-        epix.rect(P(-100, -100), P(100, 100))
-        epix.fill(epix.White())
+        epix.rect(lower_left=Point(x=-100, y=-100), upper_right=Point(x=100, y=100))
+        epix.fill(epix.white())
 
-    circ(epix.Tan(2 * math.pi * epix.tix()))
+    circ(epix.tan(2 * math.pi * epix.tix()))
 
-    epix.dot(P(-1, 0), P(4, -2), "$-1$", epix.LabelPos.br)
+    epix.dot(
+        Point(x=-1, y=0), offset=Point(x=4, y=-2), text="$-1$", align=epix.LabelPos.br
+    )
 
-    epix.plain(epix.RGB(0.9, 0.7, 1))
+    epix.plain(epix.rgb(0.9, 0.7, 1))
 
     # light purple
-    epix.fill(epix.RGB(0.9, 0.7, 1))
+    epix.fill(epix.rgb(0.9, 0.7, 1))
 
-    epix.clip_face(O, epix.E_3)
+    epix.clip_face(loc=O, normal=epix.E_3)
     epix.plot(f, R)
 
     epix.clip_face(
-        O, P(0, epix.Sin(2 * math.pi * epix.tix()), -epix.Cos(2 * math.pi * epix.tix()))
+        loc=O,
+        normal=Point(
+            x=0,
+            y=epix.sin(2 * math.pi * epix.tix()),
+            z=-epix.cos(2 * math.pi * epix.tix()),
+        ),
     )
     epix.surface(f, R)
     epix.clip_restore()
-    epix.dot(P(1, 0), P(2, -2), "$1$", epix.LabelPos.br)
+    epix.dot(
+        Point(x=1, y=0), offset=Point(x=2, y=-2), text="$1$", align=epix.LabelPos.br
+    )
 
-    epix.dot(P(0, 0, 1), P(0, 8), r"$\infty$", epix.LabelPos.t)
+    epix.dot(
+        Point(x=0, y=0, z=1),
+        offset=Point(x=0, y=8),
+        text=r"$\infty$",
+        align=epix.LabelPos.t,
+    )
 
     epix.pst_format()
 

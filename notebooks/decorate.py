@@ -20,80 +20,99 @@
 # The C++ default (`#define LINEFIELD`, `NORMAL` off) is what's ported here.
 
 # %%
+from __future__ import annotations
+
+from dataclasses import dataclass, field
+
 import epix
-from epix import P
+from epix import Point
 
-N1 = 24  # latitudes
-N2 = 48  # longitudes
+n_lat = 24  # latitudes
+n_long = 48  # longitudes
 
-du = 1.0 / N1
-dv = 1.0 / N2
+du = 1.0 / n_lat
+dv = 1.0 / n_long
 
-VIEWPT = P(6, 3, 4)
+VIEWPT = Point(x=6, y=3, z=4)
 
 r_0 = 0.95  # minor radius
 R_0 = 2  # major radius
 
 
-def g(u):
-    return R_0 + r_0 * epix.Cos(u)
+def g(u: float) -> float:
+    return R_0 + r_0 * epix.cos(u)
 
 
-def F(u, v):
-    return epix.polar(g(u), v) + P(0, 0, r_0 * epix.Sin(u))
+def F(u: float, v: float) -> epix.Point:
+    return epix.polar(radius=g(u), theta=v) + Point(x=0, y=0, z=r_0 * epix.sin(u))
 
 
 # a facet-like class that can be drawn with extra decorations (here, a diagonal
 # "line field" and orientation-dependent colors)
+@dataclass
 class MeshQuad:
-    def __init__(self, f, u0, v0):
-        self.pt1 = f(u0, v0)
-        self.pt2 = f(u0 + du, v0)
-        self.pt3 = f(u0 + du, v0 + dv)
-        self.pt4 = f(u0, v0 + dv)
+    f: object
+    u0: float
+    v0: float
+    pt1: Point = field(init=False)
+    pt2: Point = field(init=False)
+    pt3: Point = field(init=False)
+    pt4: Point = field(init=False)
+    center: Point = field(init=False)
+    distance: float = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.pt1 = self.f(self.u0, self.v0)
+        self.pt2 = self.f(self.u0 + du, self.v0)
+        self.pt3 = self.f(self.u0 + du, self.v0 + dv)
+        self.pt4 = self.f(self.u0, self.v0 + dv)
         self.center = 0.25 * (self.pt1 + self.pt2 + self.pt3 + self.pt4)
         self.distance = (self.center - epix.camera.viewpt()).norm()
 
-    def how_far(self):
+    def how_far(self) -> float:
         return self.distance
 
-    def draw(self):
-        direction = self.center - epix.camera.viewpt()
-        normal = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
+    def draw(self) -> None:
+        direction: epix.Point = self.center - epix.camera.viewpt()
+        normal: epix.Point = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
         normal = (1 / normal.norm()) * normal
 
-        epix.blue(0.75 * (normal | (epix.recip(self.distance) * direction)))
+        epix.set_blue(0.75 * (normal | (epix.recip(self.distance) * direction)))
 
         epix.fill()
-        epix.quad(self.pt1, self.pt2, self.pt3, self.pt4)
+        epix.quad(a=self.pt1, b=self.pt2, c=self.pt3, d=self.pt4)
         epix.fill(False)
 
         if (normal | direction) > 0:
-            epix.bbold(epix.Blue(1.8))
+            epix.bbold(epix.blue(1.8))
         else:
-            epix.bold(epix.Red())
+            epix.bold(epix.red())
 
-        epix.line(self.pt1, 0.5 * (self.pt3 + self.pt4))
-        epix.line(0.5 * (self.pt1 + self.pt2), self.pt3)
+        epix.line(tail=self.pt1, head=0.5 * (self.pt3 + self.pt4))
+        epix.line(tail=0.5 * (self.pt1 + self.pt2), head=self.pt3)
 
 
 # %%
-with epix.figure(P(-3, -3), P(3, 3), "4x4in") as fig:
+with epix.figure(
+    lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3), size="4x4in"
+) as fig:
     epix.revolutions()
 
     epix.viewpoint(VIEWPT)
     epix.camera.range(10)
 
     # chop off the front
-    epix.clip_face(P(R_0, 0, r_0), P(-0.25, -0.25, -1))
+    epix.clip_face(loc=Point(x=R_0, y=0, z=r_0), normal=Point(x=-0.25, y=-0.25, z=-1))
 
     # build and draw a torus
-    mesh = [MeshQuad(F, i * du, j * dv) for i in range(N1) for j in range(N2)]
+    quads: list[MeshQuad] = [
+        MeshQuad(F, i * du, j * dv) for i in range(n_lat) for j in range(n_long)
+    ]
 
-    mesh.sort(key=lambda m: m.how_far(), reverse=True)
+    quads.sort(key=lambda quad: quad.how_far(), reverse=True)
 
-    for m in mesh:
-        m.draw()
+    for quad in quads:
+        quad.draw()
 
     epix.pst_format()
 fig

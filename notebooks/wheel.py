@@ -16,36 +16,47 @@
 # A rolling wheel tracing a cycloid, shown as a stack of panels (`screen`/`inset`).
 
 # %%
+from __future__ import annotations
+
 from math import ceil, pi
 
 import epix
-from epix import P
+from epix import Point
 
 
-def F(t, r):
-    return P(t - r * epix.Sin(t), 1 - r * epix.Cos(t))  # a cycloid
+def F(t: float, r: float) -> epix.Point:
+    return Point(x=t - r * epix.sin(t), y=1 - r * epix.cos(t))  # a cycloid
 
 
 # %%
-with epix.figure(P(0, 0), P(15, 27), "4 x 7.2in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=15, y=27), size="4 x 7.2in"
+) as fig:
     dt = 5 * pi / 11
     t = dt
     for i in range(9):
-        scr = epix.screen(P(-1, 0), P(15, 2))  # drawing area
-        epix.activate(scr)
-        epix.plain(epix.Black())
-        epix.line(P(-1, 0), P(15, 0))  # the ground
-        epix.circle(P(t, 1), 1)  # the wheel
-        R = epix.domain(
-            P(0, 0), P(t, 1), epix.mesh(10 * i, 5), epix.mesh(int(ceil(1 + 4 * t)), 5)
+        panel: epix.Screen = epix.Screen(
+            lower_left=Point(x=-1, y=0), upper_right=Point(x=15, y=2)
+        )  # drawing area
+        epix.activate(panel)
+        epix.plain(epix.black())
+        epix.line(tail=Point(x=-1, y=0), head=Point(x=15, y=0))  # the ground
+        epix.circle(center=Point(x=t, y=1), radius=1)  # the wheel
+        R: epix.Domain = epix.Domain(
+            lower_left=Point(x=0, y=0),
+            upper_right=Point(x=t, y=1),
+            coarse=epix.Mesh(nx=10 * i, ny=5),
+            fine=epix.Mesh(nx=int(ceil(1 + 4 * t)), ny=5),
         )
         epix.bold()
         for j in range(6):
-            epix.pen(epix.RGB(1 - 0.125 * j, 0.125 * j, 0.5 + 0.125 * j))
+            epix.pen(epix.rgb(1 - 0.125 * j, 0.125 * j, 0.5 + 0.125 * j))
             epix.plot(F, R.slice2(0.2 * j))
-        epix.bold(epix.Green())
-        epix.line(P(t, 1), F(t, 1))
-        epix.inset(P(0, 25 - 3 * i), P(15, 27 - 3 * i))  # page layout
-        epix.deactivate(scr)
+        epix.bold(epix.green())
+        epix.line(tail=Point(x=t, y=1), head=F(t, 1))
+        epix.inset(
+            lower_left=Point(x=0, y=25 - 3 * i), upper_right=Point(x=15, y=27 - 3 * i)
+        )  # page layout
+        epix.deactivate(panel)
         t += dt
 fig

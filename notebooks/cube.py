@@ -22,31 +22,41 @@
 # frames are **byte-identical** to the C++ original.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def frame():
+def frame() -> None:
     t = epix.tix()
-    epix.picture(P(-4, -4), P(4, 4), "5 x 5in")
+    epix.picture(
+        lower_left=Point(x=-4, y=-4), upper_right=Point(x=4, y=4), size="5 x 5in"
+    )
     epix.begin()
     epix.revolutions()
-    epix.grid(1, 1)
+    epix.grid(nx=1, ny=1)
 
-    ctr = P(3.25, -3.25)  # "clock" showing the angle
+    ctr: epix.Point = Point(x=3.25, y=-3.25)  # "clock" showing the angle
     epix.bold()
-    epix.ellipse(ctr, P(0.5, 0.5))
-    epix.line(ctr, ctr + epix.polar(0.4, t))
+    epix.ellipse(center=ctr, radius=Point(x=0.5, y=0.5))
+    epix.line(tail=ctr, head=ctr + epix.polar(radius=0.4, theta=t))
     epix.label_angle(t - 0.25)
-    epix.label(ctr + epix.polar(0.6, t), r"$\theta$")
+    epix.label(ctr + epix.polar(radius=0.6, theta=t), r"$\theta$")
 
-    R = epix.domain(P(-2, -2, -2), P(2, 2, 2), epix.mesh(1, 1, 1))
-    epix.camera.at(epix.sph(10, t, -0.05))
-    epix.plain(epix.Cyan())
-    epix.plot(lambda x, y, z: epix.P(x, y, z), R)  # the cube
-    epix.camera.at(epix.sph(10, 0.01 + t, -0.05))
-    epix.red(1.4)
-    epix.plot(lambda x, y, z: epix.P(x, y, z), R)  # second, slightly-rotated copy
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=-2, y=-2, z=-2),
+        upper_right=Point(x=2, y=2, z=2),
+        coarse=epix.Mesh(nx=1, ny=1, nz=1),
+    )
+    epix.camera.at(epix.sph(radius=10, theta=t, phi=-0.05))
+    epix.plain(epix.cyan())
+    epix.plot(lambda x, y, z: epix.Point(x=x, y=y, z=z), R)  # the cube
+    epix.camera.at(epix.sph(radius=10, theta=0.01 + t, phi=-0.05))
+    epix.set_red(1.4)
+    epix.plot(
+        lambda x, y, z: epix.Point(x=x, y=y, z=z), R
+    )  # second, slightly-rotated copy
 
 
 # %%

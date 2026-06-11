@@ -16,8 +16,10 @@
 # A keyhole contour for complex integration (built from arcs via the `path` class).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 theta = 60
 rad = 0.25
@@ -25,27 +27,52 @@ Rad = 4.5
 ht = 0.0625
 
 # %%
-epix.bounding_box(P(-5, -5), P(5, 5))
+epix.bounding_box(Point(x=-5, y=-5), Point(x=5, y=5))
 epix.picture(160, 160)
 epix.unitlength("0.35mm")
 epix.begin()
 epix.degrees()
-theta1 = epix.Asin(ht / rad)
-theta2 = epix.Asin(ht / Rad)
-epix.fill(epix.Black(0.1))
-contour = epix.path(P(0, 0), Rad * epix.E_1, Rad * epix.E_2, theta2, 360 - theta2)
-contour += epix.path(epix.polar(Rad, -theta2), epix.polar(rad, -theta1))
-contour += epix.path(P(0, 0), rad * epix.E_1, rad * epix.E_2, 360 - theta1, theta1)
-contour += epix.path(epix.polar(rad, theta1), epix.polar(Rad, theta2))
+theta1 = epix.asin(ht / rad)
+theta2 = epix.asin(ht / Rad)
+epix.fill(epix.black(0.1))
+contour: epix.Path = epix.Path(
+    Point(x=0, y=0), Rad * epix.E_1, Rad * epix.E_2, theta2, 360 - theta2
+)
+contour += epix.Path(
+    epix.polar(radius=Rad, theta=-theta2), epix.polar(radius=rad, theta=-theta1)
+)
+contour += epix.Path(
+    Point(x=0, y=0), rad * epix.E_1, rad * epix.E_2, 360 - theta1, theta1
+)
+contour += epix.Path(
+    epix.polar(radius=rad, theta=theta1), epix.polar(radius=Rad, theta=theta2)
+)
 contour.close().fill().draw()
-epix.dot(P(0, 0))
-epix.arrow_width(2)
+epix.dot(Point(x=0, y=0))
+epix.arrow_width(width=2)
 epix.arrow_inset(0.25)
-epix.arrow(P(Rad / 4, 0.1 * Rad), P(3 * Rad / 4, 0.1 * Rad))
-epix.arrow(P(3 * Rad / 4, -0.1 * Rad), P(Rad / 4, -0.1 * Rad))
-epix.arc_arrow(P(0, 0), 0.9 * Rad, 180 - theta, 180 + theta)
-epix.label(P(Rad, ht), P(2, 4), r"$R\to\infty$", epix.LabelPos.tr)
-epix.label(P(0, rad), P(0, 4), r"$\delta\to0$", epix.LabelPos.tl)
-epix.label(epix.polar(Rad, 45), P(0, 0), r"$\gamma$", epix.LabelPos.tr)
+epix.arrow(tail=Point(x=Rad / 4, y=0.1 * Rad), head=Point(x=3 * Rad / 4, y=0.1 * Rad))
+epix.arrow(tail=Point(x=3 * Rad / 4, y=-0.1 * Rad), head=Point(x=Rad / 4, y=-0.1 * Rad))
+epix.arc_arrow(
+    center=Point(x=0, y=0), radius=0.9 * Rad, start=180 - theta, finish=180 + theta
+)
+epix.label(
+    Point(x=Rad, y=ht),
+    offset=Point(x=2, y=4),
+    text=r"$R\to\infty$",
+    align=epix.LabelPos.tr,
+)
+epix.label(
+    Point(x=0, y=rad),
+    offset=Point(x=0, y=4),
+    text=r"$\delta\to0$",
+    align=epix.LabelPos.tl,
+)
+epix.label(
+    epix.polar(radius=Rad, theta=45),
+    offset=Point(x=0, y=0),
+    text=r"$\gamma$",
+    align=epix.LabelPos.tr,
+)
 fig = epix.render()
 fig

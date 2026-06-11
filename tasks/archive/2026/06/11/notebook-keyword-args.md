@@ -1,8 +1,19 @@
 # Task: Use keyword arguments in the ported notebooks
 
-**Status:** proposed — needs go-ahead
+**Status:** DONE (2026-06-11) — applied together with `pythonic-cleanup.md` in one
+pass; see that doc's execution log. All 79 ports verified byte-identical.
 **Requested:** 2026-06-10 (Bill)
 **Owner:** Bill (via Claude)
+
+## Outcome (2026-06-11)
+
+Done as part of the combined cleanup pass. Convention applied: keyword the
+genuinely-unclear trailing args (`n=` sample counts, `size=` figure strings,
+`cull=`, `offset=`/`text=`/`align=` on the label family, `width=` pen/border/base,
+`nx=`/`ny=`/`nz=` grid/mesh, `scale=`, `thickness=`, `radius=`, level-set
+`coarse=`/`fine=`), using the binding's real `nb::arg` names (the binding's
+`n1`/`n2`/`n3` were renamed to `nx`/`ny`/`nz` as part of the same pass). Points and
+colors stay positional. Full harness: 79/79 PASS.
 
 ## Goal
 

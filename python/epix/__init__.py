@@ -4,8 +4,8 @@
   helpers (Phase 2), or render an existing `.xp` with `show()` (Phase 1).
 - Figures display inline in Jupyter (PNG) via the render helper.
 
-The scene API (P, Color, picture, begin, plot, label, pen, fill, line, the color
-constructors, axes, …) is re-exported straight from the compiled `_epix`
+The scene API (Point, Color, picture, begin, plot, label, pen, fill, line, the
+color constructors, axes, …) is re-exported straight from the compiled `_epix`
 bindings, so it grows automatically as the bound surface expands.
 
 (Provisional package name / API shape — still open.)
@@ -13,6 +13,6 @@ bindings, so it grows automatically as the bound surface expands.
 
 from __future__ import annotations
 
-from ._epix import *  # noqa: F401,F403  (scene API: P, Color, picture, ...)
+from ._epix import *  # noqa: F401,F403  (scene API: Point, Color, picture, ...)
 from .figure import Animation, animate, figure, render
 from .render import Figure, render_eepic, render_xp, show

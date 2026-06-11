@@ -16,13 +16,15 @@
 # A semicircle with an inscribed rectangle.
 
 # %%
+from __future__ import annotations
+
 from math import pi, sqrt
 
 import epix
-from epix import P
+from epix import Point
 
 
-def f(x):
+def f(x: float) -> float:
     return sqrt(1 - x * x)
 
 
@@ -32,12 +34,21 @@ posn = 0.5
 y_posn = f(posn)
 
 # %%
-with epix.figure(P(-1, 0), P(1, 1), "2.5 x 1.25in") as fig:
+with epix.figure(
+    lower_left=Point(x=-1, y=0), upper_right=Point(x=1, y=1), size="2.5 x 1.25in"
+) as fig:
     epix.h_axis(4)
     epix.v_axis(2)
-    epix.h_axis_labels(int(epix.xsize()), P(0, -4), epix.LabelPos.b)
-    epix.arc(P(0, 0), 1, 0, pi)
+    epix.h_axis_labels(
+        int(epix.xsize()), offset=Point(x=0, y=-4), align=epix.LabelPos.b
+    )
+    epix.arc(center=Point(x=0, y=0), radius=1, start=0, finish=pi)
     epix.bold()
-    epix.rect(P(-width, 0), P(width, height))
-    epix.label(P(posn, y_posn), P(2, 4), r"$y=\sqrt{1-x^2}$", epix.LabelPos.tr)
+    epix.rect(lower_left=Point(x=-width, y=0), upper_right=Point(x=width, y=height))
+    epix.label(
+        Point(x=posn, y=y_posn),
+        offset=Point(x=2, y=4),
+        text=r"$y=\sqrt{1-x^2}$",
+        align=epix.LabelPos.tr,
+    )
 fig

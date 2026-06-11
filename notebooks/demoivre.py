@@ -16,33 +16,49 @@
 # De Moivre's theorem: $(1 + i\theta/n)^n \to e^{i\theta}$, via the `pair` type.
 
 # %%
+from __future__ import annotations
+
 from math import pi
 
 import epix
-from epix import P
+from epix import Point
 
 N = 24
 theta = 0.875 * pi
-alpha = epix.pair(1, theta / N)
+alpha = epix.Pair(1, theta / N)
 
 
-def pair2P(arg):
-    return P(arg.x1(), arg.x2())
+def pair2P(arg: epix.Pair) -> epix.Point:
+    return Point(x=arg.x1(), y=arg.x2())
 
 
 # %%
-with epix.figure(P(-1.5, 0), P(1, 1.25), "200 x 100pt") as fig:
-    power = epix.pair(1, 0)
+with epix.figure(
+    lower_left=Point(x=-1.5, y=0), upper_right=Point(x=1, y=1.25), size="200 x 100pt"
+) as fig:
+    power = epix.Pair(1, 0)
     for _ in range(N):
-        epix.line(P(0, 0), pair2P(alpha * power))  # two sides
-        epix.line(pair2P(power), pair2P(alpha * power))  # of triangle
+        epix.line(tail=Point(x=0, y=0), head=pair2P(alpha * power))  # two sides
+        epix.line(tail=pair2P(power), head=pair2P(alpha * power))  # of triangle
         power = power * alpha
-    epix.label(pair2P(alpha), P(2, 0), r"$\alpha=1+\frac{i\theta}{n}$", epix.LabelPos.r)
+    epix.label(
+        pair2P(alpha),
+        offset=Point(x=2, y=0),
+        text=r"$\alpha=1+\frac{i\theta}{n}$",
+        align=epix.LabelPos.r,
+    )
     epix.label_angle(theta - pi)
-    epix.ddot(pair2P(power), P(2, 4), r"$\alpha^n\approx e^{i\theta}$", epix.LabelPos.b)
-    epix.plain(epix.Black(0.3))
-    epix.arc(P(0, 0), 1, 0, theta)
-    epix.ddot(epix.cis(theta), P(0, -4), "$$", epix.LabelPos.b)
-    epix.bold(epix.Red())
-    epix.triangle(P(0, 0), P(1, 0), pair2P(alpha))
+    epix.ddot(
+        pair2P(power),
+        offset=Point(x=2, y=4),
+        text=r"$\alpha^n\approx e^{i\theta}$",
+        align=epix.LabelPos.b,
+    )
+    epix.plain(epix.black(0.3))
+    epix.arc(center=Point(x=0, y=0), radius=1, start=0, finish=theta)
+    epix.ddot(
+        epix.cis(theta), offset=Point(x=0, y=-4), text="$$", align=epix.LabelPos.b
+    )
+    epix.bold(epix.red())
+    epix.triangle(a=Point(x=0, y=0), b=Point(x=1, y=0), c=pair2P(alpha))
 fig

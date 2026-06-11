@@ -16,37 +16,75 @@
 # A sphere drawn at coarse/fine mesh, flat/smooth shading — four panels.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def F(u, v):
-    return epix.sph(1, u, v)
+def F(u: float, v: float) -> epix.Point:
+    return epix.sph(radius=1, theta=u, phi=v)
 
 
 # %%
-with epix.figure(P(0, 0), P(5, 1), "5 x 1in") as fig:
-    coarse = epix.domain(P(0, 0), P(0.5, 1), epix.mesh(6, 12), epix.mesh(60, 60))
-    fine = epix.domain(P(0, 0), P(0.5, 1), epix.mesh(15, 30), epix.mesh(60, 60))
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=5, y=1), size="5 x 1in"
+) as fig:
+    coarse: epix.Domain = epix.Domain(
+        lower_left=Point(x=0, y=0),
+        upper_right=Point(x=0.5, y=1),
+        coarse=epix.Mesh(nx=6, ny=12),
+        fine=epix.Mesh(nx=60, ny=60),
+    )
+    fine: epix.Domain = epix.Domain(
+        lower_left=Point(x=0, y=0),
+        upper_right=Point(x=0.5, y=1),
+        coarse=epix.Mesh(nx=15, ny=30),
+        fine=epix.Mesh(nx=60, ny=60),
+    )
     epix.revolutions()
-    epix.camera.at(P(5, 4, 3))
-    epix.fill(epix.White())
+    epix.camera.at(Point(x=5, y=4, z=3))
+    epix.fill(epix.white())
     epix.nofill()  # fill color set -> flat shading
-    scr1 = epix.screen(P(-1, -1), P(1, 1))
-    epix.activate(scr1)
+    screen_coarse_flat: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+    )
+    epix.activate(screen_coarse_flat)
     epix.surface(F, coarse)
-    scr2 = epix.screen(P(-1, -1), P(1, 1))
-    epix.activate(scr2)
+    screen_fine_flat: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+    )
+    epix.activate(screen_fine_flat)
     epix.surface(F, fine)
     epix.fill()
-    scr3 = epix.screen(P(-1, -1), P(1, 1))
-    epix.activate(scr3)
+    screen_coarse_smooth: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+    )
+    epix.activate(screen_coarse_smooth)
     epix.surface(F, coarse)
-    scr4 = epix.screen(P(-1, -1), P(1, 1))
-    epix.activate(scr4)
+    screen_fine_smooth: epix.Screen = epix.Screen(
+        lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+    )
+    epix.activate(screen_fine_smooth)
     epix.surface(F, fine)
-    epix.inset(scr1, P(0, 0), P(1, 1))
-    epix.inset(scr2, P(1.25, 0), P(2.25, 1))
-    epix.inset(scr3, P(2.5, 0), P(3.5, 1))
-    epix.inset(scr4, P(3.75, 0), P(4.75, 1))
+    epix.inset(
+        child=screen_coarse_flat,
+        lower_left=Point(x=0, y=0),
+        upper_right=Point(x=1, y=1),
+    )
+    epix.inset(
+        child=screen_fine_flat,
+        lower_left=Point(x=1.25, y=0),
+        upper_right=Point(x=2.25, y=1),
+    )
+    epix.inset(
+        child=screen_coarse_smooth,
+        lower_left=Point(x=2.5, y=0),
+        upper_right=Point(x=3.5, y=1),
+    )
+    epix.inset(
+        child=screen_fine_smooth,
+        lower_left=Point(x=3.75, y=0),
+        upper_right=Point(x=4.75, y=1),
+    )
 fig

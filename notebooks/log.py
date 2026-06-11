@@ -19,13 +19,16 @@
 # Patches are octagons shaded by a point light; the path is drawn in green.
 
 # %%
+from __future__ import annotations
+
 import math
+from dataclasses import dataclass, field
 
 import epix
-from epix import P
+from epix import Point
 
-LIGHT = P(2, 2, 0)  # location of light, for shading
-VIEWPT = P(15, -10, 6)
+LIGHT = Point(x=2, y=2, z=0)  # location of light, for shading
+VIEWPT = Point(x=15, y=-10, z=6)
 
 # surface and path mesh fineness
 N1 = 18
@@ -41,31 +44,42 @@ EPS = 0  # (0.002)
 
 
 # visual styles
-def path_color():
-    epix.green(0.8)
+def path_color() -> None:
+    epix.set_green(0.8)
 
 
-def label_color():
-    epix.yellow(0.5)
+def label_color() -> None:
+    epix.set_yellow(0.5)
 
 
-def dot_color():
-    epix.red()
+def dot_color() -> None:
+    epix.set_red()
 
 
-def path_width():
+def path_width() -> None:
     epix.pen(1.5)
 
 
 # can represent either a surface element or a path element
+@dataclass
 class MeshElt:
     last_was_seg = False  # static shared state
 
+    is_segment: bool
+    fudge: float
+    center: object = field(init=False, default=None)
+    pt1: object = field(init=False, default=None)
+    pt2: object = field(init=False, default=None)
+    pt3: object = field(init=False, default=None)
+    pt4: object = field(init=False, default=None)
+    pt5: object = field(init=False, default=None)
+    pt6: object = field(init=False, default=None)
+    pt7: object = field(init=False, default=None)
+    pt8: object = field(init=False, default=None)
+
     @classmethod
-    def surface(cls, f, u0, v0):
-        self = cls.__new__(cls)
-        self.is_segment = False
-        self.fudge = 0.25  # artificial increment to distance
+    def surface(cls, f, u0: float, v0: float) -> MeshElt:
+        self: MeshElt = cls(is_segment=False, fudge=0.25)  # fudge = distance increment
         self.pt1 = f(u0 + EPS, v0 + EPS)
         self.pt2 = f(u0 + 0.5 * du, v0 + EPS)
         self.pt3 = f(u0 + du - EPS, v0 + EPS)
@@ -78,10 +92,8 @@ class MeshElt:
         return self
 
     @classmethod
-    def segment(cls, f, t0):
-        self = cls.__new__(cls)
-        self.is_segment = True
-        self.fudge = 0
+    def segment(cls, f, t0: float) -> MeshElt:
+        self: MeshElt = cls(is_segment=True, fudge=0)
         self.pt1 = f(t0)
         self.pt2 = f(t0 + 0.25 * dt)
         self.pt3 = f(t0 + 0.5 * dt)
@@ -90,12 +102,12 @@ class MeshElt:
         self.center = 0.333 * (self.pt1 + (self.pt3 + self.pt5))
         return self
 
-    def how_far(self):
+    def how_far(self) -> float:
         return self.fudge + (self.center - epix.camera.viewpt()).norm()
 
-    def draw(self):
+    def draw(self) -> None:
         if not self.is_segment:
-            normal = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
+            normal: epix.Point = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
             normal = (1 / normal.norm()) * normal
 
             dens = 0.5 * (1 - ((normal | LIGHT) / LIGHT.norm()))
@@ -104,10 +116,10 @@ class MeshElt:
                 MeshElt.last_was_seg = False
                 epix.plain()  # reset pen width
 
-            epix.black()
-            epix.gray(dens)
+            epix.set_black()
+            epix.set_gray(dens)
 
-            bd = [
+            octagon_points: list[epix.Point] = [
                 self.pt1,
                 self.pt2,
                 self.pt3,
@@ -117,40 +129,50 @@ class MeshElt:
                 self.pt7,
                 self.pt8,
             ]
-            temp = epix.path(bd, True, True)  # closed and filled
-            temp.draw()
+            patch: epix.Path = epix.Path(
+                octagon_points, True, True
+            )  # closed and filled
+            patch.draw()
         else:  # segment
             if not MeshElt.last_was_seg:
                 MeshElt.last_was_seg = True
                 path_width()
                 path_color()
 
-            bd = [self.pt1, self.pt2, self.pt3, self.pt4, self.pt5]
-            temp = epix.path(bd, False, False)
-            temp.draw()
+            segment_points: list[epix.Point] = [
+                self.pt1,
+                self.pt2,
+                self.pt3,
+                self.pt4,
+                self.pt5,
+            ]
+            curve: epix.Path = epix.Path(segment_points, False, False)
+            curve.draw()
 
 
 # the maps to be plotted
-def C_log(u, v):
-    return epix.polar(math.exp(u), math.pi * v) + P(0, 0, u + math.pi * v)
+def C_log(u: float, v: float) -> epix.Point:
+    return epix.polar(radius=math.exp(u), theta=math.pi * v) + Point(
+        x=0, y=0, z=u + math.pi * v
+    )
 
 
-def C_log1(t):
+def C_log1(t: float) -> epix.Point:
     return C_log(0, t)
 
 
 # %%
-epix.bounding_box(P(-6, -12), P(6, 12))
+epix.bounding_box(Point(x=-6, y=-12), Point(x=6, y=12))
 epix.unitlength("1in")
-epix.picture(P(4, 8))
+epix.picture(Point(x=4, y=8))
 
 epix.begin()
 epix.fill()
 
 epix.degrees()
 epix.label(
-    P(0, epix.ymin()),
-    P(0, 4),
+    Point(x=0, y=epix.ymin()),
+    Point(x=0, y=4),
     r"$z=\mathrm{Re}\,\log(x+iy) + \mathrm{Im}\,\log(x+iy)$",
     epix.LabelPos.t,
 )
@@ -159,7 +181,7 @@ epix.radians()
 epix.viewpoint(VIEWPT)
 epix.camera.range(20)
 
-mesh_data = [
+mesh_data: list[MeshElt] = [
     MeshElt.surface(C_log, -3 + du * i, -3 + dv * j)
     for i in range(N1)
     for j in range(N2)
@@ -177,9 +199,9 @@ epix.marker(C_log(0, 0), epix.MarkType.BOX)
 epix.marker(C_log(0, 2), epix.MarkType.BOX)
 
 label_color()
-epix.label(C_log(0, -2), P(6, 0), r"$-2\pi i$", epix.LabelPos.r)
-epix.label(C_log(0, 0), P(6, 0), "$0$", epix.LabelPos.r)
-epix.label(C_log(0, 2), P(-6, 0), r"$2\pi i$", epix.LabelPos.l)
+epix.label(C_log(0, -2), Point(x=6, y=0), r"$-2\pi i$", epix.LabelPos.r)
+epix.label(C_log(0, 0), Point(x=6, y=0), "$0$", epix.LabelPos.r)
+epix.label(C_log(0, 2), Point(x=-6, y=0), r"$2\pi i$", epix.LabelPos.l)
 
 fig = epix.render()
 fig

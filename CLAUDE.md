@@ -109,20 +109,60 @@ device". Run `podman image prune -f` between rebuilds.
 To add or remove a library source/header, edit the `epix_sources` / `epix_headers`
 lists in `meson.build` (now the authoritative manifest).
 
-## Python bindings + notebooks (`python/`, `notebooks/`) — in progress
+## Python bindings + notebooks (`python/`, `notebooks/`)
 
-A second front-end is being built: **real nanobind bindings over `libepix`** plus
-a notebook layer, so you write a figure in Python the way the `.xp` samples are
-written in C++, rendered inline. Goal: port all ~81 `samples/` to percent-format
+A second front-end: **real nanobind bindings over `libepix`** plus a notebook
+layer, so you write a figure in Python the way the `.xp` samples are written in
+C++, rendered inline. Goal was to port all ~81 `samples/` to percent-format
 notebooks, each **byte-identical** to the C++ original. The C++ samples stay as
-the permanent oracle — this is purely additive. **Authoritative status + full
-history (incl. the precise remaining-work list): `tasks/python-bindings-and-notebooks.md`.**
-(Tech chosen: nanobind → architecture A, real bindings; C++20.) **Status: 80 of
-81 demos ported byte-identically** as of 2026-06-10 — **effectively complete.** The
-single remaining demo, `histogram`, is **blocked** (its `samples/binom.dat` data
-file is absent from the repo; the C++ oracle can't run either), not a porting gap.
-See the task doc — post-port follow-ups (Pythonic cleanup, keyword args, dir
-grouping, distro packaging, ASan teardown) are now unblocked.
+the permanent oracle — this is purely additive. **Port DONE: 80/81 byte-identical**
+(the one holdout, `histogram`, is hard-blocked — its `samples/binom.dat` is absent
+so the C++ oracle can't run either). Closeout + full history:
+`tasks/archive/2026/06/11/python-bindings-and-notebooks.md`. Tech: nanobind →
+architecture A, real bindings; C++20.
+
+**Pythonic API (post-2026-06-11).** After the port, the public Python API was
+renamed from the C++/ePiX vocabulary to **Pythonic names** (cleanup closeout:
+`tasks/archive/2026/06/11/pythonic-cleanup.md`). Use these names in new notebooks:
+- **Types → CapWords:** `Point` (was `P`), `Mesh`, `Domain`, `Screen`, `Axis`,
+  `Legend`, `Affine`, `Frame`, `Scenery`, `DataFile`, `DataBins`, `Pair`, `Path`
+  (`Color`/`Camera`/`Complex`/`Sphere`/`Circle`/`Segment`/`Plane` unchanged).
+- **Functions → snake_case:** color *factories* are lowercase (`red()`/`rgb()`/…
+  return a `Color`); pen-*setters* are `set_red()`/`set_rgb()`/…; trig lowercased
+  (`sin`/`cos`/…); `infinite_line` (was `Line`), `quarter_turn` (was `J`),
+  `root_complex` (was `rootC`); grid/mesh count args are `nx`/`ny`/`nz`.
+- **Keyword args (convention A):** notebooks keyword the unclear *and* the
+  structural/paired args — `n=`, `size=`, `cull=`, `offset=`/`align=`, `width=`,
+  `nx=`/`ny=`/`nz=`, `scale=`, and the point pairs `lower_left=`/`upper_right=`,
+  `tail=`/`head=`, `center=`/`radius=`/`normal=`, `coarse=`/`fine=`, `loc=`,
+  `a=`/`b=`/`c=`/`d=`. The coordinate constructors and other multi-scalar funcs are
+  keyworded **everywhere, even nested in expressions** (`sph(radius=, theta=, phi=)`,
+  `cyl(radius=, theta=, z=)`, `polar(radius=, theta=)`, `arc(center=, radius=,
+  start=, finish=)`, `latitude(lat=, long_min=, long_max=)`, `riemann_sum(f, a=, b=,
+  n=, type=)`, `v_error_bar(loc=, error=, kind=, width=)`, `right_angle`,
+  `axis_break`, `surface_rev`, `gray(depth=)`, `dot_size(diameter=)`,
+  `affine.scale(factor=)`, `DataBins(low=, high=, n=)`, …).
+  **Several cryptic binding `nb::arg` names were renamed** for readability:
+  `sw`/`ne` → `lower_left`/`upper_right`; `ctr`/`rad`/`r` → `center`/`radius`;
+  `perp` → `normal`; `t` → `theta` (polar/sph/cyl); `d` → `intensity` (color tints);
+  `col` → `color`; `wd`/`mk`/`err`/`w` → `width`/`kind`/`error`/`width`;
+  `wh` → `size`; `diam` → `diameter`; `scr` → `screen`; `posn` → `position`;
+  `s` → `factor`; `lo`/`hi` → `low`/`high`. (Kept where already clear: `r`/`g`/`b`
+  rgb channels, `t_min`/`t_max`, `e1`/`e2`/`e3`, parametric `t`, `phi`.) The lone
+  anchor point in `label(at, …)`, the plotted `f`/`F`, the domain `R`, and the
+  single-number color tints (`black(0.2)`) stay positional.
+  (`tasks/archive/2026/06/11/expanded-keyword-arguments.md`.) Even the `Point`
+  constructor is keyworded everywhere: `Point(x=…, y=…, z=…)`.
+- **Type hints:** every notebook starts with `from __future__ import annotations`
+  and annotates `def` params/returns (`-> float`, `-> epix.Point`, `-> epix.Color`,
+  `-> None`) plus object-typed locals (`panel: epix.Screen`, `R: epix.Domain`, …).
+  Annotations don't execute (PEP 563), so they're byte-identity-free.
+- **In-progress notebook polish** (`tasks/notebook-structure-and-types.md`): type
+  hints DONE; still TODO = an `epix.activated(screen)` context manager to replace
+  the manual `activate`/`deactivate` pairs, extract-to-helpers for the repeated
+  panel blocks (`color_sep`/`tori`/`coord_tricks`), and an enum for `log.py`'s
+  segment flag. Other follow-ups (dir grouping, distro packaging, ASan teardown):
+  see `tasks/`.
 
 Layout:
 - `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
@@ -183,15 +223,15 @@ How it works:
   tell "wrong arity" from "the function raised at the probe point" (e.g. `1/0` in
   `dipole`). Caveat: nanobind functions report `(args, kwargs)`→2, so when a
   *nanobind* function needs the 3-var form, the port passes a strict-arity lambda
-  (`lambda x,y,z: epix.P(x,y,z)`). See `callable_takes_two` in `_epix.cc`.
+  (`lambda x,y,z: epix.Point(x,y,z)`). See `callable_takes_two` in `_epix.cc`.
 - **Objects that hold a function pointer build eagerly.** `scenery` samples its
   surface (and captures the current fill state) at construction/`add()` time, so
   the Python wrapper builds the C++ object immediately (trampoline set→sample→
   cleared), holding no callable — correct per-surface colors and no GC cycle.
 - **The bind-on-demand workflow:** port a demo → it fails on a missing symbol →
   `nm`-check + bind that one thing → re-verify. Don't try to bind the whole API
-  up front. `tasks/python-bindings-and-notebooks.md` tracks status + a precise
-  remaining-work list (grouped by the subsystem each demo still needs).
+  up front. (The port is now complete; the bind-list history lives in
+  `tasks/archive/2026/06/11/python-bindings-and-notebooks.md`.)
 - **Three `.flx` are broken upstream** (`lighting`, `helicoid`, `stereo_proj`,
   and `riemann` — now fixed): they use bare enum names (`tr`, …) without
   `using enum`, so they don't even compile under enum-class. Add

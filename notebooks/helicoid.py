@@ -19,91 +19,110 @@
 # and painter-sorted back-to-front.
 
 # %%
+from __future__ import annotations
+
 import math
+from dataclasses import dataclass, field
 
 import epix
-from epix import P
+from epix import Point
 
 # number of meridians and latitudes
-N1 = 72
-N2 = 24
+n_merid = 72
+n_lat = 24
 
-VIEWPT = P(4, 3, 4)
+VIEWPT = Point(x=4, y=3, z=4)
 
 # locations of "lights"
-LIGHT_R = P(10, 0, 10)
-LIGHT_G = P(0, 10, 10)
-LIGHT_B = P(0, -10, 10)
+LIGHT_R = Point(x=10, y=0, z=10)
+LIGHT_G = Point(x=0, y=10, z=10)
+LIGHT_B = Point(x=0, y=-10, z=10)
 
 # internal constants
-EPS = 0.0  # facet shrink factor
-du = 2.0 / N1
-dv = 4.0 / N2
+facet_shrink = 0.0  # facet shrink factor
+du = 2.0 / n_merid
+dv = 4.0 / n_lat
 
 
 # parametrized surfaces
-def helicoid(u, v):
-    return P(
-        math.sinh(v) * epix.Cos(math.pi * u),
-        math.sinh(v) * epix.Sin(math.pi * u),
+def helicoid(u: float, v: float) -> epix.Point:
+    return Point(
+        math.sinh(v) * epix.cos(math.pi * u),
+        math.sinh(v) * epix.sin(math.pi * u),
         2 * math.pi * u,
     )
 
 
-def catenoid(u, v):
-    return P(
-        math.cosh(v) * epix.Sin(math.pi * u), -math.cosh(v) * epix.Cos(math.pi * u), -v
+def catenoid(u: float, v: float) -> epix.Point:
+    return Point(
+        x=math.cosh(v) * epix.sin(math.pi * u),
+        y=-math.cosh(v) * epix.cos(math.pi * u),
+        z=-v,
     )
 
 
-def morph(u, v):
-    return epix.Cos(2 * math.pi * epix.tix()) * helicoid(u, v) + epix.Sin(
+def morph(u: float, v: float) -> epix.Point:
+    return epix.cos(2 * math.pi * epix.tix()) * helicoid(u, v) + epix.sin(
         2 * math.pi * epix.tix()
     ) * catenoid(u, v)
 
 
 # facet-like class with light reflection
+@dataclass
 class Element:
-    def __init__(self, f, u0, v0):
-        self.pt1 = f(u0 + EPS, v0 + EPS)
-        self.pt2 = f(u0 + du - EPS, v0 + EPS)
-        self.pt3 = f(u0 + du - EPS, v0 + dv - EPS)
-        self.pt4 = f(u0 + EPS, v0 + dv - EPS)
-        center = 0.25 * (self.pt1 + (self.pt2 + (self.pt3 + self.pt4)))
+    f: object
+    u0: float
+    v0: float
+    pt1: Point = field(init=False)
+    pt2: Point = field(init=False)
+    pt3: Point = field(init=False)
+    pt4: Point = field(init=False)
+    distance: float = field(init=False)
+
+    def __post_init__(self) -> None:
+        self.pt1 = self.f(self.u0 + facet_shrink, self.v0 + facet_shrink)
+        self.pt2 = self.f(self.u0 + du - facet_shrink, self.v0 + facet_shrink)
+        self.pt3 = self.f(self.u0 + du - facet_shrink, self.v0 + dv - facet_shrink)
+        self.pt4 = self.f(self.u0 + facet_shrink, self.v0 + dv - facet_shrink)
+        center: epix.Point = 0.25 * (self.pt1 + (self.pt2 + (self.pt3 + self.pt4)))
         self.distance = (center - epix.camera.viewpt()).norm()
 
-    def how_far(self):
+    def how_far(self) -> float:
         return self.distance
 
-    def draw(self):
-        normal = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
+    def draw(self) -> None:
+        normal: epix.Point = (self.pt2 - self.pt1) ^ (self.pt4 - self.pt1)
         normal = (1 / normal.norm()) * normal
 
         dens_r = 0.75 * (math.pow(normal | LIGHT_R, 2) / (LIGHT_R | LIGHT_R))
         dens_g = 0.75 * (math.pow(normal | LIGHT_G, 2) / (LIGHT_G | LIGHT_G))
         dens_b = 0.75 * (math.pow(normal | LIGHT_B, 2) / (LIGHT_B | LIGHT_B))
 
-        epix.fill(epix.RGB(dens_r, dens_g, dens_b))
-        epix.quad(self.pt1, self.pt2, self.pt3, self.pt4)
+        epix.fill(epix.rgb(dens_r, dens_g, dens_b))
+        epix.quad(a=self.pt1, b=self.pt2, c=self.pt3, d=self.pt4)
 
 
 # %%
-def build():
+def build() -> None:
     MAX = 8
-    epix.picture(P(-MAX, -MAX), P(MAX, MAX), "5x5in")
+    epix.picture(
+        lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="5x5in"
+    )
 
     epix.begin()
-    epix.pen(epix.Neutral(), 0)  # no grid lines
+    epix.pen(epix.neutral(), width=0)  # no grid lines
 
     # draw bounding square for uniform frame size
-    epix.backing(epix.Black())
+    epix.backing(epix.black())
     epix.viewpoint(VIEWPT)
 
     epix.camera.range(20)
 
     # build surface
-    mesh = [
-        Element(morph, -1 + du * i, -2 + dv * j) for i in range(N1) for j in range(N2)
+    mesh: list[Element] = [
+        Element(morph, -1 + du * i, -2 + dv * j)
+        for i in range(n_merid)
+        for j in range(n_lat)
     ]
 
     mesh.sort(key=lambda e: e.how_far(), reverse=True)

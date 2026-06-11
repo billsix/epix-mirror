@@ -16,45 +16,55 @@
 # Graphing 1/x across broken axes (three `screen` panels with `axis_break`).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 gap = 0.15
-GRAY = epix.Black(0.5)
+GRAY = epix.black(0.5)
 
 # %%
-with epix.figure(P(0, 0), P(2 + gap, 2 + gap), "4x4in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=2 + gap, y=2 + gap), size="4x4in"
+) as fig:
     epix.plain(GRAY)
-    epix.axis_break(P(1, 0), P(1 + gap, 0))
-    epix.axis_break(P(0, 1), P(0, 1 + gap))
+    epix.axis_break(tail=Point(x=1, y=0), head=Point(x=1 + gap, y=0))
+    epix.axis_break(tail=Point(x=0, y=1), head=Point(x=0, y=1 + gap))
 
-    scr1 = epix.screen(P(0, 0), P(4, 4))
-    epix.activate(scr1)
+    screen_origin: epix.Screen = epix.Screen(
+        lower_left=Point(x=0, y=0), upper_right=Point(x=4, y=4)
+    )
+    epix.activate(screen_origin)
     epix.set_crop()
-    epix.grid(8, 8)
-    epix.h_axis_labels(4, P(0, -4), epix.LabelPos.b)
-    epix.v_axis_labels(4, P(-4, 0), epix.LabelPos.l)
-    epix.bold(epix.Red())
-    epix.plot(epix.recip, 0, 4, 120)
-    epix.inset(P(0, 0), P(1, 1))
+    epix.grid(nx=8, ny=8)
+    epix.h_axis_labels(n=4, offset=Point(x=0, y=-4), align=epix.LabelPos.b)
+    epix.v_axis_labels(n=4, offset=Point(x=-4, y=0), align=epix.LabelPos.l)
+    epix.bold(epix.red())
+    epix.plot(epix.recip, 0, 4, n=120)
+    epix.inset(lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
 
-    scr2 = epix.screen(P(10, 0), P(14, 4))
-    epix.activate(scr2)
-    epix.set_crop()
-    epix.plain(GRAY)
-    epix.grid(8, 8)
-    epix.h_axis_labels(4, P(0, -4), epix.LabelPos.b)
-    epix.bold(epix.Red())
-    epix.plot(epix.recip, 10, 14, 20)
-    epix.inset(P(1 + gap, 0), P(2 + gap, 1))
-
-    scr3 = epix.screen(P(0, 10), P(4, 14))
-    epix.activate(scr3)
+    screen_large_x: epix.Screen = epix.Screen(
+        lower_left=Point(x=10, y=0), upper_right=Point(x=14, y=4)
+    )
+    epix.activate(screen_large_x)
     epix.set_crop()
     epix.plain(GRAY)
-    epix.grid(8, 8)
-    epix.v_axis_labels(4, P(-4, 0), epix.LabelPos.l)
-    epix.bold(epix.Red())
-    epix.plot(epix.recip, 0.05, 0.1, 10)
-    epix.inset(P(0, 1 + gap), P(1, 2 + gap))
+    epix.grid(nx=8, ny=8)
+    epix.h_axis_labels(n=4, offset=Point(x=0, y=-4), align=epix.LabelPos.b)
+    epix.bold(epix.red())
+    epix.plot(epix.recip, 10, 14, n=20)
+    epix.inset(lower_left=Point(x=1 + gap, y=0), upper_right=Point(x=2 + gap, y=1))
+
+    screen_large_y: epix.Screen = epix.Screen(
+        lower_left=Point(x=0, y=10), upper_right=Point(x=4, y=14)
+    )
+    epix.activate(screen_large_y)
+    epix.set_crop()
+    epix.plain(GRAY)
+    epix.grid(nx=8, ny=8)
+    epix.v_axis_labels(n=4, offset=Point(x=-4, y=0), align=epix.LabelPos.l)
+    epix.bold(epix.red())
+    epix.plot(epix.recip, 0.05, 0.1, n=10)
+    epix.inset(lower_left=Point(x=0, y=1 + gap), upper_right=Point(x=1, y=2 + gap))
 fig

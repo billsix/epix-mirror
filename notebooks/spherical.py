@@ -16,54 +16,97 @@
 # Spherical coordinates: nested coordinate surfaces (ρ, θ, φ) with labelled axes.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 MAX = 3
 
 
-def sph3(rho, th, phi):  # wrap so arity is detectable (nanobind fns report 2)
-    return epix.sph(rho, th, phi)
+def sph3(
+    rho: float, th: float, phi: float
+) -> epix.Point:  # wrap so arity is detectable (nanobind fns report 2)
+    return epix.sph(radius=rho, theta=th, phi=phi)
 
 
 # %%
-with epix.figure(P(-MAX, -MAX), P(MAX, MAX), "6x6in") as fig:
+with epix.figure(
+    lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="6x6in"
+) as fig:
     epix.camera.at(30, 5, 20)
     epix.revolutions()
-    R = epix.domain(
-        P(0, 0, -0.25), P(3, 1, 0.25), epix.mesh(12, 48, 24), epix.mesh(12, 96, 120)
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=0, y=0, z=-0.25),
+        upper_right=Point(x=3, y=1, z=0.25),
+        coarse=epix.Mesh(nx=12, ny=48, nz=24),
+        fine=epix.Mesh(nx=12, ny=96, nz=120),
     )
     Phi = 7.0 / 48
     Theta = 7.0 / 48
-    epix.plain(epix.Black(0.5))
-    epix.fill(epix.Red(1.9))
-    coords = epix.scenery(sph3, R.slice1(2))  # rho = 2
-    epix.fill(epix.Yellow(0.35))
+    epix.plain(epix.black(0.5))
+    epix.fill(epix.red(1.9))
+    coords: epix.Scenery = epix.Scenery(sph3, R.slice1(2))  # rho = 2
+    epix.fill(epix.yellow(0.35))
     coords.add(sph3, R.slice2(0)).add(sph3, R.slice2(Theta))
-    epix.fill(epix.Blue(1.9))
+    epix.fill(epix.blue(1.9))
     coords.add(sph3, R.slice3(0)).add(sph3, R.slice3(Phi))
     coords.draw()
     epix.fill(False)
-    epix.pen(epix.Black())
-    epix.base(epix.White(), "1.2pt")
+    epix.pen(epix.black())
+    epix.base(epix.white(), width="1.2pt")
     epix.arrow_fill(True)
-    epix.arrow(P(3, 0, 0), P(3.5, 0, 0))
-    epix.label(P(3.5, 0, 0), P(-2, -2), "$x$", epix.LabelPos.bl)
-    epix.arrow(P(0, 3, 0), P(0, 3.5, 0))
-    epix.label(P(0, 3.5, 0), P(2, -2), "$y$", epix.LabelPos.br)
-    epix.arrow(P(0, 0, 3), P(0, 0, 3.5))
-    epix.label(P(0, 0, 3.5), P(0, 4), "$z$", epix.LabelPos.t)
+    epix.arrow(tail=Point(x=3, y=0, z=0), head=Point(x=3.5, y=0, z=0))
+    epix.label(
+        Point(x=3.5, y=0, z=0),
+        offset=Point(x=-2, y=-2),
+        text="$x$",
+        align=epix.LabelPos.bl,
+    )
+    epix.arrow(tail=Point(x=0, y=3, z=0), head=Point(x=0, y=3.5, z=0))
+    epix.label(
+        Point(x=0, y=3.5, z=0),
+        offset=Point(x=2, y=-2),
+        text="$y$",
+        align=epix.LabelPos.br,
+    )
+    epix.arrow(tail=Point(x=0, y=0, z=3), head=Point(x=0, y=0, z=3.5))
+    epix.label(
+        Point(x=0, y=0, z=3.5),
+        offset=Point(x=0, y=4),
+        text="$z$",
+        align=epix.LabelPos.t,
+    )
     epix.bold()
-    epix.arc_arrow(P(0, 0, 0), 2, 0.5 * Theta, Theta)
-    epix.arc_arrow(P(0, 0, 0), 2, 0.5 * Theta, 0)
-    epix.aarrow(P(0, 0, 0), epix.sph(2, Theta, Phi))
-    epix.label(epix.sph(2, 0.5 * Theta, 0), P(2, 2), r"$\theta$", epix.LabelPos.t)
-    epix.label(epix.sph(2, Theta, 0.5 * Phi), P(-2, 0), r"$\phi$", epix.LabelPos.l)
-    epix.label(epix.sph(1, Theta, Phi), P(2, -2), r"$\rho$", epix.LabelPos.br)
-    epix.base(epix.Neutral(), 0)
+    epix.arc_arrow(
+        center=Point(x=0, y=0, z=0), radius=2, start=0.5 * Theta, finish=Theta
+    )
+    epix.arc_arrow(center=Point(x=0, y=0, z=0), radius=2, start=0.5 * Theta, finish=0)
+    epix.aarrow(
+        tail=Point(x=0, y=0, z=0), head=epix.sph(radius=2, theta=Theta, phi=Phi)
+    )
+    epix.label(
+        epix.sph(radius=2, theta=0.5 * Theta, phi=0),
+        offset=Point(x=2, y=2),
+        text=r"$\theta$",
+        align=epix.LabelPos.t,
+    )
+    epix.label(
+        epix.sph(radius=2, theta=Theta, phi=0.5 * Phi),
+        offset=Point(x=-2, y=0),
+        text=r"$\phi$",
+        align=epix.LabelPos.l,
+    )
+    epix.label(
+        epix.sph(radius=1, theta=Theta, phi=Phi),
+        offset=Point(x=2, y=-2),
+        text=r"$\rho$",
+        align=epix.LabelPos.br,
+    )
+    epix.base(epix.neutral(), width=0)
     epix.dashed()
     epix.plain()
-    epix.line(P(0, 0, 0), P(2, 0, 0))
-    epix.line(P(0, 0, 0), epix.sph(2, Theta, 0))
-    epix.line(P(0, 0, 0), epix.sph(2, Theta, Phi))
+    epix.line(tail=Point(x=0, y=0, z=0), head=Point(x=2, y=0, z=0))
+    epix.line(tail=Point(x=0, y=0, z=0), head=epix.sph(radius=2, theta=Theta, phi=0))
+    epix.line(tail=Point(x=0, y=0, z=0), head=epix.sph(radius=2, theta=Theta, phi=Phi))
 fig

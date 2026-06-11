@@ -16,18 +16,22 @@
 # Basic 2-D objects: triangle, circle, rectangles, a grid.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 # %%
-with epix.figure(P(0, 0), P(5, 2), "3.75 x 1.5in") as fig:
-    epix.triangle(P(0.9, 1), P(3.1, 1), P(2, 1.5))
-    epix.circle(P(4, 1.5), 0.25)
-    epix.rect(P(1, 0), P(3, 1))
-    epix.fill(epix.Black(0.1))
-    epix.rect(P(2.3, 0), P(2.7, 0.8))
-    epix.fill(epix.White())
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=5, y=2), size="3.75 x 1.5in"
+) as fig:
+    epix.triangle(a=Point(x=0.9, y=1), b=Point(x=3.1, y=1), c=Point(x=2, y=1.5))
+    epix.circle(center=Point(x=4, y=1.5), radius=0.25)
+    epix.rect(lower_left=Point(x=1, y=0), upper_right=Point(x=3, y=1))
+    epix.fill(epix.black(0.1))
+    epix.rect(lower_left=Point(x=2.3, y=0), upper_right=Point(x=2.7, y=0.8))
+    epix.fill(epix.white())
     epix.bold()
-    epix.grid(P(1.4, 0.2), P(2, 0.6), 2, 2)
-    epix.line(P(epix.xmin(), 0), P(epix.xmax(), 0))
+    epix.grid(lower_left=Point(x=1.4, y=0.2), upper_right=Point(x=2, y=0.6), nx=2, ny=2)
+    epix.line(tail=Point(x=epix.xmin(), y=0), head=Point(x=epix.xmax(), y=0))
 fig

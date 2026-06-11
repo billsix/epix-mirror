@@ -18,30 +18,38 @@
 # `screen` panel.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 koch_seed = [6, 4, 0, 1, -1, 0]
 
 # %%
-with epix.figure(P(0, 0), P(4, 1), "6 x 1.5in") as fig:
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=4, y=1), size="6 x 1.5in"
+) as fig:
     epix.degrees()
 
     for i in range(1, 5):
         # draw von Koch curve at "depth" i
-        tmp = epix.screen(P(-1, -1), P(1, 1))
-        epix.activate(tmp)
+        panel: epix.Screen = epix.Screen(
+            lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1)
+        )
+        epix.activate(panel)
 
         if i == 1:
-            epix.bold(epix.Red())
-            epix.fractal(epix.cis(150), epix.cis(30), i, koch_seed)
-            epix.plain(epix.Black())
+            epix.bold(epix.red())
+            epix.fractal(p=epix.cis(150), q=epix.cis(30), depth=i, pre_seed=koch_seed)
+            epix.plain(epix.black())
         else:
-            epix.fractal(epix.cis(150), epix.cis(30), i, koch_seed)
+            epix.fractal(p=epix.cis(150), q=epix.cis(30), depth=i, pre_seed=koch_seed)
 
-        epix.fractal(epix.cis(30), epix.cis(-90), i, koch_seed)
-        epix.fractal(epix.cis(-90), epix.cis(150), i, koch_seed)
+        epix.fractal(p=epix.cis(30), q=epix.cis(-90), depth=i, pre_seed=koch_seed)
+        epix.fractal(p=epix.cis(-90), q=epix.cis(150), depth=i, pre_seed=koch_seed)
 
-        epix.inset(tmp, P(i - 1, 0), P(i, 1))
-        epix.deactivate(tmp)
+        epix.inset(
+            child=panel, lower_left=Point(x=i - 1, y=0), upper_right=Point(x=i, y=1)
+        )
+        epix.deactivate(panel)
 fig

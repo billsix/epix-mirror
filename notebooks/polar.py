@@ -16,22 +16,26 @@
 # A polar rose on a polar grid (degrees mode).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def f(t):
-    return 2 * epix.Cos(3 * t)
+def f(t: float) -> float:
+    return 2 * epix.cos(3 * t)
 
 
 # %%
-with epix.figure(P(-2, -2), P(2, 2), "2x2in") as fig:
+with epix.figure(
+    lower_left=Point(x=-2, y=-2), upper_right=Point(x=2, y=2), size="2x2in"
+) as fig:
     epix.degrees()
-    epix.black(0.3)
-    epix.polar_grid(2, 4, 24)  # radius, rings, sectors
-    epix.black()
-    epix.bottom_axis(4, P(0, -4)).subdivide(2).draw()
-    epix.left_axis(4, P(-4, 0)).subdivide(2).draw()
+    epix.set_black(0.3)
+    epix.polar_grid(radius=2, nx=4, ny=24)  # radius, rings, sectors
+    epix.set_black()
+    epix.bottom_axis(4, offset=Point(x=0, y=-4)).subdivide(n=2).draw()
+    epix.left_axis(4, offset=Point(x=-4, y=0)).subdivide(n=2).draw()
     epix.bold()
-    epix.polarplot(f, 0, 180, 120)
+    epix.polarplot(f, 0, 180, n=120)
 fig

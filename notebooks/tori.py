@@ -16,46 +16,71 @@
 # A torus shown three ways (solid, cropped, boxed) across three `screen` panels.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 
-def F(u, v):
-    return epix.polar(2.25 + epix.Cos(u), v) + P(0, 0, epix.Sin(u))
+def F(u: float, v: float) -> epix.Point:
+    return epix.polar(radius=2.25 + epix.cos(u), theta=v) + Point(
+        x=0, y=0, z=epix.sin(u)
+    )
 
 
 # %%
-with epix.figure(P(0, 0), P(4, 1), "6 x 1.5in") as fig:
-    R = epix.domain(P(0, 0), P(1, 1), epix.mesh(12, 30), epix.mesh(24, 60))
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=4, y=1), size="6 x 1.5in"
+) as fig:
+    R: epix.Domain = epix.Domain(
+        lower_left=Point(x=0, y=0),
+        upper_right=Point(x=1, y=1),
+        coarse=epix.Mesh(nx=12, ny=30),
+        fine=epix.Mesh(nx=24, ny=60),
+    )
     epix.revolutions()
     epix.camera.at(10, 7, 5)
 
-    scr1 = epix.screen(P(-3, -3), P(3, 3))
-    epix.activate(scr1)
-    epix.fill(epix.White())
+    screen_solid: epix.Screen = epix.Screen(
+        lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3)
+    )
+    epix.activate(screen_solid)
+    epix.fill(epix.white())
     epix.surface(F, R)
-    epix.inset(P(0, 0), P(1, 1))
-    epix.deactivate(scr1)
+    epix.inset(lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
+    epix.deactivate(screen_solid)
 
-    scr2 = epix.screen(P(-3, -3), P(3, 3))
-    epix.activate(scr2)
+    screen_cropped: epix.Screen = epix.Screen(
+        lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3)
+    )
+    epix.activate(screen_cropped)
     epix.set_crop()
     epix.border()
     epix.surface(F, R)
-    epix.inset(P(1.5, 0), P(2.5, 1))
-    epix.deactivate(scr2)
+    epix.inset(lower_left=Point(x=1.5, y=0), upper_right=Point(x=2.5, y=1))
+    epix.deactivate(screen_cropped)
 
-    scr3 = epix.screen(P(-3, -3), P(3, 3))
-    epix.activate(scr3)
-    epix.clip_box(P(3.5, 2, 1.5))
+    screen_boxed: epix.Screen = epix.Screen(
+        lower_left=Point(x=-3, y=-3), upper_right=Point(x=3, y=3)
+    )
+    epix.activate(screen_boxed)
+    epix.clip_box(Point(x=3.5, y=2, z=1.5))
     epix.nofill()
-    epix.rect(P(-3.5, -2, -1.5), P(-3.5, 2, 1.5))
-    epix.rect(P(-3.5, -2, -1.5), P(3.5, -2, 1.5))
+    epix.rect(
+        lower_left=Point(x=-3.5, y=-2, z=-1.5), upper_right=Point(x=-3.5, y=2, z=1.5)
+    )
+    epix.rect(
+        lower_left=Point(x=-3.5, y=-2, z=-1.5), upper_right=Point(x=3.5, y=-2, z=1.5)
+    )
     epix.fill()
     epix.surface(F, R)
     epix.nofill()
-    epix.rect(P(3.5, -2, -1.5), P(3.5, 2, 1.5))
-    epix.rect(P(-3.5, 2, -1.5), P(3.5, 2, 1.5))
-    epix.inset(P(3, 0), P(4, 1))
-    epix.deactivate(scr3)
+    epix.rect(
+        lower_left=Point(x=3.5, y=-2, z=-1.5), upper_right=Point(x=3.5, y=2, z=1.5)
+    )
+    epix.rect(
+        lower_left=Point(x=-3.5, y=2, z=-1.5), upper_right=Point(x=3.5, y=2, z=1.5)
+    )
+    epix.inset(lower_left=Point(x=3, y=0), upper_right=Point(x=4, y=1))
+    epix.deactivate(screen_boxed)
 fig

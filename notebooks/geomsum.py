@@ -16,28 +16,34 @@
 # The geometric series 1/2 + 1/4 + 1/8 + … filling the unit square.
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 N = 8
 
 # %%
-with epix.figure(P(0, 0), P(1, 1), "2.5x2.5in") as fig:
-    epix.pen(epix.White(), "0.8pt")
-    epix.fill(epix.White(0.9))
-    epix.rect(P(0, 0), P(1, 1))
-    epix.black()
-    epix.label(P(1.0 / 4, 1.0 / 2), r"$\frac{1}{2}$")
-    epix.label(P(5.0 / 8, 3.0 / 4), r"$\frac{1}{8}$")
-    epix.label(P(13.0 / 16, 7.0 / 8), r"$\frac{1}{32}$")
-    epix.white()
-    epix.fill(epix.Blue())
+with epix.figure(
+    lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1), size="2.5x2.5in"
+) as fig:
+    epix.pen(epix.white(), width="0.8pt")
+    epix.fill(epix.white(0.9))
+    epix.rect(lower_left=Point(x=0, y=0), upper_right=Point(x=1, y=1))
+    epix.set_black()
+    epix.label(Point(x=1.0 / 4, y=1.0 / 2), r"$\frac{1}{2}$")
+    epix.label(Point(x=5.0 / 8, y=3.0 / 4), r"$\frac{1}{8}$")
+    epix.label(Point(x=13.0 / 16, y=7.0 / 8), r"$\frac{1}{32}$")
+    epix.set_white()
+    epix.fill(epix.blue())
     t = 0.5
     for _ in range(N):
-        epix.rect(P(1 - t, 1 - 2 * t), P(1, 1 - t))
-        epix.line(P(1 - t, 1 - 2 * t), P(1 - t, 1))
+        epix.rect(
+            lower_left=Point(x=1 - t, y=1 - 2 * t), upper_right=Point(x=1, y=1 - t)
+        )
+        epix.line(tail=Point(x=1 - t, y=1 - 2 * t), head=Point(x=1 - t, y=1))
         t *= 0.5
-    epix.label(P(3.0 / 4, 1.0 / 4), r"$\mathbf{\frac{1}{4}}$")
-    epix.label(P(7.0 / 8, 5.0 / 8), r"$\mathbf{\frac{1}{16}}$")
-    epix.label(P(15.0 / 16, 13.0 / 16), r"$\mathbf{\frac{1}{64}}$")
+    epix.label(Point(x=3.0 / 4, y=1.0 / 4), r"$\mathbf{\frac{1}{4}}$")
+    epix.label(Point(x=7.0 / 8, y=5.0 / 8), r"$\mathbf{\frac{1}{16}}$")
+    epix.label(Point(x=15.0 / 16, y=13.0 / 16), r"$\mathbf{\frac{1}{64}}$")
 fig

@@ -16,20 +16,24 @@
 # A stack of clipped, color-graded planes (the `Plane` class).
 
 # %%
+from __future__ import annotations
+
 import epix
-from epix import P
+from epix import Point
 
 N = 20
 
 # %%
-with epix.figure(P(-2, -2), P(2, 2), "6x6in") as fig:
+with epix.figure(
+    lower_left=Point(x=-2, y=-2), upper_right=Point(x=2, y=2), size="6x6in"
+) as fig:
     epix.border()
     epix.fill()
-    epix.camera.at(P(10, -6, 4))
-    epix.clip_box(P(-1, -1, -1), P(1, 1, 1))
-    C = epix.Plane(P(-1, -1, -1), P(1, 1, 1))
+    epix.camera.at(Point(x=10, y=-6, z=4))
+    epix.clip_box(lower_left=Point(x=-1, y=-1, z=-1), upper_right=Point(x=1, y=1, z=1))
+    C: epix.Plane = epix.Plane(Point(x=-1, y=-1, z=-1), Point(x=1, y=1, z=1))
     for i in range(1, N):
-        epix.rgb(i * 1.0 / N, 0.2, 1 - i * 1.0 / N)
-        C.shift((2.0 / N) * P(1, 1, 1))
+        epix.set_rgb(i * 1.0 / N, 0.2, 1 - i * 1.0 / N)
+        C.shift((2.0 / N) * Point(x=1, y=1, z=1))
         C.draw()
 fig
