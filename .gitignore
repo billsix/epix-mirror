@@ -11,3 +11,6 @@ __pycache__/
 *.so
 /notebooks/*.ipynb
 .ipynb_checkpoints/
+
+# exported OCI image tars (make image-export) — large, never commit
+epix-*.tar

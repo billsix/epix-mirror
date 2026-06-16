@@ -132,6 +132,14 @@ format: ## Format C++ (clang-format) + Python (ruff) in place
 clean: ## Remove the host $(OUTPUT_DIR) folder
 	rm -rf $(OUTPUT_DIR)
 
+.PHONY: image-export
+image-export: ## export the OCI image to a timestamped tar in the repo root
+	$(CONTAINER_CMD) save $(CONTAINER_NAME) -o $(CONTAINER_NAME)-$(shell date +%m-%d-%Y_%H-%M-%S).tar
+
+.PHONY: image-import
+image-import: ## import an OCI image tar: make image-import FILE=foo.tar
+	$(CONTAINER_CMD) load -i $(FILE)
+
 .PHONY: help
 help:
 	@grep --extended-regexp '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-16s\033[0m %s\n", $$1, $$2}'
