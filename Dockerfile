@@ -59,5 +59,8 @@ RUN cd /epix && \
     meson install -C /tmp/build && \
     rm -rf /tmp/build
 
+# Seed the interactive shell history with the JupyterLab launcher (press Up).
+RUN echo "/usr/local/bin/jupyter.sh # JupyterLab on http://127.0.0.1:8888/lab" >> ~/.bash_history
+
 COPY entrypoint/entrypoint.sh /entrypoint.sh
 ENTRYPOINT ["/entrypoint.sh"]

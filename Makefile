@@ -47,7 +47,8 @@ SCRIPT_MOUNTS = \
 	-v $(CURDIR)/entrypoint/build.sh:/build.sh:Z \
 	-v $(CURDIR)/entrypoint/examples.sh:/examples.sh:Z \
 	-v $(CURDIR)/entrypoint/examples-anim.sh:/examples-anim.sh:Z \
-	-v $(CURDIR)/entrypoint/format.sh:/format.sh:Z
+	-v $(CURDIR)/entrypoint/format.sh:/format.sh:Z \
+	-v $(CURDIR)/entrypoint/jupyter.sh:/usr/local/bin/jupyter.sh:Z
 
 RUN = $(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) --entrypoint /bin/bash
 
@@ -110,7 +111,6 @@ asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (remove las
 jupyter: py-ext ## Launch JupyterLab (:8888) with the epix package; builds the extension first
 	$(RUN) -it \
 		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
-		-v $(CURDIR)/entrypoint/jupyter.sh:/usr/local/bin/jupyter.sh:Z \
 		-p 8888:8888 \
 		$(CONTAINER_NAME) /usr/local/bin/jupyter.sh
 
