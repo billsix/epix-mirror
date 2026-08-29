@@ -20,11 +20,14 @@ CONTAINER_NAME = epix
 # Host folder for rendered examples; bind-mounted into the container at /output.
 OUTPUT_DIR ?= $(CURDIR)/output
 
-# Appended to every inner `podman run` / `podman build`.  Empty by default
-# (correct on a normal host).  Running nested inside the claudecontainer
-# sandbox needs --cgroups=disabled, e.g.:
-#     make examples PODMAN_RUN_FLAGS=--cgroups=disabled
-PODMAN_RUN_FLAGS   ?=
+# Extra flags for every container `run`. Auto-set when running nested inside a
+# runClaudeInContainer/runCrushInContainer sandbox (which exports NESTED_PODMAN=1,
+# making --cgroups=disabled apply so podman-in-podman works); empty — and
+# byte-identical behavior — on a normal host. Overridable:
+#   make shell PODMAN_RUN_FLAGS='--cgroups=disabled --network=host'
+# On `run` lines only, never `build` (podman build rejects --cgroups). Convention:
+# runClaudeInContainer tasks/reference/nested-podman-design.md.
+PODMAN_RUN_FLAGS   ?= $(if $(filter 1,$(NESTED_PODMAN)),--cgroups=disabled)
 PODMAN_BUILD_FLAGS ?=
 
 # Passed through to the render scripts.

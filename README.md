@@ -93,8 +93,8 @@ make notebooks              # convert notebooks/*.py (jupytext) -> .ipynb
 
 Rendered figures land in `./output/` on the host (bind-mounted into the
 container). The build scripts live in [`entrypoint/`](entrypoint/); the image
-builds ePiX with Meson. When running nested inside another container, append
-`PODMAN_RUN_FLAGS=--cgroups=disabled`. (Repeated `make image` rebuilds can
+builds ePiX with Meson. When running nested inside another container, `--cgroups=disabled`
+is auto-applied via `PODMAN_RUN_FLAGS` (keyed on `NESTED_PODMAN=1`). (Repeated `make image` rebuilds can
 exhaust the container image store, a small tmpfs — run `podman image prune -f`
 to reclaim space.)
 

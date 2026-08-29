@@ -182,9 +182,9 @@ The env form is simplest for a loop over many `.xp` binaries; prefer it.
 ## In-container-only constraint
 
 All of this runs **inside the epix image**, per the working arrangement — never
-on the host. Nested-podman caveats apply: every inner `podman run`/`build` needs
-`PODMAN_RUN_FLAGS=--cgroups=disabled` / `PODMAN_BUILD_FLAGS=--cgroups=disabled`
-(already threaded through the `Makefile`), and the inner image store is a small
+on the host. Nested-podman caveats apply: `--cgroups=disabled` auto-applies to inner `podman run`s
+via `PODMAN_RUN_FLAGS` (keyed on `NESTED_PODMAN=1`, 2026-08-29; `PODMAN_BUILD_FLAGS`
+stays manual and is normally not needed), and the inner image store is a small
 tmpfs (`podman image prune -f` between rebuilds). The gate adds **no new image
 dependency**: `libasan` is already in the `Dockerfile` and trap-UBSan needs no
 runtime. clang is the one thing to confirm — the image installs

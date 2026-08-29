@@ -88,7 +88,8 @@ up-to-date, `FORCE=1` to override), `jupyter` (JupyterLab on :8888 — **depends
 `format` (clang-format C++ + ruff Python — also runs automatically on `make
 shell` exit, via `entrypoint/format.sh`).
 Entrypoint scripts in `entrypoint/` are bind-mounted (edit without rebuild).
-Nested (podman-in-podman) usage needs `PODMAN_RUN_FLAGS=--cgroups=disabled`. The
+Nested (podman-in-podman) runs auto-apply `--cgroups=disabled` via `PODMAN_RUN_FLAGS`
+(keyed on the sandbox's `NESTED_PODMAN=1` export). The
 render scripts run each figure from a scratch copy with `epix -I.` so the host
 tree stays clean and sibling `#include`s resolve. See
 `tasks/archive/2026/06/09/container-build-tooling.md` for the design + gotchas.
@@ -207,7 +208,7 @@ How it works:
 - **The per-session dev loop (operational).** The container image store is an
   *ephemeral tmpfs*, so a fresh session rebuilds it: `make image` (~minutes — the
   TeX-Live layer). Then iterate: after each `_epix.cc` change run
-  `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled` (it relinks only when needed;
+  `make py-ext` (nested: `--cgroups=disabled` auto-applies; it relinks only when needed;
   `FORCE=1` to force). Note `py-ext` links the bind-mounted `build/libepix.a`, so
   after editing *libepix* C++ sources (`src/`/`include/`) run `make build` (or
   `make lib`) first — otherwise the extension links a stale library. Run the

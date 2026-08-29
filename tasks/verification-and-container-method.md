@@ -97,8 +97,9 @@ None of the toolchain the harness needs lives on the bare host / Claude sandbox:
 
 The project's `Makefile` bakes all of that into a Fedora 44 OCI image
 (`make image`). I run that image **nested** (podman-in-podman) inside the Claude
-sandbox. Two nested-specific things (from the global `CLAUDE.md`): every inner run
-needs `--cgroups=disabled` (the sandbox's `/sys/fs/cgroup` is read-only), and the
+sandbox. Two nested-specific things (from the global `CLAUDE.md`): inner runs carry
+`--cgroups=disabled` (auto-applied via `PODMAN_RUN_FLAGS` since 2026-08-29; originally
+hand-added because the sandbox's `/sys/fs/cgroup` was read-only), and the
 inner image store is an **ephemeral tmpfs** — the image doesn't survive the
 session, so it's a `make image` rebuild (~minutes, the TeX-Live layer) at the start
 of each session.
