@@ -1,8 +1,9 @@
 # Explainer: how port "byte compatibility" is verified, and how nested containers were used
 
 **Status:** reference / retrospective (not deferred work) — explains the method
-used while porting demos in `python-bindings-and-notebooks.md`.
-**Written:** 2026-06-10 (Bill asked for this writeup)
+used while porting demos in `tasks/archive/2026/06/11/python-bindings-and-notebooks.md`.
+Moved from `tasks/` to `tasks/reference/` 2026-10-06 (it states what is true, not work to do).
+**Written:** 2026-06-10 (William Emerison Six <billsix@gmail.com> asked for this writeup)
 
 ---
 
@@ -96,13 +97,14 @@ None of the toolchain the harness needs lives on the bare host / Claude sandbox:
   ghostscript + ImageMagick stack.
 
 The project's `Makefile` bakes all of that into a Fedora 44 OCI image
-(`make image`). I run that image **nested** (podman-in-podman) inside the Claude
+(`make image`). The agent ran that image **nested** (podman-in-podman) inside the Claude
 sandbox. Two nested-specific things (from the global `CLAUDE.md`): inner runs carry
 `--cgroups=disabled` (auto-applied via `PODMAN_RUN_FLAGS` since 2026-08-29; originally
 hand-added because the sandbox's `/sys/fs/cgroup` was read-only), and the
-inner image store is an **ephemeral tmpfs** — the image doesn't survive the
-session, so it's a `make image` rebuild (~minutes, the TeX-Live layer) at the start
-of each session.
+inner image store was, at the time, an **ephemeral tmpfs** (moved to a
+per-session on-disk directory 2026-09-27; still ephemeral) — the image doesn't
+survive the session, so it's a `make image` rebuild (~minutes, the TeX-Live layer)
+at the start of each session.
 
 ## 5. Were the nested containers helpful — or inefficient? (the batching question)
 
@@ -110,21 +112,24 @@ of each session.
 the image bakes `epix` installed at `/usr/local`, so the oracle's `g++ … -lepix`
 compile "just works" with no host setup. There was no realistic non-container path.
 
-**But my first runs *were* inefficient, and I fixed it by batching — which is
-exactly what you're asking about.** The cost breakdown of a single verify is:
+**But the first runs *were* inefficient, and batching fixed it — which is exactly
+what the maintainer asked about.** The cost breakdown of a single verify is:
 
 - container **startup** (overlay mount + process init): the dominant cost,
 - the **g++ compile** of the oracle (~a second),
 - the actual run + diff: sub-second.
 
-My very first verifications spun up a **separate `podman run` per demo** — including
+The very first verifications spun up a **separate `podman run` per demo** — including
 running `butterfly` three times as three separate `podman run`s for a stability
 check. That pays the container-startup cost *every single time*, which dwarfs the
 sub-second verify.
 
-I switched to **one `podman run` with a shell loop** over the demos:
+The fix was **one `podman run` with a shell loop** over the demos:
 
 ```sh
+# June 2026 form (PYTHONPATH; no shell-exec yet). Since 2026-10-06 a saved script run through
+#   make shell-exec SCRIPT=tools/verify_image.sh
+# does the same loop -- the venv has `epix` installed editable, so no PYTHONPATH.
 podman run --rm --cgroups=disabled -v /epix:/epix:Z -e PYTHONPATH=/epix/python \
   epix -c 'for n in butterfly shadeplot clipping legend …; do
              python3 /epix/build-aux/verify_ports.py $n; done'
@@ -133,7 +138,7 @@ podman run --rm --cgroups=disabled -v /epix:/epix:Z -e PYTHONPATH=/epix/python \
 Each demo still gets a **fresh Python process** (required for libepix state
 isolation — `verify_ports.py` `os._exit`s), but they all **share one container**.
 That collapsed the overhead from *N container starts* to *1* per batch, and it's how
-every batch after the first couple was run. So: the containers were helpful, my
+every batch after the first couple was run. So: the containers were helpful, the
 initial usage was inefficient, and the fix was to batch the verifies inside a single
 container.
 
@@ -143,19 +148,21 @@ container.
   *text*). The TeX/ghostscript/ImageMagick stack is only for the inline PNG render
   (`_repr_png_`). So a verify-only loop is fast; the heavy stack is a one-time
   *image-build* cost, not a per-verify cost.
-- **The `.so` rebuild is separate and cheap-ish.** After each `_epix.cc` change I
+- **The `.so` rebuild is separate and cheap-ish.** After each `_epix.cc` change the agent
   ran `make py-ext PODMAN_RUN_FLAGS=--cgroups=disabled` (one container, a single
   `g++` of the binding) — independent of the verify loop.
 - **The one unavoidable big cost** is `make image` once per session (ephemeral
   store). A persistent image cache, if the sandbox allowed it, would remove the
-  per-session TeX-Live rebuild.
+  per-session TeX-Live rebuild. (Since 2026-09-27 the sandbox reuses the host's
+  images read-only, which removes the base-image pull but not this project's
+  own TeX-Live layer.)
 
-**What I could still do better:** after each new binding I rebuilt the `.so` and
+**What could still be done better:** after each new binding the agent rebuilt the `.so` and
 re-ran the *entire* regression set (all ported-this-session demos), not just the new
 one. That's some redundant re-verification on big batches. A tighter loop would
 verify the **new** demo first, and run the full regression sweep **once at the end**
-of a batch — trading a little early-regression-detection for fewer total runs. I
-leaned toward the safer "re-verify everything each time" because the runs were cheap
+of a batch — trading a little early-regression-detection for fewer total runs. The
+agent leaned toward the safer "re-verify everything each time" because the runs were cheap
 once batched and it caught any cross-binding regression immediately.
 
 ## 6. TL;DR
@@ -171,17 +178,3 @@ once batched and it caught any cross-binding regression immediately.
   verifies into a single container's shell loop** (fresh Python process each,
   shared container). Verification needs only `g++` + `libepix`, not the TeX render
   path; the only big one-time cost is the per-session image rebuild.
-
-## 6. TL;DR
-
-- "Byte compatibility" = the notebook's **eepic text** is identical to the C++
-  sample's, because **both run the same `libepix`**; the bindings aren't a reimpl.
-- `verify_ports.py NAME`: `exec` the notebook → eepic; `g++ -DEPIX_FMT_EEPIC` +
-  run the `.xp` → oracle eepic; strip timestamps; exact string compare. One demo
-  per process (libepix global state); `.flx` compared per frame.
-- Nested containers were necessary and helpful (they hold the whole toolchain).
-  Running one `podman run` per demo was the inefficiency; **batching all verifies
-  into a single container's shell loop** (fresh Python process each, shared
-  container) was the fix. Verification needs only `g++` + `libepix`, not the TeX
-  render path; the only big one-time cost is the per-session image rebuild.
-```

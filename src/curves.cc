@@ -151,19 +151,15 @@ void quad(const P& p1, const P& p2, const P& p3, const P& p4) {
 void rect(const P& p1, const P& p2) {
   P diagonal(p2 - p1);
   P jump;
-  int perp_count(0);
 
-  // count coordinate axes perp to diagonal and flag normal
+  // flag the normal from the coordinate axes perp to diagonal
   if (fabs(diagonal | E_1) < EPIX_EPSILON) {
-    ++perp_count;
     jump = E_2 & (diagonal);
   }
   if (fabs(diagonal | E_2) < EPIX_EPSILON) {
-    ++perp_count;
     jump = E_3 & (diagonal);
   }
   if (fabs(diagonal | E_3) < EPIX_EPSILON) {
-    ++perp_count;
     jump = E_1 & (diagonal);
   }
 

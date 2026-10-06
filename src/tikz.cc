@@ -157,7 +157,7 @@ std::string tikz::end_picture() const {
 }
 
 // Actual work done in start_picture
-std::string tikz::set_unitlength(const std::string& len) const {
+std::string tikz::set_unitlength(const std::string& /*len*/) const {
   return "";
   /*
   std::stringstream obuf;

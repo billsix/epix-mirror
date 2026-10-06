@@ -61,7 +61,8 @@ CMYK_Color::CMYK_Color(double c, double m, double y, double k)
 }
 
 // private, no arg checking, bool unused
-CMYK_Color::CMYK_Color(double c, double m, double y, double k, const bool arg)
+CMYK_Color::CMYK_Color(double c, double m, double y, double k,
+                       const bool /*arg*/)
     : cyan(c), magenta(m), yellow(y), black(k) {}
 
 // black = min(c,m,y), following Uwe Kern's xcolor documentation

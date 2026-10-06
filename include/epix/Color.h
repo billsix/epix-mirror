@@ -90,11 +90,11 @@ class Color {
 };  // end of class Color
 
 Color operator*(double, const Color&);
-const bool operator==(const Color&, const Color&);
-const bool operator!=(const Color&, const Color&);
+bool operator==(const Color&, const Color&);
+bool operator!=(const Color&, const Color&);
 
 // for palette ordering
-const bool operator<(const Color&, const Color&);
+bool operator<(const Color&, const Color&);
 
 /*
  * * *  Primary color functions in the global namespace * * *

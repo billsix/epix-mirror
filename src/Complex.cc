@@ -81,13 +81,11 @@ Complex& Complex::conj() {
   return *this;
 }
 
-const bool Complex::operator==(const Complex& arg) const {
+bool Complex::operator==(const Complex& arg) const {
   return m_real == arg.m_real && m_imag == arg.m_imag;
 }
 
-const bool Complex::operator!=(const Complex& arg) const {
-  return *this != arg;
-}
+bool Complex::operator!=(const Complex& arg) const { return !(*this == arg); }
 
 double Complex::re() const { return m_real; }
 
@@ -136,7 +134,7 @@ Complex logC(const Complex& arg, int branch) {
   return Complex(log(arg.norm()), arg.Arg(branch));
 }
 
-Complex sqrtC(const Complex& arg, int branch) {
+Complex sqrtC(const Complex& arg, int /*branch*/) {
   double rad(sqrt(arg.norm())), th(0.5 * Arg(arg));
   return Complex(rad * Cos(th), rad * Sin(th));
 }

@@ -17,6 +17,19 @@
 CONTAINER_CMD  = podman
 CONTAINER_NAME = epix
 
+# Optional-feature flags. Full image by default; a LEAN image is opt-in with
+# MINIMAL_IMAGE=1, which flips each feature OFF -- `make image MINIMAL_IMAGE=1` drops the
+# TeX-Live/ghostscript/ImageMagick rendering stack (BUILD_DOCS) and JupyterLab (USE_JUPYTER),
+# neither of which the gates need (`make build`, `make asan`, the byte-identity harness run on
+# g++ + libepix + nanobind). MINIMAL_IMAGE is a BUILD-CONTENT signal and is deliberately
+# SEPARATE from NESTED_PODMAN (a RUN-capability signal, used only by PODMAN_RUN_FLAGS below):
+# the sandbox does NOT auto-set MINIMAL_IMAGE, so a nested `make image` builds the full image
+# unless you ask for lean. Override a single flag too (`make image MINIMAL_IMAGE=1 BUILD_DOCS=1`).
+# A bare `podman build` stays lean regardless (each Dockerfile ARG defaults to 0).
+# Convention: runClaudeInContainer tasks/reference/minimal-nested-images.md.
+BUILD_DOCS  ?= $(if $(filter 1,$(MINIMAL_IMAGE)),0,1)
+USE_JUPYTER ?= $(if $(filter 1,$(MINIMAL_IMAGE)),0,1)
+
 # Host folder for rendered examples; bind-mounted into the container at /output.
 OUTPUT_DIR ?= $(CURDIR)/output
 
@@ -55,19 +68,39 @@ SCRIPT_MOUNTS = \
 
 RUN = $(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) --entrypoint /bin/bash
 
+# `shell` and `shell-exec` share ONE flag block so the batch twin can never drift
+# from the interactive shell (scoped to this pair only). Convention:
+# runClaudeInContainer tasks/add-shell-exec-target.md.
+SHELL_RUN_FLAGS = \
+	--entrypoint /bin/bash \
+	$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
+	$(GITCONFIG_MOUNT) $(TMUX_MOUNT)
+
+# In-container repo mount path (matches SRC_MOUNT: -v $(CURDIR):/epix).
+REPO_MOUNT = /epix
+
+# shell-exec payload: cd to the repo root (independent of shell.sh's own cd), then
+# run the inline CMD, else the repo-relative SCRIPT. Prefers CMD when both are set.
+SHELL_EXEC_ARGS = -c 'cd $(REPO_MOUNT) && $(if $(CMD),$(CMD),exec bash $(SCRIPT))'
+
 .PHONY: all
 all: image shell ## Build the image, then drop into a shell
 
 .PHONY: image
-image: ## Build the OCI image
-	$(CONTAINER_CMD) build $(PODMAN_BUILD_FLAGS) -t $(CONTAINER_NAME) .
+image: ## Build the OCI image (full; MINIMAL_IMAGE=1 for lean -- see the flag block)
+	$(CONTAINER_CMD) build $(PODMAN_BUILD_FLAGS) \
+		--build-arg BUILD_DOCS=$(BUILD_DOCS) \
+		--build-arg USE_JUPYTER=$(USE_JUPYTER) \
+		-t $(CONTAINER_NAME) .
 
 .PHONY: shell
 shell: ## Interactive dev shell (live tree bind-mounted; epix/elaps/flix on PATH)
-	$(RUN) -it \
-		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
-		$(GITCONFIG_MOUNT) $(TMUX_MOUNT) \
-		$(CONTAINER_NAME) /shell.sh
+	$(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) -it $(SHELL_RUN_FLAGS) $(CONTAINER_NAME) /shell.sh
+
+.PHONY: shell-exec
+shell-exec: image ## Run a script/command in the shell env (no TTY): make shell-exec SCRIPT=path | CMD='...'
+	@[ -n "$(SCRIPT)$(CMD)" ] || { echo 'usage: make shell-exec SCRIPT=<repo-relative path> | CMD="..."'; exit 2; }
+	$(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) $(SHELL_RUN_FLAGS) $(CONTAINER_NAME) /shell.sh $(SHELL_EXEC_ARGS)
 
 .PHONY: lib
 lib: ## Build libepix.a + driver scripts (meson) from the bind-mounted sources
@@ -104,7 +137,7 @@ py-ext: ## Build the nanobind extension (_epix*.so); links build/libepix.a if pr
 		$(CONTAINER_NAME) /build_py.sh
 
 .PHONY: asan
-asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (remove last phase)
+asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (fate: tasks/add-sanitizer-gate.md)
 	$(RUN) \
 		$(SRC_MOUNT) \
 		-v $(CURDIR)/entrypoint/asan_check.sh:/asan_check.sh:Z \

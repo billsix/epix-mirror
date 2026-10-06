@@ -1,0 +1,12 @@
+alias ls='ls --color=auto'
+export GPG_TTY=$(tty)
+PS1='\[\e[36m\]┌─(\t) \[\e[32m\]\u@\h:\w\n\[\e[36m\]└─λ \[\e[0m\]'
+
+# Format the tree (clang-format + ruff) when the interactive shell exits. Only an
+# interactive shell sources .bashrc, so a `make shell-exec` payload never triggers
+# this. /format.sh is bind-mounted by the Makefile's shell targets.
+exit() {
+    echo "Formatting on shell exit"
+    cd /epix && /format.sh
+    builtin exit "$@"
+}

@@ -32,7 +32,7 @@ cat <<HEADER_HEADER > $HEADER_FILE
 
 HEADER_HEADER
 
-cat $HEADERS | grep -v "\#include" >> $HEADER_FILE
+cat $HEADERS | grep -v "#include" >> $HEADER_FILE
 
 echo >> $HEADER_FILE
 echo "#endif /* EPIX_H */" >> $HEADER_FILE

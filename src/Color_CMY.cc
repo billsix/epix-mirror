@@ -49,7 +49,7 @@ CMY_Color::CMY_Color(double c, double m, double y)
       yellow(make_b(c, m, y)) {}
 
 // private, no arg checking, bool unused
-CMY_Color::CMY_Color(double c, double m, double y, const bool arg)
+CMY_Color::CMY_Color(double c, double m, double y, const bool /*arg*/)
     : cyan(c), magenta(m), yellow(y) {}
 
 CMY_Color::CMY_Color(const RGB_Densities& s)

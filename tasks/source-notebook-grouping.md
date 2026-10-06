@@ -1,9 +1,11 @@
 # Task: Evaluate grouping the notebooks + source figures into a folder structure
 
 **Status:** proposed — **DEFERRED until the port is complete.** Analyze + propose a
-grouping first; reorganize only on Bill's go-ahead.
-**Requested:** 2026-06-10 (Bill)
-**Owner:** Bill (via Claude)
+grouping first; reorganize only on the maintainer's go-ahead.
+**Priority:** 8
+**Difficulty:** 3
+**Requested:** 2026-06-10 (William Emerison Six <billsix@gmail.com>)
+**Owner:** the maintainer (via the agent)
 
 ## Goal
 
@@ -24,7 +26,7 @@ is stable (81/81), as a single deliberate pass.
 `samples/*.xp` / `*.flx` are upstream-authored; `CLAUDE.md` calls this a "faithful
 mirror," and `samples/README` annotates every sample as the canonical learning
 index. Physically reshuffling `samples/` diverges from upstream. Three options to
-weigh with Bill before anything moves:
+weigh with the maintainer before anything moves:
 
 - **(a) Group only `notebooks/`** (our own artifacts); leave `samples/` flat —
   least disruptive, but the two dirs stop being parallel.
@@ -59,7 +61,7 @@ Cross-reference `samples/README`'s existing per-sample annotations.
 ## Process
 
 1. **Analyze** the full set; propose a grouping **and** which of (a)/(b)/(c).
-2. **Present** to Bill; **stop** for confirmation.
+2. **Present** to the maintainer; **stop** for confirmation.
 3. **On go-ahead:** move/restructure, fix every path consumer
    (`verify_ports.py` first), re-run the full harness, `make format`.
 

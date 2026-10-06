@@ -1,9 +1,11 @@
 # Task: Distro packaging — Debian, Fedora 44, Gentoo ebuild
 
 **Status:** proposed — **DEFERRED until the port is complete.** Draft the files,
-build-test where feasible, then Bill verifies actual installs.
-**Requested:** 2026-06-10 (Bill)
-**Owner:** Bill (via Claude)
+build-test where feasible, then the maintainer verifies actual installs.
+**Priority:** 8
+**Difficulty:** 6
+**Requested:** 2026-06-10 (William Emerison Six <billsix@gmail.com>)
+**Owner:** the maintainer (via the agent)
 
 ## Goal
 
@@ -11,7 +13,7 @@ After porting is complete, create the packaging files to build/install ePiX on:
 
 - **Debian** — a `debian/` dir (`control`, `rules`, `changelog`, `copyright`,
   `compat`/source-format, install lists, maybe `watch`).
-- **Fedora 44** — an RPM `epix.spec` (Bill's host is Fedora 44).
+- **Fedora 44** — an RPM `epix.spec` (the maintainer's host is Fedora 44).
 - **Gentoo** — an `epix-<ver>.ebuild`.
 
 ## Why deferred
@@ -70,13 +72,13 @@ wrapper scripts **compile the user's `.xp` figure on the fly**:
 
 ## Process
 
-1. Confirm the open questions with Bill (esp. Python-package scope + compliance
+1. Confirm the open questions with the maintainer (esp. Python-package scope + compliance
    bar) and the chosen source.
 2. Draft each distro's files, reusing the `Dockerfile` dep list.
 3. **Build-test where feasible nested** (per the global CLAUDE.md nested-podman
-   setup): the `.spec` via `rpmbuild` in a Fedora 44 image (Bill's host target),
+   setup): the `.spec` via `rpmbuild` in a Fedora 44 image (the maintainer's host target),
    Debian via an `sbuild`/`pbuilder` image, the ebuild via a stage3 image. I can
-   build/package locally; **Bill verifies the actual installed tools run** (display
+   build/package locally; **the maintainer verifies the actual installed tools run** (display
    /TeX /runtime-compiler behavior — the build-vs-runtime split).
 4. Iterate.
 

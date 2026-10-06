@@ -3,10 +3,11 @@
 # smoke test (build-aux/asan_smoke.cc) over it, to catch latent memory bugs in
 # the libepix surface the Python bindings cover. Run via `make asan`.
 #
-# DEV-ONLY (needs libasan, baked into the image for now).
-# REMOVE this + libasan + the `asan` Makefile target in the final cleanup phase
-# -- see the python-bindings task doc.
+# Dev-only for now (needs libasan, in the image); tasks/add-sanitizer-gate.md decides
+# whether this becomes a permanent image-build gate or is removed.
 set -euo pipefail
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+source /venv/bin/activate
 cd /epix
 
 BUILD=/tmp/epix-asan

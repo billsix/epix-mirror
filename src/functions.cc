@@ -88,13 +88,13 @@ double acsch(double x) { return log((1 + sqrt(1 + x * x)) / x); }
 
 double acoth(double x) { return 0.5 * log((x + 1) / (x - 1)); }
 
-double zero(double arg) { return 0; }
+double zero(double /*arg*/) { return 0; }
 
-double zero(double x, double y) { return 0; }
+double zero(double /*x*/, double /*y*/) { return 0; }
 
-double zero(double x, double y, double z) { return 0; }
+double zero(double /*x*/, double /*y*/, double /*z*/) { return 0; }
 
-double zero(const P& arg) { return 0; }
+double zero(const P& /*arg*/) { return 0; }
 
 P xyz(double x, double y, double z) { return P(x, y, z); }
 

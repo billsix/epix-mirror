@@ -1,6 +1,7 @@
 # Task: Pythonic cleanup pass of the ported Python code
 
-**Status:** proposed — **effectively unblocked** (the port reached 80/81 on
+**Status:** DONE (2026-06-11; archived). The original header follows for the record:
+**Status at filing:** proposed — **effectively unblocked** (the port reached 80/81 on
 2026-06-10; only `histogram` is left, hard-blocked by a missing data file, so the
 binding surface is stable). Analyze + suggest first; only edit on Bill's explicit
 go-ahead.

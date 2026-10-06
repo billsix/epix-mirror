@@ -7,6 +7,8 @@
 # Standalone build (nanobind's "no CMake" path): compile the binding together
 # with nanobind's nb_combined.cpp runtime, at the library's C++20 standard.
 set -euo pipefail
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+source /venv/bin/activate
 cd /epix
 
 PYINC=$(python3 -c 'import sysconfig; print(sysconfig.get_path("include"))')

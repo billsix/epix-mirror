@@ -73,7 +73,7 @@ void revolutions() { the_angle_style().set_revolutions_mode(); }
 double full_turn() { return the_angle_style().from_degrees(360.0); }
 
 // clipping is always on
-void clip(bool arg) {}
+void clip(bool /*arg*/) {}
 
 void clip_box() { the_clip_box() = clip_state(); }
 

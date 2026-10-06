@@ -185,21 +185,21 @@ std::string eepic::usepackages() const {
 }
 
 // string argument for passing attributes local to this path/loop
-std::string eepic::start_open_path(const std::string& attribs) const {
+std::string eepic::start_open_path(const std::string& /*attribs*/) const {
   return "\\path";
 }
 
-std::string eepic::end_open_path(const std::string& attribs) const {
+std::string eepic::end_open_path(const std::string& /*attribs*/) const {
   std::stringstream obuf;
   obuf << std::endl;
   return obuf.str();
 }
 
-std::string eepic::start_closed_path(const std::string& attribs) const {
+std::string eepic::start_closed_path(const std::string& /*attribs*/) const {
   return "\\path";
 }
 
-std::string eepic::end_closed_path(const std::string& attribs) const {
+std::string eepic::end_closed_path(const std::string& /*attribs*/) const {
   std::stringstream obuf;
   obuf << std::endl;
   return obuf.str();

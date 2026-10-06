@@ -42,7 +42,7 @@ namespace ePiX {
 Segment::Segment(const P& p1, const P& p2)
     : m_endpt1(p1), m_endpt2(p2), m_malformed(false) {}
 
-Segment::Segment(bool tag) : m_malformed(true) {}
+Segment::Segment(bool /*tag*/) : m_malformed(true) {}
 
 P Segment::end1() const { return m_endpt1; }
 

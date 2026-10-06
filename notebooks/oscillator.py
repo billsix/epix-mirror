@@ -13,7 +13,8 @@
 
 # %% [markdown]
 # # oscillator — ported from `samples/oscillator.xp`
-# Predicted vs measured displacement of a damped harmonic oscillator (error bars + legend).
+# Predicted vs measured displacement of a damped harmonic oscillator (error bars +
+# legend).
 
 # %%
 from __future__ import annotations

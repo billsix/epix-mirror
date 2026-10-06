@@ -10,7 +10,8 @@ a figure, `anim` for an animation), and diff its eepic against the oracle:
     exactly as flix does), diff each frame against anim.frames[i].
 
 Run ONE name per process (state accumulates in libepix across renders); loop in
-the shell for several. Run in the container with PYTHONPATH=/epix/python.
+the shell for several. Run in the container (the venv has `epix` installed
+editable from /epix/python; `make shell-exec CMD=...` sets that up).
 
 Usage:  verify_ports.py NAME            ->  prints "NAME: PASS" or "NAME: FAIL ..."
 Exit 0 on PASS, 1 on FAIL/error.
@@ -28,7 +29,9 @@ SAMPLES = os.path.join(REPO, "samples")
 
 def strip(s):
     return "\n".join(
-        l for l in s.splitlines() if "Generated" not in l and "Automatically" not in l
+        line
+        for line in s.splitlines()
+        if "Generated" not in line and "Automatically" not in line
     )
 
 

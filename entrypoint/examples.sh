@@ -19,6 +19,13 @@
 # preprocessor flags, or a non-standalone .xp) is logged and the run continues.
 set -uo pipefail
 
+# Lean image (BUILD_DOCS=0) has no TeX: say so instead of failing 96 times.
+if ! command -v latex >/dev/null 2>&1; then
+    echo "latex not found: this image was built without the rendering stack" >&2
+    echo "(make image MINIMAL_IMAGE=1 drops it; rebuild with plain 'make image' or BUILD_DOCS=1)" >&2
+    exit 2
+fi
+
 RENDER="${RENDER:-eepic}"          # "eepic" (default) or "pdf"
 OUT=/output
 SRC=/epix

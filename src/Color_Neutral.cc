@@ -53,13 +53,13 @@ Color_Base& Neutral_Color::filter(const Color_Base& color) {
   return *tmp;
 }
 
-Neutral_Color& Neutral_Color::operator*=(double c) { return *this; }
+Neutral_Color& Neutral_Color::operator*=(double /*c*/) { return *this; }
 
-Neutral_Color& Neutral_Color::blend(const Color_Base& color, double d) {
+Neutral_Color& Neutral_Color::blend(const Color_Base& /*color*/, double /*d*/) {
   return *this;
 }
 
-Neutral_Color& Neutral_Color::superpose(const Color_Base& color) {
+Neutral_Color& Neutral_Color::superpose(const Color_Base& /*color*/) {
   return *this;
 }
 

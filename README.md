@@ -79,8 +79,11 @@ wrapper around `podman` that builds a Fedora image with the full toolchain
 (g++, TeX-Live, ghostscript, ImageMagick) baked in. Targets:
 
 ```sh
-make image                 # build the OCI image
+make image                 # build the OCI image (full)
+make image MINIMAL_IMAGE=1  # lean image: no TeX/ghostscript/ImageMagick, no JupyterLab (1.1 vs 2.5 GB)
 make shell                  # interactive dev shell
+make shell-exec CMD='...'   # same env, no TTY (or SCRIPT=<repo-relative path>)
+make format                 # clang-format (C++) + ruff (Python), in place
 make lib                    # build libepix.a + driver scripts (meson)
 make build                  # full build: libepix.a + Python extension
 make examples               # render samples/+doc/ -> ./output (.eepic)
@@ -93,10 +96,17 @@ make notebooks              # convert notebooks/*.py (jupytext) -> .ipynb
 
 Rendered figures land in `./output/` on the host (bind-mounted into the
 container). The build scripts live in [`entrypoint/`](entrypoint/); the image
-builds ePiX with Meson. When running nested inside another container, `--cgroups=disabled`
-is auto-applied via `PODMAN_RUN_FLAGS` (keyed on `NESTED_PODMAN=1`). (Repeated `make image` rebuilds can
-exhaust the container image store, a small tmpfs — run `podman image prune -f`
-to reclaim space.)
+builds ePiX with Meson. The system packages come from two host-runnable scripts,
+[`entrypoint/01-install-base.sh`](entrypoint/01-install-base.sh) (build + Python
+toolchain) and [`entrypoint/02-install-render.sh`](entrypoint/02-install-render.sh)
+(TeX-Live, ghostscript, ImageMagick) — run them as root on a bare Fedora host to
+get the same toolchain without a container. Python packages live in a `/venv`
+managed with `uv`; the `epix` package is installed editable from the live tree.
+The lean image still builds the library and the Python extension; `make examples`,
+`make jupyter` and `make notebooks` stop with a message naming the flag
+(`BUILD_DOCS=1` / `USE_JUPYTER=1`) that brings the feature back. When running nested inside another container, `--cgroups=disabled`
+is auto-applied via `PODMAN_RUN_FLAGS` (keyed on `NESTED_PODMAN=1`); the nested
+image store is per-session, so the first `make image` of a session rebuilds.
 
 ## Python interface
 
@@ -113,15 +123,18 @@ verified **byte-identical** to the original figure. (The lone exception,
 import epix
 from epix import Point
 
-with epix.figure(lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), size="2x1in") as fig:
+with epix.figure(
+    lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), size="2x1in"
+) as fig:
     epix.font_size("Huge")
     epix.label(Point(x=0, y=0), "Hello, world!")
-fig                      # displays inline in a notebook
+fig  # displays inline in a notebook
 ```
 
 `make jupyter` gives a notebook environment (it builds the extension first via
 `make py-ext`; or run `make py-ext` on its own, and `make notebooks` to convert
-the `.py` notebooks to `.ipynb`).
+the `.py` notebooks to `.ipynb`). JupyterLab opens the `.py` notebooks directly
+(jupytext is the default viewer) and has its announcement banners disabled.
 This is purely additive — the C++ library and the `.xp`/`.flx` workflow are
 unchanged. Design and status:
 [`tasks/archive/2026/06/11/python-bindings-and-notebooks.md`](tasks/archive/2026/06/11/python-bindings-and-notebooks.md).

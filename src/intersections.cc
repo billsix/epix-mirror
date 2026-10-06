@@ -202,7 +202,6 @@ P operator*(const Segment& seg1, const Segment& seg2) {
   const P dir2(p4 - p3);
 
   P perp(dir1 * dir2);
-  double normal_length();
 
   // non-coplanar or parallel
   if (EPS < fabs((dir1 * (p3 - p1)) | (p4 - p1)) || norm(perp) < EPS)

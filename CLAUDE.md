@@ -64,7 +64,11 @@ meson install -C build
 ```
 
 Options (`meson_options.txt`): `epix_el`, `bash_path`, `runtime_compiler`,
-`ps2eps`, `manual` (default off — the manual is heavy). Needs a C++ compiler
+`ps2eps`, `manual` (default off — the manual is heavy). `meson.build` pins
+`cpp_std=c++20` and **`warning_level=3`** (`-Wall -Wextra -Wpedantic`), and the
+library builds warning-free at that level with no suppressions — keep it that way
+(an unused parameter is spelled `/*name*/`; see
+`tasks/archive/2026/10/06/raise-meson-warning-level.md` for the sweep). Needs a C++ compiler
 (`g++`); the tools expect `bash`, `latex`, and `ps2epsi`/`ps2eps` at runtime.
 Meson is **out-of-source** — everything lands in `build/`, nothing in the tree.
 The printable manual builds from `manual.tex` + the **committed** `doc/*.eepic`
@@ -75,7 +79,11 @@ figures (no epix run needed).
 `Makefile` wraps the Meson build in a Fedora `podman` image (full
 toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick, plus
 the Python/Jupyter stack for the bindings work — see below).
-Targets (invoke with `make <t>`): `image`, `shell`, `lib` (libepix.a + driver
+Targets (invoke with `make <t>`): `image`, `shell`, `shell-exec` (the batch twin of
+`shell`: `make shell-exec SCRIPT=<repo-relative path> | CMD='...'` runs in the same
+container env, no TTY — the two share one `SHELL_RUN_FLAGS` block; in a `CMD` make expands
+`$var` (write `$$var`) and double quotes break the empty-payload guard, so use `SCRIPT=` beyond a
+one-liner), `lib` (libepix.a + driver
 scripts via meson), `build` (**full build** = `lib` + `py-ext`, so the Python
 extension reflects edited C++ sources),
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
@@ -85,18 +93,42 @@ when present, else the installed copy; skips relinking when the `.so` is
 up-to-date, `FORCE=1` to override), `jupyter` (JupyterLab on :8888 — **depends on
 `py-ext`**, so it always builds the extension first),
 `notebooks` (jupytext → `.ipynb`), `asan` (**dev-only** sanitizer smoke),
-`format` (clang-format C++ + ruff Python — also runs automatically on `make
-shell` exit, via `entrypoint/format.sh`).
+`format` (clang-format C++ + ruff Python via `entrypoint/format.sh`, which exits
+nonzero if any step failed — it also runs when you `exit` a `make shell`, through the
+hook in `entrypoint/dotfiles/.extrabashrc`).
 Entrypoint scripts in `entrypoint/` are bind-mounted (edit without rebuild).
+System packages install through two host-runnable group scripts the Dockerfile
+dispatches — `entrypoint/01-install-base.sh` (Meson/g++, Python, uv, ruff,
+clang-tools) and `entrypoint/02-install-render.sh` (TeX-Live, ghostscript,
+ImageMagick) — so the same toolchain can be installed on a bare Fedora host. The
+Python stack (JupyterLab, jupytext, ipykernel, nanobind) lives in a `uv`-managed
+`/venv` (`--system-site-packages`) that every entry script activates; the `epix`
+package is installed **editable** from `/epix/python` at image build and again,
+offline, on every `shell.sh`/`jupyter.sh` entry, so the bind mount's live tree
+(and the `_epix*.so` that `make py-ext` drops into `python/epix/`) is what
+`import epix` sees. JupyterLab is pre-configured with announcements off and
+`.py` (jupytext) files opening as notebooks.
 Nested (podman-in-podman) runs auto-apply `--cgroups=disabled` via `PODMAN_RUN_FLAGS`
 (keyed on the sandbox's `NESTED_PODMAN=1` export). The
 render scripts run each figure from a scratch copy with `epix -I.` so the host
 tree stays clean and sibling `#include`s resolve. See
 `tasks/archive/2026/06/09/container-build-tooling.md` for the design + gotchas.
 
-**Nested-podman caveat:** the inner image store is a small (~8 GB) tmpfs;
-repeated full `make image` rebuilds fill it and fail with "no space left on
-device". Run `podman image prune -f` between rebuilds.
+**Nested-podman note:** the inner image store is an ephemeral on-disk directory
+that lives for one sandbox session (not a RAM tmpfs), so a full nested `make image`
+fits and needs no pruning between rebuilds; the image does not survive the
+session, so each session starts with one `make image`.
+
+**Lean image (opt-in):** `make image MINIMAL_IMAGE=1` builds without the TeX-Live /
+ghostscript / ImageMagick rendering stack (`BUILD_DOCS=0`) and without JupyterLab /
+jupytext / ipykernel (`USE_JUPYTER=0`): **1.13 GB vs 2.49 GB** full (measured
+2026-10-06; 194 vs 1392 rpms). Everything the gates need stays — `make build`,
+`make asan`, the byte-identity harness and `tools/verify_image.sh`'s harness
+sample all pass on it; `make examples*`, `make jupyter` and `make notebooks` exit 2
+with a message naming the flag to re-enable (`make image MINIMAL_IMAGE=1 BUILD_DOCS=1`
+re-enables one group). A plain `make image`, host or nested, is the full image —
+`MINIMAL_IMAGE` is never auto-set. Convention: runClaudeInContainer
+`tasks/reference/minimal-nested-images.md`.
 
 ### Generated files — do NOT hand-edit
 
@@ -158,12 +190,12 @@ renamed from the C++/ePiX vocabulary to **Pythonic names** (cleanup closeout:
   and annotates `def` params/returns (`-> float`, `-> epix.Point`, `-> epix.Color`,
   `-> None`) plus object-typed locals (`panel: epix.Screen`, `R: epix.Domain`, …).
   Annotations don't execute (PEP 563), so they're byte-identity-free.
-- **In-progress notebook polish** (`tasks/notebook-structure-and-types.md`): type
-  hints DONE; still TODO = an `epix.activated(screen)` context manager to replace
-  the manual `activate`/`deactivate` pairs, extract-to-helpers for the repeated
-  panel blocks (`color_sep`/`tori`/`coord_tricks`), and an enum for `log.py`'s
-  segment flag. Other follow-ups (dir grouping, distro packaging, ASan teardown):
-  see `tasks/`.
+- **Notebook structure:** `epix.activated(screen)` is the context manager for
+  screen activation (replaces manual `activate`/`deactivate` pairs; used by 11
+  notebooks), `color_sep` uses a `separation()` helper, and `log.py` keys its
+  segment flag on the `PatchKind` enum
+  (`tasks/archive/2026/06/11/notebook-structure-and-types.md`). Open follow-ups
+  (dir grouping, distro packaging, the sanitizer gate): see `tasks/`.
 
 Layout:
 - `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
@@ -176,8 +208,12 @@ Layout:
 How it works:
 - ePiX's global-state model maps to module-level functions; `figure()` is a
   context manager wrapping `picture()`/`begin()`. Capture is via
-  **`print_eepic(file)`** (a clean named-file output — not stdout) → read back →
-  render with `elaps` (which also accepts an `.eepic`, not just `.xp`).
+  **`print_eepic(file)`** (a clean named-file output — not stdout) → read back into a
+  `Figure` holding the eepic text. The PNG is rasterized **lazily** on first display
+  (`elaps` → eps → `gs`; `elaps` also accepts an `.eepic`, not just `.xp`), so building
+  a figure — and therefore the byte-identity harness — needs only libepix; displaying
+  one needs the rendering stack (absent from the lean image, where `_repr_png_` raises
+  `FileNotFoundError` and `animate()` keeps the frames' eepic with an empty gif).
 - Extension build (`entrypoint/build_py.sh`, `make py-ext`): standalone g++ of
   `_epix.cc` + nanobind's `nb_combined.cpp`, statically linking libepix. Needs
   `python3-devel` + `nanobind` + nanobind's `ext/robin_map/include`.
@@ -205,16 +241,17 @@ How it works:
   `.flx`. Run one name per process (libepix accumulates state). Loop in the shell
   for a batch; `PASS`/`FAIL` per demo. This is the inner loop of the whole port
   effort.
-- **The per-session dev loop (operational).** The container image store is an
-  *ephemeral tmpfs*, so a fresh session rebuilds it: `make image` (~minutes — the
-  TeX-Live layer). Then iterate: after each `_epix.cc` change run
+- **The per-session dev loop (operational).** The nested image store is
+  ephemeral per sandbox session, so a fresh session rebuilds it: `make image`
+  (~minutes — the TeX-Live layer). Then iterate: after each `_epix.cc` change run
   `make py-ext` (nested: `--cgroups=disabled` auto-applies; it relinks only when needed;
   `FORCE=1` to force). Note `py-ext` links the bind-mounted `build/libepix.a`, so
   after editing *libepix* C++ sources (`src/`/`include/`) run `make build` (or
   `make lib`) first — otherwise the extension links a stale library. Run the
   harness in the container —
-  `podman run --rm --cgroups=disabled -v /epix:/epix:Z -e PYTHONPATH=/epix/python
-  epix -c 'for n in NAME …; do python3 /epix/build-aux/verify_ports.py $n; done'`.
+  `make shell-exec CMD='for n in NAME …; do python3 build-aux/verify_ports.py $n; done'`
+  (the venv has `epix` installed editable, so no `PYTHONPATH`); `make shell-exec
+  SCRIPT=tools/verify_image.sh` is the saved smoke gate (env + 8-port harness sample + Jupyter settings).
   Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),
   **not** the TeX/ghostscript render path — that's only for the inline PNGs.
 - **Dispatch 2-var vs 3-var callables by `inspect.signature`, never a trial
@@ -233,8 +270,8 @@ How it works:
   `nm`-check + bind that one thing → re-verify. Don't try to bind the whole API
   up front. (The port is now complete; the bind-list history lives in
   `tasks/archive/2026/06/11/python-bindings-and-notebooks.md`.)
-- **Three `.flx` are broken upstream** (`lighting`, `helicoid`, `stereo_proj`,
-  and `riemann` — now fixed): they use bare enum names (`tr`, …) without
+- **Four `.flx` were broken upstream** (`lighting`, `helicoid`, `stereo_proj`,
+  `riemann` — all fixed here): they use bare enum names (`tr`, …) without
   `using enum`, so they don't even compile under enum-class. Add
   `using enum epix_label_posn;` to make the oracle build before porting.
 - **Byte-identity needs the same float *expression structure*, not just the same
@@ -264,18 +301,22 @@ How it works:
   labelled-marker form), register the new one *after* it and give `scale` **no
   default**, so a 2-arg call can't fall into the 3-arg overload.
 
-**A libepix bug fixed here (independent of the bindings, worth keeping):**
-`screen::screen()` left the pimpl pointer `m_screen` uninitialized — latent UB
-that only "worked" because the canvas lives in zero-initialized static storage.
-Fixed with a default member initializer `screen_data* m_screen = nullptr;` in
-`screen.h`. Found via AddressSanitizer; the binding's call pattern exposed it.
+**libepix bugs fixed here (independent of the bindings, worth keeping):**
+- `screen::screen()` left the pimpl pointer `m_screen` uninitialized — latent UB
+  that only "worked" because the canvas lives in zero-initialized static storage.
+  Fixed with a default member initializer `screen_data* m_screen = nullptr;` in
+  `screen.h`. Found via AddressSanitizer; the binding's call pattern exposed it.
+- `Complex::operator!=` returned `*this != arg` — infinite recursion on any `!=`
+  between two `Complex` values. Now `!(*this == arg)`. Found by
+  `-Winfinite-recursion` when `warning_level` was raised (2026-10-06).
 
-**DEV-ONLY, remove when the bindings task completes** (see the task doc's cleanup
-checklist): `libasan` (Dockerfile), `entrypoint/asan_check.sh`,
-`build-aux/asan_smoke.cc`, the `asan` Makefile target. `make asan` builds an
-ASan libepix and runs the smoke test (which mirrors the bound surface) to catch
-latent libepix memory bugs as coverage grows — keep mirroring new bindings into
-`asan_smoke.cc` until removal.
+**Sanitizer tooling — kept pending `tasks/add-sanitizer-gate.md`:** `libasan`
+(Dockerfile), `entrypoint/asan_check.sh`, `build-aux/asan_smoke.cc`, the `asan`
+Makefile target. They were added as dev-only aids during the bindings work and
+stay until that task decides whether they become a permanent image-build gate
+(ASan + trap-UBSan) or are removed. `make asan` builds an ASan libepix and runs
+the smoke test (which mirrors the bound surface); keep mirroring new bindings
+into `asan_smoke.cc` meanwhile.
 
 ## Code layout
 
@@ -337,12 +378,15 @@ code/ChangeLog wins:
 - Don't "fix" generated files (above) — change the source they're built from.
 - This is a faithful mirror; keep upstream-authored prose (`NEWS`, `BUGS`,
   `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise. **Exception
-  (Bill, 2026-06-10): code formatting.** `make format` / `entrypoint/format.sh`
+  (William Emerison Six <billsix@gmail.com>, 2026-06-10): code formatting.** `make format` / `entrypoint/format.sh`
   applies `clang-format` (google style, `.clang-format`) tree-wide — *including*
   the upstream `src/`/`include/` sources — and `ruff` to the Python
   (`python/pyproject.toml [tool.ruff]`, covering `notebooks/` too). So formatting
   churn on upstream files is expected and intended, not a violation of the mirror
-  rule. (`.clang-tidy` + `make`-able clang-tidy are available too.)
-- Bill commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
+  rule. (`.clang-tidy` is present for `run-clang-tidy` against a Meson build dir;
+  there is no `make tidy` target.)
+- `git config blame.ignoreRevsFile .git-blame-ignore-revs` once per clone: the file
+  lists the 2026-06-09 tree-wide reformat commit so `git blame` skips it.
+- The maintainer commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
   `tasks/<slug>.md` doc — see `tasks/` for in-flight items and
   `tasks/archive/` for finished ones.

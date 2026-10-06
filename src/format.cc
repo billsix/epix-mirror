@@ -298,7 +298,7 @@ std::string format::xdefinecolor(const std::string& model,
 }
 
 // protected, non-virtual
-std::string format::xdefinecolor(const std::string& model,
+std::string format::xdefinecolor(const std::string& /*model*/,
                                  const std::string& name, double d1, double d2,
                                  double d3, double d4) const {
   std::stringstream obuf;
@@ -420,7 +420,7 @@ std::string format::print_paths(const std::list<edge2d>& edges,
 // protected, non-virtual (print LaTeX command for marker of specified size)
 std::string format::print_latex_marker(const epix_mark_type mark,
                                        const marker_sizes& sz,
-                                       const std::string& len) const {
+                                       const std::string& /*len*/) const {
   std::stringstream obuf;
 
   obuf << "$";

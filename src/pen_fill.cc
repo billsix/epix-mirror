@@ -67,7 +67,7 @@ pen_fill::pen_fill(const Color& fill, const pen_data& line,
       m_border(data),
       m_edges(data) {}
 
-pen_fill::pen_fill(const Color& fill, const pen_data& line, double th,
+pen_fill::pen_fill(const Color& fill, const pen_data& line, double /*th*/,
                    const std::list<edge2d>& data)
     : m_tint(fill),
       m_line(line),

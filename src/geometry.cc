@@ -166,7 +166,7 @@ class seg {
 
 // assumes seg contains the actual (scaled, translated) endpoints
 void draw_sphere_arc(const seg& sgmt, double t_min, double t_max, bool front,
-                     sphere_proj_type TYPE, const Sphere& S) {
+                     sphere_proj_type /*TYPE*/, const Sphere& S) {
   P tail(sgmt(t_min)), head(sgmt(t_max));
   double cos_theta(((head - S.center()) | (tail - S.center())) /
                    pow(S.radius(), 2));
