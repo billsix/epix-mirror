@@ -14,9 +14,9 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
 #     (ps2epsi/ps2pdf) + epstopdf.  ePiX's default backend is eepic, but some
 #     samples emit PSTricks/TikZ, so those packages are included too.
 #   Animations (flix): ImageMagick `convert` (eps->png, png->mng/gif).
-#   libasan: DEV-ONLY runtime for AddressSanitizer builds (`make asan`), used to
-#     catch latent libepix memory bugs while the Python bindings are written.
-#     REMOVE in the final cleanup phase (see python-bindings task doc).
+#   libasan: runtime for AddressSanitizer builds (`make asan`), which catch
+#     latent libepix memory bugs. Dev-only for now; tasks/add-sanitizer-gate.md
+#     decides whether it becomes a permanent image-build gate or is removed.
 #   clang-tools-extra: clang-format + clang-tidy for `make format` / `make tidy`
 #     (the C++ formatter/linter; pairs with .clang-format / .clang-tidy). Permanent.
 RUN --mount=type=cache,target=/var/cache/libdnf5 \

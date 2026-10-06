@@ -1,0 +1,9 @@
+# Commits to skip in `git blame` (GitHub honours this file automatically; locally run
+#   git config blame.ignoreRevsFile .git-blame-ignore-revs
+# once per clone).
+#
+# The tree-wide clang-format + ruff reformat (2026-06-09). Caveat: this commit also
+# carries a handful of real edits (CLAUDE.md, Makefile, entrypoint/format.sh,
+# python/pyproject.toml, a task doc, small notebook fixes); blame on those few lines
+# will skip to the previous author. The src/ and include/ churn it hides is the point.
+1c4d0ede14df7af27b97c9011ca40f14885e7876

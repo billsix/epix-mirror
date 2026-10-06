@@ -104,7 +104,7 @@ py-ext: ## Build the nanobind extension (_epix*.so); links build/libepix.a if pr
 		$(CONTAINER_NAME) /build_py.sh
 
 .PHONY: asan
-asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (remove last phase)
+asan: ## [dev] AddressSanitizer smoke over the bound libepix surface (fate: tasks/add-sanitizer-gate.md)
 	$(RUN) \
 		$(SRC_MOUNT) \
 		-v $(CURDIR)/entrypoint/asan_check.sh:/asan_check.sh:Z \

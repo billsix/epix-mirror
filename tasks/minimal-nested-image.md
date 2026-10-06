@@ -1,22 +1,28 @@
-# Lean image for nested-podman builds — what "minimal" means for epix-mirror
+# Lean image on `MINIMAL_IMAGE=1` — what "minimal" means for epix-mirror
 
 **Status:** proposed — research done 2026-09-10 (survey of the Dockerfile + Makefile from the
 runClaudeInContainer sandbox); **implementation needs go-ahead**. One of the per-project children of
 runClaudeInContainer `tasks/minimal-image-for-nested-podman-standard.md` (the convention: every optional-feature build flag defaults to its lean value when
-`NESTED_PODMAN=1`); the fleet-wide findings table is runClaudeInContainer `tasks/reference/minimal-nested-images.md`. Created 2026-09-10 at the maintainer's
+`MINIMAL_IMAGE=1` is passed, full otherwise — host or nested); the fleet-wide findings table is runClaudeInContainer `tasks/reference/minimal-nested-images.md`. Created 2026-09-10 at the maintainer's
 request (William Emerison Six <billsix@gmail.com>: "go through all of my projects with CLAUDE.md …
 research what a minimal nested podman container would be for them").
-**Priority:** 4
+**Updated:** 2026-10-06 (William Emerison Six <billsix@gmail.com>, via agent) — reworded from the
+retired `NESTED_PODMAN`-keyed auto-lean idiom to the opt-in `MINIMAL_IMAGE` flag (renamed 2026-09-27,
+when the nested store moved to disk and a full image fits nested). Priority lowered 4 → 7: the lean
+image is now a convenience for export/airgap, not a prerequisite for nested work.
+**Priority:** 7
 **Difficulty:** 4
 
 ## BLUF
 
-Make `make image` inside a sandbox (which exports `NESTED_PODMAN=1`) build a lean image that fits
-the nested RAM store and still runs this project's gate, while a host `make image` stays
-byte-identical — via the idiom `FLAG ?= $(if $(filter 1,$(NESTED_PODMAN)),0,1)` on each optional-feature flag (the `PODMAN_RUN_FLAGS`
-pattern applied to build flags; reference implementation: runCrushInContainer `client/Makefile`,
-`FULL_TOOLCHAIN`). Done = the flags below carry the nested-aware default, a nested `make image`
-builds and passes the gate, both image sizes are measured and recorded here and in `CLAUDE.md`.
+Make `make image MINIMAL_IMAGE=1` build a lean image (library + Python extension + ASan, no TeX /
+ghostscript / ImageMagick / JupyterLab) that still runs this project's gate, while a plain `make image`
+— host or nested — stays byte-identical to today — via the idiom
+`FLAG ?= $(if $(filter 1,$(MINIMAL_IMAGE)),0,1)` on each optional-feature flag (reference
+implementation: runCrushInContainer `client/Makefile`, `FULL_TOOLCHAIN`). Done = the flags below carry
+that default, a `MINIMAL_IMAGE=1` build passes the gate, both image sizes are measured and recorded
+here and in `CLAUDE.md`. Depends on `tasks/dockerfile-to-standard-template.md` (the dnf-group-script
+split), which is where the flag-gated install groups get their files; do that first.
 
 ## Context — read first
 
@@ -38,11 +44,11 @@ builds and passes the gate, both image sizes are measured and recorded here and 
 ## Plan
 
 - [ ] Dockerfile: `ARG BUILD_DOCS=0` / `ARG USE_JUPYTER=0`; split the single `dnf install` and the pip line accordingly (keep the dnf cache mounts).
-- [ ] Makefile: both flags with the nested-aware default; `--build-arg`s on `image`; `examples*` and `jupyter`/`notebooks` targets fail with a clear message when built lean (a `test -x /usr/bin/latex` guard, say).
+- [ ] Makefile: both flags with the `MINIMAL_IMAGE` default; `--build-arg`s on `image`; `examples*` and `jupyter`/`notebooks` targets fail with a clear message when built lean (a `test -x /usr/bin/latex` guard, say).
 - [ ] The Makefile mentions `PODMAN_RUN_FLAGS` 3× — confirm it is the `?= $(if …)` auto-default form (the 2026-08-29 rollout says it is) while in there.
-- [ ] Measure both images; the CLAUDE.md already has a 'Nested-podman caveat' paragraph (line ~96) — replace it with the new default.
-- [ ] Record both sizes (host full vs nested lean) here and in `CLAUDE.md`; add the standard's one-line
-      rule to `CLAUDE.md` ("nested = lean image automatically; `FLAG=1` overrides").
+- [ ] Measure both images (full vs `MINIMAL_IMAGE=1`); record both sizes here and in `CLAUDE.md`
+      next to the "Nested-podman note" paragraph, plus the standard's one-line rule
+      ("`make image MINIMAL_IMAGE=1` builds lean; `FLAG=1` re-enables one group").
 
 ## Open questions
 

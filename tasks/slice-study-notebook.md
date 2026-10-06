@@ -3,8 +3,10 @@
 **Status:** proposed — needs go-ahead to build (and the residual open questions
 below answered). Investigation/demo-survey can proceed; the notebook itself waits
 for confirmation.
-**Requested:** 2026-06-10 (Bill)
-**Owner:** Bill (via Claude)
+**Priority:** 6
+**Difficulty:** 4
+**Requested:** 2026-06-10 (William Emerison Six <billsix@gmail.com>)
+**Owner:** the maintainer (via the agent)
 
 ## Goal
 
@@ -16,7 +18,7 @@ slice positions `x₀`/`y₀` are defined at the top so the user can swap in the
 function and re-run. (This is the partial-derivative picture: the x = x₀ slice is
 the curve `z` vs `y`; the y = y₀ slice is `z` vs `x`.)
 
-### Decisions captured (Bill, 2026-06-10)
+### Decisions captured (William Emerison Six <billsix@gmail.com>, 2026-06-10)
 
 - **Function form:** surface `z = f(x, y)` (a graph of a 2-variable function), not
   a scalar field `f(x,y,z)`. So "slices" are the coordinate-plane cross-sections,
@@ -32,16 +34,16 @@ the curve `z` vs `y`; the y = y₀ slice is `z` vs `x`.)
 1. **Which cross-section(s) in the upper-left inset?** With both planes in one
    figure there are two cross-sections (`z` vs `y` at x = x₀, and `z` vs `x` at
    y = y₀). Options: show **both** (two small 2-D axes, or overlaid), or just
-   **one** (which?), or the inset cycles. Bill's call.
+   **one** (which?), or the inset cycles. the maintainer's call.
 2. **Slice positions:** fixed `x₀`/`y₀` constants (simplest, like `clipping.xp`),
    or should the demo sweep/animate the slice position (a `.flx`-style frame loop)?
-   Default assumption: fixed constants unless Bill wants animation.
+   Default assumption: fixed constants unless the maintainer wants animation.
 3. **Static vs interactive:** the render pipeline produces static PNGs. A slider
    for `x₀`/`y₀` (ipywidgets) would be a bigger architectural add — out of scope
-   unless Bill asks. Default: static.
+   unless the maintainer asks. Default: static.
 4. **Example `f`:** pick a function that shows the idea well (the monkey saddle
    `0.75·y(y−√3·x)(y+√3·x)` from `clipping.xp`, or something with clearly different
-   x- and y-cross-sections, e.g. `x² − y²`). Bill's preference welcome.
+   x- and y-cross-sections, e.g. `x² − y²`). the maintainer's preference welcome.
 
 ## Demo survey (the task's first ask) — seeded from the recent porting work
 
@@ -94,15 +96,15 @@ clipping.py's **slicing** (surface pieces + cut curves + cutting planes, `clip_b
   `grid`/`h_axis`/`v_axis`/`plot`, flattened camera, `inset` to the upper-left).
 Parameterize `f`, domain, `x₀`, `y₀` at the top. Everything needed is already
 bound — expect **no new bindings**, which the harness can't verify here (this is a
-new figure, not a port of an existing `.xp`), so correctness is **visual** (Bill
+new figure, not a port of an existing `.xp`), so correctness is **visual** (the maintainer
 verifies the rendered PNG per the build-vs-runtime split), not byte-identity.
 
 ## Process
 
 1. **Survey** (above) — confirm the slice + inset demos; note anything missed.
-2. **Confirm** the residual open questions with Bill; pick the example `f`.
+2. **Confirm** the residual open questions with the maintainer; pick the example `f`.
 3. **Build** the notebook (after go-ahead): surface cut by both planes + the 2-D
-   cross-section inset upper-left; render and have Bill eyeball the PNG.
+   cross-section inset upper-left; render and have the maintainer eyeball the PNG.
 4. Iterate on the visual until it reads well; `make format`.
 
 ## Relationship to other tasks
@@ -116,6 +118,6 @@ verifies the rendered PNG per the build-vs-runtime split), not byte-identity.
 
 ## Notes
 
-- This is a **teaching artifact** (Bill teaches from these) — the point is to make
+- This is a **teaching artifact** (the maintainer teaches from these) — the point is to make
   the partial-derivative / cross-section idea legible, so clarity of the figure and
   the swap-in-your-own-`f` ergonomics matter more than code cleverness.

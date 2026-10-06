@@ -13,3 +13,6 @@ epix.h
 *.eepic
 *.eps
 *.pdf
+
+# exported OCI image tars (make image-export): never send them into the build context
+*.tar

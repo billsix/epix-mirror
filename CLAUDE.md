@@ -94,9 +94,10 @@ render scripts run each figure from a scratch copy with `epix -I.` so the host
 tree stays clean and sibling `#include`s resolve. See
 `tasks/archive/2026/06/09/container-build-tooling.md` for the design + gotchas.
 
-**Nested-podman caveat:** the inner image store is a small (~8 GB) tmpfs;
-repeated full `make image` rebuilds fill it and fail with "no space left on
-device". Run `podman image prune -f` between rebuilds.
+**Nested-podman note:** the inner image store is an ephemeral on-disk directory
+that lives for one sandbox session (not a RAM tmpfs), so a full nested `make image`
+fits and needs no pruning between rebuilds; the image does not survive the
+session, so each session starts with one `make image`.
 
 ### Generated files — do NOT hand-edit
 
@@ -158,12 +159,12 @@ renamed from the C++/ePiX vocabulary to **Pythonic names** (cleanup closeout:
   and annotates `def` params/returns (`-> float`, `-> epix.Point`, `-> epix.Color`,
   `-> None`) plus object-typed locals (`panel: epix.Screen`, `R: epix.Domain`, …).
   Annotations don't execute (PEP 563), so they're byte-identity-free.
-- **In-progress notebook polish** (`tasks/notebook-structure-and-types.md`): type
-  hints DONE; still TODO = an `epix.activated(screen)` context manager to replace
-  the manual `activate`/`deactivate` pairs, extract-to-helpers for the repeated
-  panel blocks (`color_sep`/`tori`/`coord_tricks`), and an enum for `log.py`'s
-  segment flag. Other follow-ups (dir grouping, distro packaging, ASan teardown):
-  see `tasks/`.
+- **Notebook structure:** `epix.activated(screen)` is the context manager for
+  screen activation (replaces manual `activate`/`deactivate` pairs; used by 11
+  notebooks), `color_sep` uses a `separation()` helper, and `log.py` keys its
+  segment flag on the `PatchKind` enum
+  (`tasks/archive/2026/06/11/notebook-structure-and-types.md`). Open follow-ups
+  (dir grouping, distro packaging, the sanitizer gate): see `tasks/`.
 
 Layout:
 - `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
@@ -205,9 +206,9 @@ How it works:
   `.flx`. Run one name per process (libepix accumulates state). Loop in the shell
   for a batch; `PASS`/`FAIL` per demo. This is the inner loop of the whole port
   effort.
-- **The per-session dev loop (operational).** The container image store is an
-  *ephemeral tmpfs*, so a fresh session rebuilds it: `make image` (~minutes — the
-  TeX-Live layer). Then iterate: after each `_epix.cc` change run
+- **The per-session dev loop (operational).** The nested image store is
+  ephemeral per sandbox session, so a fresh session rebuilds it: `make image`
+  (~minutes — the TeX-Live layer). Then iterate: after each `_epix.cc` change run
   `make py-ext` (nested: `--cgroups=disabled` auto-applies; it relinks only when needed;
   `FORCE=1` to force). Note `py-ext` links the bind-mounted `build/libepix.a`, so
   after editing *libepix* C++ sources (`src/`/`include/`) run `make build` (or
@@ -233,8 +234,8 @@ How it works:
   `nm`-check + bind that one thing → re-verify. Don't try to bind the whole API
   up front. (The port is now complete; the bind-list history lives in
   `tasks/archive/2026/06/11/python-bindings-and-notebooks.md`.)
-- **Three `.flx` are broken upstream** (`lighting`, `helicoid`, `stereo_proj`,
-  and `riemann` — now fixed): they use bare enum names (`tr`, …) without
+- **Four `.flx` were broken upstream** (`lighting`, `helicoid`, `stereo_proj`,
+  `riemann` — all fixed here): they use bare enum names (`tr`, …) without
   `using enum`, so they don't even compile under enum-class. Add
   `using enum epix_label_posn;` to make the oracle build before porting.
 - **Byte-identity needs the same float *expression structure*, not just the same
@@ -270,12 +271,13 @@ that only "worked" because the canvas lives in zero-initialized static storage.
 Fixed with a default member initializer `screen_data* m_screen = nullptr;` in
 `screen.h`. Found via AddressSanitizer; the binding's call pattern exposed it.
 
-**DEV-ONLY, remove when the bindings task completes** (see the task doc's cleanup
-checklist): `libasan` (Dockerfile), `entrypoint/asan_check.sh`,
-`build-aux/asan_smoke.cc`, the `asan` Makefile target. `make asan` builds an
-ASan libepix and runs the smoke test (which mirrors the bound surface) to catch
-latent libepix memory bugs as coverage grows — keep mirroring new bindings into
-`asan_smoke.cc` until removal.
+**Sanitizer tooling — kept pending `tasks/add-sanitizer-gate.md`:** `libasan`
+(Dockerfile), `entrypoint/asan_check.sh`, `build-aux/asan_smoke.cc`, the `asan`
+Makefile target. They were added as dev-only aids during the bindings work and
+stay until that task decides whether they become a permanent image-build gate
+(ASan + trap-UBSan) or are removed. `make asan` builds an ASan libepix and runs
+the smoke test (which mirrors the bound surface); keep mirroring new bindings
+into `asan_smoke.cc` meanwhile.
 
 ## Code layout
 
@@ -337,12 +339,13 @@ code/ChangeLog wins:
 - Don't "fix" generated files (above) — change the source they're built from.
 - This is a faithful mirror; keep upstream-authored prose (`NEWS`, `BUGS`,
   `THANKS`, `AUTHORS`, `ChangeLog`) intact unless asked otherwise. **Exception
-  (Bill, 2026-06-10): code formatting.** `make format` / `entrypoint/format.sh`
+  (William Emerison Six <billsix@gmail.com>, 2026-06-10): code formatting.** `make format` / `entrypoint/format.sh`
   applies `clang-format` (google style, `.clang-format`) tree-wide — *including*
   the upstream `src/`/`include/` sources — and `ruff` to the Python
   (`python/pyproject.toml [tool.ruff]`, covering `notebooks/` too). So formatting
   churn on upstream files is expected and intended, not a violation of the mirror
-  rule. (`.clang-tidy` + `make`-able clang-tidy are available too.)
-- Bill commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
+  rule. (`.clang-tidy` is present for `run-clang-tidy` against a Meson build dir;
+  there is no `make tidy` target.)
+- The maintainer commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
   `tasks/<slug>.md` doc — see `tasks/` for in-flight items and
   `tasks/archive/` for finished ones.

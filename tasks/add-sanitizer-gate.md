@@ -1,6 +1,8 @@
 # Add an ASan + UBSan(trap) build gate to the image
 
 **Status:** proposed — needs go-ahead
+**Priority:** 5
+**Difficulty:** 4
 **Created:** 2026-06-16
 
 ## Goal
@@ -184,8 +186,8 @@ The env form is simplest for a loop over many `.xp` binaries; prefer it.
 All of this runs **inside the epix image**, per the working arrangement — never
 on the host. Nested-podman caveats apply: `--cgroups=disabled` auto-applies to inner `podman run`s
 via `PODMAN_RUN_FLAGS` (keyed on `NESTED_PODMAN=1`, 2026-08-29; `PODMAN_BUILD_FLAGS`
-stays manual and is normally not needed), and the inner image store is a small
-tmpfs (`podman image prune -f` between rebuilds). The gate adds **no new image
+stays manual and is normally not needed), and the inner image store is a
+per-session on-disk directory (no pruning needed between rebuilds). The gate adds **no new image
 dependency**: `libasan` is already in the `Dockerfile` and trap-UBSan needs no
 runtime. clang is the one thing to confirm — the image installs
 `clang-tools-extra` (clang-format/tidy) but **not necessarily `clang`/`clang++`
@@ -248,7 +250,7 @@ so it doesn't say "remove libasan" while the gate depends on it.
 - spimulator gate (template): `/billopt/spimulator/tasks/archive/2026/06/16/ubsan-sweep.md`
   + `RUN_SANITIZERS` in spimulator's `Dockerfile`/`Makefile`.
 - epix verification method (the corpus + compile recipe this gate reuses):
-  `tasks/verification-and-container-method.md`, `build-aux/verify_ports.py`.
+  `tasks/reference/verification-and-container-method.md`, `build-aux/verify_ports.py`.
 - Existing dev ASan tooling: `entrypoint/asan_check.sh`, `build-aux/asan_smoke.cc`,
   `make asan`, the `libasan` line in `Dockerfile` (all marked DEV-ONLY today).
 - The libepix bug ASan already caught: `screen.h` `m_screen` initializer

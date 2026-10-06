@@ -2,8 +2,10 @@
 
 **Status:** proposed — needs go-ahead. (Investigation/design can proceed; the
 build-file changes wait for confirmation.)
-**Requested:** 2026-06-11 (Bill)
-**Owner:** Bill (via Claude)
+**Priority:** 7
+**Difficulty:** 5
+**Requested:** 2026-06-11 (William Emerison Six <billsix@gmail.com>)
+**Owner:** the maintainer (via the agent)
 
 ## Goal
 
@@ -107,7 +109,7 @@ packagers redirect via `--prefix` / the python install scheme.
 7. **Docs** — update `CLAUDE.md` (Build / Python sections), `README.md`
    (Installation + Python interface), and `meson_options.txt` comments.
 
-## Open questions (resolve with Bill before building)
+## Open questions (resolve with the maintainer before building)
 
 - **nanobind discovery method** (CMake-config dependency vs interpreter
   `--include-dir` + `nb_combined.cpp`) — which is most portable for Gentoo/Fedora/

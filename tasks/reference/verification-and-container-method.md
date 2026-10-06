@@ -1,8 +1,9 @@
 # Explainer: how port "byte compatibility" is verified, and how nested containers were used
 
 **Status:** reference / retrospective (not deferred work) — explains the method
-used while porting demos in `python-bindings-and-notebooks.md`.
-**Written:** 2026-06-10 (Bill asked for this writeup)
+used while porting demos in `tasks/archive/2026/06/11/python-bindings-and-notebooks.md`.
+Moved from `tasks/` to `tasks/reference/` 2026-10-06 (it states what is true, not work to do).
+**Written:** 2026-06-10 (William Emerison Six <billsix@gmail.com> asked for this writeup)
 
 ---
 
@@ -100,9 +101,10 @@ The project's `Makefile` bakes all of that into a Fedora 44 OCI image
 sandbox. Two nested-specific things (from the global `CLAUDE.md`): inner runs carry
 `--cgroups=disabled` (auto-applied via `PODMAN_RUN_FLAGS` since 2026-08-29; originally
 hand-added because the sandbox's `/sys/fs/cgroup` was read-only), and the
-inner image store is an **ephemeral tmpfs** — the image doesn't survive the
-session, so it's a `make image` rebuild (~minutes, the TeX-Live layer) at the start
-of each session.
+inner image store was, at the time, an **ephemeral tmpfs** (moved to a
+per-session on-disk directory 2026-09-27; still ephemeral) — the image doesn't
+survive the session, so it's a `make image` rebuild (~minutes, the TeX-Live layer)
+at the start of each session.
 
 ## 5. Were the nested containers helpful — or inefficient? (the batching question)
 
@@ -148,7 +150,9 @@ container.
   `g++` of the binding) — independent of the verify loop.
 - **The one unavoidable big cost** is `make image` once per session (ephemeral
   store). A persistent image cache, if the sandbox allowed it, would remove the
-  per-session TeX-Live rebuild.
+  per-session TeX-Live rebuild. (Since 2026-09-27 the sandbox reuses the host's
+  images read-only, which removes the base-image pull but not this project's
+  own TeX-Live layer.)
 
 **What I could still do better:** after each new binding I rebuilt the `.so` and
 re-ran the *entire* regression set (all ported-this-session demos), not just the new
@@ -171,17 +175,3 @@ once batched and it caught any cross-binding regression immediately.
   verifies into a single container's shell loop** (fresh Python process each,
   shared container). Verification needs only `g++` + `libepix`, not the TeX render
   path; the only big one-time cost is the per-session image rebuild.
-
-## 6. TL;DR
-
-- "Byte compatibility" = the notebook's **eepic text** is identical to the C++
-  sample's, because **both run the same `libepix`**; the bindings aren't a reimpl.
-- `verify_ports.py NAME`: `exec` the notebook → eepic; `g++ -DEPIX_FMT_EEPIC` +
-  run the `.xp` → oracle eepic; strip timestamps; exact string compare. One demo
-  per process (libepix global state); `.flx` compared per frame.
-- Nested containers were necessary and helpful (they hold the whole toolchain).
-  Running one `podman run` per demo was the inefficiency; **batching all verifies
-  into a single container's shell loop** (fresh Python process each, shared
-  container) was the fix. Verification needs only `g++` + `libepix`, not the TeX
-  render path; the only big one-time cost is the per-session image rebuild.
-```
