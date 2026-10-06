@@ -230,7 +230,8 @@ How it works:
   `make lib`) first — otherwise the extension links a stale library. Run the
   harness in the container —
   `make shell-exec CMD='for n in NAME …; do python3 build-aux/verify_ports.py $n; done'`
-  (the venv has `epix` installed editable, so no `PYTHONPATH`).
+  (the venv has `epix` installed editable, so no `PYTHONPATH`); `make shell-exec
+  SCRIPT=tools/verify_image.sh` is the saved smoke gate (env + 8-port harness sample + Jupyter settings).
   Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),
   **not** the TeX/ghostscript render path — that's only for the inline PNGs.
 - **Dispatch 2-var vs 3-var callables by `inspect.signature`, never a trial

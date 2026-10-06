@@ -23,7 +23,7 @@ implementation: runCrushInContainer `client/Makefile`, `FULL_TOOLCHAIN`). Done =
 that default, a `MINIMAL_IMAGE=1` build passes the gate, both image sizes are measured and recorded
 here and in `CLAUDE.md`. The dnf-group-script split it needs landed 2026-10-06
 (`tasks/dockerfile-to-standard-template.md`, DONE): gate `02-install-render.sh` and the venv's
-Jupyter packages; reuse `tasks/adhoc/dockerfile-to-standard-template/verify_image.sh` as the in-image gate.
+Jupyter packages; run `tools/verify_image.sh` (via `make shell-exec SCRIPT=`) as the in-image gate.
 
 ## Context — read first
 

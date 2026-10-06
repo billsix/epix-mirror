@@ -1,6 +1,6 @@
 # Bring the container build onto the standard template: dnf group scripts, uv-in-venv, Jupyter config
 
-**Status:** DONE (2026-10-06) — all gates green nested; see Verification below.
+**Status:** DONE (2026-10-06); archived 2026-10-06. All gates green nested; see Verification.
 **Priority:** 3
 **Difficulty:** 4
 **Started:** 2026-10-06
@@ -12,15 +12,15 @@ whatever will be compatible with geometricalgebra and mvp")
 
 ## BLUF
 
-Make epix-mirror's `Dockerfile` / `Makefile` / `entrypoint/` conform to the maintainer's
-container-per-project template the way geometricalgebra and modelviewprojection already do: system
-packages move into host-runnable `entrypoint/0N-install-*.sh` group scripts the Dockerfile dispatches;
-the Python stack moves from `pip install --break-system-packages` into a `/venv` populated with
-`uv pip`; JupyterLab gets the two standard config tweaks (announcements off, `.py` opens as a
-notebook); `shell.sh` becomes the `set -e` + `exec bash "$@"` launcher with a `shell-exec` Makefile
-twin. Done = a nested `make image` builds, `make build` + the byte-identity harness still PASS,
+Brought epix-mirror's `Dockerfile` / `Makefile` / `entrypoint/` onto the maintainer's
+container-per-project template, the way geometricalgebra and modelviewprojection already were: system
+packages moved into host-runnable `entrypoint/0N-install-*.sh` group scripts the Dockerfile dispatches;
+the Python stack moved from `pip install --break-system-packages` into a `/venv` populated with
+`uv pip`; JupyterLab got the two standard config tweaks (announcements off, `.py` opens as a
+notebook); `shell.sh` became the `set -e` + `exec bash "$@"` launcher with a `shell-exec` Makefile
+twin. "Done" was: a nested `make image` builds, `make build` + the byte-identity harness still PASS,
 `make notebooks` / `make format` run, the Jupyter settings are verified in-image, and the editable
-install works with `--network=none`.
+install works with `--network=none` — all met (Verification below).
 
 ## Context
 
@@ -43,27 +43,39 @@ install works with `--network=none`.
   reached via `PYTHONPATH=/epix/python` (never installed); `shell.sh` runs a non-exec'd `bash` so it
   can run `format.sh` on exit; no `shell-exec`; `format.sh` swallows every failure (`|| true`).
 - **Decisions (2026-10-06, agent, per the maintainer's note):**
-  - Follow gacalc literally (venv at `/venv`, `--system-site-packages`, `uv` from dnf, scripts
-    `source /venv/bin/activate`), since the note asks for compatibility with gacalc and mvp.
-  - Install the Python package **editable** into the venv (build-time against the `COPY`'d tree, and
+  - Followed gacalc literally (venv at `/venv`, `--system-site-packages`, `uv` from dnf, scripts
+    `source /venv/bin/activate`), since the note asked for compatibility with gacalc and mvp.
+  - Installed the Python package **editable** into the venv (build-time against the `COPY`'d tree, and
     again, offline, on every entry) instead of `PYTHONPATH`; the bind mount shadows the baked copy at
     the same path (`/epix/python`), so host edits win — the template's fixed-path invariant.
-  - Two dnf groups: `01-install-base.sh` (build + Python + format toolchain) and
+  - Split the packages into two dnf groups: `01-install-base.sh` (build + Python + format toolchain) and
     `02-install-render.sh` (TeX-Live, ghostscript, ImageMagick — only `examples*` and inline PNGs need
-    them). **Not flag-gated yet**: both always run. Gating them (`BUILD_DOCS`/`USE_JUPYTER` with the
-    `MINIMAL_IMAGE` idiom) is `tasks/minimal-nested-image.md`, which now depends on this split.
-  - Format-on-exit moves from `shell.sh`'s non-exec `bash` to an `EXIT` trap in
-    `entrypoint/dotfiles/.extrabashrc` (interactive shells only), so `shell.sh` can `exec bash "$@"`.
-  - `format.sh` propagates failures (`status=0; cmd || status=1; exit $status`) and no longer hides
+    them). Deliberately **not flag-gated here**: both groups always ran. Gating them
+    (`BUILD_DOCS`/`USE_JUPYTER` on the `MINIMAL_IMAGE` idiom) was left to `tasks/minimal-nested-image.md`,
+    which this split unblocked (done the same day).
+  - Moved format-on-exit from `shell.sh`'s non-exec `bash` to an `exit()` hook in
+    `entrypoint/dotfiles/.extrabashrc` (interactive shells only), so `shell.sh` could `exec bash "$@"`.
+  - Made `format.sh` propagate failures (`status=0; cmd || status=1; exit $status`) and stop hiding
     `ruff check` output.
 
-## Goal
+## Goal (as filed)
 
 The epix-mirror image is built, entered, and formatted the same way as geometricalgebra and
 modelviewprojection — group install scripts a bare Fedora host can run, a uv-managed `/venv`
 holding JupyterLab/jupytext/nanobind with the standard Jupyter tweaks baked in, the project's own
 Python installed editable and offline from the live mount, and the `shell`/`shell-exec` launcher
 pair — without changing what the C++ build produces or what the byte-identity harness verifies.
+
+## Chronology (harvested from the branch history before the squash)
+
+1. Filed 2026-10-06 from the maintainer's written note, with the plan above.
+2. First batch (scripts, Dockerfile, Makefile, entry scripts, the ruff fixes, docs) built and gated
+   nested; committed by the maintainer together with the day's drift fixes.
+3. Completion tail: the shell-exec quoting gotcha found while running the gate through `CMD=`, the
+   gate saved as an ad-hoc script and run through `SCRIPT=`, the task marked DONE.
+4. Archived 2026-10-06. At archive the gate script was judged reusable (the minimal-image task runs
+   it) and promoted to `tools/verify_image.sh`; its sample list later swapped `hello` (no C++ oracle,
+   so always FAIL) for `cube`.
 
 ## Plan
 
@@ -93,8 +105,8 @@ pair — without changing what the C++ build produces or what the byte-identity 
 | --- | --- |
 | `make image` (full, from scratch) | built; 11 Dockerfile steps, dnf 1200 packages |
 | `make build` (lib + py-ext) | libepix.a + `_epix.cpython-314-x86_64-linux-gnu.so` linked against the bind-mounted lib |
-| `make shell-exec SCRIPT=tasks/adhoc/dockerfile-to-standard-template/verify_image.sh` | venv active (`/venv/bin/python`, `epix` from `/epix/python`), uv 0.12.19, ruff 0.16.9, JupyterLab 4.6.4 |
-| byte-identity harness, sample of 8 | koch lorenz steiner stereo_proj plotting3 tori decorate **PASS**; `hello` FAIL is expected (no `samples/hello.xp` oracle — it is an original intro notebook, see the archived notebook-structure task) |
+| `make shell-exec SCRIPT=tools/verify_image.sh` (promoted from `tasks/adhoc/` at archive) | venv active (`/venv/bin/python`, `epix` from `/epix/python`), uv 0.12.19, ruff 0.16.9, JupyterLab 4.6.4 |
+| byte-identity harness, sample of 8 | koch lorenz steiner stereo_proj plotting3 tori decorate **PASS**; `hello` FAIL was expected (no `samples/hello.xp` oracle — it is an original intro notebook, see the archived notebook-structure task) and was replaced by `cube` in the saved gate |
 | `make notebooks` | 81 `.ipynb` |
 | `make format` twice | exit 0 both times, "All checks passed", 87 files unchanged, tree unchanged |
 | Jupyter settings | `jupytext-config list-default-viewer` → `python: Jupytext Notebook`; `page_config.json` disables `@jupyterlab/apputils-extension:announcements` |
@@ -102,7 +114,7 @@ pair — without changing what the C++ build produces or what the byte-identity 
 | `make shell-exec` with no args | usage + exit 2 |
 | script modes | every `entrypoint/*.sh` 100755 (`scripts/epix-lib.sh` stays 644: upstream, sourced not executed) |
 
-Gotchas met: (1) a `CMD='...'` payload containing **double quotes** breaks the Makefile's
+Gotchas met (both harvested into runClaudeInContainer `tasks/reference/shell-exec-and-container-template.md`): (1) a `CMD='...'` payload containing **double quotes** breaks the Makefile's
 `[ -n "$(SCRIPT)$(CMD)" ]` guard (make pastes it verbatim) — use `SCRIPT=` for anything beyond a
 one-liner; (2) `shell-exec: image` re-runs the `COPY . /epix` + Meson + editable-install layers whenever
 the tree changed since the last build (~1–2 min nested; the dnf/venv layers stay cached).
@@ -118,8 +130,8 @@ the tree changed since the last build (~1–2 min nested; the dnf/venv layers st
   ruff → dnf. The uv cache mount only speeds rebuilds; the packages land in the committed `/venv` layer.
 - **`.dockerignore`** gained `__pycache__`, `*.so`, `*.ipynb`, `*.tar` (an exported image tar in the
   repo root would otherwise enter the build context and be baked by `COPY . /epix`).
-- **ruff gate made real** (`format.sh` now propagates failures; previously every step was `|| true`,
-  which hid 17 existing errors): `__init__.py` re-exports → redundant aliases (no `__all__`, so
+- **ruff gate made real** (`format.sh` propagates failures from this task on; before it every step was
+  `|| true`, which hid 17 existing errors): `__init__.py` re-exports → redundant aliases (no `__all__`, so
   `from epix import *` still re-exports everything `_epix` provides); `verify_ports.py` `l` → `line`;
   `stereo_proj.py` `O` → `origin` (variable names never reach the eepic; harness-checked); three
   un-reflowable LaTeX label strings carry `# noqa: E501`; one comment reflowed. `pyproject.toml`
@@ -128,16 +140,15 @@ the tree changed since the last build (~1–2 min nested; the dnf/venv layers st
   names so they read side by side with the oracle; `build-aux/*.py`: T201, a CLI gate prints).
   `tasks/` excluded from ruff: ruff ≥ 0.14 formats Python code blocks inside Markdown and reflowed the
   aligned example comments in four archived task docs (reverted).
-- **Format-on-exit** is now an `exit()` shell function in `entrypoint/dotfiles/.extrabashrc` (the
+- **Format-on-exit** became an `exit()` shell function in `entrypoint/dotfiles/.extrabashrc` (the
   mvp/gacalc idiom); it fires on `exit`, not on Ctrl-D, and never for a `shell-exec` payload (non-
   interactive bash does not read `.bashrc`).
-- **Not done here, by design:** flag-gating the render/Jupyter groups (`tasks/minimal-nested-image.md`);
+- **Not done here, by design:** flag-gating the render/Jupyter groups (done the same day in `tasks/archive/2026/10/06/minimal-nested-image.md`);
   a `ty` type-check step (no type checker was in the gate before; gacalc runs `ty check`); renaming the
   notebooks' C++-mirroring names (mvp's "Python naming wins over math shorthand" would say rename —
-  the maintainer's call, it touches ~30 notebooks and needs a full harness sweep).
+  the maintainer's call, it touches ~30 notebooks and needs a full harness sweep). **Decided 2026-10-06
+  (William Emerison Six <billsix@gmail.com>): keep the exemption.**
 
 ## Open questions
 
-None. Owed at archive: the move to `tasks/archive/2026/10/06/` (working-tree move done, left unstaged
-for the maintainer's separate archive commit); `tasks/adhoc/dockerfile-to-standard-template/verify_image.sh`
-is kept (not one-shot) — it is the in-image gate `tasks/minimal-nested-image.md` should reuse.
+None (the notebook-naming question was decided: keep the exemption).

@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# verify_image.sh -- in-container gates for tasks/dockerfile-to-standard-template.md:
-# the venv is active and `epix` imports from the live mount; the byte-identity harness
-# still PASSes on a sample of ports; the two JupyterLab tweaks are baked. Run from the
-# repo root inside the image, i.e.
-#   make shell-exec SCRIPT=tasks/adhoc/dockerfile-to-standard-template/verify_image.sh
-# (which also exercises the shell-exec SCRIPT= path). Every step runs; exit is nonzero
-# if any failed.
+# verify_image.sh -- in-image smoke gate for the container build: the venv is active
+# and `epix` imports from the live mount; the byte-identity harness PASSes on a sample
+# of ports; the two JupyterLab tweaks are baked. Run from the repo root inside the
+# image (`make build` first, so the extension exists):
+#   make shell-exec SCRIPT=tools/verify_image.sh
+# Every step runs; exit is nonzero if any failed. Promoted from tasks/adhoc/ (the
+# dockerfile-to-standard-template task) because the minimal-image work reuses it.
 status=0
 
 echo "## environment"
@@ -16,7 +16,7 @@ ruff --version || status=1
 jupyter lab --version || status=1
 
 echo "## byte-identity harness (sample)"
-for n in hello koch lorenz steiner stereo_proj plotting3 tori decorate; do
+for n in cube koch lorenz steiner stereo_proj plotting3 tori decorate; do
     python3 build-aux/verify_ports.py "$n" || status=1
 done
 
