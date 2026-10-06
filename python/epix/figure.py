@@ -22,6 +22,7 @@ from __future__ import annotations
 
 import base64
 import os
+import shutil
 import subprocess
 import tempfile
 from contextlib import contextmanager
@@ -31,22 +32,19 @@ from .render import Figure, render_eepic
 
 
 def render(dpi: int = 150) -> Figure:
-    """Capture the current ePiX picture (via ``print_eepic``) and render to PNG.
+    """Capture the current ePiX picture (via ``print_eepic``) as a :class:`Figure`.
 
-    The eepic is always captured; the PNG is best-effort. A few demos produce an
-    enormous eepic (tens of thousands of colored facets) that exceeds LaTeX's
-    memory when rasterized — those still return a valid ``Figure`` (with the
-    eepic) but an empty PNG rather than raising, so the notebook doesn't crash.
+    The eepic is captured now; the PNG is rasterized lazily on first display and
+    is best-effort. A few demos produce an enormous eepic (tens of thousands of
+    colored facets) that exceeds LaTeX's memory when rasterized — those display
+    as nothing rather than raising, so the notebook doesn't crash. Building the
+    figure needs only libepix, which is what the byte-identity harness relies on.
     """
     fd, path = tempfile.mkstemp(suffix=".eepic")
     os.close(fd)
     try:
         _epix.print_eepic(path)
-        try:
-            return render_eepic(path, dpi=dpi)
-        except subprocess.CalledProcessError:
-            with open(path) as f:
-                return Figure(b"", f.read())
+        return render_eepic(path, dpi=dpi)
     finally:
         os.unlink(path)
 
@@ -132,7 +130,9 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
     ePiX's global state — ePiX accumulates per-render state (the color palette,
     etc.) with no public reset, exactly as `flix` works around by running a new
     process per frame. The parent (clean state) then renders each eepic to PNG and
-    assembles a looping gif via ImageMagick ``convert``.
+    assembles a looping gif via ImageMagick ``convert`` — when the rendering
+    toolchain is present; on the lean image (no ``gs``/``convert``) the frames
+    keep their eepic and the gif is empty.
     """
     frames: list[Figure] = []
     with tempfile.TemporaryDirectory() as d:
@@ -154,21 +154,18 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
             eepics.append(ep)
 
         paths: list[str] = []
+        can_render: bool = all(shutil.which(t) for t in ("elaps", "gs", "convert"))
         for i, ep in enumerate(eepics):  # parent renders eepic -> png
             # The eepic is always captured (it's the correctness artifact); the
             # PNG is best-effort. A heavy frame (tens of thousands of facets) can
             # exceed LaTeX/ghostscript limits when rasterized, exactly like the
-            # giant single figures render() guards against -- in that case keep
-            # the frame's eepic with an empty PNG instead of failing the whole
-            # animation, and just drop it from the assembled gif.
-            try:
-                fig: Figure = render_eepic(ep, dpi=dpi)
+            # giant single figures render() guards against -- in that case the
+            # frame's png is empty and it is dropped from the assembled gif.
+            fig: Figure = render_eepic(ep, dpi=dpi)
+            if can_render and fig.png:
                 p: str = os.path.join(d, f"f{i:04d}.png")
                 fig.save(p)
                 paths.append(p)
-            except subprocess.CalledProcessError:
-                with open(ep) as f:
-                    fig = Figure(b"", f.read())
             frames.append(fig)
         gif: bytes = b""
         if paths:

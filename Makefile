@@ -17,6 +17,19 @@
 CONTAINER_CMD  = podman
 CONTAINER_NAME = epix
 
+# Optional-feature flags. Full image by default; a LEAN image is opt-in with
+# MINIMAL_IMAGE=1, which flips each feature OFF -- `make image MINIMAL_IMAGE=1` drops the
+# TeX-Live/ghostscript/ImageMagick rendering stack (BUILD_DOCS) and JupyterLab (USE_JUPYTER),
+# neither of which the gates need (`make build`, `make asan`, the byte-identity harness run on
+# g++ + libepix + nanobind). MINIMAL_IMAGE is a BUILD-CONTENT signal and is deliberately
+# SEPARATE from NESTED_PODMAN (a RUN-capability signal, used only by PODMAN_RUN_FLAGS below):
+# the sandbox does NOT auto-set MINIMAL_IMAGE, so a nested `make image` builds the full image
+# unless you ask for lean. Override a single flag too (`make image MINIMAL_IMAGE=1 BUILD_DOCS=1`).
+# A bare `podman build` stays lean regardless (each Dockerfile ARG defaults to 0).
+# Convention: runClaudeInContainer tasks/reference/minimal-nested-images.md.
+BUILD_DOCS  ?= $(if $(filter 1,$(MINIMAL_IMAGE)),0,1)
+USE_JUPYTER ?= $(if $(filter 1,$(MINIMAL_IMAGE)),0,1)
+
 # Host folder for rendered examples; bind-mounted into the container at /output.
 OUTPUT_DIR ?= $(CURDIR)/output
 
@@ -74,8 +87,11 @@ SHELL_EXEC_ARGS = -c 'cd $(REPO_MOUNT) && $(if $(CMD),$(CMD),exec bash $(SCRIPT)
 all: image shell ## Build the image, then drop into a shell
 
 .PHONY: image
-image: ## Build the OCI image
-	$(CONTAINER_CMD) build $(PODMAN_BUILD_FLAGS) -t $(CONTAINER_NAME) .
+image: ## Build the OCI image (full; MINIMAL_IMAGE=1 for lean -- see the flag block)
+	$(CONTAINER_CMD) build $(PODMAN_BUILD_FLAGS) \
+		--build-arg BUILD_DOCS=$(BUILD_DOCS) \
+		--build-arg USE_JUPYTER=$(USE_JUPYTER) \
+		-t $(CONTAINER_NAME) .
 
 .PHONY: shell
 shell: ## Interactive dev shell (live tree bind-mounted; epix/elaps/flix on PATH)

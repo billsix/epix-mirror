@@ -1,5 +1,15 @@
 FROM registry.fedoraproject.org/fedora:44
 
+# Optional-feature flags. Each defaults to 0 so a bare `podman build` is lean; the
+# Makefile passes the real values (1 by default, 0 under `make image MINIMAL_IMAGE=1`).
+#   BUILD_DOCS  -- the figure-rendering stack (TeX-Live, ghostscript, ImageMagick):
+#                 `make examples`/`examples-anim` and the notebooks' inline PNGs.
+#   USE_JUPYTER -- JupyterLab + jupytext + ipykernel: `make jupyter`/`notebooks`.
+# Neither is needed to build libepix, the drivers, or the Python extension, nor by the
+# gates (`make build`, `make asan`, the byte-identity harness).
+ARG BUILD_DOCS=0
+ARG USE_JUPYTER=0
+
 # Keep the dnf package cache across builds (BuildKit cache mounts), so iterating
 # on this file doesn't re-download the (large) TeX-Live stack every time. The cache
 # mount is build plumbing only: the installed packages land in committed layers, so
@@ -13,21 +23,21 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
 COPY entrypoint/dotfiles/ /root/
 
 # System packages: per-group, host-runnable scripts (see each script's header for
-# what the group is and why). 01 = build + Python + format toolchain; 02 = the
-# TeX/ghostscript/ImageMagick rendering stack. Both run unconditionally today; a
-# flag-gated lean image is tasks/minimal-nested-image.md.
+# what the group is and why). 01 = build + Python + format toolchain, always;
+# 02 = the TeX/ghostscript/ImageMagick rendering stack, only when BUILD_DOCS=1.
 COPY entrypoint/01-install-base.sh entrypoint/02-install-render.sh /usr/local/bin/
 RUN --mount=type=cache,target=/var/cache/libdnf5 \
     --mount=type=cache,target=/var/lib/dnf \
     /usr/local/bin/01-install-base.sh && \
-    /usr/local/bin/02-install-render.sh
+    if [ "$BUILD_DOCS" = "1" ]; then /usr/local/bin/02-install-render.sh ; fi
 
 # Python environment: a venv at /venv (--system-site-packages, so it also sees the
 # dnf-installed setuptools/wheel/ruff), populated with uv. Every entry script
 # activates it. Deps land in the committed /venv layer (the uv cache mount only
 # speeds rebuilds), so an exported image runs offline.
-#   jupyterlab/jupytext/ipython/ipykernel: the notebook front-end.
-#   nanobind: headers + nb_combined.cpp for the extension build (entrypoint/build_py.sh).
+#   nanobind (always): headers + nb_combined.cpp for the extension build
+#     (entrypoint/build_py.sh) -- part of the `make build` gate.
+#   jupyterlab/jupytext/ipython/ipykernel (USE_JUPYTER=1): the notebook front-end.
 # JupyterLab tweaks (same as geometricalgebra / modelviewprojection):
 #   jupytext-config set-default-viewer python: a .py (jupytext percent) file opens as a
 #     notebook by default.
@@ -37,9 +47,12 @@ RUN --mount=type=cache,target=/root/.cache/uv \
     python3 -m venv --system-site-packages /venv/ && \
     export VIRTUAL_ENV_DISABLE_PROMPT=1 && \
     source /venv/bin/activate && \
-    uv pip install --python /venv/bin/python jupyterlab jupytext ipython ipykernel nanobind && \
-    jupytext-config set-default-viewer python && \
-    jupyter labextension disable --level=user "@jupyterlab/apputils-extension:announcements" && \
+    uv pip install --python /venv/bin/python nanobind && \
+    if [ "$USE_JUPYTER" = "1" ]; then \
+      uv pip install --python /venv/bin/python jupyterlab jupytext ipython ipykernel && \
+      jupytext-config set-default-viewer python && \
+      jupyter labextension disable --level=user "@jupyterlab/apputils-extension:announcements" ; \
+    fi && \
     echo "source ~/.extrabashrc" >> ~/.bashrc && \
     echo "elaps --pdf samples/hello.xp" >> ~/.bash_history && \
     echo "/build.sh" >> ~/.bash_history && \

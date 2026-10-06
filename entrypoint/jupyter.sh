@@ -4,6 +4,13 @@
 export VIRTUAL_ENV_DISABLE_PROMPT=1
 source /venv/bin/activate
 cd /epix
+
+# Lean image (USE_JUPYTER=0) has no JupyterLab: say so.
+if ! command -v jupyter >/dev/null 2>&1; then
+    echo "jupyter not found: this image was built without JupyterLab" >&2
+    echo "(make image MINIMAL_IMAGE=1 drops it; rebuild with plain 'make image' or USE_JUPYTER=1)" >&2
+    exit 2
+fi
 # Editable, offline install of python/ against the live mount (mirrors shell.sh).
 uv pip install --python "$(which python)" --no-deps --no-index --no-build-isolation -e python
 

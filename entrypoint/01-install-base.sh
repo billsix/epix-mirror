@@ -3,8 +3,8 @@
 # 01-install-base.sh -- the always-needed Fedora packages for ePiX.
 #
 # One package group per script, no options: WHICH optional groups also get installed
-# is decided by the Dockerfile (today both groups run unconditionally; a lean image
-# that skips 02-install-render.sh is tasks/minimal-nested-image.md). The same
+# is decided by the Dockerfile's ARG `if` (this base group always; 02-install-render.sh
+# only when BUILD_DOCS=1, which `make image MINIMAL_IMAGE=1` turns off). The same
 # packages install during `podman build`, on a bare Fedora host, or in a guest with
 # no container runtime. `dnf upgrade` stays in the Dockerfile (its own earlier layer).
 #

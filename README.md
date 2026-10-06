@@ -79,7 +79,8 @@ wrapper around `podman` that builds a Fedora image with the full toolchain
 (g++, TeX-Live, ghostscript, ImageMagick) baked in. Targets:
 
 ```sh
-make image                 # build the OCI image
+make image                 # build the OCI image (full)
+make image MINIMAL_IMAGE=1  # lean image: no TeX/ghostscript/ImageMagick, no JupyterLab (1.1 vs 2.5 GB)
 make shell                  # interactive dev shell
 make shell-exec CMD='...'   # same env, no TTY (or SCRIPT=<repo-relative path>)
 make format                 # clang-format (C++) + ruff (Python), in place
@@ -100,7 +101,10 @@ builds ePiX with Meson. The system packages come from two host-runnable scripts,
 toolchain) and [`entrypoint/02-install-render.sh`](entrypoint/02-install-render.sh)
 (TeX-Live, ghostscript, ImageMagick) — run them as root on a bare Fedora host to
 get the same toolchain without a container. Python packages live in a `/venv`
-managed with `uv`; the `epix` package is installed editable from the live tree. When running nested inside another container, `--cgroups=disabled`
+managed with `uv`; the `epix` package is installed editable from the live tree.
+The lean image still builds the library and the Python extension; `make examples`,
+`make jupyter` and `make notebooks` stop with a message naming the flag
+(`BUILD_DOCS=1` / `USE_JUPYTER=1`) that brings the feature back. When running nested inside another container, `--cgroups=disabled`
 is auto-applied via `PODMAN_RUN_FLAGS` (keyed on `NESTED_PODMAN=1`); the nested
 image store is per-session, so the first `make image` of a session rebuilds.
 

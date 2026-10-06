@@ -81,8 +81,9 @@ toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick, plus
 the Python/Jupyter stack for the bindings work — see below).
 Targets (invoke with `make <t>`): `image`, `shell`, `shell-exec` (the batch twin of
 `shell`: `make shell-exec SCRIPT=<repo-relative path> | CMD='...'` runs in the same
-container env, no TTY — the two share one `SHELL_RUN_FLAGS` block; a `CMD` containing
-double quotes breaks the empty-payload guard, so use `SCRIPT=` beyond a one-liner), `lib` (libepix.a + driver
+container env, no TTY — the two share one `SHELL_RUN_FLAGS` block; in a `CMD` make expands
+`$var` (write `$$var`) and double quotes break the empty-payload guard, so use `SCRIPT=` beyond a
+one-liner), `lib` (libepix.a + driver
 scripts via meson), `build` (**full build** = `lib` + `py-ext`, so the Python
 extension reflects edited C++ sources),
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
@@ -117,6 +118,17 @@ tree stays clean and sibling `#include`s resolve. See
 that lives for one sandbox session (not a RAM tmpfs), so a full nested `make image`
 fits and needs no pruning between rebuilds; the image does not survive the
 session, so each session starts with one `make image`.
+
+**Lean image (opt-in):** `make image MINIMAL_IMAGE=1` builds without the TeX-Live /
+ghostscript / ImageMagick rendering stack (`BUILD_DOCS=0`) and without JupyterLab /
+jupytext / ipykernel (`USE_JUPYTER=0`): **1.13 GB vs 2.49 GB** full (measured
+2026-10-06; 194 vs 1392 rpms). Everything the gates need stays — `make build`,
+`make asan`, the byte-identity harness and `tools/verify_image.sh`'s harness
+sample all pass on it; `make examples*`, `make jupyter` and `make notebooks` exit 2
+with a message naming the flag to re-enable (`make image MINIMAL_IMAGE=1 BUILD_DOCS=1`
+re-enables one group). A plain `make image`, host or nested, is the full image —
+`MINIMAL_IMAGE` is never auto-set. Convention: runClaudeInContainer
+`tasks/reference/minimal-nested-images.md`.
 
 ### Generated files — do NOT hand-edit
 
@@ -196,8 +208,12 @@ Layout:
 How it works:
 - ePiX's global-state model maps to module-level functions; `figure()` is a
   context manager wrapping `picture()`/`begin()`. Capture is via
-  **`print_eepic(file)`** (a clean named-file output — not stdout) → read back →
-  render with `elaps` (which also accepts an `.eepic`, not just `.xp`).
+  **`print_eepic(file)`** (a clean named-file output — not stdout) → read back into a
+  `Figure` holding the eepic text. The PNG is rasterized **lazily** on first display
+  (`elaps` → eps → `gs`; `elaps` also accepts an `.eepic`, not just `.xp`), so building
+  a figure — and therefore the byte-identity harness — needs only libepix; displaying
+  one needs the rendering stack (absent from the lean image, where `_repr_png_` raises
+  `FileNotFoundError` and `animate()` keeps the frames' eepic with an empty gif).
 - Extension build (`entrypoint/build_py.sh`, `make py-ext`): standalone g++ of
   `_epix.cc` + nanobind's `nb_combined.cpp`, statically linking libepix. Needs
   `python3-devel` + `nanobind` + nanobind's `ext/robin_map/include`.
