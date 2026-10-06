@@ -477,7 +477,7 @@ void data_file::write(const char* fname, std::string pt_out(double, double),
       output << pt_out(m_data.at(col1 - 1).at(i), m_data.at(col2 - 1).at(i));
     }
 
-    catch (std::out_of_range) {
+    catch (const std::out_of_range&) {
       epix_warning("data_file::write(): Invalid column index");
       return;
     }
@@ -533,7 +533,7 @@ void data_file::plot(epix_mark_type TYPE, unsigned int col1, unsigned int col2,
                        m_data.at(col3 - 1).at(i));
     }
 
-    catch (std::out_of_range) {
+    catch (const std::out_of_range&) {
       epix_warning("data_file::plot(): Invalid column index");
       return;
     }

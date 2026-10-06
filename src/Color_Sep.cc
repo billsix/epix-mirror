@@ -186,34 +186,40 @@ std::vector<double> Black_Layer::densities() const {
 }
 
 // null operations
-Cyan_Layer& Cyan_Layer::operator*=(double x) { return *this; }
-Cyan_Layer& Cyan_Layer::blend(const Color_Base& col, double d) { return *this; }
+Cyan_Layer& Cyan_Layer::operator*=(double /*x*/) { return *this; }
+Cyan_Layer& Cyan_Layer::blend(const Color_Base& /*col*/, double /*d*/) {
+  return *this;
+}
 
-Cyan_Layer& Cyan_Layer::superpose(const Color_Base& col) { return *this; }
+Cyan_Layer& Cyan_Layer::superpose(const Color_Base& /*col*/) { return *this; }
 Cyan_Layer& Cyan_Layer::invert() { return *this; }
 
-Magenta_Layer& Magenta_Layer::operator*=(double x) { return *this; }
-Magenta_Layer& Magenta_Layer::blend(const Color_Base& col, double d) {
+Magenta_Layer& Magenta_Layer::operator*=(double /*x*/) { return *this; }
+Magenta_Layer& Magenta_Layer::blend(const Color_Base& /*col*/, double /*d*/) {
   return *this;
 }
 
-Magenta_Layer& Magenta_Layer::superpose(const Color_Base& col) { return *this; }
+Magenta_Layer& Magenta_Layer::superpose(const Color_Base& /*col*/) {
+  return *this;
+}
 Magenta_Layer& Magenta_Layer::invert() { return *this; }
 
-Yellow_Layer& Yellow_Layer::operator*=(double x) { return *this; }
-Yellow_Layer& Yellow_Layer::blend(const Color_Base& col, double d) {
+Yellow_Layer& Yellow_Layer::operator*=(double /*x*/) { return *this; }
+Yellow_Layer& Yellow_Layer::blend(const Color_Base& /*col*/, double /*d*/) {
   return *this;
 }
 
-Yellow_Layer& Yellow_Layer::superpose(const Color_Base& col) { return *this; }
+Yellow_Layer& Yellow_Layer::superpose(const Color_Base& /*col*/) {
+  return *this;
+}
 Yellow_Layer& Yellow_Layer::invert() { return *this; }
 
-Black_Layer& Black_Layer::operator*=(double x) { return *this; }
-Black_Layer& Black_Layer::blend(const Color_Base& col, double d) {
+Black_Layer& Black_Layer::operator*=(double /*x*/) { return *this; }
+Black_Layer& Black_Layer::blend(const Color_Base& /*col*/, double /*d*/) {
   return *this;
 }
 
-Black_Layer& Black_Layer::superpose(const Color_Base& col) { return *this; }
+Black_Layer& Black_Layer::superpose(const Color_Base& /*col*/) { return *this; }
 Black_Layer& Black_Layer::invert() { return *this; }
 
 }  // namespace ePiX

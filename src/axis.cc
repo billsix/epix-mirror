@@ -359,11 +359,11 @@ std::string __epix_axis_label(double x) {
   return obuf.str();
 }
 
-std::string __epix_axis1_label(double x, double y) {
+std::string __epix_axis1_label(double x, double /*y*/) {
   return __epix_axis_label(x);
 }
 
-std::string __epix_axis2_label(double x, double y) {
+std::string __epix_axis2_label(double /*x*/, double y) {
   return __epix_axis_label(y);
 }
 
@@ -388,12 +388,12 @@ std::string __epix_log_label(double x, const unsigned int base) {
   return obuf.str();
 }
 
-std::string __epix_log_axis1_label(double x, double y,
+std::string __epix_log_axis1_label(double x, double /*y*/,
                                    const unsigned int base = 10) {
   return __epix_log_label(x, base);
 }
 
-std::string __epix_log_axis2_label(double x, double y,
+std::string __epix_log_axis2_label(double /*x*/, double y,
                                    const unsigned int base = 10) {
   return __epix_log_label(y, base);
 }
@@ -669,7 +669,7 @@ double __epix_coord3(const P& arg) { return arg.x3(); }
 // String representations of double
 // triples separated by commas
 std::string __epix_coord_as_double(double x, unsigned int digits,
-                                   unsigned int base) {
+                                   unsigned int /*base*/) {
   std::stringstream obuf;
   obuf.precision(digits);
 
@@ -694,7 +694,7 @@ std::string __epix_coord_as_double(double x, unsigned int digits,
 
 // [-]\frac{p}{q}
 std::string __epix_coord_as_frac(double x, unsigned int digits,
-                                 unsigned int base) {
+                                 unsigned int /*base*/) {
   ePiX::frac xfrac(x);
 
   std::stringstream obuf;
@@ -718,7 +718,7 @@ std::string __epix_coord_as_frac(double x, unsigned int digits,
 
 // [-]\frac{p\pi}{q}
 std::string __epix_coord_as_trig_frac(double x, unsigned int digits,
-                                      unsigned int base) {
+                                      unsigned int /*base*/) {
   ePiX::frac xfrac(x / M_PI);
 
   int xnum(xfrac.num());

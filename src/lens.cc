@@ -62,7 +62,7 @@ bool Perspective::needs_clip() const { return true; }
 Perspective* Perspective::clone() const { return new Perspective(*this); }
 
 pair Orthog::operator()(const P& arg, const frame& orient, const P& viewpt,
-                        double dist) const {
+                        double /*dist*/) const {
   P arg_vector(arg - viewpt);
   double u1(orient.sea() | arg_vector);
   double u2(orient.sky() | arg_vector);

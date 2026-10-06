@@ -117,7 +117,7 @@ legend_tile& legend_tile::map_by(const affine& f) {
 }
 
 // legends unaffected by cropping
-legend_tile& legend_tile::crop_to(const screen_mask& M) {
+legend_tile& legend_tile::crop_to(const screen_mask& /*M*/) {
   /*
   if (M.crops(m_here))
     m_seen = false;

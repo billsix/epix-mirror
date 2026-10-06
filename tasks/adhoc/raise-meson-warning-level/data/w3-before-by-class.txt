@@ -1,0 +1,7 @@
+    138 [-Wignored-qualifiers]
+     63 [-Wunused-parameter]
+      2 [-Wcatch-value=]
+      1 [-Wvexing-parse]
+      1 [-Wunused-but-set-variable=]
+      1 [-Wparentheses]
+      1 [-Winfinite-recursion]

@@ -143,15 +143,15 @@ Color operator*(double c, const Color& col) {
   return tmp *= c;
 }
 
-const bool operator==(const Color& col1, const Color& col2) {
+bool operator==(const Color& col1, const Color& col2) {
   return col1.name() == col2.name();
 }
 
-const bool operator!=(const Color& col1, const Color& col2) {
+bool operator!=(const Color& col1, const Color& col2) {
   return col1.name() != col2.name();
 }
 
-const bool operator<(const Color& col1, const Color& col2) {
+bool operator<(const Color& col1, const Color& col2) {
   return col1.name() < col2.name();
 }
 

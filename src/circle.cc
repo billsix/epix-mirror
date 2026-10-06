@@ -98,7 +98,7 @@ Circle::Circle(const P& pt1, const P& pt2, const P& pt3) : m_malformed(false) {
   }
 }
 
-Circle::Circle(bool tag) : m_malformed(true) {}
+Circle::Circle(bool /*tag*/) : m_malformed(true) {}
 
 P Circle::center() const { return m_center; }
 

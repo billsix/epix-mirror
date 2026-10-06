@@ -46,7 +46,7 @@ frame::frame() : m_e1(E_1), m_e2(E_2), m_e3(E_3) {}
 // frame constructor, suitable for (sea,sky,eye) frames: Usually we
 // know the eye vector and want to preserve its direction. The frame
 // is guaranteed to be right-handed, and the first arg is immaterial.
-frame::frame(P arg1, P arg2, P arg3) {
+frame::frame(P /*arg1*/, P arg2, P arg3) {
   if (norm(arg2 * arg3) < EPIX_EPSILON)  // too nearly linearly dependent
     epix_error("Linearly dependent arguments to frame");
 

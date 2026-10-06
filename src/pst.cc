@@ -151,8 +151,9 @@ std::string pst::print_color(const std::string& model, const std::string& name,
   return obuf.str();
 }
 
-std::string pst::print_color(const std::string& model, const std::string& name,
-                             double d1, double d2, double d3, double d4) const {
+std::string pst::print_color(const std::string& /*model*/,
+                             const std::string& name, double d1, double d2,
+                             double d3, double d4) const {
   // model presumably "cmyk"
   std::stringstream obuf;
   obuf << "\\newcmykcolor{" << name << "}{" << d1 << " " << d2 << " " << d3
@@ -215,7 +216,7 @@ std::string pst::start_open_path(const std::string& attribs) const {
   return "\\psline" + attribs;
 }
 
-std::string pst::end_open_path(const std::string& attribs) const {
+std::string pst::end_open_path(const std::string& /*attribs*/) const {
   std::stringstream obuf;
   obuf << std::endl;
   return obuf.str();
@@ -225,7 +226,7 @@ std::string pst::start_closed_path(const std::string& attribs) const {
   return "\\pspolygon" + attribs;
 }
 
-std::string pst::end_closed_path(const std::string& attribs) const {
+std::string pst::end_closed_path(const std::string& /*attribs*/) const {
   std::stringstream obuf;
   obuf << std::endl;
   return obuf.str();
@@ -296,7 +297,7 @@ std::string pst::put_box(const pair& loc, const std::string& msg) const {
 
 std::string pst::print_circle_marker(const pair& here, double diam, bool fill,
                                      const Color& color,
-                                     const std::string& len) const {
+                                     const std::string& /*len*/) const {
   std::stringstream obuf;
   obuf << "\\pscircle";
 

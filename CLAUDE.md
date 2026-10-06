@@ -64,7 +64,11 @@ meson install -C build
 ```
 
 Options (`meson_options.txt`): `epix_el`, `bash_path`, `runtime_compiler`,
-`ps2eps`, `manual` (default off — the manual is heavy). Needs a C++ compiler
+`ps2eps`, `manual` (default off — the manual is heavy). `meson.build` pins
+`cpp_std=c++20` and **`warning_level=3`** (`-Wall -Wextra -Wpedantic`), and the
+library builds warning-free at that level with no suppressions — keep it that way
+(an unused parameter is spelled `/*name*/`; see
+`tasks/archive/2026/10/06/raise-meson-warning-level.md` for the sweep). Needs a C++ compiler
 (`g++`); the tools expect `bash`, `latex`, and `ps2epsi`/`ps2eps` at runtime.
 Meson is **out-of-source** — everything lands in `build/`, nothing in the tree.
 The printable manual builds from `manual.tex` + the **committed** `doc/*.eepic`
@@ -281,11 +285,14 @@ How it works:
   labelled-marker form), register the new one *after* it and give `scale` **no
   default**, so a 2-arg call can't fall into the 3-arg overload.
 
-**A libepix bug fixed here (independent of the bindings, worth keeping):**
-`screen::screen()` left the pimpl pointer `m_screen` uninitialized — latent UB
-that only "worked" because the canvas lives in zero-initialized static storage.
-Fixed with a default member initializer `screen_data* m_screen = nullptr;` in
-`screen.h`. Found via AddressSanitizer; the binding's call pattern exposed it.
+**libepix bugs fixed here (independent of the bindings, worth keeping):**
+- `screen::screen()` left the pimpl pointer `m_screen` uninitialized — latent UB
+  that only "worked" because the canvas lives in zero-initialized static storage.
+  Fixed with a default member initializer `screen_data* m_screen = nullptr;` in
+  `screen.h`. Found via AddressSanitizer; the binding's call pattern exposed it.
+- `Complex::operator!=` returned `*this != arg` — infinite recursion on any `!=`
+  between two `Complex` values. Now `!(*this == arg)`. Found by
+  `-Winfinite-recursion` when `warning_level` was raised (2026-10-06).
 
 **Sanitizer tooling — kept pending `tasks/add-sanitizer-gate.md`:** `libasan`
 (Dockerfile), `entrypoint/asan_check.sh`, `build-aux/asan_smoke.cc`, the `asan`

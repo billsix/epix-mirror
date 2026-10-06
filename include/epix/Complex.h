@@ -45,8 +45,8 @@ class Complex {
   Complex& operator/=(const Complex& arg);
   Complex& conj();
 
-  const bool operator==(const Complex& arg) const;
-  const bool operator!=(const Complex& arg) const;
+  bool operator==(const Complex& arg) const;
+  bool operator!=(const Complex& arg) const;
 
   double re() const;
   double im() const;

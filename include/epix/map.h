@@ -65,11 +65,11 @@ T id(T arg) {
 }
 
 template <typename T1, typename T2>
-T1 proj1(T1 arg1, T2 arg2) {
+T1 proj1(T1 arg1, T2 /*arg2*/) {
   return arg1;
 }
 template <typename T1, typename T2>
-T2 proj2(T1 arg1, T2 arg2) {
+T2 proj2(T1 /*arg1*/, T2 arg2) {
   return arg2;
 }
 

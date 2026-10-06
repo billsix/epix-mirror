@@ -44,15 +44,16 @@ class screen_mask;
 
 verbatim::verbatim(const std::string& text) : m_text(text) {}
 
-verbatim& verbatim::map_by(const affine& f) { return *this; }
+verbatim& verbatim::map_by(const affine& /*f*/) { return *this; }
 
-verbatim& verbatim::crop_to(const screen_mask& M) { return *this; }
+verbatim& verbatim::crop_to(const screen_mask& /*M*/) { return *this; }
 
 verbatim* verbatim::clone() const { return new verbatim(*this); }
 
 bool verbatim::is_empty() const { return (m_text == ""); }
 
-std::string verbatim::print_to(const format& fmt, const std::string& L) const {
+std::string verbatim::print_to(const format& fmt,
+                               const std::string& /*L*/) const {
   if (is_empty()) return "";
 
   // else

@@ -112,7 +112,7 @@ label_data::label_data(const P& here, epix_mark_type mark, epix_label_posn A)
     m_style.label_angle(0);  // no initial rotation
 
     // prevent unseemly alignment; default is c, so needn't check
-    if (m_mark == HTICK && A == t || A == b)
+    if ((m_mark == HTICK && A == t) || A == b)
       m_style.align_to(A);
 
     else if (A == l || A == r)
