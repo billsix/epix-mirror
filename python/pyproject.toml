@@ -28,13 +28,28 @@ include = ["epix*"]
 # (`--config python/pyproject.toml`) so it also covers notebooks/ at the repo root.
 [tool.ruff]
 line-length = 88
-extend-exclude = ["build", "output"]
+# tasks/ is prose: ruff >= 0.14 formats Python code blocks inside Markdown, and the
+# task docs' annotated examples (aligned trailing comments) must not be reflowed.
+extend-exclude = ["build", "output", "tasks"]
 
 [tool.ruff.lint]
+# The shared cross-project tier (runClaudeInContainer
+# tasks/reference/python-coding-standard.md). E231/E302 are deliberately absent:
+# they are preview-only rules that did nothing but warn, and `ruff format` covers
+# both (spacing after a comma, blank lines around defs).
 select = [
     "F401", "F811", "E402", "I001", "TID252", "F841",
-    "E302", "E231", "B006", "B007", "B008", "UP007",
+    "B006", "B007", "B008", "UP007",
     "UP035", "S311", "S602", "T201",
-    "E", "F", "I",
+    "E", "F", "I", "N",
 ]
 ignore = []
+
+[tool.ruff.lint.per-file-ignores]
+# The notebooks are byte-identical ports of samples/*.xp and keep the C++ sample's
+# function and variable names (the plotted `F`, `Phi`, `P_n`, ...) so a reader can
+# line each one up with its oracle; the names never reach the rendered eepic.
+# Casing rules only -- argument order, imports, and everything else stay enforced.
+"notebooks/*.py" = ["N802", "N803", "N806", "N816"]
+# verify_ports.py is a command-line gate whose PASS/FAIL lines ARE its output.
+"build-aux/*.py" = ["T201"]

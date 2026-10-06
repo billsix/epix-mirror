@@ -169,7 +169,7 @@ with epix.figure(
     epix.masklabel(
         Point(x=0.5 * (epix.xmin() + epix.xmax()), y=epix.ymax()),
         offset=Point(x=0, y=0),
-        text=r"\begin{minipage}{2.25in}A graph with unexpected tangent line\end{minipage}",
+        text=r"\begin{minipage}{2.25in}A graph with unexpected tangent line\end{minipage}",  # noqa: E501
         align=epix.LabelPos.b,
     )
 fig

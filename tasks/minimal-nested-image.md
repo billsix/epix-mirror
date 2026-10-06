@@ -21,8 +21,9 @@ ghostscript / ImageMagick / JupyterLab) that still runs this project's gate, whi
 `FLAG ?= $(if $(filter 1,$(MINIMAL_IMAGE)),0,1)` on each optional-feature flag (reference
 implementation: runCrushInContainer `client/Makefile`, `FULL_TOOLCHAIN`). Done = the flags below carry
 that default, a `MINIMAL_IMAGE=1` build passes the gate, both image sizes are measured and recorded
-here and in `CLAUDE.md`. Depends on `tasks/dockerfile-to-standard-template.md` (the dnf-group-script
-split), which is where the flag-gated install groups get their files; do that first.
+here and in `CLAUDE.md`. The dnf-group-script split it needs landed 2026-10-06
+(`tasks/dockerfile-to-standard-template.md`, DONE): gate `02-install-render.sh` and the venv's
+Jupyter packages; reuse `tasks/adhoc/dockerfile-to-standard-template/verify_image.sh` as the in-image gate.
 
 ## Context — read first
 

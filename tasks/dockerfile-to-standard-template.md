@@ -1,6 +1,6 @@
 # Bring the container build onto the standard template: dnf group scripts, uv-in-venv, Jupyter config
 
-**Status:** in-progress
+**Status:** DONE (2026-10-06) — all gates green nested; see Verification below.
 **Priority:** 3
 **Difficulty:** 4
 **Started:** 2026-10-06
@@ -82,10 +82,30 @@ pair — without changing what the C++ build produces or what the byte-identity 
       `SHELL_EXEC_ARGS`), `shell-exec: image`.
 - [x] Repoint `PYTHONPATH` mentions (`CLAUDE.md` harness line, `build-aux/verify_ports.py` docstring,
       `jupyter.sh`).
-- [ ] Verify nested: `make image`; `make build`; harness on a sample of names via `make shell-exec`;
+- [x] Verify nested: `make image`; `make build`; harness on a sample of names via `make shell-exec`;
       `make notebooks`; `make format` twice (idempotent, exit 0); Jupyter settings listed in-image;
       `--network=none` entry + `import epix`; `git ls-files -s -- '*.sh'` modes.
 - [x] Docs: `CLAUDE.md` + `README.md` build sections; stage by path.
+
+## Verification (2026-10-06, nested in the runClaudeInContainer sandbox)
+
+| Gate | Result |
+| --- | --- |
+| `make image` (full, from scratch) | built; 11 Dockerfile steps, dnf 1200 packages |
+| `make build` (lib + py-ext) | libepix.a + `_epix.cpython-314-x86_64-linux-gnu.so` linked against the bind-mounted lib |
+| `make shell-exec SCRIPT=tasks/adhoc/dockerfile-to-standard-template/verify_image.sh` | venv active (`/venv/bin/python`, `epix` from `/epix/python`), uv 0.12.19, ruff 0.16.9, JupyterLab 4.6.4 |
+| byte-identity harness, sample of 8 | koch lorenz steiner stereo_proj plotting3 tori decorate **PASS**; `hello` FAIL is expected (no `samples/hello.xp` oracle — it is an original intro notebook, see the archived notebook-structure task) |
+| `make notebooks` | 81 `.ipynb` |
+| `make format` twice | exit 0 both times, "All checks passed", 87 files unchanged, tree unchanged |
+| Jupyter settings | `jupytext-config list-default-viewer` → `python: Jupytext Notebook`; `page_config.json` disables `@jupyterlab/apputils-extension:announcements` |
+| offline entry (`--network=none`, `/shell.sh -c 'import epix'`) | editable install re-ran offline; import resolves to the mount |
+| `make shell-exec` with no args | usage + exit 2 |
+| script modes | every `entrypoint/*.sh` 100755 (`scripts/epix-lib.sh` stays 644: upstream, sourced not executed) |
+
+Gotchas met: (1) a `CMD='...'` payload containing **double quotes** breaks the Makefile's
+`[ -n "$(SCRIPT)$(CMD)" ]` guard (make pastes it verbatim) — use `SCRIPT=` for anything beyond a
+one-liner; (2) `shell-exec: image` re-runs the `COPY . /epix` + Meson + editable-install layers whenever
+the tree changed since the last build (~1–2 min nested; the dnf/venv layers stay cached).
 
 ## Notes / decisions
 
@@ -117,3 +137,7 @@ pair — without changing what the C++ build produces or what the byte-identity 
   the maintainer's call, it touches ~30 notebooks and needs a full harness sweep).
 
 ## Open questions
+
+None. Owed at archive: the move to `tasks/archive/2026/10/06/` (working-tree move done, left unstaged
+for the maintainer's separate archive commit); `tasks/adhoc/dockerfile-to-standard-template/verify_image.sh`
+is kept (not one-shot) — it is the in-image gate `tasks/minimal-nested-image.md` should reuse.

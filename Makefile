@@ -55,6 +55,21 @@ SCRIPT_MOUNTS = \
 
 RUN = $(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) --entrypoint /bin/bash
 
+# `shell` and `shell-exec` share ONE flag block so the batch twin can never drift
+# from the interactive shell (scoped to this pair only). Convention:
+# runClaudeInContainer tasks/add-shell-exec-target.md.
+SHELL_RUN_FLAGS = \
+	--entrypoint /bin/bash \
+	$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
+	$(GITCONFIG_MOUNT) $(TMUX_MOUNT)
+
+# In-container repo mount path (matches SRC_MOUNT: -v $(CURDIR):/epix).
+REPO_MOUNT = /epix
+
+# shell-exec payload: cd to the repo root (independent of shell.sh's own cd), then
+# run the inline CMD, else the repo-relative SCRIPT. Prefers CMD when both are set.
+SHELL_EXEC_ARGS = -c 'cd $(REPO_MOUNT) && $(if $(CMD),$(CMD),exec bash $(SCRIPT))'
+
 .PHONY: all
 all: image shell ## Build the image, then drop into a shell
 
@@ -64,10 +79,12 @@ image: ## Build the OCI image
 
 .PHONY: shell
 shell: ## Interactive dev shell (live tree bind-mounted; epix/elaps/flix on PATH)
-	$(RUN) -it \
-		$(SRC_MOUNT) $(SCRIPT_MOUNTS) \
-		$(GITCONFIG_MOUNT) $(TMUX_MOUNT) \
-		$(CONTAINER_NAME) /shell.sh
+	$(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) -it $(SHELL_RUN_FLAGS) $(CONTAINER_NAME) /shell.sh
+
+.PHONY: shell-exec
+shell-exec: image ## Run a script/command in the shell env (no TTY): make shell-exec SCRIPT=path | CMD='...'
+	@[ -n "$(SCRIPT)$(CMD)" ] || { echo 'usage: make shell-exec SCRIPT=<repo-relative path> | CMD="..."'; exit 2; }
+	$(CONTAINER_CMD) run --rm $(PODMAN_RUN_FLAGS) $(SHELL_RUN_FLAGS) $(CONTAINER_NAME) /shell.sh $(SHELL_EXEC_ARGS)
 
 .PHONY: lib
 lib: ## Build libepix.a + driver scripts (meson) from the bind-mounted sources

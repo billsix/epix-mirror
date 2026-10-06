@@ -1,10 +1,13 @@
 #!/usr/bin/env bash
-# jupyter.sh -- launch JupyterLab in the container with the epix package on the
-# path. Run via `make jupyter`; open http://127.0.0.1:8888/lab on the host.
+# jupyter.sh -- launch JupyterLab in the container with the epix package
+# importable. Run via `make jupyter`; open http://127.0.0.1:8888/lab on the host.
+export VIRTUAL_ENV_DISABLE_PROMPT=1
+source /venv/bin/activate
 cd /epix
-export PYTHONPATH="/epix/python:${PYTHONPATH}"
+# Editable, offline install of python/ against the live mount (mirrors shell.sh).
+uv pip install --python "$(which python)" --no-deps --no-index --no-build-isolation -e python
 
-python3 -m ipykernel install --user --name=epix --display-name=epix 2>/dev/null || true
+python -m ipykernel install --user --name=epix --display-name=epix >/dev/null 2>&1 || true
 
 exec jupyter lab \
     --allow-root \

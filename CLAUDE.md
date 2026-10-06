@@ -75,7 +75,10 @@ figures (no epix run needed).
 `Makefile` wraps the Meson build in a Fedora `podman` image (full
 toolchain baked in: meson/ninja, g++, TeX-Live, ghostscript, ImageMagick, plus
 the Python/Jupyter stack for the bindings work — see below).
-Targets (invoke with `make <t>`): `image`, `shell`, `lib` (libepix.a + driver
+Targets (invoke with `make <t>`): `image`, `shell`, `shell-exec` (the batch twin of
+`shell`: `make shell-exec SCRIPT=<repo-relative path> | CMD='...'` runs in the same
+container env, no TTY — the two share one `SHELL_RUN_FLAGS` block; a `CMD` containing
+double quotes breaks the empty-payload guard, so use `SCRIPT=` beyond a one-liner), `lib` (libepix.a + driver
 scripts via meson), `build` (**full build** = `lib` + `py-ext`, so the Python
 extension reflects edited C++ sources),
 `examples` (samples/+doc/ → `./output`, `.eepic`; `RENDER=pdf` adds PDFs),
@@ -85,9 +88,21 @@ when present, else the installed copy; skips relinking when the `.so` is
 up-to-date, `FORCE=1` to override), `jupyter` (JupyterLab on :8888 — **depends on
 `py-ext`**, so it always builds the extension first),
 `notebooks` (jupytext → `.ipynb`), `asan` (**dev-only** sanitizer smoke),
-`format` (clang-format C++ + ruff Python — also runs automatically on `make
-shell` exit, via `entrypoint/format.sh`).
+`format` (clang-format C++ + ruff Python via `entrypoint/format.sh`, which exits
+nonzero if any step failed — it also runs when you `exit` a `make shell`, through the
+hook in `entrypoint/dotfiles/.extrabashrc`).
 Entrypoint scripts in `entrypoint/` are bind-mounted (edit without rebuild).
+System packages install through two host-runnable group scripts the Dockerfile
+dispatches — `entrypoint/01-install-base.sh` (Meson/g++, Python, uv, ruff,
+clang-tools) and `entrypoint/02-install-render.sh` (TeX-Live, ghostscript,
+ImageMagick) — so the same toolchain can be installed on a bare Fedora host. The
+Python stack (JupyterLab, jupytext, ipykernel, nanobind) lives in a `uv`-managed
+`/venv` (`--system-site-packages`) that every entry script activates; the `epix`
+package is installed **editable** from `/epix/python` at image build and again,
+offline, on every `shell.sh`/`jupyter.sh` entry, so the bind mount's live tree
+(and the `_epix*.so` that `make py-ext` drops into `python/epix/`) is what
+`import epix` sees. JupyterLab is pre-configured with announcements off and
+`.py` (jupytext) files opening as notebooks.
 Nested (podman-in-podman) runs auto-apply `--cgroups=disabled` via `PODMAN_RUN_FLAGS`
 (keyed on the sandbox's `NESTED_PODMAN=1` export). The
 render scripts run each figure from a scratch copy with `epix -I.` so the host
@@ -214,8 +229,8 @@ How it works:
   after editing *libepix* C++ sources (`src/`/`include/`) run `make build` (or
   `make lib`) first — otherwise the extension links a stale library. Run the
   harness in the container —
-  `podman run --rm --cgroups=disabled -v /epix:/epix:Z -e PYTHONPATH=/epix/python
-  epix -c 'for n in NAME …; do python3 /epix/build-aux/verify_ports.py $n; done'`.
+  `make shell-exec CMD='for n in NAME …; do python3 build-aux/verify_ports.py $n; done'`
+  (the venv has `epix` installed editable, so no `PYTHONPATH`).
   Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),
   **not** the TeX/ghostscript render path — that's only for the inline PNGs.
 - **Dispatch 2-var vs 3-var callables by `inspect.signature`, never a trial
@@ -346,6 +361,8 @@ code/ChangeLog wins:
   churn on upstream files is expected and intended, not a violation of the mirror
   rule. (`.clang-tidy` is present for `run-clang-tidy` against a Meson build dir;
   there is no `make tidy` target.)
+- `git config blame.ignoreRevsFile .git-blame-ignore-revs` once per clone: the file
+  lists the 2026-06-09 tree-wide reformat commit so `git blame` skips it.
 - The maintainer commits; Claude does not (see global CLAUDE.md). Non-trivial work gets a
   `tasks/<slug>.md` doc — see `tasks/` for in-flight items and
   `tasks/archive/` for finished ones.

@@ -26,7 +26,7 @@ import math
 import epix
 from epix import Point
 
-O: epix.Point = Point(x=0, y=0, z=0)
+origin: epix.Point = Point(x=0, y=0, z=0)
 
 
 def circ(t: float) -> None:
@@ -81,11 +81,11 @@ def build() -> None:
     # light purple
     epix.fill(epix.rgb(0.9, 0.7, 1))
 
-    epix.clip_face(loc=O, normal=epix.E_3)
+    epix.clip_face(loc=origin, normal=epix.E_3)
     epix.plot(f, R)
 
     epix.clip_face(
-        loc=O,
+        loc=origin,
         normal=Point(
             x=0,
             y=epix.sin(2 * math.pi * epix.tix()),

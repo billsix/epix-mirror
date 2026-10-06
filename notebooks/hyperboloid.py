@@ -102,14 +102,14 @@ with epix.figure(
     epix.label(
         Point(x=0, y=0, z=-3),
         offset=Point(x=0, y=-24),
-        text=r"$\ell_\theta^-(t)=(\cos\theta, \sin\theta, 0) + t(\sin\theta, -\cos\theta, 1)$",
+        text=r"$\ell_\theta^-(t)=(\cos\theta, \sin\theta, 0) + t(\sin\theta, -\cos\theta, 1)$",  # noqa: E501
         align=epix.LabelPos.b,
     )
 
     epix.label(
         Point(x=0, y=0, z=-3),
         offset=Point(x=0, y=-12),
-        text=r"$\ell_\theta^+(t)=(\cos\theta, \sin\theta, 0) + t(-\sin\theta, \cos\theta, 1)$",
+        text=r"$\ell_\theta^+(t)=(\cos\theta, \sin\theta, 0) + t(-\sin\theta, \cos\theta, 1)$",  # noqa: E501
         align=epix.LabelPos.b,
     )
 
