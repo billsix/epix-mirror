@@ -98,7 +98,7 @@ The image had to be rebuilt (`make image`): the previous one predated the `/venv
   this change: `build.py` (no `samples/build.xp`) and `hello.py` (an `epix.show` display demo whose
   `../samples/...` path resolves only from `notebooks/`).
 - **The one-process check**
-  (`tasks/adhoc/reset-global-state-between-figures/one_process_check.py all`): all 80 figure-building
+  (`tools/one_process_check.py all`, then under `tasks/adhoc/`): all 80 figure-building
   notebooks, run one after another in **one** process, were each byte-identical (every frame, for
   animations) to the same notebook run alone. **80/80**.
 - **The control** (`one_process_check.py all --no-reset`, with `reset_state` stubbed out): the first
@@ -111,8 +111,8 @@ The image had to be rebuilt (`make image`): the previous one predated the `/venv
 
 ## Archive
 
-The archive move is its own commit, after the work commit. It `git rm`s the one-shot
-`tasks/adhoc/reset-global-state-between-figures/` scripts (`repro.py`, `run_checks.sh`,
-`one_process_check.py`) unless the maintainer promotes `one_process_check.py` to `tools/` as a permanent
-in-process-isolation gate beside `verify_image.sh`. `CLAUDE.md` already points at the archived path,
-which resolves once the move is made.
+The archive move was its own commit, after the work commit. It `git rm`ed the one-shot
+`repro.py` and `run_checks.sh` from `tasks/adhoc/reset-global-state-between-figures/`, and promoted
+`one_process_check.py` to `tools/one_process_check.py` (at the maintainer's request) as a reusable
+in-process-isolation check, documented in `CLAUDE.md` beside `tools/verify_image.sh` and in
+`tasks/reference/verification-and-container-method.md`. It is not wired into any gate.

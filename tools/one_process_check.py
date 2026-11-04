@@ -1,8 +1,13 @@
 #!/usr/bin/env python3
-"""Prove that ePiX figures drawn one after another in ONE process are unaffected
-by each other, now that `epix.figure()` / `epix.animate()` call `reset_state()`.
+"""Check that ePiX figures drawn one after another in ONE process don't affect each
+other: `epix.figure()` and `epix.animate()` call `reset_state()`, and this proves
+the reset covers every piece of libepix's global state, for every notebook.
 
-Two modes (run inside the container, where `epix` is installed editable):
+Run inside the container, where `epix` is installed editable, from the repo root:
+
+  make shell-exec CMD='python3 tools/one_process_check.py all'
+
+Modes:
 
   one_process_check.py fresh NAME     -> print NAME's eepic(s), run alone in this process
   one_process_check.py all            -> run EVERY notebook in this one process, in
@@ -26,7 +31,7 @@ import subprocess
 import sys
 import types
 
-REPO: pathlib.Path = pathlib.Path(__file__).resolve().parents[3]
+REPO: pathlib.Path = pathlib.Path(__file__).resolve().parents[1]
 NOTEBOOKS: pathlib.Path = REPO / "notebooks"
 # hello.py only displays existing .xp files (epix.show); it builds no figure.
 SKIP: frozenset[str] = frozenset({"hello"})

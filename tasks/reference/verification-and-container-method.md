@@ -86,7 +86,9 @@ styles, palette, output format, camera) in process-global singletons.
 `epix.figure()` calls `reset_state()` before each picture, so a notebook can draw
 any number of figures in one process, each byte-identical to drawing it alone; the
 proof was running all 80 figure-building notebooks back to back in one process
-(80/80 identical, and 48 differing with the reset stubbed out). The harness still
+(80/80 identical, and 48 differing with the reset stubbed out). That check is kept
+as `tools/one_process_check.py` (`all`, or `all --no-reset` for the control). The
+harness still
 runs each `verify_ports.py NAME` in its **own fresh Python process** and `os._exit`s
 at the end, so one failing port can't affect the next. You verify one name per
 process; to do several, you loop in the shell (see §5).

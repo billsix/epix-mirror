@@ -264,6 +264,9 @@ How it works:
   `make shell-exec CMD='for n in NAME …; do python3 build-aux/verify_ports.py $n; done'`
   (the venv has `epix` installed editable, so no `PYTHONPATH`); `make shell-exec
   SCRIPT=tools/verify_image.sh` is the saved smoke gate (env + 8-port harness sample + Jupyter settings).
+  `make shell-exec CMD='python3 tools/one_process_check.py all'` runs every notebook
+  back to back in one process and diffs each against a fresh-process run, proving
+  `reset_state()` still covers all global state (`all --no-reset` is the control).
   Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),
   **not** the TeX/ghostscript render path — that's only for the inline PNGs.
 - **Dispatch 2-var vs 3-var callables by `inspect.signature`, never a trial
