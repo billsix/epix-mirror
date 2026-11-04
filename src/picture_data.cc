@@ -89,6 +89,18 @@ picture_data& picture_data::operator=(const picture_data& pd) {
 
 picture_data::~picture_data() { delete m_format; }
 
+void picture_data::reset() {
+  the_unitlength = length();
+  the_hoffset = length();
+  the_voffset = length();
+
+  delete m_format;
+  m_format = new eepic();
+  m_palette.clear();
+  m_pre_writes.clear();
+  m_post_writes.clear();
+}
+
 picture_data& picture_data::add_to_palette(const Color& col) {
   if (!col.is_unset()) m_palette.insert(col);
   return *this;

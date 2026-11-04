@@ -77,15 +77,19 @@ C++ `main()`. The harness:
 **Animations (`.flx`)** are the same idea per frame: compile the `.flx` once, then
 run `./bin i count` for each frame `i` (which sets the `tix()` counter to
 `i/count`, exactly as the `flix` tool does), and diff each frame's eepic against
-the Python `anim.frames[i].eepic`. The Python side mirrors this by `fork()`-ing a
-fresh process per frame (ePiX accumulates global state with no public reset, so a
-fresh process per frame is required — same reason `flix` runs a new process per
-frame).
+the Python `anim.frames[i].eepic`. The Python side mirrors `flix`, which runs a
+new process per frame: `animate()` `fork()`s a child per frame, and the child calls
+`reset_state()` first, because the fork copies whatever state the parent holds.
 
-**One demo per process.** Because libepix accumulates global state across renders
-(the color palette, etc.), each `verify_ports.py NAME` runs in its **own fresh
-Python process** and `os._exit`s at the end. You verify one name per process; to do
-several, you loop in the shell (see §5).
+**Global state, and one demo per process.** libepix keeps its drawing state (pen,
+styles, palette, output format, camera) in process-global singletons.
+`epix.figure()` calls `reset_state()` before each picture, so a notebook can draw
+any number of figures in one process, each byte-identical to drawing it alone; the
+proof was running all 80 figure-building notebooks back to back in one process
+(80/80 identical, and 48 differing with the reset stubbed out). The harness still
+runs each `verify_ports.py NAME` in its **own fresh Python process** and `os._exit`s
+at the end, so one failing port can't affect the next. You verify one name per
+process; to do several, you loop in the shell (see §5).
 
 ## 4. Why containers at all
 
@@ -172,7 +176,8 @@ once batched and it caught any cross-binding regression immediately.
   reimplementation, so there's no second implementation to drift.
 - `verify_ports.py NAME`: `exec` the notebook → eepic; `g++ -DEPIX_FMT_EEPIC` +
   run the `.xp` → oracle eepic; strip timestamp lines; exact string compare. One
-  demo per process (libepix global state); `.flx` compared per frame.
+  demo per process (failure isolation; `figure()` resets libepix's global
+  state anyway); `.flx` compared per frame.
 - Nested containers were necessary and helpful (they hold the whole toolchain).
   The inefficiency was one `podman run` *per demo*; the fix was **batching all
   verifies into a single container's shell loop** (fresh Python process each,

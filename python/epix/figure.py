@@ -15,7 +15,11 @@ the active picture, then we capture it via ``print_eepic`` and render inline.
 
 The scene API (P, picture, begin, plot, label, pen, fill, line, colors, …) comes
 straight from the `_epix` bindings; this module just adds capture + render.
-One figure at a time (matches ePiX's global model) — fine for notebooks.
+ePiX's drawing state is global; ``figure()`` resets it before each picture (and
+``animate()`` before each frame), so figures drawn one after another in a process do
+not affect each other.  Code that sets a picture up by hand (``bounding_box`` /
+``picture`` / ``begin`` / ``render``) calls ``epix.reset_state()`` first for the same
+guarantee.
 """
 
 from __future__ import annotations
@@ -71,7 +75,13 @@ class _Pending:
 
 @contextmanager
 def figure(lower_left, upper_right, size, dpi: int = 150):
-    """Context manager: sets up the picture, captures + renders it on exit."""
+    """Context manager: sets up the picture, captures + renders it on exit.
+
+    Each figure starts from ePiX's startup state (``reset_state()``): no pen, fill,
+    line style, label style, palette, camera or output format carries over from an
+    earlier figure in the same process, so a notebook may draw any number of them.
+    """
+    _epix.reset_state()
     _epix.picture(lower_left, upper_right, size)
     _epix.begin()
     pending: _Pending = _Pending()
@@ -142,6 +152,10 @@ def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation
             pid: int = os.fork()
             if pid == 0:  # child: isolated ePiX state
                 try:
+                    # The fork copies whatever state the parent has accumulated
+                    # (an earlier figure in the same notebook); start each frame
+                    # from the startup state instead.
+                    _epix.reset_state()
                     _epix.set_tix(i / count)
                     build()
                     _epix.print_eepic(ep)

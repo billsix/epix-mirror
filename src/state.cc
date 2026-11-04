@@ -52,6 +52,8 @@
 #include "screen.h"
 
 #include "clipping.h"
+#include "picture_data.h"
+#include "picture.h"
 
 #include "state.h"
 
@@ -309,4 +311,24 @@ void black(double d) { rgb(1 - d, 1 - d, 1 - d); }
 void cyan(double d) { cmyk(d, 0, 0, 0); }
 void magenta(double d) { cmyk(0, d, 0, 0); }
 void yellow(double d) { cmyk(0, 0, d, 0); }
+
+void reset_state() {
+  // Each singleton gets a freshly constructed value, built the same way as the
+  // static that holds it (see each the_*() accessor).
+  the_paint_style() = paint_state();
+  the_path_style() = path_state();
+  the_arrowhead_style() = arrowhead_state();
+  the_mark_size() = marker_sizes();
+  the_angle_style() = angle_state();
+  the_label_style() = label_state();
+  the_clip_box() = clip_state();
+  cam() = Camera();
+  // the_crop_box() (cropping.cc) is not reset: nothing outside its own file
+  // reads it, so it cannot carry state from one figure to the next.
+
+  // The screen stack holds a pointer to the canvas; drop any screens a figure
+  // activated and did not deactivate.
+  the_screen_stack().reset();
+  the_picture().reset();
+}
 }  // namespace ePiX

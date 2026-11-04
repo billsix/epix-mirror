@@ -208,6 +208,15 @@ void cyan(double d = 1);
 void magenta(double d = 1);
 void yellow(double d = 1);
 
+// Restore every piece of global drawing state to its startup value: the pen,
+// fill, line style, arrowheads, marker sizes, angle units, label style, clip
+// box, the camera, the screen stack, and the picture's palette, output
+// format, pre/post-writes, unitlength and offsets.  A program that draws
+// several figures in one process calls this before each picture() so no figure
+// inherits another's state.  picture() itself replaces the canvas, page and
+// bounding box, so those are left to it.
+void reset_state();
+
 }  // namespace ePiX
 
 #endif /* EPIX_STATE */

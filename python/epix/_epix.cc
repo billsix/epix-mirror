@@ -228,6 +228,7 @@ NB_MODULE(_epix, m) {
         nb::arg("lower_left"), nb::arg("upper_right"), nb::arg("size"));
   m.def("begin", &begin);
   m.def("end_picture", &end_picture);
+  m.def("reset_state", &reset_state);
   m.def("print_eepic", &print_eepic, nb::arg("filename"));
 
   m.def("xmin", []() { return xmin(); });

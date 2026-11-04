@@ -1,101 +1,118 @@
-# Reset ePiX's global state at the start of every `epix.figure()`
+# Reset ePiX's global state at the start of every `epix.figure()` — done-record
 
-**Status:** proposed — needs go-ahead
-**Priority:** 3
-**Difficulty:** 4
-**Created:** 2026-11-04 (William Emerison Six <billsix@gmail.com>). Found while building live-rendered
-ePiX notebooks for gacalc (github.com/billsix/geometricalgebra, its
-`tasks/frame-class-orthonormal-invertible-function.md`).
+**Completed:** 2026-11-04. Requested by William Emerison Six <billsix@gmail.com>; implemented by the
+agent. Found while building live-rendered ePiX notebooks for gacalc (github.com/billsix/geometricalgebra,
+whose `tasks/frame-notebooks-epix.md` was blocked on this).
 
-## BLUF
+## The problem
 
-Drawing two figures in one Python process makes the second one inherit the first one's pen, line style,
-fill, label style, color palette, camera, and so on, because libepix keeps all of that in process-global
-singletons and nothing resets them between figures. Fix: a C++ `reset_state()` (bound as
-`epix.reset_state()`) that restores every singleton to its startup default, called by `epix.figure()`
-before `picture()`. Done = a notebook can draw any number of figures in one kernel, each byte-identical
-to drawing it alone in a fresh process, and the existing byte-identity port harness still passes.
-
-## Context (read first)
-
-- `python/epix/figure.py`: `figure()` calls `_epix.picture()` + `_epix.begin()`, then captures with
-  `print_eepic`. Its docstring says "One figure at a time (matches ePiX's global model)". `animate()`
-  already works around the problem by **forking a child per frame** ("ePiX accumulates per-render state
-  (the color palette, etc.) with no public reset"). Forking is not available to `figure()`, because the
-  body of a `with` block runs in the caller's process.
-- gacalc's renderer (`tools/render_epix_figures.py` there) runs each figure in a fresh interpreter for
-  the same reason.
-- `CLAUDE.md` › "Python bindings + notebooks": the byte-identity harness `build-aux/verify_ports.py NAME`
-  and the smoke gate `make shell-exec SCRIPT=tools/verify_image.sh`.
-
-## The bug, reproduced (2026-11-04, in gacalc's image)
-
-```python
-def draw(red):
-    with epix.figure(lower_left=Point(x=-1, y=-1), upper_right=Point(x=1, y=1), size="2x2in") as fig:
-        if red:
-            epix.pen(color=epix.rgb(r=1, g=0, b=0), width=3)
-            epix.dashed()
-        epix.line(tail=Point(x=-1, y=0), head=Point(x=1, y=0))
-    return fig
-draw(True); b = draw(False)     # b's eepic is byte-identical to the red, dashed figure's
-```
-
-Drawn alone in a fresh process, `draw(False)` gives a different (plain) eepic. Calling
+libepix keeps its drawing state in process-global singletons, and nothing reset them between figures.
+Drawing two figures in one Python process made the second inherit the first's pen, line style, fill,
+label style, color palette, output format and camera. In the 2026-11-04 repro (a red, dashed line
+figure, then a plain one), the second figure's eepic was byte-identical to the first. Calling
 `pen`/`line_style("-")`/`nofill`/`label_color`/`label_angle` by hand at the top of the second figure
-makes its drawing commands match a fresh process. The leftover `\xdefinecolor{rgb_ff0000}` stays,
-though, because the palette is not reset by any public call.
+fixed its drawing commands but not the leftover `\xdefinecolor{rgb_ff0000}`, because no public call
+cleared the palette. `animate()` had worked around this by forking per frame, which `figure()` cannot
+do: the body of a `with` block runs in the caller's process.
 
-## Where the global state lives (from a read of `src/`, 2026-11-04)
+## The inventory
 
-Function-local `static` singletons, each returned by reference:
+Every mutable singleton is a function-local `static auto* x(new T())` returned by reference; a grep of
+`src/` for that shape found these, and nothing else:
 
-| accessor | file | holds |
-|---|---|---|
-| `the_picture()` | `src/picture.cc` | `picture_data`: canvas, page, unitlength, offsets, **`m_palette`** (the `std::set<Color>` behind the `\xdefinecolor` lines) |
-| `xmin()`/`xmax()`/`xsize()`/`ymin()`/`ymax()`/`ysize()`, `the_tix` | `src/picture.cc` | bounding box, animation parameter |
-| `the_label_style()` | `src/label_style.cc` | font size and face, text color, label angle, mask, padding, border |
-| `the_path_style()` | `src/path_style.cc` | line style (dashes), dash size |
-| `the_paint_style()` | `src/paint_style.cc` | pen (line color/width), base pen, fill color and fill flag |
-| `the_arrowhead_style()` | `src/arrow_style.cc` | arrowhead shape |
-| `the_mark_size()` | `src/marker_style.cc` | dot and tick sizes |
-| `the_angle_style()` | `src/angle_units.cc` | radians/degrees/revolutions |
-| `the_clip_box()` / `the_crop_box()` | `src/clipping.cc`, `src/cropping.cc` | clip and crop regions |
-| `the_screen_stack()` | `src/active_screen.cc` | `screen_broker`, a list of screen pointers seeded with `&the_picture().the_canvas` |
-| `cam()` | `src/camera.cc` | the 3D `Camera` (position, target, orientation) |
+| accessor | file | holds | reset? |
+|---|---|---|---|
+| `the_picture()` | `picture.cc` | `picture_data`: canvas, page, unitlength, offsets, output format, palette, pre/post writes | by member (see below) |
+| `xmin()`…`ysize()` | `picture.cc` | bounding box | no: `picture()` sets them |
+| `the_tix` | `picture.cc` | animation parameter | no: `set_tix`/`animate()` sets it |
+| `the_label_style()` | `label_style.cc` | font, text color, angle, mask, padding, border | yes |
+| `the_path_style()` | `path_style.cc` | line style, dash size | yes |
+| `the_paint_style()` | `paint_style.cc` | pen, base pen, fill | yes |
+| `the_arrowhead_style()` | `arrow_style.cc` | arrowhead shape | yes |
+| `the_mark_size()` | `marker_style.cc` | dot and tick sizes | yes |
+| `the_angle_style()` | `angle_units.cc` | angle units | yes |
+| `the_clip_box()` | `clipping.cc` | clip region | yes |
+| `the_crop_box()` | `cropping.cc` | crop region | no: nothing outside its own file reads it |
+| `the_screen_stack()` | `active_screen.cc` | `screen_broker`, seeded with `&the_picture().the_canvas` | yes, `reset()` |
+| `cam()` | `camera.cc` | the 3D `Camera` | yes |
 
-`picture()` replaces the canvas, so drawn content does not leak. Everything else does. This list is a
-lead from one read: confirm it in step 1, because "grep found nothing" is not proof of absence.
+The `Color.cc` neutrals (`Neutral()`, `RGB_Neutral()`, …) also match the shape but return a copy, so
+they cannot carry state.
 
-## Plan
+## What was built
 
-1. **Inventory.** Grep `src/` for every function-local `static` and namespace-scope mutable object, and
-   finish the table above (for example, check `legend`, `format`, and the `Color.cc` neutrals, which look
-   immutable).
-2. **`void reset_state()`** in a new `src/reset.cc` (+ header in `make_header`'s list and `meson.build`).
-   It assigns each singleton a freshly default-constructed value: `the_label_style() = label_state();`,
-   `the_paint_style() = paint_state();`, `the_picture() = picture_data();`, `cam() = Camera();`, …
-   - **Order matters for `the_screen_stack()`:** it holds a pointer to `the_picture().the_canvas`.
-     `picture_data`'s assignment keeps the object's address, so the pointer stays valid, but reset the
-     stack to its single canvas entry anyway (pop to one), so a figure that leaked an `activate` without
-     `deactivate` cannot poison the next one.
-   - The defaults must equal the startup state exactly, or every port's byte-identity breaks. The
-     harness is the proof: see step 5.
-3. **Bind it:** `reset_state` in `python/epix/_epix.cc`, exported from `epix/__init__.py`.
-4. **Call it from `figure()`**, before `_epix.picture(...)`. Update the docstring: "Each figure starts
-   from ePiX's default state, so a notebook may draw any number of figures." `animate()` keeps its fork,
-   since it is still correct and isolates `tix`. Optionally also reset in the child, for belt and braces.
-5. **Verify:**
-   - Every port still passes `build-aux/verify_ports.py` (a reset at startup must be a no-op).
-   - A new test draws the 80 ported figures **in one process**, each one's eepic byte-identical to its
-     fresh-process output. That is the real proof that every piece of state is covered.
-   - The red/dashed repro above passes, including the palette.
-   - `make asan` passes (the reset reassigns objects that pointers reference).
-6. **Docs:** the `CLAUDE.md` bindings section, `figure.py`'s module docstring, and a `NEWS`/changelog
-   entry if the project keeps one for the Python layer.
+- **`void reset_state()`** (`include/epix/state.h`, `src/state.cc`) assigns a freshly constructed value
+  to each style singleton marked "yes" above, then calls two new members:
+  - **`screen_broker::reset()`** (`active_screen.{h,cc}`): back to the canvas alone, dropping any screen
+    a figure activated and didn't deactivate;
+  - **`picture_data::reset()`** (`picture_data.{h,cc}`): a fresh `eepic` output format, an empty palette
+    and pre/post writes, and default unitlength and offsets. The canvas and page are left alone, since
+    every `picture()` form replaces them.
+- **Bound as `epix.reset_state()`** (`python/epix/_epix.cc`; `epix/__init__.py` re-exports it through
+  its existing `from ._epix import *`). **`figure()` calls it before `picture()`**, and **`animate()`'s
+  per-frame child calls it too**, because the fork copies whatever state the parent has accumulated.
+  Manual-form code (`bounding_box`/`picture`/`begin`/`render`) calls `epix.reset_state()` itself, as
+  `figure.py`'s module docstring says.
+- **An upstream bug fixed along the way: `Camera::operator=`** (`src/camera.cc`) copied `the_distance`
+  into `the_clip_range` and leaked the old lens, so a reset camera would have kept a near-clip plane at
+  infinity instead of `MIN_CLIP`. It now copies the right field, deletes the old lens, and guards
+  self-assignment. No sample, doc figure or notebook assigns a camera, so no existing output changed.
+  Listed under `CLAUDE.md`'s "libepix bugs fixed here".
+- `build-aux/asan_smoke.cc` draws a second picture after `reset_state()` (after moving the camera and
+  switching to `tikz_format()`), so the reassignments run under the sanitizer.
+- `CLAUDE.md` gained the "Global state is reset per figure" gotcha, and its port count was corrected
+  from "80/81 byte-identical" to 79/81: `hello.py` is a display demo, not a port of `hello.xp`, and
+  `histogram` was never ported.
 
-## Open questions
+## Decisions
 
-1. **C++ API name.** `reset_state()`? Or have `picture()` reset implicitly? That would change behaviour
-   for C++ `.xp` files that set a style *before* `picture()`, which the samples may rely on. I recommend
-   an explicit `reset_state()`, called only by the Python `figure()`.
+1. **An explicit `reset_state()`, called by the Python `figure()`**, rather than an implicit reset
+   inside C++ `picture()`. A `.xp` file may set styles before `picture()`, and an implicit reset would
+   discard them (the maintainer: "whatever you recommend", William Emerison Six <billsix@gmail.com>,
+   2026-11-04).
+2. **Reset `picture_data` by member, not by assigning a fresh `picture_data()`** as the plan first
+   proposed. A fresh `picture_data` has null-pimpl screens, and copying one dereferences null.
+3. **`reset_state()` lives in `state.{h,cc}`**, not the new `src/reset.cc` the plan proposed: `state.h`
+   already declares the imperative drawing-state calls (`pen()`, `fill()`, …), so the reset sits beside
+   them and no new file enters `meson.build` or `make_header`.
+4. **`the_crop_box()` was left out** rather than given a header declaration only so it could be reset.
+5. **`animate()` keeps its fork**, now with a reset in the child: the fork still isolates `tix` and
+   keeps one bad frame from poisoning the next.
+6. **No `NEWS` entry.** `NEWS` is the upstream ePiX 1.2 file (last changed 2007) and records nothing
+   about the Python layer; `CLAUDE.md` is where this repo documents the bindings.
+7. **`picture_data::set_format` still leaks the previous format** (it assigns without deleting). It is
+   upstream, harmless at the scale of one figure, and partly masked now that `reset()` deletes the format
+   it finds. It was left as it is.
+
+## Verification (in a rebuilt `epix` image, 2026-11-04)
+
+The image had to be rebuilt (`make image`): the previous one predated the `/venv` layout, so
+`make py-ext` failed.
+
+- `make build`: `libepix` and the extension built with 0 warnings at `warning_level=3`.
+- **The repro** (`tasks/adhoc/reset-global-state-between-figures/repro.py`): the plain figure drawn after
+  the red, dashed one was byte-identical to the same figure drawn in a fresh process, palette lines
+  included. PASS.
+- **The byte-identity port harness** (`build-aux/verify_ports.py`, one notebook per process): **79/79
+  ports PASS**. The two other notebooks are demos without an oracle and fail the harness regardless of
+  this change: `build.py` (no `samples/build.xp`) and `hello.py` (an `epix.show` display demo whose
+  `../samples/...` path resolves only from `notebooks/`).
+- **The one-process check**
+  (`tasks/adhoc/reset-global-state-between-figures/one_process_check.py all`): all 80 figure-building
+  notebooks, run one after another in **one** process, were each byte-identical (every frame, for
+  animations) to the same notebook run alone. **80/80**.
+- **The control** (`one_process_check.py all --no-reset`, with `reset_state` stubbed out): the first
+  notebook passed (nothing ran before it), the next **48 all differed** from their fresh runs, and then
+  `pendulum`'s animation crashed ("animation frame 0 failed to render") on inherited state. So the check
+  detects leaks, and the 80/80 is the reset's doing.
+- `make asan`: "ASan smoke OK (no memory errors)".
+- `make format` (clang-format + ruff; epix-mirror has no CI workflows, so this is the gate): passed and
+  changed nothing; `clang-format --dry-run --Werror` was also clean on every edited C++ file.
+
+## Archive
+
+The archive move is its own commit, after the work commit. It `git rm`s the one-shot
+`tasks/adhoc/reset-global-state-between-figures/` scripts (`repro.py`, `run_checks.sh`,
+`one_process_check.py`) unless the maintainer promotes `one_process_check.py` to `tools/` as a permanent
+in-process-isolation gate beside `verify_image.sh`. `CLAUDE.md` already points at the archived path,
+which resolves once the move is made.

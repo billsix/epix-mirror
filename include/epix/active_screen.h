@@ -57,6 +57,9 @@ class screen_broker {
   void push(screen&);
   screen* pop();
 
+  // back to the startup stack: the picture's canvas alone
+  void reset();
+
  private:
   std::list<screen*> m_screens;
 

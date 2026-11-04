@@ -82,6 +82,12 @@ class picture_data {
 
   picture_data& add_to_palette(const Color&);
 
+  // Restore the startup palette, output format, pre/post-writes, unitlength and
+  // offsets.  The canvas and page are left alone: picture() always replaces
+  // them, and a default-constructed screen cannot be copied (its pimpl is
+  // null).
+  void reset();
+
   void set_format(const format&);
 
   // output requires knowledge of unitlength; all other ops handled by data

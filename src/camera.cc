@@ -98,16 +98,19 @@ Camera::Camera(const Camera& cam)
       the_lens(cam.the_lens->clone()) {}
 
 Camera& Camera::operator=(const Camera& cam) {
-  Lens* tmp_lens(cam.the_lens->clone());
-  the_lens = tmp_lens;
+  if (this != &cam) {
+    Lens* tmp_lens(cam.the_lens->clone());
+    delete the_lens;
+    the_lens = tmp_lens;
 
-  the_viewpt = cam.the_viewpt;
-  the_target = cam.the_target;
-  the_orient = cam.the_orient;
-  the_distance = cam.the_distance;
-  the_clip_range = cam.the_distance;
+    the_viewpt = cam.the_viewpt;
+    the_target = cam.the_target;
+    the_orient = cam.the_orient;
+    the_distance = cam.the_distance;
+    the_clip_range = cam.the_clip_range;
 
-  the_filter = cam.the_filter;
+    the_filter = cam.the_filter;
+  }
 
   return *this;
 }
