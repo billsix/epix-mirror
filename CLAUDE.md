@@ -148,9 +148,12 @@ A second front-end: **real nanobind bindings over `libepix`** plus a notebook
 layer, so you write a figure in Python the way the `.xp` samples are written in
 C++, rendered inline. Goal was to port all ~81 `samples/` to percent-format
 notebooks, each **byte-identical** to the C++ original. The C++ samples stay as
-the permanent oracle — this is purely additive. **Port DONE: 80/81 byte-identical**
-(the one holdout, `histogram`, is hard-blocked — its `samples/binom.dat` is absent
-so the C++ oracle can't run either). Closeout + full history:
+the permanent oracle — this is purely additive. **Port DONE: 79/81 byte-identical**
+(recounted 2026-11-04: 79 notebooks port a sample and all pass the harness). Two
+samples have no port: `histogram` is hard-blocked (its `samples/binom.dat` is absent,
+so the C++ oracle can't run either), and `hello.xp` has only `notebooks/hello.py`, a
+display demo (`epix.show`) rather than a port. `notebooks/build.py` is a second demo,
+with no sample. Closeout + full history:
 `tasks/archive/2026/06/11/python-bindings-and-notebooks.md`. Tech: nanobind →
 architecture A, real bindings; C++20.
 
@@ -228,19 +231,28 @@ How it works:
   three-function forms). Bind via a module-global `nb::callable` + a C trampoline
   that calls it (one call at a time — fine for figures). See the `tramp_*` /
   `g_fn*` globals in `_epix.cc`.
-- **Animations must `fork()` per frame.** ePiX accumulates per-render global
-  state with *no public reset* — notably the color palette
-  (`picture_data::m_palette`). A naive in-process frame loop leaks state into
-  later frames. `animate()` forks per frame (build + `print_eepic` in the child,
-  parent renders), matching how `flix` runs a fresh process per frame. (`fork()`
-  inside a threaded Jupyter kernel is a runtime caveat to watch.)
+- **Global state is reset per figure: `reset_state()`.** ePiX keeps its drawing
+  state in process-global singletons (pen, fill, line style, label style, the
+  color palette `picture_data::m_palette`, output format, camera, screen stack, …).
+  `reset_state()` (`state.{h,cc}`, bound as `epix.reset_state()`) restores all of it
+  to the startup values, and `figure()` calls it before `picture()`, so a notebook
+  can draw any number of figures in one kernel. Manual-form code
+  (`bounding_box`/`picture`/`begin`/`render`) calls `epix.reset_state()` itself.
+  `animate()` still forks per frame (build + `print_eepic` in the child, parent
+  renders), matching how `flix` runs a fresh process per frame, and the child calls
+  `reset_state()` too, since the fork copies the parent's state. (`fork()` inside a
+  threaded Jupyter kernel is a runtime caveat to watch.) Not reset, deliberately:
+  the canvas/page and bounding-box values (every `picture()` form replaces them),
+  `tix` (set per frame), and `the_crop_box()` (read by nothing outside
+  `cropping.cc`). Design + verification:
+  `tasks/archive/2026/11/04/reset-global-state-between-figures.md`.
 - **Verify every port with the harness, not by hand.** `build-aux/verify_ports.py
   NAME` execs `notebooks/NAME.py`, grabs its `fig`/`anim`, and diffs the eepic
   against the sample **compiled with `-DEPIX_FMT_EEPIC`** (forces eepic so
   in-file `pst_format()`/`tikz_format()` don't change the oracle) — per-frame for
-  `.flx`. Run one name per process (libepix accumulates state). Loop in the shell
-  for a batch; `PASS`/`FAIL` per demo. This is the inner loop of the whole port
-  effort.
+  `.flx`. Run one name per process (it predates `reset_state()`, and one process
+  per name keeps a failure isolated). Loop in the shell for a batch; `PASS`/`FAIL`
+  per demo. This is the inner loop of the whole port effort.
 - **The per-session dev loop (operational).** The nested image store is
   ephemeral per sandbox session, so a fresh session rebuilds it: `make image`
   (~minutes — the TeX-Live layer). Then iterate: after each `_epix.cc` change run
@@ -252,6 +264,9 @@ How it works:
   `make shell-exec CMD='for n in NAME …; do python3 build-aux/verify_ports.py $n; done'`
   (the venv has `epix` installed editable, so no `PYTHONPATH`); `make shell-exec
   SCRIPT=tools/verify_image.sh` is the saved smoke gate (env + 8-port harness sample + Jupyter settings).
+  `make shell-exec CMD='python3 tools/one_process_check.py all'` runs every notebook
+  back to back in one process and diffs each against a fresh-process run, proving
+  `reset_state()` still covers all global state (`all --no-reset` is the control).
   Verification itself only needs `g++` + `libepix` (it diffs the `.eepic` *text*),
   **not** the TeX/ghostscript render path — that's only for the inline PNGs.
 - **Dispatch 2-var vs 3-var callables by `inspect.signature`, never a trial
@@ -283,12 +298,12 @@ How it works:
   re-associated to a flat sum; (c) Python's `^` (the bound cross product) binds
   *looser* than `+`/`-`, so a normal `(b-a)^(d-a)` needs explicit parens. A
   mismatch here is a silent eepic diff, not an error.
-- **Figure setup has two idioms.** `figure()` (the context manager) wraps only
-  `picture(sw, ne, size)`. Demos that instead use `bounding_box(...)` +
-  `unitlength(...)` + `picture(w,h)` / `picture(P)` build the scene with the
-  manual lower-level form: `epix.bounding_box(...)`, `epix.unitlength(...)`,
-  `epix.picture(...)`, `epix.begin()`, … , `fig = epix.render()` — as
-  `notebooks/contour.py` / `minkowski.py` / `log.py` do.
+- **Figure setup has two idioms.** `figure()` (the context manager) wraps
+  `reset_state()` + `picture(sw, ne, size)`. Demos that instead use
+  `bounding_box(...)` + `unitlength(...)` + `picture(w,h)` / `picture(P)` build the
+  scene with the manual lower-level form: `epix.bounding_box(...)`,
+  `epix.unitlength(...)`, `epix.picture(...)`, `epix.begin()`, … ,
+  `fig = epix.render()` — as `notebooks/contour.py` / `minkowski.py` / `log.py` do.
 - **Painter's-algorithm demos port faithfully.** Demos that build a list of
   facets/patches and draw them back-to-front (`decorate`, `log`, …) sort by
   distance: Python's stable `list.sort(reverse=True)` matches C++ `stable_sort`
@@ -309,6 +324,10 @@ How it works:
 - `Complex::operator!=` returned `*this != arg` — infinite recursion on any `!=`
   between two `Complex` values. Now `!(*this == arg)`. Found by
   `-Winfinite-recursion` when `warning_level` was raised (2026-10-06).
+- `Camera::operator=` copied `the_distance` into `the_clip_range` (so an assigned
+  camera had the wrong near-clip plane) and leaked the old lens. It now copies
+  `the_clip_range`, deletes the old lens, and guards self-assignment. No sample
+  assigns a camera; found writing `reset_state()` (2026-11-04), which does.
 
 **Sanitizer tooling — kept pending `tasks/add-sanitizer-gate.md`:** `libasan`
 (Dockerfile), `entrypoint/asan_check.sh`, `build-aux/asan_smoke.cc`, the `asan`

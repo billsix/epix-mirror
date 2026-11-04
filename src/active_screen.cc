@@ -57,6 +57,11 @@ screen* screen_broker::pop() {
 }
 
 // global functions
+void screen_broker::reset() {
+  m_screens.clear();
+  m_screens.push_front(&the_picture().the_canvas);
+}
+
 screen_broker& the_screen_stack() {
   static auto* the_screen_broker(new screen_broker());
   return *the_screen_broker;

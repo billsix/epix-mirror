@@ -247,5 +247,15 @@ int main() {
   }
 
   print_eepic("/tmp/asan_smoke.eepic");
+
+  // A second figure after reset_state(): exercises the singleton reassignments
+  // (camera lens, crop mask, palette/format) under the sanitizer.
+  camera.at(P(3, 2, 1));
+  tikz_format();
+  reset_state();
+  picture(P(-1, -1), P(1, 1), "1x1in");
+  begin();
+  line(P(-1, 0), P(1, 0));
+  print_eepic("/tmp/asan_smoke2.eepic");
   return 0;
 }
