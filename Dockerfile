@@ -1,4 +1,4 @@
-FROM registry.fedoraproject.org/fedora:44
+FROM registry.fedoraproject.org/fedora:45
 
 # Optional-feature flags. Each defaults to 0 so a bare `podman build` is lean; the
 # Makefile passes the real values (1 by default, 0 under `make image MINIMAL_IMAGE=1`).
