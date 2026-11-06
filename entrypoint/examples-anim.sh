@@ -16,8 +16,15 @@ set -uo pipefail
 
 # Lean image (BUILD_DOCS=0) has no TeX: say so instead of failing 96 times.
 if ! command -v latex >/dev/null 2>&1; then
-    echo "latex not found: this image was built without the rendering stack" >&2
-    echo "(make image MINIMAL_IMAGE=1 drops it; rebuild with plain 'make image' or BUILD_DOCS=1)" >&2
+    echo "ERROR: make examples-anim needs latex + ImageMagick (frames via ePiX, assembled with" >&2
+    echo "       convert); this image was built without them (BUILD_DOCS=0)." >&2
+    echo "" >&2
+    echo "Enable it persistently, then rebuild and run:" >&2
+    echo "  echo 'export BUILD_DOCS=1' >> ~/.bashrc && source ~/.bashrc" >&2
+    echo "  make image" >&2
+    echo "  make examples-anim" >&2
+    echo "" >&2
+    echo "(This session only: run  export BUILD_DOCS=1  instead of the echo/source line.)" >&2
     exit 2
 fi
 

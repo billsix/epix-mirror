@@ -7,8 +7,14 @@ cd /epix
 
 # Lean image (USE_JUPYTER=0) has no JupyterLab: say so.
 if ! command -v jupyter >/dev/null 2>&1; then
-    echo "jupyter not found: this image was built without JupyterLab" >&2
-    echo "(make image MINIMAL_IMAGE=1 drops it; rebuild with plain 'make image' or USE_JUPYTER=1)" >&2
+    echo "ERROR: make jupyter needs JupyterLab; this image was built without it (USE_JUPYTER=0)." >&2
+    echo "" >&2
+    echo "Enable it persistently, then rebuild and run:" >&2
+    echo "  echo 'export USE_JUPYTER=1' >> ~/.bashrc && source ~/.bashrc" >&2
+    echo "  make image" >&2
+    echo "  make jupyter" >&2
+    echo "" >&2
+    echo "(This session only: run  export USE_JUPYTER=1  instead of the echo/source line.)" >&2
     exit 2
 fi
 # Editable, offline install of python/ against the live mount (mirrors shell.sh).
