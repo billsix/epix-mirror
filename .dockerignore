@@ -13,7 +13,9 @@ epix.h
 *.eepic
 *.eps
 *.pdf
-__pycache__
+# Anchored at the context root (unlike .gitignore): **/ reaches caches below it.
+**/__pycache__/
+**/*.py[cod]
 *.so
 *.ipynb
 
