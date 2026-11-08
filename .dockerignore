@@ -5,19 +5,21 @@ output
 build
 
 # render outputs / stray generated files (the committed doc/*.eepic figures are
-# only needed for the -Dmanual build, which the image does not run)
-*.o
+# only needed for the -Dmanual build, which the image does not run).
+# Patterns are anchored at the context root (unlike .gitignore), so anything that
+# can appear below the root needs a leading **/; libepix.a and epix.h are
+# root-level build outputs.
+**/*.o
 libepix.a
 epix.h
-*-local
-*.eepic
-*.eps
-*.pdf
-# Anchored at the context root (unlike .gitignore): **/ reaches caches below it.
+**/*-local
+**/*.eepic
+**/*.eps
+**/*.pdf
 **/__pycache__/
 **/*.py[cod]
-*.so
-*.ipynb
+**/*.so
+**/*.ipynb
 
 # exported OCI image tars (make image-export): never send them into the build context
 *.tar
