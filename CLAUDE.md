@@ -259,7 +259,11 @@ How it works:
   `make py-ext` (nested: `--cgroups=disabled` auto-applies; it relinks only when needed;
   `FORCE=1` to force). Note `py-ext` links the bind-mounted `build/libepix.a`, so
   after editing *libepix* C++ sources (`src/`/`include/`) run `make build` (or
-  `make lib`) first — otherwise the extension links a stale library. Run the
+  `make lib`) first — otherwise the extension links a stale library. After an image
+  bump of Meson or Python, the bind-mounted `build/` and `python/epix/_epix.cpython-3NN-*.so`
+  are stale (Meson refuses an old-version build dir; the venv cannot load an old-ABI `.so`, so
+  `import epix` fails with `No module named 'epix._epix'`): run
+  `make shell-exec CMD='meson setup --reconfigure build'` then `make build`. Run the
   harness in the container —
   `make shell-exec CMD='for n in NAME …; do python3 build-aux/verify_ports.py $n; done'`
   (the venv has `epix` installed editable, so no `PYTHONPATH`); `make shell-exec
