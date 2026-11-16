@@ -29,6 +29,7 @@ import os
 import shutil
 import subprocess
 import tempfile
+from collections.abc import Sequence
 from contextlib import contextmanager
 
 from . import _epix
@@ -87,6 +88,79 @@ def figure(lower_left, upper_right, size, dpi: int = 150):
     pending: _Pending = _Pending()
     yield pending
     pending.figure = render(dpi=dpi)
+
+
+def fit_bounds(
+    points: Sequence[_epix.Point], width: float, margin: float = 0.18
+) -> tuple[_epix.Point, _epix.Point, str]:
+    """The bounding box and size that fit ``points`` in a figure ``width`` inches wide.
+
+    The box is the smallest one holding every point's ``x``/``y``, grown on each side
+    by ``margin`` times the larger of its width and height. The size keeps one inch
+    the same number of units on both axes, so circles stay round: the height is
+    ``width`` scaled by the box's height over its width. A single point (or points
+    that all coincide) gets a box one unit across. Returns
+    ``(lower_left, upper_right, size)``, the first three arguments of
+    :func:`figure`. 2D only: ``z`` is ignored.
+
+    For example, the points (0, 0) and (2, 1) with no margin fit a 2-by-1 box, which
+    at 4 inches wide is 2 inches tall::
+
+        lower_left, upper_right, size = epix.fit_bounds(
+            points=[epix.Point(x=0, y=0), epix.Point(x=2, y=1)], width=4, margin=0
+        )
+        # lower_left = (0, 0), upper_right = (2, 1), size = "4.00x2.00in"
+    """
+    if not points:
+        raise ValueError("fit_bounds: at least one point is needed")
+    xs: list[float] = [p.x1() for p in points]
+    ys: list[float] = [p.x2() for p in points]
+    span_x: float = max(xs) - min(xs)
+    span_y: float = max(ys) - min(ys)
+    extent: float = max(span_x, span_y) or 1.0  # coincident points: a unit box
+    grow: float = margin * extent
+    # an axis the points don't spread along still gets the full extent, so the box
+    # never has zero width or height
+    pad_x: float = grow + (extent / 2 if span_x == 0 else 0)
+    pad_y: float = grow + (extent / 2 if span_y == 0 else 0)
+    lower_left: _epix.Point = _epix.Point(x=min(xs) - pad_x, y=min(ys) - pad_y)
+    upper_right: _epix.Point = _epix.Point(x=max(xs) + pad_x, y=max(ys) + pad_y)
+    box_width: float = upper_right.x1() - lower_left.x1()
+    box_height: float = upper_right.x2() - lower_left.x2()
+    size: str = f"{width:.2f}x{width * box_height / box_width:.2f}in"
+    return lower_left, upper_right, size
+
+
+@contextmanager
+def figure_around(
+    points: Sequence[_epix.Point],
+    width: float,
+    margin: float = 0.18,
+    dpi: int = 150,
+):
+    """:func:`figure`, with its box and size fitted to ``points``.
+
+    The box and size come from :func:`fit_bounds`. Use it for figures drawn from values
+    that can change, as in a notebook whose reader edits the vectors and reruns: the
+    picture always holds the points, at a fixed width and with equal scales on both
+    axes::
+
+        with epix.figure_around(points=[a, b, a + b], width=3.4) as fig:
+            epix.arrow(tail=origin, head=a, scale=0.7)
+            ...
+        fig
+
+    Everything else is :func:`figure`'s, including the state reset before drawing.
+    """
+    lower_left: _epix.Point
+    upper_right: _epix.Point
+    size: str
+    lower_left, upper_right, size = fit_bounds(
+        points=points, width=width, margin=margin
+    )
+    pending: _Pending
+    with figure(lower_left, upper_right, size, dpi=dpi) as pending:
+        yield pending
 
 
 @contextmanager

@@ -204,7 +204,9 @@ Layout:
 - `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
   (`.xp`/`.eepic` → png via `elaps`+ghostscript; `Figure` with `_repr_png_`),
   `figure.py` (the Pythonic scene API + `figure()`/`render()` context helpers +
-  `animate()`/`Animation`). `__init__.py` does `from ._epix import *` so the API
+  `animate()`/`Animation`, and `figure_around(points, width)`, a `figure()` whose box and
+  size are fitted to 2D points by `fit_bounds()`, for figures drawn from values a reader can
+  change). `__init__.py` does `from ._epix import *` so the API
   grows automatically. `pyproject.toml` alongside.
 - `notebooks/*.py` — jupytext percent-format notebooks (`make notebooks` → ipynb).
 
