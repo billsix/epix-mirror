@@ -1,6 +1,6 @@
 # A figure that fits its points, then use it in geometricalgebra's live notebooks
 
-**Status:** proposed — needs go-ahead (Open questions below block implementation)
+**Status:** proposed — needs go-ahead (all questions answered)
 **Priority:** 6
 **Difficulty:** 3
 **Created:** 2026-11-16 (William Emerison Six <billsix@gmail.com>)
@@ -37,8 +37,8 @@ can change needs a figure that fits whatever points it is given. Done means thre
 
 ## Plan (draft)
 
-1. **Here:** add the fitting figure to `python/epix/figure.py`, next to `figure`. It takes the
-   points, a width, a margin and a dpi. It computes the bounds and the size, with equal scales,
+1. **Here:** add `figure_around` (Decision 1) to `python/epix/figure.py`, next to `figure`. It
+   takes 2D points, a width, a margin and a dpi. It computes the bounds and the size, with equal scales,
    and delegates to `figure`, so the state reset and rendering stay in one place. Add a doctest or a
    `samples/` / `notebooks/` example, and a `ChangeLog` / `NEWS` entry if this repo keeps them for
    the Python layer.
@@ -53,14 +53,15 @@ can change needs a figure that fits whatever points it is given. Done means thre
      `tasks/reference/book-outline.md` ("Structural conventions").
 4. Commit each repo's half in that repo.
 
+## Decisions (William Emerison Six <billsix@gmail.com>, 2026-11-16)
+
+1. **API shape:** a separate function, `epix.figure_around(points, width, margin=0.18, dpi=150)`.
+   `epix.figure()` keeps its signature, so every existing figure stays byte-identical.
+2. **2D only for now.** 3D fitting through the camera's projection is left out. The only callers
+   that need fitting are 2D, and a 3D projection depends on a camera set inside the figure.
+3. **geometricalgebra's frame-QR notebooks keep their hand-tuned bounds.** Only the Part III
+   helper `scene_around` switches to the new function.
+
 ## Open questions
 
-1. **API shape:** a separate `epix.figure_around(points, width, margin=0.18, dpi=150)`, or a second
-   mode of `epix.figure(points=..., width=...)`? *(Recommend: a separate function. `figure`'s
-   signature stays as it is, and every existing figure stays byte-identical.)*
-2. **3D:** should it also fit 3D points through the camera's projection, or is 2D enough for now?
-   *(Recommend: 2D now. The only callers that need fitting are 2D, and the 3D projection depends
-   on the camera set inside the figure.)*
-3. **geometricalgebra's frame-QR notebooks:** switch them to the fitting figure in the same change,
-   or leave their hand-tuned bounds? *(Recommend: leave them; their figures are tuned and readers
-   aren't invited to change those frames.)*
+None. The task is ready to start on your go-ahead.
