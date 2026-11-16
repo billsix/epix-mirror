@@ -1,67 +1,76 @@
-# A figure that fits its points, then use it in geometricalgebra's live notebooks
+# A figure that fits its points, used by geometricalgebra's live notebooks
 
-**Status:** proposed — needs go-ahead (all questions answered)
-**Priority:** 6
-**Difficulty:** 3
 **Created:** 2026-11-16 (William Emerison Six <billsix@gmail.com>)
+**Done:** 2026-11-16, on branch `figure-fit-to-points` here and branch
+`use-epix-figure-fit-to-points` in github.com/billsix/geometricalgebra
 
-## BLUF
+## What was done
 
-`epix.figure()` (`python/epix/figure.py`) takes fixed bounds and a fixed size:
-`figure(lower_left, upper_right, size, dpi=150)`. A notebook that draws live from vectors a reader
-can change needs a figure that fits whatever points it is given. Done means three things.
-- This repo's Python layer has such a function, with a doctest or sample.
-- In github.com/billsix/geometricalgebra, the `Dockerfile`'s `EPIX_COMMIT` is bumped to a commit
-  that has it.
-- That repo's local workaround, `scene_around` in `book/figures/epix/_bootstrap_live.py`, calls the
-  new function instead of computing the bounds itself.
+`epix.figure()` takes fixed bounds and a fixed size. geometricalgebra's Part III notebooks draw live
+from vectors a reader can change, so they had computed the bounds themselves in a helper. This
+task moved that computation into epix and switched the helper over to it.
 
-## Context
-
-- **What geometricalgebra does today** (`book/figures/epix/_bootstrap_live.py` `scene_around`,
-  added 2026-11-16 for its book's Part III notebooks `book/docs/notebooks/bootstrap-*.py`):
-  - it takes the points a figure must show, plus the origin;
-  - it adds a margin of 18% of the larger extent;
-  - it computes `lower_left` / `upper_right`;
-  - it sets `size` to a fixed 3.4 in width, with the height chosen to keep the two scales equal;
-  - it calls `epix.figure(...)` and then draws light axes.
-  Only the axes are specific to that book. The fitting is the general part.
-- **Another caller there:** geometricalgebra's `book/figures/epix/_frame_scene.py`
-  `scene_2d` / `scene_3d` take explicit bounds, which `book/docs/notebooks/frame-qr-2d.py` /
-  `frame-qr-3d.py` pick by hand for each figure.
-- **How geometricalgebra pins this repo:** the `ARG EPIX_COMMIT=…` in its `Dockerfile`, at
-  `275adef…` on 2026-11-16, while this repo's `master` was `7515d93`. `entrypoint/install-epix.sh`
-  there fetches and builds that commit. Bumping it needs a `make image` there.
-- `epix.figure()` resets ePiX's global state for each figure (`reset_state()`), and the live
-  notebooks rely on that. The new function must keep it.
-
-## Plan (draft)
-
-1. **Here:** add `figure_around` (Decision 1) to `python/epix/figure.py`, next to `figure`. It
-   takes 2D points, a width, a margin and a dpi. It computes the bounds and the size, with equal scales,
-   and delegates to `figure`, so the state reset and rendering stay in one place. Add a doctest or a
-   `samples/` / `notebooks/` example, and a `ChangeLog` / `NEWS` entry if this repo keeps them for
-   the Python layer.
-2. **Gate here:** this repo's own build and test targets (see `CLAUDE.md`).
-3. **geometricalgebra:**
-   - bump `EPIX_COMMIT` to the new commit and run `make image`;
-   - replace the bounds-and-size computation in `scene_around` with the new call, keeping the
-     axes it draws;
-   - rerun the six `bootstrap-*.py` notebooks and `make docs`, and check that the 13 figures are
-     unchanged or better;
-   - update the helper's docstring and its note in geometricalgebra's
-     `tasks/reference/book-outline.md` ("Structural conventions").
-4. Commit each repo's half in that repo.
+- **Here** (`python/epix/figure.py`, exported from `python/epix/__init__.py`):
+  - `fit_bounds(points, width, margin=0.18)` returns `(lower_left, upper_right, size)`, the first
+    three arguments of `figure()`, sized to hold 2D points at a fixed width with equal scales on
+    both axes.
+    - The box is the points' extent, grown on each side by `margin` times the larger side.
+    - Coincident points get a unit box.
+    - An axis the points don't spread along gets the full extent, so neither side is ever zero.
+    - An empty list raises `ValueError`.
+  - `figure_around(points, width, margin=0.18, dpi=150)` is `figure()` with those arguments.
+  - `figure()` itself is unchanged, so every existing figure and the byte-identity harness are
+    unaffected.
+  - `CLAUDE.md`'s `python/` layout note mentions both. No `ChangeLog` or `NEWS` entry: those are
+    upstream prose, which this mirror leaves intact.
+- **In geometricalgebra** (commit "Use epix.fit_bounds in the Part III notebook scenes; pin
+  epix-mirror 8cb788a"):
+  - `book/figures/epix/_bootstrap_live.py` `scene_around` gets its box and size from
+    `epix.fit_bounds` and still draws its axes across the box.
+  - `Dockerfile` `EPIX_COMMIT` moved from `275adef…` to `8cb788a…`, this repo's implementation
+    commit. Between the two pins only `python/epix/` changed.
+  - That repo's `tasks/reference/book-and-docs-pipeline.md` records the new minimum pin.
 
 ## Decisions (William Emerison Six <billsix@gmail.com>, 2026-11-16)
 
-1. **API shape:** a separate function, `epix.figure_around(points, width, margin=0.18, dpi=150)`.
-   `epix.figure()` keeps its signature, so every existing figure stays byte-identical.
-2. **2D only for now.** 3D fitting through the camera's projection is left out. The only callers
-   that need fitting are 2D, and a 3D projection depends on a camera set inside the figure.
-3. **geometricalgebra's frame-QR notebooks keep their hand-tuned bounds.** Only the Part III
-   helper `scene_around` switches to the new function.
+1. **A separate function**, `epix.figure_around`, leaving `figure()`'s signature and output alone.
+2. **2D only.** 3D fitting through the camera's projection was left out.
+3. **geometricalgebra's frame-QR notebooks keep their hand-tuned bounds.**
 
-## Open questions
+Judgment calls made during the work:
+- `fit_bounds` is public alongside `figure_around`, because geometricalgebra's `scene_around` needs
+  the box itself to draw its axes. It calls `fit_bounds` and then `figure()` rather than
+  `figure_around`.
+- The pin is the implementation commit `8cb788a`, not this branch's tip, so later task-doc commits
+  don't matter to the pin.
 
-None. The task is ready to start on your go-ahead.
+## Owed: push before geometricalgebra's image build
+
+geometricalgebra's `entrypoint/install-epix.sh` fetches `EPIX_COMMIT` from
+github.com/billsix/epix-mirror. `8cb788a` exists only locally until this branch is merged and
+pushed to the `github` remote. Until then, geometricalgebra's `make image` fails to fetch it. After
+the push, run `make image` there, then `make docs`.
+
+## Verification
+
+- `tasks/adhoc/figure-fit-to-points/check_figure_around.py` (run in geometricalgebra's image with
+  this tree's `python/` on `PYTHONPATH`) passes all six checks:
+  - the docstring example;
+  - coincident points give a unit box;
+  - collinear points give a box with height;
+  - empty input raises;
+  - the result agrees with geometricalgebra's old hand computation for the Part III vectors;
+  - `figure_around`'s eepic equals `figure()`'s for the same scene.
+- ruff (this repo's `python/pyproject.toml` config): lint and format clean on `python/epix` and the
+  check script.
+- This repo's containerized gates, after a nested `make image`:
+  - `make shell-exec SCRIPT=tools/verify_image.sh` passed (environment, the 8-port byte-identity
+    sample, the Jupyter settings).
+  - `make format` exits 1, but not because of this change. `master` fails identically, on six
+    ruff findings in `tools/one_process_check.py` (one E501 and five T201 `print`s), a file this
+    task didn't touch. The files this task changed are clean. Left as found.
+- geometricalgebra, with this tree's `python/epix` mounted over the image's copy:
+  - all six `bootstrap-*.py` notebooks execute;
+  - their 13 figures are byte-identical PNGs before and after the change;
+  - `make format` is green.
+  - `make image` and `make docs` there wait on the push above.
