@@ -18,6 +18,8 @@ from .figure import Animation as Animation
 from .figure import activated as activated
 from .figure import animate as animate
 from .figure import figure as figure
+from .figure import figure_around as figure_around
+from .figure import fit_bounds as fit_bounds
 from .figure import render as render
 from .render import Figure as Figure
 from .render import render_eepic as render_eepic
