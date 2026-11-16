@@ -44,12 +44,12 @@ Judgment calls made during the work:
 - The pin is the implementation commit `8cb788a`, not this branch's tip, so later task-doc commits
   don't matter to the pin.
 
-## Owed: push before geometricalgebra's image build
+## The push, and geometricalgebra's image build
 
 geometricalgebra's `entrypoint/install-epix.sh` fetches `EPIX_COMMIT` from
-github.com/billsix/epix-mirror. `8cb788a` exists only locally until this branch is merged and
-pushed to the `github` remote. Until then, geometricalgebra's `make image` fails to fetch it. After
-the push, run `make image` there, then `make docs`.
+github.com/billsix/epix-mirror, so its image couldn't be built until this branch was on GitHub. The
+maintainer merged it with a merge commit (`6116ed6`) and pushed it on 2026-11-16. `8cb788a` is an
+ancestor of that merge, so the pin resolved unchanged.
 
 ## Verification
 
@@ -74,4 +74,8 @@ the push, run `make image` there, then `make docs`.
   - all six `bootstrap-*.py` notebooks execute;
   - their 13 figures are byte-identical PNGs before and after the change;
   - `make format` is green.
-  - `make image` and `make docs` there wait on the push above.
+  - after the push: geometricalgebra's `make image` built with `EPIX_COMMIT=8cb788a`, and its
+    image has `epix.fit_bounds` and `epix.figure_around`. On that image the 13 figures are
+    byte-identical to the baseline, `make format` is green, and `make docs` is green. There were no
+    undefined references and no Part III or frame-QR warnings, and the notebook pages carry their
+    figures.
