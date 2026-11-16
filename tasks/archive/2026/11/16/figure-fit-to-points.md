@@ -54,7 +54,8 @@ the push, run `make image` there, then `make docs`.
 ## Verification
 
 - `tasks/adhoc/figure-fit-to-points/check_figure_around.py` (run in geometricalgebra's image with
-  this tree's `python/` on `PYTHONPATH`) passes all six checks:
+  this tree's `python/` on `PYTHONPATH`; a one-shot script, removed at archive and kept in commit
+  `8cb788a`) passes all six checks:
   - the docstring example;
   - coincident points give a unit box;
   - collinear points give a box with height;
