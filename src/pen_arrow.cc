@@ -31,6 +31,7 @@
  * 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
  */
 
+#include <cmath>
 #include <sstream>
 #include <list>  // for arrow shaft cropping
 
@@ -65,7 +66,8 @@ pen_arrow::pen_arrow(const pair& tail, const pair& head, const pen_data& line,
       m_scale(scale),
       m_shorten(sin_th),
       m_head_seen(head_seen),
-      m_style(the_arrowhead_style()) {}
+      m_style(the_arrowhead_style()),
+      m_path_style(the_path_style()) {}
 
 pen_arrow* pen_arrow::clone() const { return new pen_arrow(*this); }
 
@@ -104,7 +106,8 @@ pen_arrow& pen_arrow::crop_to(const screen_mask& M) {
 }
 
 bool pen_arrow::is_empty() const {
-  return !(m_head_seen && m_shaft.is_seen()) || m_line.color().is_unset();
+  // a cropped-away head still leaves the shaft segment to draw
+  return !m_shaft.is_seen() || m_line.color().is_unset();
 }
 
 /*
@@ -130,6 +133,10 @@ std::string pen_arrow::print_to(const format& fmt,
   // else
   std::stringstream obuf;
 
+  if (!m_head_seen)  // head cropped away: the shaft segment, in full
+    return fmt.print_line(m_shaft, pair(0, 0), m_line, m_base, m_path_style,
+                          len);
+
   if (m_shaft.tail() == m_shaft.head())  // draw a ddot
   {
     label_state my_state(the_label_style());
@@ -152,16 +159,30 @@ std::string pen_arrow::print_to(const format& fmt,
     const double wd(m_scale * m_style.width());
     const double ht(m_style.ratio() * wd * m_shorten);
 
-    const pair base(head - ht * unit_dir);
-    const pair foot(head - (1 - m_style.inset()) * ht * unit_dir);
+    // The outline is stroked with the line pen, and at the narrow tip the
+    // stroke's miter reaches (pen width / 2) / sin(half-angle) past the
+    // polygon's corner. Set the polygon back by that much, so the visible tip
+    // lands on the point the arrow was drawn to.
+    length pen_width(m_line.width());
+    const double half_pen_pt(0.5 * pen_width.to("pt").magnitude());
+    const double setback(0 < wd ? half_pen_pt * std::hypot(wd, ht) / wd : 0);
+    const pair tip(head - setback * unit_dir);
+
+    const pair base(tip - ht * unit_dir);
+    const pair foot(tip - (1 - m_style.inset()) * ht * unit_dir);
 
     const pair ear_left(base + wd * unit_perp);
     const pair ear_right(base - wd * unit_perp);
 
+    // the shaft segment stops at the foot, under the head, if there is room
+    if (0 < ((foot - m_shaft.tail()) | dir))
+      obuf << fmt.print_line(edge2d(m_shaft.tail(), foot, true), pair(0, 0),
+                             m_line, m_base, m_path_style, len);
+
     std::list<edge2d> bd;
     bd.push_back(edge2d(foot, ear_right, true));
-    bd.push_back(edge2d(ear_right, head, true));
-    bd.push_back(edge2d(head, ear_left, true));
+    bd.push_back(edge2d(ear_right, tip, true));
+    bd.push_back(edge2d(tip, ear_left, true));
     bd.push_back(edge2d(ear_left, foot, true));
 
     obuf << fmt.print_fill(bd, pair(0, 0), m_line.color(), m_line, len);

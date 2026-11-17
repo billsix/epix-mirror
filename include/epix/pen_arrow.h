@@ -39,6 +39,7 @@
 #include <string>
 
 #include "edge_data.h"
+#include "path_style.h"
 #include "pen_data.h"
 #include "tile.h"
 
@@ -47,7 +48,8 @@ namespace ePiX {
 class affine;
 class screen_mask;
 
-// arrowhead tile class
+// arrowhead tile class: the head, and the last shaft segment (tail to head),
+// which ends at the head's foot so it cannot show past the tip
 class pen_arrow : public tile {
  public:
   pen_arrow(const pair& tail, const pair& head, const pen_data& line,
@@ -75,6 +77,7 @@ class pen_arrow : public tile {
   bool m_head_seen;
 
   arrowhead_state m_style;
+  path_state m_path_style;  // the shaft's dashing, for the segment drawn here
 };  // end of class pen_arrow
 
 }  // namespace ePiX

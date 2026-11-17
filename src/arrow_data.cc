@@ -92,6 +92,10 @@ void arrow_data::photo(screen& scr, const Camera& mycam, const pen_data& line,
       edges.push_back(tmp);
   }
 
+  // The head tile draws the last segment itself, stopping it under the head,
+  // so leave that segment out of the shaft when there is a head.
+  if (m_head_seen && !edges.empty()) edges.pop_back();
+
   // draw shaft
   scr.m_screen->add_tile(
       pen_line(line.seen_through(mycam), under.seen_through(mycam), edges));
