@@ -43,13 +43,20 @@ RUN --mount=type=cache,target=/var/cache/libdnf5 \
 #     notebook by default.
 #   labextension disable ...announcements: no "news"/update banners. --level=user
 #     writes /root/.jupyter/labconfig/, read under any prefix.
+# Every version comes from constraints.txt (`make update-pins` regenerates it), so a
+# rebuild installs the same set. The uv cache mount is a different filesystem from
+# the image layer, so uv must copy rather than hardlink (it warns otherwise);
+# UV_LINK_MODE=copy says so.
+ENV UV_LINK_MODE=copy
+COPY constraints.txt /tmp/constraints.txt
 RUN --mount=type=cache,target=/root/.cache/uv \
     python3 -m venv --system-site-packages /venv/ && \
     export VIRTUAL_ENV_DISABLE_PROMPT=1 && \
     source /venv/bin/activate && \
-    uv pip install --python /venv/bin/python nanobind && \
+    uv pip install --python /venv/bin/python -c /tmp/constraints.txt nanobind && \
     if [ "$USE_JUPYTER" = "1" ]; then \
-      uv pip install --python /venv/bin/python jupyterlab jupytext ipython ipykernel && \
+      uv pip install --python /venv/bin/python -c /tmp/constraints.txt \
+        jupyterlab jupytext ipython ipykernel && \
       jupytext-config set-default-viewer python && \
       jupyter labextension disable --level=user "@jupyterlab/apputils-extension:announcements" ; \
     fi && \

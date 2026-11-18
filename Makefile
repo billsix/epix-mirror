@@ -164,6 +164,11 @@ format: ## Format C++ (clang-format) + Python (ruff) in place
 		-v $(CURDIR)/entrypoint/format.sh:/format.sh:Z \
 		$(CONTAINER_NAME) /format.sh
 
+.PHONY: update-pins
+update-pins: image ## (container, network) re-resolve constraints.txt, the image's pinned Python versions
+	$(RUN) $(SRC_MOUNT) $(CONTAINER_NAME) \
+		-c 'source /venv/bin/activate && cd $(REPO_MOUNT) && uv pip compile entrypoint/image-requirements.in --python /venv/bin/python -o constraints.txt'
+
 .PHONY: clean
 clean: ## Remove the host $(OUTPUT_DIR) folder
 	rm -rf $(OUTPUT_DIR)

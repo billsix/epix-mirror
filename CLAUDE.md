@@ -102,7 +102,10 @@ dispatches — `entrypoint/01-install-base.sh` (Meson/g++, Python, uv, ruff,
 clang-tools) and `entrypoint/02-install-render.sh` (TeX-Live, ghostscript,
 ImageMagick) — so the same toolchain can be installed on a bare Fedora host. The
 Python stack (JupyterLab, jupytext, ipykernel, nanobind) lives in a `uv`-managed
-`/venv` (`--system-site-packages`) that every entry script activates; the `epix`
+`/venv` (`--system-site-packages`) that every entry script activates. Every version in it,
+transitive deps included, is pinned by `constraints.txt`, which is generated from
+`entrypoint/image-requirements.in` by `make update-pins` (needs the network; then `make image`).
+Never hand-edit it. The `epix`
 package is installed **editable** from `/epix/python` at image build and again,
 offline, on every `shell.sh`/`jupyter.sh` entry, so the bind mount's live tree
 (and the `_epix*.so` that `make py-ext` drops into `python/epix/`) is what

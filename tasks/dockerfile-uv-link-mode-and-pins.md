@@ -1,40 +1,29 @@
-# Dockerfile: silence uv's hardlink warning; decide whether to pin the venv packages
+# Dockerfile: silence uv's hardlink warning; pin the venv packages (done)
 
-**Status:** proposed — needs go-ahead
-**Priority:** 8
-**Difficulty:** 2 (the warning) / 4 (adding a `constraints.txt` lock)
-**Started:** 2026-11-18 (William Emerison Six <billsix@gmail.com>)
+**Done:** 2026-11-18 (William Emerison Six <billsix@gmail.com>)
 
-## BLUF
+The venv `RUN` in `Dockerfile` installed `nanobind` and, under `USE_JUPYTER`,
+`jupyterlab jupytext ipython ipykernel` with `uv pip install` under a uv cache mount. That printed
+uv's "Failed to hardlink files" warning, and none of the versions were pinned.
 
-The venv `RUN` in `Dockerfile` installs `nanobind` and, under `USE_JUPYTER`, `jupyterlab
-jupytext ipython ipykernel` with `uv pip install` under a uv cache mount, so `make image`
-prints uv's "Failed to hardlink files" warning. Those installs are also completely
-unpinned: no `==` pins and no `constraints.txt`. Done = `ENV UV_LINK_MODE=copy` is set and the
-warning is gone. Adding the lock is optional and waits on the open question.
+**Decision** (2026-11-18, William Emerison Six <billsix@gmail.com>, taking the task's
+recommendation): lock the whole set, both nanobind (the extension is built against it) and the
+Jupyter stack, per the "lock everything" rule in the `python-coding-standard.md` reference doc in
+github.com/billsix/runClaudeInContainer ("Pin direct dependencies").
 
-## Context
+What changed:
+- `entrypoint/image-requirements.in` lists the five direct packages.
+- `constraints.txt` (95 pins) was generated from it with `uv pip compile` for the image's
+  Python 3.15. It was first generated in the previous image, since the new `Dockerfile` needs it to build.
+- `make update-pins` regenerates it. Layout as in github.com/billsix/geometricalgebra.
+- The `Dockerfile` `COPY`s `constraints.txt` just before the venv `RUN`, installs both groups with
+  `-c`, and sets `ENV UV_LINK_MODE=copy`. The cache mount is a different filesystem from the layer,
+  so uv has to copy, and the setting says so.
+- `CLAUDE.md` describes the lock and the target.
 
-- This is the same cleanup as github.com/billsix/geometricalgebra
-  `tasks/dockerfile-pin-every-venv-install.md`. The rule is in the `python-coding-standard.md`
-  reference doc in github.com/billsix/runClaudeInContainer, "Pin direct dependencies".
-- **The hardlink warning:** the uv cache mount is a different filesystem from `/venv`, so uv
-  has to copy. Copying is required anyway, since the cache mount is discarded after the build.
-- **Unpinned:** each rebuild without cache gets whatever PyPI serves that day. geometricalgebra
-  builds epix-mirror through its own `entrypoint/install-epix.sh` and pins nanobind through its
-  own `constraints.txt`, so this only affects epix-mirror's own image.
-- There is no double install here (no later constrained layer), so the `-`/`+` downgrades
-  geometricalgebra shows can't happen.
+Verified nested on 2026-11-18: `make image` (nanobind 3.1.0 and jupyterlab 4.6.6, the pinned
+versions; no hardlink warning), `make build` (libepix + the `_epix.cpython-315` extension), and
+`make shell-exec SCRIPT=tools/verify_image.sh` (result 0).
 
-## Plan
-
-1. Add `ENV UV_LINK_MODE=copy` (with a one-line why) before the venv `RUN`; `make image`; no warning.
-2. Only if question 1 is answered yes: add `constraints.txt` (`uv pip compile` for the image's
-   Python) and a `make update-pins` target, install with `-c constraints.txt`, using
-   geometricalgebra's layout as the model.
-
-## Open questions
-
-1. Add a `constraints.txt` lock and `make update-pins` for nanobind and the Jupyter stack?
-   Recommendation: yes for nanobind (the Python extension is built against it). The Jupyter
-   front-end is a dev convenience, so it is fine either way.
+A bump to `constraints.txt` re-runs the venv layer and the layers after it (the `COPY . /epix`
+source bake). The slow dnf/TeX layers above it are unaffected.
