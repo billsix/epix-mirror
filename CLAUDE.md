@@ -202,7 +202,9 @@ renamed from the C++/ePiX vocabulary to **Pythonic names** (cleanup closeout:
 
 Layout:
 - `python/epix/` — the package. `_epix.cc` (the nanobind binding), `render.py`
-  (`.xp`/`.eepic` → png via `elaps`+ghostscript; `Figure` with `_repr_png_`),
+  (`.xp`/`.eepic` → png via `elaps`+ghostscript; `Figure` with `_repr_png_`; an optional
+  `background="#rrggbb"` on `Figure`/`figure()`/`figure_around()`/`render()` flattens the PNG
+  onto that colour with ImageMagick, default transparent),
   `figure.py` (the Pythonic scene API + `figure()`/`render()` context helpers +
   `animate()`/`Animation`, and `figure_around(points, width)`, a `figure()` whose box and
   size are fitted to 2D points by `fit_bounds()`, for figures drawn from values a reader can
