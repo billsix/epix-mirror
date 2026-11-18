@@ -36,7 +36,7 @@ from . import _epix
 from .render import Figure, render_eepic
 
 
-def render(dpi: int = 150) -> Figure:
+def render(dpi: int = 150, background: str | None = None) -> Figure:
     """Capture the current ePiX picture (via ``print_eepic``) as a :class:`Figure`.
 
     The eepic is captured now; the PNG is rasterized lazily on first display and
@@ -44,12 +44,14 @@ def render(dpi: int = 150) -> Figure:
     colored facets) that exceeds LaTeX's memory when rasterized — those display
     as nothing rather than raising, so the notebook doesn't crash. Building the
     figure needs only libepix, which is what the byte-identity harness relies on.
+    ``background`` (``"#rrggbb"``) makes the PNG opaque in that colour; the default
+    leaves it transparent (see :class:`~epix.render.Figure`).
     """
     fd, path = tempfile.mkstemp(suffix=".eepic")
     os.close(fd)
     try:
         _epix.print_eepic(path)
-        return render_eepic(path, dpi=dpi)
+        return render_eepic(path, dpi=dpi, background=background)
     finally:
         os.unlink(path)
 
@@ -75,19 +77,23 @@ class _Pending:
 
 
 @contextmanager
-def figure(lower_left, upper_right, size, dpi: int = 150):
+def figure(
+    lower_left, upper_right, size, dpi: int = 150, background: str | None = None
+):
     """Context manager: sets up the picture, captures + renders it on exit.
 
     Each figure starts from ePiX's startup state (``reset_state()``): no pen, fill,
     line style, label style, palette, camera or output format carries over from an
     earlier figure in the same process, so a notebook may draw any number of them.
+    ``background`` (``"#rrggbb"``) makes the rendered PNG opaque in that colour; the
+    default, ``None``, leaves it transparent.
     """
     _epix.reset_state()
     _epix.picture(lower_left, upper_right, size)
     _epix.begin()
     pending: _Pending = _Pending()
     yield pending
-    pending.figure = render(dpi=dpi)
+    pending.figure = render(dpi=dpi, background=background)
 
 
 def fit_bounds(
@@ -137,6 +143,7 @@ def figure_around(
     width: float,
     margin: float = 0.18,
     dpi: int = 150,
+    background: str | None = None,
 ):
     """:func:`figure`, with its box and size fitted to ``points``.
 
@@ -150,7 +157,8 @@ def figure_around(
             ...
         fig
 
-    Everything else is :func:`figure`'s, including the state reset before drawing.
+    Everything else is :func:`figure`'s, including the state reset before drawing
+    and the optional ``background``.
     """
     lower_left: _epix.Point
     upper_right: _epix.Point
@@ -159,7 +167,9 @@ def figure_around(
         points=points, width=width, margin=margin
     )
     pending: _Pending
-    with figure(lower_left, upper_right, size, dpi=dpi) as pending:
+    with figure(
+        lower_left, upper_right, size, dpi=dpi, background=background
+    ) as pending:
         yield pending
 
 

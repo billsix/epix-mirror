@@ -1,55 +1,41 @@
 # An optional opaque background for rendered figures
 
-**Status:** proposed — needs go-ahead
+**Completed:** 2026-11-18 (William Emerison Six <billsix@gmail.com>)
 **Priority:** 4
 **Difficulty:** 3
 **Created:** 2026-11-16 (William Emerison Six <billsix@gmail.com>)
 **Related:** github.com/billsix/geometricalgebra `tasks/live-epix-figure-background.md` (the
-consumer half); `tasks/archive/2026/11/16/figure-fit-to-points.md` (the same two-repo workflow)
+consumer half, which waits for this to be merged and pushed);
+`tasks/archive/2026/11/16/figure-fit-to-points.md` (the same two-repo workflow)
 
-## BLUF
+## Outcome
 
-`python/epix/render.py` rasterizes a figure's eps with `gs -sDEVICE=pngalpha`, so every PNG
-`figure()` produces has a transparent background. On a dark-mode HTML page that reads badly.
-Add an optional `background="#rrggbb"` to `figure`, `figure_around` and `render` (and the `Figure`
-they build) that makes the PNG opaque in that colour. The default, `None`, stays transparent, so
-existing output is unchanged. Done means the option exists, is checked, and
-github.com/billsix/geometricalgebra's live notebook figures use it with `#f2f2f2` (its half,
-`tasks/live-epix-figure-background.md`, bumps `EPIX_COMMIT` and passes the colour).
+`figure`, `figure_around`, `render`, `render_eepic`, `render_xp` and `Figure` take an optional
+`background="#rrggbb"`. With it, the PNG ghostscript writes (`pngalpha`, transparent) is flattened
+onto that colour with ImageMagick (`magick png -background <colour> -flatten png`, falling back to
+`convert`), so the figure reads well on a dark page. Without it, the default `None`, the PNG is
+produced exactly as before. The eepic never changes, so the byte-identity harness is unaffected.
+A colour that is not `#rrggbb` raises `ValueError` when the `Figure` is built.
 
-## Context
+Code: `python/epix/render.py` (`_require_background`, `_flatten`, the `background` parameter
+threaded through `Figure` → `_rasterize_eepic_text` → `_render_via_elaps`) and
+`python/epix/figure.py` (`render`, `figure`, `figure_around`).
 
-- **How a PNG is made:** `Figure.png` is rasterized lazily on first access
-  (`_rasterize_eepic_text` → `_render_via_elaps`: `elaps -o fig.eps`, then `_eps_to_png`, which
-  runs `gs -sDEVICE=pngalpha … -sOutputFile=fig.png`). `Figure._repr_png_` returns those bytes to
-  Jupyter.
-- **What geometricalgebra does for its prebuilt figures:** its `tools/render_epix_figures.py`
-  flattens each PNG with ImageMagick onto `#f2f2f2`. It wants the same for figures drawn live in
-  notebooks, which only pass through this package.
-- **The decision is the maintainer's** (William Emerison Six <billsix@gmail.com>, 2026-11-16, in
-  that repo's task): the background is an option here, default transparent.
-- ImageMagick and ghostscript are in this repo's full image (`entrypoint/02-install-render.sh`).
-  The lean image has neither, and rasterizing already raises there.
+## Decision (William Emerison Six <billsix@gmail.com>, 2026-11-18)
 
-## Plan (draft)
+1. **Flatten with ImageMagick, not an opaque ghostscript device.** This matches geometricalgebra's
+   prebuilt figures in method, and it leaves the no-background path untouched.
 
-1. Choose the mechanism (Open question 1). Thread `background: str | None = None` through
-   `figure` / `figure_around` / `render` into `Figure`, and from there into the rasterization.
-2. Leave the eepic untouched. The background affects only the PNG, so the byte-identity harness is
-   unaffected.
-3. Check it with a one-shot script under `tasks/adhoc/figure-background/`:
-   - with a background, every PNG pixel is opaque and the corners are that colour;
-   - without one, the PNG is unchanged (byte-identical to before);
-   - the eepic is identical either way.
-4. Gates: this repo's `make format` (its `tools/one_process_check.py` findings fail on `master`
-   too, see `tasks/archive/2026/11/16/figure-fit-to-points.md`), and
-   `make shell-exec SCRIPT=tools/verify_image.sh`.
-5. Then geometricalgebra's half, after this is merged and pushed.
+## Verification
 
-## Open questions
-
-1. **Mechanism:** a ghostscript device that renders opaque (`png16m` with the background painted
-   first, for example), or keep `pngalpha` and flatten afterwards with ImageMagick
-   (`magick fig.png -background <colour> -flatten`), the way geometricalgebra's tool does?
-   *(Recommend: flatten with ImageMagick. It matches geometricalgebra's prebuilt figures pixel for
-   pixel in method, and the no-background path stays byte-identical.)*
+- **`tasks/adhoc/figure-background/check.py`**, a one-shot deleted at archive, run with
+  `make shell-exec CMD='python3 tasks/adhoc/figure-background/check.py'`:
+  - the eepic is identical with and without a background;
+  - a `#f2f2f2` figure's PNG is opaque, with corner pixel `F2F2F2`;
+  - the default PNG is still transparent and byte-identical to the old pipeline's output for the
+    same eepic;
+  - a bad colour raises.
+- `make shell-exec SCRIPT=tools/verify_image.sh` passed (result 0).
+- `entrypoint/format.sh`: ruff and clang-format were clean on the changed files. Its six findings
+  are all in `tools/one_process_check.py` and fail on `master` too (noted in
+  `tasks/archive/2026/11/16/figure-fit-to-points.md`).
