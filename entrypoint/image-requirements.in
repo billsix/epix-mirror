@@ -1,0 +1,8 @@
+# The image's Python packages, resolved into constraints.txt by `make update-pins`.
+# nanobind: headers + nb_combined.cpp for the extension build (entrypoint/build_py.sh).
+nanobind
+# The notebook front-end, installed only when USE_JUPYTER=1.
+jupyterlab
+jupytext
+ipython
+ipykernel
