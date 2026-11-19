@@ -32,6 +32,11 @@ line-length = 88
 # task docs' annotated examples (aligned trailing comments) must not be reflowed.
 extend-exclude = ["build", "output", "tasks"]
 
+# The package supports Python >= 3.9 (requires-python), but tools/ runs only in the
+# image, on its Python 3.15, and uses `match`, so lint it as that version.
+[tool.ruff.per-file-target-version]
+"tools/*.py" = "py314"
+
 [tool.ruff.lint]
 # The shared cross-project tier (runClaudeInContainer
 # tasks/reference/python-coding-standard.md). E231/E302 are deliberately absent:
@@ -53,3 +58,5 @@ ignore = []
 "notebooks/*.py" = ["N802", "N803", "N806", "N816"]
 # verify_ports.py is a command-line gate whose PASS/FAIL lines ARE its output.
 "build-aux/*.py" = ["T201"]
+# tools/ scripts are command-line checks too; their printed lines are the result.
+"tools/*.py" = ["T201"]

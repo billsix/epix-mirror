@@ -9,7 +9,8 @@ Run inside the container, where `epix` is installed editable, from the repo root
 
 Modes:
 
-  one_process_check.py fresh NAME     -> print NAME's eepic(s), run alone in this process
+  one_process_check.py fresh NAME     -> print NAME's eepic(s), run alone in this
+                                         process
   one_process_check.py all            -> run EVERY notebook in this one process, in
                                          order, and compare each one's eepic(s) against
                                          a `fresh NAME` subprocess; print PASS/FAIL per

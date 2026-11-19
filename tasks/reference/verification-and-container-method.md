@@ -102,7 +102,7 @@ None of the toolchain the harness needs lives on the bare host / Claude sandbox:
 - (only for the *inline PNG render*, not for verification) the heavy TeX-Live +
   ghostscript + ImageMagick stack.
 
-The project's `Makefile` bakes all of that into a Fedora 44 OCI image
+The project's `Makefile` bakes all of that into a Fedora 45 OCI image
 (`make image`). The agent ran that image **nested** (podman-in-podman) inside the Claude
 sandbox. Two nested-specific things (from the global `CLAUDE.md`): inner runs carry
 `--cgroups=disabled` (auto-applied via `PODMAN_RUN_FLAGS` since 2026-08-29; originally
