@@ -1,6 +1,6 @@
 # Ship type information with the `epix` Python package
 
-**Status:** proposed — needs go-ahead (open questions below)
+**Status:** in progress
 **Priority:** 5
 **Difficulty:** 4
 **Created:** 2026-11-19 (William Emerison Six <billsix@gmail.com>), from a consumer's need in
@@ -57,13 +57,13 @@ types from an installed epix, with a check that the stub matches the built exten
 5. Tell the consumer: gacalc then switches its epix install to a mode static tools can see, drops
    the pyright exclusions and ty's `allowed-unresolved-imports`, and runs its gates.
 
+## Decisions (William Emerison Six <billsix@gmail.com>, 2026-11-19)
+
+1. **Commit the generated `_epix.pyi`**, with a gate that fails when regenerating it changes
+   anything.
+2. **No stub-only `epix-stubs` package for now.** The stubs ship inside the `epix` package;
+   a stub package can follow if a consumer's CI needs one.
+
 ## Open questions
 
-1. **Commit the generated `_epix.pyi`, or generate it at build time only?** Recommend: commit it,
-   with a check that regenerating it changes nothing, so a reader (and a checker with no compiler)
-   sees the API, and a binding change shows up in review.
-2. **A stub-only distribution for consumers without ePiX?** gacalc's lean CI image has no ePiX at
-   all, so even with stubs inside the package its CI pyright cannot see them unless the image builds
-   ePiX. A separate `epix-stubs` package (`.pyi` files only, installable with no compiler) would let
-   it check the 31 notebooks there. Recommend: not now. Ship the stubs in the package first; gacalc
-   can check those notebooks in its full image, and a stub package can follow if CI needs it.
+None.
