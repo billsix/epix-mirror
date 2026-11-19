@@ -1,69 +1,63 @@
 # Ship type information with the `epix` Python package
 
-**Status:** in progress
-**Priority:** 5
-**Difficulty:** 4
 **Created:** 2026-11-19 (William Emerison Six <billsix@gmail.com>), from a consumer's need in
 github.com/billsix/geometricalgebra.
+**Done:** 2026-11-19, branch `ship-python-type-information` (`ea712f7`).
 
-## BLUF
-
-The `epix` package carries no type information: the compiled `_epix` extension has no `.pyi`
-stub, and the package has no `py.typed` marker. A static type checker that imports `epix`
-therefore sees nothing, and every name a consumer re-exports from it (`Point`, `LabelPos`,
-`Color`, the `epix.figure._Pending` proxy) is reported unknown. Generate a stub for `_epix` with
-`nanobind.stubgen`, add `py.typed`, and give the pure-Python modules (`figure.py`, `render.py`)
-full annotations. Done means pyright and ty both resolve `from epix import Point, LabelPos` to real
-types from an installed epix, with a check that the stub matches the built extension.
-
-## Context (read first)
-
-- **The consumer.** gacalc (github.com/billsix/geometricalgebra) draws its book's figures with
-  `epix`. Its scene helpers are the `gacalc.epixscene` package. 31 of its notebooks import
-  `Point`, `PendingFigure`, `LabelPos` and `Color` through those helpers, and for that reason its
-  pyright gate excludes them (its `pyrightconfig.json`, and its
-  `tasks/epix-type-stubs-for-pyright.md`). Its ty gate allows `epix` to be unresolved
-  (`pyproject.toml`, `[tool.ty.analysis] allowed-unresolved-imports`).
-- **Two separate gaps**, both confirmed 2026-11-19 in gacalc's image:
-  1. *No type information.* `python/epix/` holds `__init__.py`, `figure.py`, `render.py` and the
-     built `_epix*.so`, with no `.pyi` and no `py.typed`. `__init__.py` re-exports the scene API with
-     `from ._epix import *`, so its whole surface (about 360 bindings in `python/epix/_epix.cc`) is
-     invisible to a checker. `figure.py` is partly annotated: `render`, `figure` and `fit_bounds`
-     are; `_Pending`'s `png`/`eepic`/`save` and `activated` are not.
-  2. *The editable install hides the package from static tools.* gacalc's image installs epix
-     editable from `/opt/epix-src/python`. setuptools' default editable mode writes an import-hook
-     finder (`__editable___epix_1_2_22_finder.py`), which pyright and ty cannot follow, even
-     with stubs. A path-based `.pth` (`--config-settings editable_mode=compat`, or a
-     non-editable install) is visible to them. This half is the consumer's install command
-     (gacalc's `entrypoint/install-epix.sh`), noted here so the stub work is tested the way a
-     consumer installs.
-- **nanobind 3.1.0** (in gacalc's image) has `nanobind.stubgen`, which writes a `.pyi` from an
-  imported extension module, including the `nb::arg` names that gacalc's keyword-argument gate
-  relies on.
-- `entrypoint/build_py.sh` builds the extension outside Meson. `tasks/meson-python-option.md`
-  proposes moving it into Meson. Stub generation belongs in whichever builds the `.so`.
-
-## Plan
-
-1. Generate `python/epix/_epix.pyi` with `python -m nanobind.stubgen -m epix._epix -o …` after
-   the extension is built (`entrypoint/build_py.sh`, and in Meson if that task lands first).
-2. Add `python/epix/py.typed` and list both files as package data in `python/pyproject.toml`.
-3. Annotate the rest of `figure.py` and `render.py` (`_Pending.png`/`eepic`/`save`, `activated`).
-   Consider making `_Pending` public, since consumers have to alias a private name to type a
-   `with epix.figure() as fig:` target.
-4. Gate: a check that rebuilding the stub reproduces the committed one, or that the stub is
-   regenerated on every build (Q1), plus pyright and ty over `notebooks/` and a small consumer
-   probe (`from epix import Point, LabelPos; p: Point = Point(x=1, y=2)`) with zero diagnostics.
-5. Tell the consumer: gacalc then switches its epix install to a mode static tools can see, drops
-   the pyright exclusions and ty's `allowed-unresolved-imports`, and runs its gates.
+The `epix` package carried no type information: the compiled `_epix` extension had no `.pyi`, and
+the package had no `py.typed`. A type checker that imported `epix` saw nothing, and every name a
+consumer re-exported from it was reported unknown. gacalc's pyright gate excluded 31 notebooks
+for that reason (its `tasks/epix-type-stubs-for-pyright.md`, blocked on this task being pushed).
 
 ## Decisions (William Emerison Six <billsix@gmail.com>, 2026-11-19)
 
-1. **Commit the generated `_epix.pyi`**, with a gate that fails when regenerating it changes
+1. The generated `_epix.pyi` is committed, with a gate that fails when regenerating it changes
    anything.
-2. **No stub-only `epix-stubs` package for now.** The stubs ship inside the `epix` package;
-   a stub package can follow if a consumer's CI needs one.
+2. No stub-only `epix-stubs` package for now. The stubs ship inside `epix`, and a stub package can
+   follow if a consumer's CI (gacalc's lean image has no ePiX) needs one.
 
-## Open questions
+## What was done
 
-None.
+- `entrypoint/build_py.sh` runs `python -m nanobind.stubgen -q -m epix._epix -o
+  python/epix/_epix.pyi` after the link step, and also when the relink is skipped as up to date.
+  The stub is 908 lines and fully typed: no `object` or `Any` fallbacks, and the bound argument
+  names are kept.
+- `tools/check_stub.sh` regenerates the stub into a scratch file and compares it with the
+  committed one. It exits 0 when current, 1 when stale (with a diff), and 2 when it cannot run.
+  `tools/verify_image.sh` runs it. ruff's `extend-exclude` skips the stub, so the formatter cannot
+  make the comparison fail.
+- `python/epix/py.typed` was added, and both files are `[tool.setuptools.package-data]` in
+  `python/pyproject.toml`.
+- `figure.py` and `render.py` are fully annotated: `_Pending`'s `_repr_png_`, `png`, `eepic` and
+  `save`; `figure`, `figure_around` and `activated` as `Generator[…, None, None]`, which is valid
+  for the package's `requires-python >= 3.9`; `animate`'s `build`; and the `__init__`s.
+  `_Pending.save()` called before the figure renders now raises a `RuntimeError` saying so,
+  instead of an `AttributeError` on `None`.
+- `CLAUDE.md`: the stub is listed under generated files, plus the type-information bullet in the
+  Python layout.
+- Not done: making `_Pending` public. Consumers still alias the private name to type a
+  `with epix.figure() as fig:` target, and renaming a public API is the maintainer's call.
+
+## Verification
+
+- The stub was generated twice, byte-identical.
+- pyright and ty ran from gacalc's image, which has both, against this checkout on the search
+  path. A consumer probe that imports `Point` and `LabelPos`, calls `figure`, `label` and `black`,
+  and makes one deliberate bad assignment got exactly that one error from each checker. Both
+  checkers also passed `python/epix` with no diagnostics.
+- A wheel built from `python/` contains `epix/py.typed` and `epix/_epix.pyi`. It has no `.so`,
+  as before this change; that is `tasks/meson-python-option.md`.
+- An editable install with `--config-settings editable_mode=compat` writes a plain path `.pth`
+  (`/epix/python`), which static checkers can follow. The default mode writes an import hook,
+  which they cannot.
+- `entrypoint/format.sh` exited 0. `tools/verify_image.sh` passed: 8 of 8 ports PASS, and the
+  stub is current.
+
+## For the consumer
+
+gacalc's `tasks/epix-type-stubs-for-pyright.md` clears once this branch is pushed. Its steps are:
+
+1. Bump `EPIX_COMMIT`.
+2. Install epix in compat mode in `entrypoint/install-epix.sh`.
+3. Drop pyright's exclude list and ty's `allowed-unresolved-imports`.
+4. Decide how its lean CI image gets the types.
