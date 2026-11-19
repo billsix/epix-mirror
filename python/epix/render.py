@@ -63,7 +63,7 @@ class Figure:
         dpi: int = 150,
         png: bytes | None = None,
         background: str | None = None,
-    ):
+    ) -> None:
         _require_background(background)
         self.eepic = eepic
         self.dpi = dpi

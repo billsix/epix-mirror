@@ -41,14 +41,19 @@ fi
 if [ "${FORCE:-0}" != 1 ] && [ -f "$OUT" ] \
    && [ "$OUT" -nt python/epix/_epix.cc ] && [ "$OUT" -nt "$LIBEPIX" ]; then
     echo "up to date: $OUT (newer than _epix.cc and $LIBEPIX; set FORCE=1 to relink)"
-    exit 0
+else
+    # nanobind bundles tsl/robin_map under ext/robin_map/include (CMake adds it; we do too).
+    g++ -O2 -shared -fPIC -std=c++20 -fvisibility=hidden \
+        -I"$PYINC" -I"$NBINC" -I"$NBDIR/ext/robin_map/include" -I"$EPIX_INC" \
+        python/epix/_epix.cc "$NBSRC" \
+        "$LIBEPIX" -lm \
+        -o "$OUT"
+    echo "built $OUT"
 fi
 
-# nanobind bundles tsl/robin_map under ext/robin_map/include (CMake adds it; we do too).
-g++ -O2 -shared -fPIC -std=c++20 -fvisibility=hidden \
-    -I"$PYINC" -I"$NBINC" -I"$NBDIR/ext/robin_map/include" -I"$EPIX_INC" \
-    python/epix/_epix.cc "$NBSRC" \
-    "$LIBEPIX" -lm \
-    -o "$OUT"
-
-echo "built $OUT"
+# The type stub for the extension, written from the built module by nanobind's stubgen
+# (argument names and types as bound). It is committed, so a binding change shows up in
+# review; tools/check_stub.sh fails when the committed copy is stale. Regenerated on
+# every run, since a relink skipped above does not mean the stub is current.
+python3 -m nanobind.stubgen -q -m epix._epix -o python/epix/_epix.pyi
+echo "wrote python/epix/_epix.pyi"

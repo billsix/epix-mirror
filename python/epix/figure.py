@@ -29,7 +29,7 @@ import os
 import shutil
 import subprocess
 import tempfile
-from collections.abc import Sequence
+from collections.abc import Callable, Generator, Sequence
 from contextlib import contextmanager
 
 from . import _epix
@@ -61,25 +61,33 @@ class _Pending:
 
     figure: Figure | None = None
 
-    def _repr_png_(self):
+    def _repr_png_(self) -> bytes | None:
         return self.figure._repr_png_() if self.figure is not None else None
 
     @property
-    def png(self):
+    def png(self) -> bytes | None:
         return None if self.figure is None else self.figure.png
 
     @property
-    def eepic(self):
+    def eepic(self) -> str | None:
         return None if self.figure is None else self.figure.eepic
 
-    def save(self, path):
+    def save(self, path: str) -> None:
+        if self.figure is None:
+            raise RuntimeError(
+                "save() called inside the figure() block, before rendering"
+            )
         self.figure.save(path)
 
 
 @contextmanager
 def figure(
-    lower_left, upper_right, size, dpi: int = 150, background: str | None = None
-):
+    lower_left: _epix.Point,
+    upper_right: _epix.Point,
+    size: str,
+    dpi: int = 150,
+    background: str | None = None,
+) -> Generator[_Pending, None, None]:
     """Context manager: sets up the picture, captures + renders it on exit.
 
     Each figure starts from ePiX's startup state (``reset_state()``): no pen, fill,
@@ -144,7 +152,7 @@ def figure_around(
     margin: float = 0.18,
     dpi: int = 150,
     background: str | None = None,
-):
+) -> Generator[_Pending, None, None]:
     """:func:`figure`, with its box and size fitted to ``points``.
 
     The box and size come from :func:`fit_bounds`. Use it for figures drawn from values
@@ -174,7 +182,7 @@ def figure_around(
 
 
 @contextmanager
-def activated(screen):
+def activated(screen: _epix.Screen) -> Generator[_epix.Screen, None, None]:
     """Context manager: activate ``screen`` for the duration of a ``with`` block.
 
     ePiX's ``activate``/``deactivate`` bracket a run of drawing calls that should
@@ -200,11 +208,11 @@ def activated(screen):
 class Animation:
     """A rendered animation: a gif (shown inline in Jupyter) + the per-frame Figures."""
 
-    def __init__(self, gif: bytes, frames: list[Figure]):
+    def __init__(self, gif: bytes, frames: list[Figure]) -> None:
         self.gif = gif
         self.frames = frames
 
-    def _repr_html_(self):
+    def _repr_html_(self) -> str:
         b64 = base64.b64encode(self.gif).decode("ascii")
         return f'<img src="data:image/gif;base64,{b64}"/>'
 
@@ -213,7 +221,9 @@ class Animation:
             f.write(self.gif)
 
 
-def animate(build, count: int = 24, dpi: int = 100, delay: int = 8) -> Animation:
+def animate(
+    build: Callable[[], None], count: int = 24, dpi: int = 100, delay: int = 8
+) -> Animation:
     """Render an animation by calling ``build()`` once per frame.
 
     Mirrors ePiX's ``.flx`` model: frame ``i`` is rendered with the ``tix()``
