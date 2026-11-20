@@ -55,5 +55,8 @@ fi
 # (argument names and types as bound). It is committed, so a binding change shows up in
 # review; tools/check_stub.sh fails when the committed copy is stale. Regenerated on
 # every run, since a relink skipped above does not mean the stub is current.
-python3 -m nanobind.stubgen -q -m epix._epix -o python/epix/_epix.pyi
+# python/ goes on the path so the import finds the module just built, whether or not the
+# epix package is installed yet.
+PYTHONPATH="$PWD/python${PYTHONPATH:+:$PYTHONPATH}" \
+    python3 -m nanobind.stubgen -q -m epix._epix -o python/epix/_epix.pyi
 echo "wrote python/epix/_epix.pyi"

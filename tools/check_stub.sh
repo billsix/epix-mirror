@@ -16,7 +16,9 @@ export VIRTUAL_ENV_DISABLE_PROMPT=1
 scratch=$(mktemp --suffix=.pyi) || exit 2
 trap 'rm -f "$scratch"' EXIT
 
-if ! python3 -m nanobind.stubgen -q -m epix._epix -o "$scratch"; then
+# python/ on the path: compare against the tree here, installed epix or not.
+if ! PYTHONPATH="$PWD/python${PYTHONPATH:+:$PYTHONPATH}" \
+    python3 -m nanobind.stubgen -q -m epix._epix -o "$scratch"; then
     echo "check_stub: could not generate a stub from epix._epix (is the extension built? make py-ext)" >&2
     exit 2
 fi
