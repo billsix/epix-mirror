@@ -21,11 +21,6 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-
-def f(x: float, t: float) -> epix.Point:
-    return Point(x=x, y=epix.sin(x + t))
-
-
 R: epix.Domain = epix.Domain(
     lower_left=Point(x=0, y=0),
     upper_right=Point(x=1, y=1),
@@ -35,6 +30,10 @@ R: epix.Domain = epix.Domain(
 
 
 def build() -> None:
+
+    def f(x: float, t: float) -> epix.Point:
+        return Point(x=x, y=epix.sin(x + t))
+
     t = epix.tix()
     epix.picture(lower_left=Point(x=0, y=0), upper_right=Point(x=5, y=2), size="5x2in")
     epix.begin()

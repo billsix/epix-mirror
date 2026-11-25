@@ -43,17 +43,17 @@ alpha = slope - epix.deriv_eval(phi, beta)
 eps: float = 0.02  # size of extraction
 
 
-# a small perturbation to adjust the derivative
-def f(x: float) -> float:
-    return x / (1 + 16384 * x * x)
-
-
-def gn(x: float) -> float:
-    return f(alpha * (x - beta))
-
-
 # phi's Evil Twin
 def psi(x: float) -> float:
+
+    def gn(x: float) -> float:
+
+        # a small perturbation to adjust the derivative
+        def f(x: float) -> float:
+            return x / (1 + 16384 * x * x)
+
+        return f(alpha * (x - beta))
+
     return phi(x) + gn(x)
 
 

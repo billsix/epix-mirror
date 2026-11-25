@@ -44,29 +44,6 @@ du: float = 2.0 / n_merid
 dv: float = 4.0 / n_lat
 
 
-# parametrized surfaces
-def helicoid(u: float, v: float) -> epix.Point:
-    return Point(
-        math.sinh(v) * epix.cos(math.pi * u),
-        math.sinh(v) * epix.sin(math.pi * u),
-        2 * math.pi * u,
-    )
-
-
-def catenoid(u: float, v: float) -> epix.Point:
-    return Point(
-        x=math.cosh(v) * epix.sin(math.pi * u),
-        y=-math.cosh(v) * epix.cos(math.pi * u),
-        z=-v,
-    )
-
-
-def morph(u: float, v: float) -> epix.Point:
-    return epix.cos(2 * math.pi * epix.tix()) * helicoid(u, v) + epix.sin(
-        2 * math.pi * epix.tix()
-    ) * catenoid(u, v)
-
-
 # facet-like class with light reflection
 @dataclass
 class Element:
@@ -104,6 +81,28 @@ class Element:
 
 # %%
 def build() -> None:
+
+    def morph(u: float, v: float) -> epix.Point:
+
+        def catenoid(u: float, v: float) -> epix.Point:
+            return Point(
+                x=math.cosh(v) * epix.sin(math.pi * u),
+                y=-math.cosh(v) * epix.cos(math.pi * u),
+                z=-v,
+            )
+
+        # parametrized surfaces
+        def helicoid(u: float, v: float) -> epix.Point:
+            return Point(
+                math.sinh(v) * epix.cos(math.pi * u),
+                math.sinh(v) * epix.sin(math.pi * u),
+                2 * math.pi * u,
+            )
+
+        return epix.cos(2 * math.pi * epix.tix()) * helicoid(u, v) + epix.sin(
+            2 * math.pi * epix.tix()
+        ) * catenoid(u, v)
+
     MAX: int = 8
     epix.picture(
         lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="5x5in"

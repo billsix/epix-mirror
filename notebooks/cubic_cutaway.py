@@ -57,12 +57,12 @@ def fm(t: float) -> epix.Point:
     return Point(x=t, y=0, z=-math.sqrt(1 - t * t * t))
 
 
-# coloring
-def dens(d: float) -> float:
-    return 0.5 * (1 + math.tanh(d))
-
-
 def color(u: float, v: float) -> epix.Point:
+
+    # coloring
+    def dens(d: float) -> float:
+        return 0.5 * (1 + math.tanh(d))
+
     return Point(x=dens(v), y=0.2, z=1 - dens(v))
 
 

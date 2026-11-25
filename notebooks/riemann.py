@@ -21,15 +21,6 @@ from __future__ import annotations
 import epix
 from epix import Point
 
-
-def F(t: float, r: float, theta: float) -> epix.Point:
-    return Point(
-        r * r * epix.cos(2 * theta),
-        r * r * epix.cos(t) * epix.sin(2 * theta) + r * epix.sin(t) * epix.sin(theta),
-        r * epix.cos(theta),
-    )
-
-
 R: epix.Domain = epix.Domain(
     lower_left=Point(x=0, y=0, z=0),
     upper_right=Point(x=1, y=1.5, z=1),
@@ -39,6 +30,15 @@ R: epix.Domain = epix.Domain(
 
 
 def build() -> None:
+
+    def F(t: float, r: float, theta: float) -> epix.Point:
+        return Point(
+            r * r * epix.cos(2 * theta),
+            r * r * epix.cos(t) * epix.sin(2 * theta)
+            + r * epix.sin(t) * epix.sin(theta),
+            r * epix.cos(theta),
+        )
+
     t = epix.tix()
     R1: epix.Domain = R.slice1(t)
     epix.picture(

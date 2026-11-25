@@ -43,14 +43,14 @@ def line_style(arg: bool) -> None:
         epix.dashed()
 
 
-def base_color(col: bool, wid: int) -> None:
-    if col:
-        epix.base(epix.blue(1.2), width=wid)
-    else:
-        epix.base(epix.neutral(), width=wid)
-
-
 def base_pen(col: bool, wid: bool) -> None:
+
+    def base_color(col: bool, wid: int) -> None:
+        if col:
+            epix.base(epix.blue(1.2), width=wid)
+        else:
+            epix.base(epix.neutral(), width=wid)
+
     if wid:
         base_color(col, 4)
     else:

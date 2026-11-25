@@ -27,33 +27,29 @@ MAX: float = 2.5
 XMIN: int = -2
 
 
-def cubic(t: float) -> epix.Point:
-    return t * Point(x=1, y=t, z=t * t)
-
-
-def cubic12(t: float) -> epix.Point:
-    pt: epix.Point = cubic(t)
-    return Point(x=pt.x1(), y=pt.x2(), z=XMIN)
-
-
-def cubic13(t: float) -> epix.Point:
-    pt: epix.Point = cubic(t)
-    return Point(x=pt.x1(), y=XMIN, z=pt.x3())
-
-
-def cubic23(t: float) -> epix.Point:
-    pt: epix.Point = cubic(t)
-    return Point(x=XMIN, y=pt.x2(), z=pt.x3())
-
-
-def bars(
-    curve1: Callable[[float], epix.Point], curve2: Callable[[float], epix.Point]
-) -> None:
-    for i in range(21):
-        epix.line(tail=curve1(-1 + 0.1 * i), head=curve2(-1 + 0.1 * i))
-
-
 def draw_frame() -> None:
+
+    def bars(
+        curve1: Callable[[float], epix.Point], curve2: Callable[[float], epix.Point]
+    ) -> None:
+        for i in range(21):
+            epix.line(tail=curve1(-1 + 0.1 * i), head=curve2(-1 + 0.1 * i))
+
+    def cubic(t: float) -> epix.Point:
+        return t * Point(x=1, y=t, z=t * t)
+
+    def cubic23(t: float) -> epix.Point:
+        pt: epix.Point = cubic(t)
+        return Point(x=XMIN, y=pt.x2(), z=pt.x3())
+
+    def cubic13(t: float) -> epix.Point:
+        pt: epix.Point = cubic(t)
+        return Point(x=pt.x1(), y=XMIN, z=pt.x3())
+
+    def cubic12(t: float) -> epix.Point:
+        pt: epix.Point = cubic(t)
+        return Point(x=pt.x1(), y=pt.x2(), z=XMIN)
+
     epix.set_blue()
     epix.bbold()
     epix.plot(cubic13, -1, 1, n=60)

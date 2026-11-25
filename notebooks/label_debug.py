@@ -45,14 +45,14 @@ def label_mask(arg: bool) -> None:
         epix.label_mask(epix.neutral())
 
 
-def set_border(col: bool, length: str) -> None:
-    if col:
-        epix.label_border(epix.blue(1.2), length)
-    else:
-        epix.label_border(epix.neutral(), length)
-
-
 def label_border(col: bool, wid: bool) -> None:
+
+    def set_border(col: bool, length: str) -> None:
+        if col:
+            epix.label_border(epix.blue(1.2), length)
+        else:
+            epix.label_border(epix.neutral(), length)
+
     if wid:
         set_border(col, "1pt")
     else:

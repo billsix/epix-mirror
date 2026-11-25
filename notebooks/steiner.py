@@ -25,18 +25,17 @@ MAX: float = 2.5
 rad: float = 0.8 * MAX
 
 
-def F(u: float, v: float) -> epix.Point:
-    x: float = rad * epix.cos(u) * epix.cos(v)
-    y: float = rad * epix.cos(u) * epix.sin(v)
-    z: float = rad * epix.sin(u)
-    return Point(x=y * z, y=x * z, z=x * y)
-
-
-def color(x: float, y: float) -> epix.Point:
-    return Point(x=1, y=1, z=1)  # white (COLORSHADE off)
-
-
 def build() -> None:
+
+    def color(x: float, y: float) -> epix.Point:
+        return Point(x=1, y=1, z=1)  # white (COLORSHADE off)
+
+    def F(u: float, v: float) -> epix.Point:
+        x: float = rad * epix.cos(u) * epix.cos(v)
+        y: float = rad * epix.cos(u) * epix.sin(v)
+        z: float = rad * epix.sin(u)
+        return Point(x=y * z, y=x * z, z=x * y)
+
     t = epix.tix()
     epix.picture(
         lower_left=Point(x=-MAX, y=-MAX), upper_right=Point(x=MAX, y=MAX), size="4x4in"

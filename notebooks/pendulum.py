@@ -31,15 +31,14 @@ ell: int = 3
 K: float = -epix.cos(theta0)
 
 
-def F(u: float, v: float) -> epix.Point:
-    return Point(x=v, y=-epix.sin(u))
-
-
-def f(t: float) -> float:
-    return 1.0 / sqrt(2 * (K + epix.cos(t)))
-
-
 def build() -> None:
+
+    def f(t: float) -> float:
+        return 1.0 / sqrt(2 * (K + epix.cos(t)))
+
+    def F(u: float, v: float) -> epix.Point:
+        return Point(x=v, y=-epix.sin(u))
+
     t = epix.tix()
     epix.picture(
         lower_left=Point(x=-6.5, y=-2.5),
