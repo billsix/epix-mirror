@@ -52,21 +52,21 @@ circles: list[epix.Circle] = [
 ]
 
 
-# bold circle if facing camera, otherwise plain
-def sphere_draw(C: epix.Circle) -> None:
-    if (C.center() | epix.camera.viewpt()) >= 0:
-        epix.bold()
-    else:
-        epix.plain()
-    C.draw()
-
-
-def icosa() -> None:
-    for C in circles:
-        sphere_draw(C)
-
-
 def build() -> None:
+
+    def icosa() -> None:
+
+        # bold circle if facing camera, otherwise plain
+        def sphere_draw(C: epix.Circle) -> None:
+            if (C.center() | epix.camera.viewpt()) >= 0:
+                epix.bold()
+            else:
+                epix.plain()
+            C.draw()
+
+        for C in circles:
+            sphere_draw(C)
+
     epix.picture(
         lower_left=Point(x=-2, y=-2), upper_right=Point(x=2, y=2), size="6x6in"
     )

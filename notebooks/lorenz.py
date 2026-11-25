@@ -30,10 +30,6 @@ XMAX: int = 50
 TMAX: int = 2000
 
 
-def F(x: float, y: float, z: float) -> epix.Point:
-    return 0.01 * Point(x=sigma * (y - x), y=x * (rho - z) - y, z=x * y - beta * z)
-
-
 R: epix.Domain = epix.Domain(
     lower_left=Point(x=-MAX, y=-MAX, z=0),
     upper_right=Point(x=MAX, y=MAX, z=2 * MAX),
@@ -42,6 +38,10 @@ R: epix.Domain = epix.Domain(
 
 
 def draw_frame() -> None:
+
+    def F(x: float, y: float, z: float) -> epix.Point:
+        return 0.01 * Point(x=sigma * (y - x), y=x * (rho - z) - y, z=x * y - beta * z)
+
     epix.dart_field(F, R.resize1(0, MAX), scale=0.5)
     epix.bold(epix.red())
     epix.ode_plot(F, Point(x=10, y=0, z=0), 0, TMAX, n=TMAX)

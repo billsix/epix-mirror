@@ -39,11 +39,11 @@ r_0: float = 0.95  # minor radius
 R_0: int = 2  # major radius
 
 
-def g(u: float) -> float:
-    return R_0 + r_0 * epix.cos(u)
-
-
 def F(u: float, v: float) -> epix.Point:
+
+    def g(u: float) -> float:
+        return R_0 + r_0 * epix.cos(u)
+
     return epix.polar(radius=g(u), theta=v) + Point(x=0, y=0, z=r_0 * epix.sin(u))
 
 

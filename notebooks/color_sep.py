@@ -25,17 +25,6 @@ import math
 import epix
 from epix import Point
 
-
-# re cos(u+iv)
-def f(u: float, v: float) -> epix.Point:
-    return Point(x=u, y=v, z=2 * math.cosh(u) * epix.cos(v))
-
-
-# RGB densities
-def color(x: float, y: float, z: float) -> epix.Point:
-    return Point(x=epix.sin(x), y=-epix.sin(y), z=-epix.sin(x))
-
-
 R: epix.Domain = epix.Domain(
     lower_left=Point(x=-1, y=-1),
     upper_right=Point(x=1, y=1),
@@ -48,6 +37,15 @@ R: epix.Domain = epix.Domain(
 # different CMYK output filter and inset at column x.  `process=None` keeps the
 # camera's current filter (the cmyk_neutral set below) for the full-color image.
 def separation(process: epix.Color | None, x: int) -> None:
+
+    # RGB densities
+    def color(x: float, y: float, z: float) -> epix.Point:
+        return Point(x=epix.sin(x), y=-epix.sin(y), z=-epix.sin(x))
+
+    # re cos(u+iv)
+    def f(u: float, v: float) -> epix.Point:
+        return Point(x=u, y=v, z=2 * math.cosh(u) * epix.cos(v))
+
     panel: epix.Screen = epix.Screen(
         lower_left=Point(x=-1.5, y=0.5), upper_right=Point(x=1.5, y=3.5)
     )

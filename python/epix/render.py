@@ -89,39 +89,6 @@ class Figure:
             f.write(self.png)
 
 
-def _eps_to_png(eps: str, png: str, dpi: int) -> None:
-    subprocess.run(
-        [
-            "gs",
-            "-q",
-            "-dSAFER",
-            "-dNOPAUSE",
-            "-dBATCH",
-            "-dEPSCrop",
-            "-sDEVICE=pngalpha",
-            f"-r{dpi}",
-            f"-sOutputFile={png}",
-            eps,
-        ],
-        check=True,
-        capture_output=True,
-    )
-
-
-def _flatten(png: str, background: str) -> None:
-    """Flatten ``png`` in place onto the opaque colour ``background`` (ImageMagick)."""
-    magick: str | None = shutil.which("magick") or shutil.which("convert")
-    if magick is None:
-        raise FileNotFoundError(
-            "ImageMagick (magick/convert) is needed for a background"
-        )
-    subprocess.run(
-        [magick, png, "-background", background, "-flatten", png],
-        check=True,
-        capture_output=True,
-    )
-
-
 def _render_via_elaps(
     src_path: str, dpi: int, background: str | None = None
 ) -> tuple[bytes, str | None]:
@@ -130,6 +97,38 @@ def _render_via_elaps(
     With a ``background`` colour the PNG is flattened onto it, else it stays
     transparent.
     """
+
+    def _flatten(png: str, background: str) -> None:
+        """Flatten ``png`` in place onto opaque ``background`` (ImageMagick)."""
+        magick: str | None = shutil.which("magick") or shutil.which("convert")
+        if magick is None:
+            raise FileNotFoundError(
+                "ImageMagick (magick/convert) is needed for a background"
+            )
+        subprocess.run(
+            [magick, png, "-background", background, "-flatten", png],
+            check=True,
+            capture_output=True,
+        )
+
+    def _eps_to_png(eps: str, png: str, dpi: int) -> None:
+        subprocess.run(
+            [
+                "gs",
+                "-q",
+                "-dSAFER",
+                "-dNOPAUSE",
+                "-dBATCH",
+                "-dEPSCrop",
+                "-sDEVICE=pngalpha",
+                f"-r{dpi}",
+                f"-sOutputFile={png}",
+                eps,
+            ],
+            check=True,
+            capture_output=True,
+        )
+
     src_path = os.path.abspath(src_path)
     name: str = os.path.basename(src_path)
     with tempfile.TemporaryDirectory() as d:

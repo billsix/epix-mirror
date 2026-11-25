@@ -22,13 +22,13 @@ import epix
 from epix import Point
 
 
-def f(x: float, y: float) -> epix.Point:
-    z: epix.Pair = epix.Pair(x, y)
-    z_squared: epix.Pair = z * z
-    return Point(x=z_squared.x1(), y=z_squared.x2(), z=x)
-
-
 def F(r: float, t: float) -> epix.Point:
+
+    def f(x: float, y: float) -> epix.Point:
+        z: epix.Pair = epix.Pair(x, y)
+        z_squared: epix.Pair = z * z
+        return Point(x=z_squared.x1(), y=z_squared.x2(), z=x)
+
     return f(r * epix.cos(t), r * epix.sin(t))
 
 

@@ -141,8 +141,12 @@ def fit_bounds(
     upper_right: _epix.Point = _epix.Point(x=max(xs) + pad_x, y=max(ys) + pad_y)
     box_width: float = upper_right.x1() - lower_left.x1()
     box_height: float = upper_right.x2() - lower_left.x2()
-    size: str = f"{width:.2f}x{width * box_height / box_width:.2f}in"
-    return lower_left, upper_right, size
+    # the physical size, in inches, keeps the box's aspect ratio
+    return (
+        lower_left,
+        upper_right,
+        f"{width:.2f}x{width * box_height / box_width:.2f}in",
+    )
 
 
 @contextmanager

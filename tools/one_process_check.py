@@ -38,42 +38,42 @@ NOTEBOOKS: pathlib.Path = REPO / "notebooks"
 SKIP: frozenset[str] = frozenset({"hello"})
 
 
-def strip(text: str) -> str:
-    """Drop the lines that carry run-specific text (timestamps, generator name)."""
-    return "\n".join(
-        line
-        for line in text.splitlines()
-        if "Generated" not in line and "Automatically" not in line
-    )
-
-
-def eepics(name: str) -> list[str]:
-    """Execute notebooks/NAME.py in this process and return its eepic text(s)."""
-    import epix
-
-    source: str = (NOTEBOOKS / f"{name}.py").read_text()
-    if "epix.figure(" not in source:
-        epix.reset_state()
-    # A real module registered in sys.modules: dataclasses (and anything else that
-    # resolves a class's module) looks the notebook up there.
-    module: types.ModuleType = types.ModuleType(f"notebook_{name}")
-    sys.modules[module.__name__] = module
-    # Running the notebook as Python is the point (as build-aux/verify_ports.py does).
-    exec(compile(source, f"{name}.py", "exec"), module.__dict__)  # noqa: S102
-    result: object = module.__dict__.get("fig") or module.__dict__.get("anim")
-    match result:
-        case None:
-            raise RuntimeError(f"{name}: notebook defined neither `fig` nor `anim`")
-        case epix.Animation() as anim:
-            return [strip(frame.eepic) for frame in anim.frames]
-        case figure:
-            return [strip(figure.eepic)]
-
-
 SEPARATOR: str = "\n=====FRAME=====\n"
 
 
 def main() -> int:
+
+    def eepics(name: str) -> list[str]:
+        """Execute notebooks/NAME.py in this process and return its eepic text(s)."""
+
+        def strip(text: str) -> str:
+            """Drop the lines with run-specific text (timestamps, generator name)."""
+            return "\n".join(
+                line
+                for line in text.splitlines()
+                if "Generated" not in line and "Automatically" not in line
+            )
+
+        import epix
+
+        source: str = (NOTEBOOKS / f"{name}.py").read_text()
+        if "epix.figure(" not in source:
+            epix.reset_state()
+        # A real module registered in sys.modules: dataclasses (and anything else that
+        # resolves a class's module) looks the notebook up there.
+        module: types.ModuleType = types.ModuleType(f"notebook_{name}")
+        sys.modules[module.__name__] = module
+        # Run the notebook as Python, as build-aux/verify_ports.py does.
+        exec(compile(source, f"{name}.py", "exec"), module.__dict__)  # noqa: S102
+        result: object = module.__dict__.get("fig") or module.__dict__.get("anim")
+        match result:
+            case None:
+                raise RuntimeError(f"{name}: notebook defined neither `fig` nor `anim`")
+            case epix.Animation() as anim:
+                return [strip(frame.eepic) for frame in anim.frames]
+            case figure:
+                return [strip(figure.eepic)]
+
     match sys.argv[1:]:
         case ["fresh", name]:
             sys.stdout.write(SEPARATOR.join(eepics(name)))

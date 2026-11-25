@@ -26,15 +26,15 @@ from epix import Point
 MAX: int = 18
 
 
-def ripple(u: float, v: float) -> float:
-    return pow(epix.cos(0.5 * sqrt(u * u + v * v)), 2)
-
-
-def f(u: float, v: float) -> float:
-    return 0.25 * (1 + ripple(u, v - 10) + ripple(u, v + 10))
-
-
 def F(u: float, v: float) -> epix.Point:
+
+    def f(u: float, v: float) -> float:
+
+        def ripple(u: float, v: float) -> float:
+            return pow(epix.cos(0.5 * sqrt(u * u + v * v)), 2)
+
+        return 0.25 * (1 + ripple(u, v - 10) + ripple(u, v + 10))
+
     return Point(x=u, y=v, z=f(u, v))
 
 

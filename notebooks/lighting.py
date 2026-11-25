@@ -32,16 +32,6 @@ N1: int = 36
 N2: int = 12
 
 
-# torus
-def F(x: float, y: float) -> epix.Point:
-    R: float = 5 - 2 * epix.sin(math.pi * y / N2)
-    return Point(
-        R * epix.cos(2 * math.pi * x / N1),
-        R * epix.sin(2 * math.pi * x / N1),
-        2 * epix.cos(math.pi * y / N2),
-    )
-
-
 # --- lighting.h, reimplemented ---
 @dataclass
 class Spot:
@@ -113,6 +103,16 @@ class Chip:
 
 # %%
 def build() -> None:
+
+    # torus
+    def F(x: float, y: float) -> epix.Point:
+        R: float = 5 - 2 * epix.sin(math.pi * y / N2)
+        return Point(
+            R * epix.cos(2 * math.pi * x / N1),
+            R * epix.sin(2 * math.pi * x / N1),
+            2 * epix.cos(math.pi * y / N2),
+        )
+
     epix.picture(
         lower_left=Point(x=-10, y=-10), upper_right=Point(x=10, y=10), size="4x4in"
     )

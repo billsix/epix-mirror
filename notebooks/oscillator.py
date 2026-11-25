@@ -25,11 +25,11 @@ import epix
 from epix import Point
 
 
-def f(t: float, a: float) -> float:
-    return 2 * exp(-0.5 * t) * epix.sin(a * t)
-
-
 def f1(t: float) -> float:
+
+    def f(t: float, a: float) -> float:
+        return 2 * exp(-0.5 * t) * epix.sin(a * t)
+
     return f(t, 2)
 
 

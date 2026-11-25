@@ -29,18 +29,6 @@ from epix import Point
 origin: epix.Point = Point(x=0, y=0, z=0)
 
 
-def circ(t: float) -> None:
-    if math.isnan(t):  # fallback, doesn't fill properly
-        epix.line(tail=Point(x=-2, y=0), head=Point(x=2, y=0))
-    else:
-        epix.circle(center=Point(x=0, y=t), radius=math.sqrt(1 + t * t))
-
-
-def f(u: float, v: float) -> epix.Point:
-    sph_point: epix.Point = epix.sph(radius=1, theta=u, phi=v)
-    return Point(x=sph_point.x3(), y=sph_point.x1(), z=sph_point.x2())
-
-
 R: epix.Domain = epix.Domain(
     lower_left=Point(x=0, y=-math.pi / 2),
     upper_right=Point(x=4 * math.pi, y=math.pi / 2),
@@ -50,6 +38,17 @@ R: epix.Domain = epix.Domain(
 
 # %%
 def build() -> None:
+
+    def f(u: float, v: float) -> epix.Point:
+        sph_point: epix.Point = epix.sph(radius=1, theta=u, phi=v)
+        return Point(x=sph_point.x3(), y=sph_point.x1(), z=sph_point.x2())
+
+    def circ(t: float) -> None:
+        if math.isnan(t):  # fallback, doesn't fill properly
+            epix.line(tail=Point(x=-2, y=0), head=Point(x=2, y=0))
+        else:
+            epix.circle(center=Point(x=0, y=t), radius=math.sqrt(1 + t * t))
+
     epix.picture(
         lower_left=Point(x=-2, y=-2), upper_right=Point(x=2, y=2), size="6 x 6in"
     )

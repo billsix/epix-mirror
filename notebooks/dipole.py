@@ -30,11 +30,11 @@ Q1: epix.Point = Point(x=1, y=0)
 Q2: epix.Point = Point(x=-1, y=0)
 
 
-def unit_charge(arg: epix.Point) -> epix.Point:
-    return epix.recip(arg.dot(arg)) * arg
-
-
 def E(x: float, y: float) -> epix.Point:
+
+    def unit_charge(arg: epix.Point) -> epix.Point:
+        return epix.recip(arg.dot(arg)) * arg
+
     temp: epix.Point = Point(x=x, y=y)
     e: epix.Point = charge1 * unit_charge(temp - Q1) + charge2 * unit_charge(temp - Q2)
     return (1.0 / e.dot(e)) * e
