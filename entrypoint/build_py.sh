@@ -14,7 +14,6 @@ cd /epix
 PYINC=$(python3 -c 'import sysconfig; print(sysconfig.get_path("include"))')
 NBDIR=$(python3 -c 'import nanobind, os; print(os.path.dirname(nanobind.__file__))')
 NBINC=$(python3 -c 'import nanobind; print(nanobind.include_dir())')
-NBSRC="$NBDIR/src/nb_combined.cpp"
 EXT=$(python3 -c 'import sysconfig; print(sysconfig.get_config_var("EXT_SUFFIX"))')
 
 OUT="python/epix/_epix${EXT}"
@@ -45,7 +44,7 @@ else
     # nanobind bundles tsl/robin_map under ext/robin_map/include (CMake adds it; we do too).
     g++ -O2 -shared -fPIC -std=c++20 -fvisibility=hidden \
         -I"$PYINC" -I"$NBINC" -I"$NBDIR/ext/robin_map/include" -I"$EPIX_INC" \
-        python/epix/_epix.cc "$NBSRC" \
+        python/epix/_epix.cc "$NBDIR/src/nb_combined.cpp" \
         "$LIBEPIX" -lm \
         -o "$OUT"
     echo "built $OUT"
